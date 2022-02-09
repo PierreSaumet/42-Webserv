@@ -1,0 +1,370 @@
+/*
+**	htons()	/	htonl()	/	ntohs()	/	ntohl()
+*/
+//	Description
+Permet de rendre notre code portable entre les differents d'ordinateurs / machines, afin d'assurer la compatibilite avec l'ordre reseau.
+Effectivement, chaque machine utilise un gestion de l'orbre des bytes qui leur est propre
+
+htons() Host to Network Short integer, convertit un entier court du format interne au format réseau.	// 16 bitss
+ntohs() Network to Host Short integer, convertit un entier court du format réseau au format interne.	// 16 bits
+
+htonl() Host to Network Long integer, convertit un entier long du format interne au format réseau.		// 32 bits
+ntohl() Network to Host Lont integer, convertit un entier long du format réseau au format interne.		// 32 bits
+
+A utiliser a chaque fois avant d'ecrire dans un socket ou apres avoir lu un socket!
+
+
+// Code
+exemple : 
+
+i = htonl(i);							-> on convertit notre entier i
+write_data(s, &i, sizeof(i))			-> on ecrit notre entier dans le socket
+
+read_data(s, &i, sizeof(i))				-> on lit notre socket
+i = ntohl(i)							-> on reconvertit notre entier i
+
+Supposons que vous vouliez transmettre un entier codée sur 4 octets à un autre ordinateur de manière portable. Il va falloir décomposer l'entier en 4 parties et envoyer chaque octet un à un.
+De même pour la réception sauf qu'il va juste falloir faire l'opération inverse.
+
+void send4(int sock, unsigned long data)
+{
+    // Tableau d'octet qui sera ensuite envoyé
+    char dataSend[4];
+    
+    // On décompose l'entier 'data' de 4 octets en 4 parties de 1 octet
+    dataSend[0] = (data >> 24) & 0xFF;  // On sélectionne l'octet de poids fort de 'data' que l'on met dans la première case du tableau d'octet 'dataSend'
+    dataSend[1] = (data >> 16) & 0xFF;  // De même avec l'octet qui suit
+    dataSend[2] = (data >> 8) & 0xFF;   // De même avec l'octet qui suit
+    dataSend[3] = (data >> 0) & 0xFF;   // On sélectionne l'octet de poids faible de 'data' que l'on met dans la dernière case du tableau d'octet 'dataSend'
+
+    // On envoi les 4 octets dans un ordre qui ne change jamais quelque soit la machine
+    send(sock, dataSend, 4, 0);
+}
+void read4(int sock, unsigned long* data)
+{
+    char dataRecv[4];
+    
+    // On reçoit une suite de 4 octets, le premier octet reçu est toujours l'octet de poids fort
+    recv(sock, dataRecv, 4, 0);
+    
+    // On rassemble les 4 octets séparé en une seul variable de 4 octets
+    unsigned long temp = 0;
+    temp |= dataRecv[0] << 24;
+    temp |= dataRecv[1] << 16;
+    temp |= dataRecv[2] << 8;
+    temp |= dataRecv[3] << 0;
+    
+    // On fini par copier le résultat dans 'data'
+    *data = temp;
+}
+
+CE QUI DONNE :
+
+void send4(int sock, unsigned long data)
+{
+    // On convertit data en entier big-endian
+    long dataSend = htonl(data);
+    
+    // On envoie l'entier convertit
+    send(sock, (char*)&dataSend, 4, 0);
+}
+
+void read4(int sock, unsigned long* data)
+{
+    long dataRecv;
+    
+    // On récupère l'entier en big-endian
+    recv(sock, (char*)&dataRecv, 4, 0);
+    
+    // On convertit l'entier récupéré en little-endian si l'ordinateur 
+    // stock les entiers en mémoire en little-endian, sinon s'il les 
+    // stock en big-endian l'entier est convertit en big-endian
+    *data = ntohl(dataRecv);
+}
+
+
+// Ressources
+man htons ou n'importe quoi
+http://www.linux-france.org/article/devl/sockets/sockets-5.html
+https://www.it-swarm-fr.com/fr/c/fonction-htons-dans-la-programmation-de-socket/1041814637/
+https://cpp.hotexamples.com/examples/-/-/htons/cpp-htons-function-examples.html
+http://sdz.tdct.org/sdz/les-sockets.html
+
+/*
+**	select()	/	poll()	/	epoll()	/	kqueue
+*/
+Ces fonctions permettent d'attendre des evenements, un changement d'etat dans les descripteurs (fd).
+* select() retourne le nbr de descripteurs si ca fonctionne, si timeout retourne 0 ou si aucun socket est pret et error == -1.
+fonction vieille mais efficace. Possede une limite de descripteurs == 1024.
+Parametre de select : int fd = identifiant du descripteur le + eleve + 1, readfds* pointeur sur tous les sockets a lire,
+writefd* pointeur sur tous les sockets a ecrire,  exceptfd* pointeur sur tous les sockets a verifier l'erreur
+Attention select peut "bloquer" mais est plus portable ( plus utilise)
+
+* poll() n'utilise pas les trois masques comme select() mais un pointeur de structure .
+struct pollfd {
+	int fd;				// file descriptor
+	short events; 		// requested events
+	short revents;		// returned events
+};	// tableau a allouer donc pas de limite fondamentale
+poll() est plus efficace sur les grandes tailles de descripteurs car on peut toujours reutiliser la meme structure.
+retourne -1 si erreur, 0 si timeout et un nombre positif si des revents sont disponibles.
+
+Le probleme de select et poll, si on veut ajouter un socket on doit l'ajouter au set existant et re call select() ou poll()
+
+* epoll()
+Utilisable seulement avec linux. C'est la fonction la plus recente et donc la plus rapide.
+On recupere une structure avec seulement les events actifs pas en "wait"
+
+
+* kqueue() pour MAC donc balec' # thug life
+// Ressources
+man2 select
+http://sdz.tdct.org/sdz/les-sockets.html
+https://bousk.developpez.com/cours/reseau-c++/TCP/05-envoi-reception-serveur/
+https://bousk.developpez.com/cours/reseau-c++/TCP/05-envoi-reception-serveur/#LIII-B-1
+https://www.blaess.fr/christophe/2013/12/27/comprendre-le-fonctionnement-de-select/
+https://daniel.haxx.se/docs/poll-vs-select.html
+https://suchprogramming.com/epoll-in-3-easy-steps/
+https://ichi.pro/fr/la-methode-de-la-folie-d-epoll-239499560322626
+
+/*
+**	socket()
+*/
+* Socket cree un endpoint de communication et retourne un socket descriptor.
+int socket(int domain, int type, int protocol)
+	domain = 	famille du protocole utilisee (AF_IFNET = tcp/ip, AF_IFNET6, AF_UNIX == unix en local ou AF_RAW)
+	type =		le type de socket cree (SOCK_STREAM == tcp/ip, SOCK_DGRAM == udp/ip, SOCK_RAW)
+	protocol = 	le protocol demande ( 0, IPPROTO_UDP, IPPROTO_CTP)
+
+Returne un entier positif si ca marche et -1 si erreur.
+attention on ne peut pas utiliser close pour le fd du socket ?
+Socket s'utilise avec une structure de type SOCKADDR_IN, qui permet de configurer la connexion
+
+// Code
+int my_socket = socket(AF_IFNET, SOCK_STREAM, 0);		// permet une connection stream socket in Internet
+
+struct sockaddr_in {
+
+	short			sin_family;			// eqgual q AF_INET ou autre
+	unsigned short	sin_port;			//	= a la valeur retourne par htons
+	struct in_addr	sin_addr;			// structure qui contient une valeur (s_addr) = adresse ip 127.0.0.1	si INADDR_ANY = on ecoute sur tout kek
+	char			sin_zero[8];		// pas utilise? 
+
+}
+
+sockaddr_in		test;
+test.sin_addr.s_addr = htonl(addresse ip lol);
+test.sin_family = AF_IFNET;
+test.sin_port = htons( peck lol ;p);
+
+// ressources
+https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-socket-create-socket#socket
+https://broux.developpez.com/articles/c/sockets/
+http://sdz.tdct.org/sdz/les-sockets.html
+
+
+/*
+**	bind()
+*/
+* bind permet d'associer au socket les informations requises. On va ssigner une adresse locale au socket
+Bind est aussi et principalement utilise cote server ( a la difference de connect() qui lui est cote client surtout)
+int bind( int socket, const struct sockaddr* addr, socklen_t addrlen);
+	socket = le socket cree avec la fonction socket()
+	addr = pointeur sur la structure sockaddr du server ( vu au dessus )
+	addrlen = la taille memoire occupe par l'addressage du server. Utiliser sizeof().
+Retourne 0 si ca marche et -1 si erreur avec differentes erreurs possibles (EBADF ...)
+
+// code
+int my_socket = socket(...);
+
+int res = bind(my_socket, (sockaddr *)&test, sizeof(test));
+
+* avec socket et bind :
+*	on a cree un socket et on lui a donne toutes les informations qu'on voulait. il faut ensuite le mettre dans un etat d;ecoute.
+
+// ressources
+https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-bind-bind-name-socket#bind
+https://broux.developpez.com/articles/c/sockets/
+http://sdz.tdct.org/sdz/les-sockets.html
+
+
+/*
+**	listen()
+*/
+* listen permet de mettre le socket en ecoute c'est a dire d'etablir la connexion.
+int listen( int socket, int backlog)
+	socket = le fameux socket a utiliser
+	backlog = le nbr max de connexion pourvant etre en attente ( FTP = 5 ) ou SOMAXCONN = le systemen choisi le nbr en fonction de la config
+
+Il faut utiliser bind puis listen ensuite. 
+A utiliser avec accept.
+Retourne 0 si Ok et -1 si erreur ( remplit errno)
+
+// code 
+int my_socket = socket( blablabla );
+
+int my_list = listen( my_socket, 5);
+
+//	ressources
+		comme au dessus.
+
+/*
+** accept()
+*/
+*	accept permet la connexion d'un socket sur un socket lie avec bind()
+		permet la connexion entre un client et le server
+int accept( int socket, struct sockaddr* addr, socklen_t *addrlen)
+	socket = le fameux socket qu'on se traine depuis des lustres
+	addr = pointer sur le context d'usage = la structure
+	addrlen = different de bind, il faut creer une varaible de type socklen_t qui est egal a l'addressage du client.
+
+Retourne 0 si ca marche et -1 si erreur
+Attention fonction bloquante, need un client pour que ca se termine
+
+// code
+socklen_t socket_size = sizeof(cisn)  == cisn = la structure sockaddr*
+int return_accept = accept(sock , (sockaddr*)& cisn, &socket_size)
+
+	autre exemple:
+
+	int clientsocket;
+	int s;
+	struct sockaddr clientaddress;
+	int address_len;
+	int accept(int s, struct sockaddr *addr, int *address_len);
+	/* socket(), bind(), and listen() 
+	have been called */
+	/* EXAMPLE 1: I want the address now */
+	address_len = sizeof(clientaddress);
+	clientsocket = accept(s, &clientaddress, &address_len);
+	/* EXAMPLE 2: I can get the address later using getpeername() */
+	clientsocket = accept(s, (struct sockaddr *) 0, 
+	(int *) 0);
+
+// ressources
+https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-accept-accept-new-connection-socket#accept
++ au dessus
+
+
+/*
+**	connect()
+/*
+* connect() est a utilise cote client, et connect le socket a l'addresse specifiee.
+Du coup je pense pas qu'on va en avoir besoin sauf pour faire des tests.
+
+int connect( int socket, struct sockadd *addr, socklen_t addrlen)
+	socket = le socket client
+	addr = addresse de l'hote a contacter
+	addrlen = sizeof du truct
+
+/// code
+pas d'example c'est toujours pareil
+
+// ressources
+https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-connect-connect-socket#connect
++ au dessus
+
+
+/*
+**	send() et recv()
+*/
+*	send permet d'envoyer des donnees et recv de les recevoir
+Les deux fonctions permettent de transmettre des chaines de caracteres.
+int send(int socket, void* buffer, size_t len, int flags)
+	// socket = le socket qui va recevoir le message
+	//	buffer = pointer = tableau avec les infos
+	//	len = la taille, le nbr d'octet a lire
+	// flags = le type d'envoie souvent = a 0
+
+	send c'est un peu comme un write!
+retourne le nbr d'octets envoye ou socket_error = -1
+
+int recv( int s, void *buffer, int len , int flags)
+	// pareil que sed
+recv est une fonction non bloquante
+
+Apparemment il y a pas trop d'ordre, les deux peuvent etre utilise l'un avant l'autre
+Par contre si on veut envoyer des sturctures c'est plus complique 
+
+// ressources
+toujours pareil
+
+/*
+**	inet_addr()
+*/
+* inet_addr permet de convertir une string qui represente une address ipv4
+par exemple, inet_addr(127.0.0.1)
+fonction pas utilise dans notre programme car, on est cense l'utiliser lors du parametrage de la stucture du socket.
+or chez nous on va l'avoir avec htonl et compagnie.
+De plus le man dit qu'il faut l'eviter KEk
+
+// ressources
+http://sdz.tdct.org/sdz/les-sockets.html
+man inet_addr
+
+
+/*
+**	setsockopt()	/	getsockname()
+* setsockopt permet de modifier le comportement d'un socket ou d'arreter/ allumner l'algo de Nagle
+Il est souvent utiliser poiur ne par permettre de temps mort (emviron 10sec) lorsqu'il y a un lien de socket
+
+retourne 0 si ok et -1 si erreur
+
+// code
+int val = 1;
+int rc = setsockopt(int s, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) = val = 1 donc pas de temps morts et relance directment
+
+* getsockname est utilise si on a perdu le non du socket.
+technquement on ne devrait pas en avoir besoin lol 
+et je crois au'il faut l'utiliser avec getpeername et on a as le droit ? 
+
+// ressources
+https://linux.die.net/man/2/setsockopt
+https://askcodez.com/utilisation-appropriee-de-getsockopt-et-setsockopt-pour-so_rcvtimeo-et-so_sndtimeo.html
+https://www.irif.fr/~jch/enseignement/sockets.pdf
+http://www.man-linux-magique.net/man2/getsockname.html
+https://man7.org/linux/man-pages/man2/getsockname.2.html
+
+
+/*
+**	fcntl()
+*/	
+* fcntl() permet de modifier un file descriptor.
+int fcntl(int socket, int cmd, ... /* arg */);
+	// socket = le socket utilise
+	// et apres les commandes...
+
+fcntl(socket , F_SETFL, O_NONBLOCK);
+= change le status en non bloquand
+
+// code
+int s;
+int rc;
+int flags;
+⋮
+⁄* Place the socket into nonblocking mode *⁄
+rc = fcntl(s, F_SETFL, O_NDELAY);
+ 
+⁄* See if asynchronous notification is set *⁄
+flags = fcntl(s, F_GETFL, 0);
+if (flags & O_NDELAY)
+   ⁄* it is set *⁄
+else
+   ⁄* it is not *⁄
+
+// ressources
+https://www.ibm.com/docs/en/zvse/6.2?topic=SSB27H_6.2.0/fa2ti_call_fcntl.html
+http://manpagesfr.free.fr/man/man2/fcntl.2.html
+http://manpagesfr.free.fr/man/man2/fcntl.2.html
+
+*/
+/*
+**	Documentation autres
+*/
+https://www.tutorialspoint.com/unix_sockets/index.htm		// explication generale d'un systeme de communication avec socket
+https://www.ibm.com/docs/en/i/7.3?topic=programming-how-sockets-work	// schema pour un serveur client
+https://www.irif.fr/~jch/enseignement/sockets.pdf	
+
+
+https://ncona.com/2019/04/building-a-simple-server-with-cpp/			// little_server
+https://www.bogotobogo.com/cplusplus/sockets_server_client.php			// C_server
