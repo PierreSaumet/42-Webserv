@@ -34,7 +34,7 @@ class Parsing {
 
         bool                            ft_check_conf_file( void );
         
-        std::vector<std::string>        ft_get_data( void );
+        std::vector<std::string>        ft_get_data_container( void );
         std::vector<t_server>           ft_get_server( void );
 
         bool                            ft_check_data( void );

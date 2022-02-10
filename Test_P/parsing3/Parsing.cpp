@@ -8,8 +8,17 @@ Parsing::Parsing( void ) : _name_of_file(NULL) {
 
 Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile) {
 
-    std::cout << "conf file = " << this->ft_check_conf_file() << std::endl;
-    this->_data = this->ft_get_data();
+   // std::cout << "conf file = " << this->ft_check_conf_file() << std::endl;
+	// On verifie que le fichier de configuration est correct
+	if (!this->ft_check_conf_file())
+	{
+		std::cout << "On continue" << std::endl;
+		this->_data = this->ft_get_data_container();
+	}
+	else
+		std::cout << "On arrete" << std::endl;
+
+    
     this->_nbr_servers = 0;
     // std::vector<std::string>::iterator it_b;
     // for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
@@ -17,23 +26,32 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile) {
     //     std::cout << " ok = " << *it_b << std::endl;
     // }
 
-    if (this->ft_check_data() == true)
-        std::cout << "ERROR dans les data" << std::endl;
+    // if (this->ft_check_data() == true)
+    //     std::cout << "ERROR dans les data" << std::endl;
 
-    std::cout << "OK " << std::endl;
+    //std::cout << "OK " << std::endl;
     return ;
 }
 
+/*
+**	Parsing Destructor
+*/
 Parsing::~Parsing( void ) {
 
     return ;
 }
 
+/*
+**	Parsing copy Constructor
+*/
 Parsing::Parsing( const Parsing &copy ) : _name_of_file(copy._name_of_file) {
 
     return ;
 }
 
+/*
+**	Parsing overload operator =	
+*/
 Parsing                         &Parsing::operator=( const Parsing &element ) {
 
     if (this != &element)
@@ -356,7 +374,14 @@ bool                            Parsing::ft_check_bracket( void )
 
 }
 
-std::vector<std::string>        Parsing::ft_get_data( void ) {
+/*
+**	ft_get_data_container():
+**		This function will get all the data from the configuration file and
+**		put it into a std::vector<std::string> container.	
+**
+**	==> Returns the container.
+*/
+std::vector<std::string>        Parsing::ft_get_data_container( void ) {
 
     std::vector<std::string>    tmp;
     std::string                 tmp_name(this->_name_of_file.begin(), this->_name_of_file.end());
@@ -366,45 +391,43 @@ std::vector<std::string>        Parsing::ft_get_data( void ) {
     if (fs.is_open() == 0)
     {
         fs.close();
-        std::cout << "ERROR, conf file doesn't exist" << std::endl;
+        std::cout << "ERROR, configuration file doesn't exist" << std::endl;
         return (tmp);
     }
     else
     {
-        std::cout << "DEBUT PARSING" << std::endl;
+		char                    *data;
         std::stringstream       buffer;
         std::string             line;
-        buffer << fs.rdbuf();
-        line = buffer.str();
-        line = this->ft_delete_comm(line);
-        std::cout << "line = " << line << std::endl;
-
-        char                    *test;
-        test = std::strtok(&line[0], " \t\n\v\r\f");
-        if (test == NULL)
+        buffer << fs.rdbuf();						// recupere tous le fichier dans un buffer
+        line = buffer.str();						//	mets le buffer dans une string pour la traiter
+        line = this->ft_delete_comm(line);			//	supprime tous les commentaires
+        data = std::strtok(&line[0], " \t\n\v\r\f");	// on divise notre string en morceaux tous les types d'espaces
+        if (data == NULL)
         {
             fs.close();
-            std::cout << "ERROR, char *test is null\n";
+            std::cout << "ERROR, configuration file is empty after deleting commentaries.\n";
         }
         else
         {
-            while (test)
+            while (data)								// on met toutes les valeurs dans un container vector
             {
-                tmp.push_back(test);
-                test = strtok(NULL, " \t\n\v\r\f");
+                tmp.push_back(data);
+                data = strtok(NULL, " \t\n\v\r\f");		
             }
-            // std::vector<std::string>::iterator it_b;
-            // for (it_b = tmp.begin(); it_b != tmp.end(); it_b++)
-            // {
-            //     std::cout << " ok = " << *it_b << std::endl;
-            // }
+			fs.close();
         }
     }
-    fs.close();
-    tmp.push_back("");
+   	tmp.push_back("");
     return (tmp);
 }
 
+/*
+**	ft_delete_comm( std::string &line ):
+**		This function will delete all commentaries (starting with #) from the configuration file.
+**
+**	==> Returns the new string "tmp" which will contain all the configuration file.
+*/
 std::string                     Parsing::ft_delete_comm( std::string &line )
 {
     std::string                 tmp = line;
@@ -419,9 +442,15 @@ std::string                     Parsing::ft_delete_comm( std::string &line )
         tmp.erase(pos, pos_end - pos);
     }
     return (tmp);
-
 }
 
+/*
+**	ft_check_conf_file():
+**		This function will check if the configuration file is correct.
+**		The file should exist, not be empty, ending with a '.conf' and use '.conf' only for file format
+**
+**	==>	Returns 1 if an error occurs, 0 otherwise.
+*/
 bool                            Parsing::ft_check_conf_file( void ) {
 
     std::string     tmp_name(this->_name_of_file.begin(), this->_name_of_file.end());
@@ -431,7 +460,7 @@ bool                            Parsing::ft_check_conf_file( void ) {
     if (fs.is_open() == 0)
     {
         fs.close();
-        std::cout << "ERROR, conf file doesn't exist" << std::endl;
+        std::cout << "ERROR, configuration file doesn't exist" << std::endl;
         return (true);
     }
     else
@@ -439,7 +468,7 @@ bool                            Parsing::ft_check_conf_file( void ) {
         if (fs.peek() == std::string::traits_type::eof())
         {
             fs.close();
-            std::cout << "ERROR, conf file is empty" << std::endl;
+            std::cout << "ERROR, configuration file is empty" << std::endl;
             return (true);
         }
         else
@@ -450,22 +479,21 @@ bool                            Parsing::ft_check_conf_file( void ) {
             if (pos_to_find == std::string::npos)
             {
                 fs.close();
-                std::cout << "ERROR, conf file should end by '.conf." << std::endl;
+                std::cout << "ERROR, configuration file must terminate with '.conf'" << std::endl;
                 return (true);
             }
             else
             {
-                // add /n 
                 tmp_name.push_back('\n');
                 if (tmp_name.compare(pos_to_find, 6, ".conf\n") != 0)
                 {
                     fs.close();
-                    std::cout << "ERROR, conf file should end by '.conf." << std::endl;
+                    std::cout << "ERROR, configuration file must have a different name and end exclusively with '.conf'" << std::endl;
                     return (true);
                 }
             }
+			fs.close();
         }
     }
-    fs.close();
     return (false);
 }
