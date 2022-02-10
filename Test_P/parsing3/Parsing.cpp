@@ -6,30 +6,31 @@ Parsing::Parsing( void ) : _name_of_file(NULL) {
     return ;
 }
 
-Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile) {
+Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_servers(0) {
 
-   // std::cout << "conf file = " << this->ft_check_conf_file() << std::endl;
 	// On verifie que le fichier de configuration est correct
 	if (!this->ft_check_conf_file())
 	{
 		std::cout << "On continue" << std::endl;
 		this->_data = this->ft_get_data_container();
+		this->_nbr_servers = 0;
+	
+		if (this->ft_check_data() == true)
+			std::cout << "ERROR dans les data" << std::endl;
+
+		std::cout << "OK " << std::endl;
 	}
 	else
 		std::cout << "On arrete" << std::endl;
 
     
-    this->_nbr_servers = 0;
+    
     // std::vector<std::string>::iterator it_b;
     // for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
     // {
     //     std::cout << " ok = " << *it_b << std::endl;
     // }
 
-    // if (this->ft_check_data() == true)
-    //     std::cout << "ERROR dans les data" << std::endl;
-
-    //std::cout << "OK " << std::endl;
     return ;
 }
 
@@ -61,55 +62,58 @@ Parsing                         &Parsing::operator=( const Parsing &element ) {
     return (*this);
 }
 
+/*
+**	ft_check_data():
+**		This function is the main function for the parsing.
+**		It will check that everything is in order.
+*/
 bool                            Parsing::ft_check_data( void ) {
 
-    std::vector<std::string>::iterator it_b;
-    for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
-    {
-        std::cout << " ok = " << *it_b << std::endl;
-    }
+   // std::vector<std::string>::iterator it_b;
+    // for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
+    // {
+    //     std::cout << " ok = " << *it_b << std::endl;
+    // }
 
-    if (this->_data.empty())
+    if (this->_data.empty())									// veriffie que les donnees ne sont pas vides
     {
         std::cout << "ERROR, data empty" << std::endl;
         return (true);
     }
-    if (this->_data[0] != "server" || this->_data[1] != "{")
+    if (this->_data[0] != "server" || this->_data[1] != "{")		// verifie que les donnees debutent par server et {
     {
-        std::cout << "ERROR, should start with server and '{'" << std::endl;
+        std::cout << "ERROR, should start with 'server' and '{'" << std::endl;
         return (true);
     }
-    if (this->_data[this->_data.size() - 2] != "}" && this->_data[this->_data.size() - 1] == "")
+    if (this->_data[this->_data.size() - 2] != "}" && this->_data[this->_data.size() - 1] == "")	// verifie que les donnees termine par }
     {
         std::cout << "Error, should end by '}'" << std::endl;
         return (true);
     }
-    
-    
-    if (this->ft_check_bracket())
+    if (this->ft_check_number_of_bracket())
     {
         std::cout << "ERROR, problem with bracket" << std::endl;
         return (true);
     }
-    // if (this->ft_check_semicolon())
+    // if (this->ft_check_semicolon())			// a faire
     // {
     //     std::cout << "ERROR, no semi colon" << std::endl;
     //     return (true);
     // }
-    // if (ft_check_location())
+    // if (ft_check_location())					// a faire
     // {
     //     std::cout << "ERROR, problem location" << std::endl;
     //     return (true);
     // }
-    std::string serv = "server";
-    std::string loc = "location";
-    this->ft_get_scope(0);
-    if (this->ft_check_server())
-    {
-        std::cout << "ERROR, problem bloc server" << std::endl;
-        return (true);
-    }
-    std::cout << "lol ok " << std::endl;
+    // std::string serv = "server";
+    // std::string loc = "location";
+    // this->ft_get_scope(0);
+    // if (this->ft_check_server())
+    // {
+    //     std::cout << "ERROR, problem bloc server" << std::endl;
+    //     return (true);
+    // }
+    // std::cout << "lol ok " << std::endl;
     return (false);
 }
 
@@ -356,22 +360,49 @@ bool                            Parsing::ft_check_semicolon( void )     // to do
     return (false);
 }
 
-bool                            Parsing::ft_check_bracket( void )
+/*
+**	ft_check_number_of_bracket():
+**		This function will count the bracket '{' and '}'.
+**		And checks if the brackets are alone.
+**	
+**	==> Returns 0 if there is no difference between the number of 'open bracket = {' and 'close bracket }'.
+**		Otherwise, return 1.
+*/
+bool                            Parsing::ft_check_number_of_bracket( void )
 {
     std::vector<std::string>::iterator  it_b;
     int                                 count = 0;
     for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
     {
-        if (*it_b == "{")
-            count++;
-        if (*it_b == "}")
-            count--;
+		std::size_t	find_open;
+		std::size_t find_close;
+		find_open = (*it_b).find("{");
+		find_close = (*it_b).find("}");
+		if (find_open != std::string::npos)
+		{
+			if ((*it_b).compare("{") == 0)
+			{
+				count++;
+				//std::cout << "OUI open =" << *it_b << std::endl;
+			}
+			else
+				return (true);
+		}
+		if (find_close != std::string::npos)
+		{
+			if ((*it_b).compare("}") == 0)
+			{
+				count--;
+				//std::cout << "OUI close =" << *it_b << std::endl;
+			}
+			else
+				return (true);
+		}
     }
     if (count == 0)
         return (false);
     else
         return (true);
-
 }
 
 /*

@@ -38,7 +38,7 @@ class Parsing {
         std::vector<t_server>           ft_get_server( void );
 
         bool                            ft_check_data( void );
-        bool                            ft_check_bracket( void );
+        bool                            ft_check_number_of_bracket( void );
         bool                            ft_check_semicolon( void );
         bool                            ft_check_location( void );
         bool                            ft_check_server( void );
