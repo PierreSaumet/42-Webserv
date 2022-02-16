@@ -146,33 +146,38 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 	return (k);
 }
 
-
-void            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index )
+/*
+**	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server):
+**      This function will checks the informations given in the 'autoindex' directive.
+**      It should find "on;" or "off;".
+**
+**     ==> Returns 0 if no problem happens, otherwise returns 1.
+*/
+bool            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
 	std::cout << "Dans autoindex =" << tmp[k] << std::endl;
 	size_t  len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 	{
-		std::cout << "Error, autoindex directive should end with '\0'" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'autoindex' directive it should end with '\0'" << std::endl;
+		return (true);
 	}
 	if (tmp[k][len - 1] != ';')
 	{
-		std::cout << "Error, autoindex directive should end with ';'" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'autoindex' directive it should end with ';'" << std::endl;
+		return (true);
 	}
 	if (tmp[k].compare("on;") != 0 && tmp[k].compare("off;") != 0)
 	{
-		std::cout << "Error, autoindex should be 'on' or 'off' " << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'autoindex' directive it should be 'on' or 'off' " << std::endl;
+		return (true);
 	}
 	if (tmp[k].compare("on;") == 0)
-		this->_servers[index].autoindex_server = true;
+		this->_servers[index_server].autoindex_server = true;
 	else
-		this->_servers[index].autoindex_server = false;
-	
-	return ;
+		this->_servers[index_server].autoindex_server = false;
+	return (false);
 }
 
 
@@ -228,7 +233,7 @@ void         Parsing::ft_get_server_name(size_t k, std::vector<std::string> tmp,
 **      This function will checks the informations given in the 'listen' directive.
 **      It should find a 'host' equal to '127.0.0.1', an 'port' > 1 and < 65535.
 **
-**     ==> Returns 0 if no problem happens, otherwise returns 1.s
+**     ==> Returns 0 if no problem happens, otherwise returns 1.
 */
 bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server) 
 {
@@ -236,22 +241,22 @@ bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 	size_t      len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 	{
-		std::cout << "Error, in 'listen directive' should end with \0" << std::endl;
+		std::cout << "Error, in 'listen directive' it should end with \0" << std::endl;
 		return (true);
 	}
 	if (tmp[k][len - 1] != ';')
 	{
-		std::cout << "Error, in 'listen directive' should end with ';'" << std::endl;
+		std::cout << "Error, in 'listen directive' it should end with ';'" << std::endl;
 		return (true);
 	}
 	if (tmp[k].find(":", 0) == std::string::npos)
 	{
-		std::cout << "Error, in 'listen directive' should have a ':' between host and port" << std::endl;
+		std::cout << "Error, in 'listen directive' it should have a ':' between host and port" << std::endl;
 		return (true);
 	}
 	if (len > 15)
 	{
-		std::cout << "Error, in 'listen directive' have bad host or port" << std::endl;
+		std::cout << "Error, in 'listen directive' it has bad host or port" << std::endl;
 		return (true);
 	}
 	if (tmp[k].compare(0, 10, "127.0.0.1:") != 0)
@@ -273,7 +278,7 @@ bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 	this->_servers[index_server].port_server = std::strtol(tmp[k].substr(10, 4).c_str(), NULL, 10);
 	if (this->_servers[index_server].port_server < 0 || this->_servers[index_server].port_server > 65535)
 	{
-		std::cout << "Error, port should be between 0 and 65535" << std::endl;
+		std::cout << "Error, in 'listen directive'  port should be between 0 and 65535" << std::endl;
 		return (true);
 	}
 
