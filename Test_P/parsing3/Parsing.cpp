@@ -108,6 +108,7 @@ bool                            Parsing::ft_check_data( void ) {
     // std::string serv = "server";
     // std::string loc = "location";
     // this->ft_get_scope(0);
+
     if (this->ft_check_server())
     {
         std::cout << "ERROR, problem bloc server" << std::endl;
@@ -176,15 +177,17 @@ bool                            Parsing::ft_check_server( void )
         i++;
     }
     std::cout << "nbr serv = " << this->_nbr_servers << std::endl;
+
     // test fonction
     i = 0;
     int y = 0;
     while (i < this->_nbr_servers)
     {
        
-        std::vector<std::string>    truc = this->ft_get_scope(y);
-        std::cout << "La taille de truc = " << truc.size() << std::endl;
-        y = truc.size();
+        std::vector<std::string>    scope_actual = this->ft_get_scope(y);
+
+        std::cout << "La taille de scope_actual = " << scope_actual.size() << std::endl;
+        y = scope_actual.size();
 
         serv_dir.insert(std::pair<std::string, bool>("listen", false));
         serv_dir.insert(std::pair<std::string, bool>("server_name", false));
@@ -192,14 +195,18 @@ bool                            Parsing::ft_check_server( void )
         serv_dir.insert(std::pair<std::string, bool>("root", false));
         serv_dir.insert(std::pair<std::string, bool>("dav_methods", false));
         serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
+        serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
+        serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
+        serv_dir.insert(std::pair<std::string, bool>("upload_path", false));
+
         // on parcoourt le vector et on verifie que nos directives sont presentes
         size_t k = 0;
         count = 0;
-        while (k < truc.size())
+        while (k < scope_actual.size())
         {
             for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
             {
-                if (it_b->first == truc[k])
+                if (it_b->first == scope_actual[k])
                 {
                     count++;
                     if (it_b->second == false)
@@ -211,84 +218,87 @@ bool                            Parsing::ft_check_server( void )
                     }
                 }
             }
-            if (truc[k] == "location")
+            if (scope_actual[k] == "location")
                 break;
             k++;
         }
-        std::cout << " COUT =  " << count << std::endl;
-        if (count != 6)
+        std::cout << "COUT =  " << count << std::endl;
+
+        // HARDCORE si il y a pas 9 directives = erreur ? a voir ...
+        if (count != 9)
         {
-            std::cout << "Error, miss : ";
+            std::cout << "ERROR, missing : ";
             for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
             {
                 if (it_b->second == false)
                     std::cout << "\"" << it_b->first << "\" ";
             }
-            std::cout << "\t directives in a bloc server before a location bloc" << std::endl;
+            std::cout << "\t directive(s) in a bloc server before a location bloc in the configuration file" << std::endl;
+            serv_dir.clear();
             return (true);
         }
         serv_dir.clear();
 
         this->_servers.push_back(Parsing::t_server());
-        k = 0;
-        while (k < truc.size())
+        k = 1;
+        while (k < scope_actual.size())
         {
-            if (truc[k] == "listen")
+            if (scope_actual[k] == "listen")
             {
                 std::cout << "go listen" << std::endl;
-                this->ft_get_listen(k, truc, i);
-                std::cout << "\thost = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
+                this->ft_get_listen(k, scope_actual, i);
+                std::cout << "\ti = " << i << " host = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
                 k += 2;
             }
-            else if (truc[k] == "server_name")
-            {
-                std::cout << "go server_name " << std::endl;
-                this->ft_get_server_name(k, truc, i);
-                std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
-                k += 2;
-            }
-            else if (truc[k] == "root")
-            {
-                std::cout << "go root" << std::endl;
-                this->ft_get_root(k ,truc, i);
-                std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
-                k += 2;
-            }
-            else if (truc[k] == "autoindex")
-            {
-                std::cout << "go autoindex " << std::endl;
-                this->ft_get_autoindex(k, truc, i);
-                std::cout << "\tauoindex = " << this->_servers[i].autoindex_server << std::endl;
-                k += 2;
-            }
-            else if (truc[k] == "dav_methods")
-            {
-                std::cout << "go dav_methods " << std::endl;
-                k = this->ft_get_methods(k, truc, i);
-                std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
-                //k += 2;
-            }
-            else if (truc[k] == "error_page")
-            {
-                std::cout << "go error_page " << std::endl;
-                k = this->ft_get_error(k, truc, i);
+            // else if (truc[k] == "server_name")
+            // {
+            //     std::cout << "go server_name " << std::endl;
+            //     this->ft_get_server_name(k, truc, i);
+            //     std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
+            //     k += 2;
+            // }
+            // else if (truc[k] == "root")
+            // {
+            //     std::cout << "go root" << std::endl;
+            //     this->ft_get_root(k ,truc, i);
+            //     std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
+            //     k += 2;
+            // }
+            // else if (truc[k] == "autoindex")
+            // {
+            //     std::cout << "go autoindex " << std::endl;
+            //     this->ft_get_autoindex(k, truc, i);
+            //     std::cout << "\tauoindex = " << this->_servers[i].autoindex_server << std::endl;
+            //     k += 2;
+            // }
+            // else if (truc[k] == "dav_methods")
+            // {
+            //     std::cout << "go dav_methods " << std::endl;
+            //     k = this->ft_get_methods(k, truc, i);
+            //     std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
+            //     //k += 2;
+            // }
+            // else if (truc[k] == "error_page")
+            // {
+            //     std::cout << "go error_page " << std::endl;
+            //     k = this->ft_get_error(k, truc, i);
                 
-                //k += 3;
-            }
-            else if (truc[k] == "location")
-            {
-                std::cout << "go location " << std::endl;
-                break;
-                k += 2;
-            }
-            else if (truc[k] == "{" || truc[k] == "}")
-            {
-                std::cout << " on coninue " << std::endl;
-                k++;
-            }
+            //     //k += 3;
+            // }
+            // else if (truc[k] == "location")
+            // {
+            //     std::cout << "go location " << std::endl;
+            //     break;
+            //     k += 2;
+            // }
+            // else if (truc[k] == "{" || truc[k] == "}")
+            // {
+            //     std::cout << " on coninue " << std::endl;
+            //     k++;
+            // }
             else
             {
-                std::cout << " EUH ERROR " << truc[k] << " et k = " << k << std::endl;
+                std::cout << " EUH ERROR " << scope_actual[k] << " et k = " << k << std::endl;
                 exit(EXIT_FAILURE);
                 //break;
             }
@@ -354,7 +364,7 @@ bool                            Parsing::ft_check_semicolon( void )     // to do
         {
             if (*it_b == *it_direc)
             {
-                std::cout << "it_b = " << *it_b << " et it_direc = " << *it_direc <<  std::endl;
+                //std::cout << "it_b = " << *it_b << " et it_direc = " << *it_direc <<  std::endl;
                 std::string tmp = *(++it_b);
                 if (tmp[tmp.size() - 1] != ';')
                     return (true);
