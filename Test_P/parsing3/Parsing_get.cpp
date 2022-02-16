@@ -1,4 +1,4 @@
-#include "Parsing.hpp"
+#include "Headers/Parsing.hpp"
 # include <iostream>
 
 size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, size_t index )
@@ -51,24 +51,24 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 	}
 
 	// on ajute l'addresse a toutes les erreurs
-	std::map<int, std::string>::iterator it = this->_servers[index].error_server.begin();
-	for (it = this->_servers[index].error_server.begin(); it != this->_servers[index].error_server.end(); it++)
-	{
-		if (it->second == "NULL")
-			it->second = address;
-		struct stat buff;
-		std::string check_c = std::to_string(it->first);
-		check_c.append(".html");
-		it->second.append("/");
-		it->second.append(check_c);
-		std::cout << "it->second = " << it->second << std::endl;
-		if (stat(it->second.c_str(), &buff) != 0)
-		{
-			std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-			exit(EXIT_FAILURE);
-		}
-		// (void)buff;
-	}
+	// std::map<int, std::string>::iterator it = this->_servers[index].error_server.begin();
+	// for (it = this->_servers[index].error_server.begin(); it != this->_servers[index].error_server.end(); it++)
+	// {
+	// 	if (it->second == "NULL")
+	// 		it->second = address;
+	// 	struct stat buff;
+	// 	std::string check_c = std::to_string(it->first);																// PROBLEME ICE
+	// 	check_c.append(".html");
+	// 	it->second.append("/");
+	// 	it->second.append(check_c);
+	// 	std::cout << "it->second = " << it->second << std::endl;
+	// 	if (stat(it->second.c_str(), &buff) != 0)
+	// 	{
+	// 		std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
+	// 		exit(EXIT_FAILURE);
+	// 	}
+	// 	// (void)buff;
+	// }
 	/*
 	**  ne verifie pas si ;es fichiers sont vides ...
 	*/

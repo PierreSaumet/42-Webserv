@@ -1,4 +1,4 @@
-#include "Parsing.hpp"
+#include "Headers/Parsing.hpp"
 #include <iostream>
 
 Parsing::Parsing( void ) : _name_of_file(NULL) {
@@ -246,7 +246,8 @@ bool                            Parsing::ft_check_server( void )
 			if (scope_actual[k] == "listen")
 			{
 				std::cout << "go listen" << std::endl;
-				this->ft_get_listen(k, scope_actual, i);
+				if (this->ft_get_listen(k, scope_actual, i))
+					return (true);
 				std::cout << "\ti = " << i << " host = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
 				k += 2;
 			}
@@ -254,10 +255,7 @@ bool                            Parsing::ft_check_server( void )
 			{
 			    std::cout << "go autoindex " << std::endl;
 			    if (this->ft_get_autoindex(k, scope_actual, i))
-				{
-					std::cout << "ERROR dans get autoindex "<< std::endl;
 					return (true);
-				}
 			    std::cout << "\ti = " << i << "autoindex = " << this->_servers[i].autoindex_server << std::endl;
 			    k += 2;
 			}
@@ -304,7 +302,8 @@ bool                            Parsing::ft_check_server( void )
 			else
 			{
 				std::cout << " EUH ERROR " << scope_actual[k] << " et k = " << k << std::endl;
-				exit(EXIT_FAILURE);
+				return (true);
+				//exit(EXIT_FAILURE);
 				//break;
 			}
 		}
@@ -437,7 +436,8 @@ std::vector<std::string>        Parsing::ft_get_data_container( void ) {
 	std::string                 tmp_name(this->_name_of_file.begin(), this->_name_of_file.end());
 	std::ifstream               fs;
 
-	fs.open(tmp_name);
+	//fs.open(tmp_name);
+	fs.open(tmp_name.c_str());
 	if (fs.is_open() == 0)
 	{
 		fs.close();
@@ -506,7 +506,8 @@ bool                            Parsing::ft_check_conf_file( void ) {
 	std::string     tmp_name(this->_name_of_file.begin(), this->_name_of_file.end());
 	std::ifstream   fs;
 	
-	fs.open(tmp_name);
+	// fs.open(tmp_name);
+	fs.open(tmp_name.c_str());
 	if (fs.is_open() == 0)
 	{
 		fs.close();
