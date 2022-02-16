@@ -16,7 +16,7 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_se
 		this->_nbr_servers = 0;
 	
 		if (this->ft_check_data() == true)
-			std::cout << "ERROR dans les data" << std::endl;
+			//std::cout << "ERROR dans les data" << std::endl;
 
 		std::cout << "OK " << std::endl;
 	}
@@ -87,19 +87,19 @@ bool                            Parsing::ft_check_data( void ) {
     }
     if (this->_data[this->_data.size() - 2] != "}" && this->_data[this->_data.size() - 1] == "")	// verifie que les donnees termine par }
     {
-        std::cout << "Error, should end by '}'" << std::endl;
+        std::cout << "ERROR, should end by '}'" << std::endl;
         return (true);
     }
     if (this->ft_check_number_of_bracket())
     {
-        std::cout << "ERROR, problem with bracket" << std::endl;
+        std::cout << "ERROR, a problem occurs with brackets." << std::endl;
         return (true);
     }
-    // if (this->ft_check_semicolon())			// a faire
-    // {
-    //     std::cout << "ERROR, no semi colon" << std::endl;
-    //     return (true);
-    // }
+    if (this->ft_check_semicolon())			// a faire
+    {
+        std::cout << "ERROR, a problem occurs with semicolon." << std::endl;
+        return (true);
+    }
     // if (ft_check_location())					// a faire
     // {
     //     std::cout << "ERROR, problem location" << std::endl;
@@ -108,11 +108,11 @@ bool                            Parsing::ft_check_data( void ) {
     // std::string serv = "server";
     // std::string loc = "location";
     // this->ft_get_scope(0);
-    // if (this->ft_check_server())
-    // {
-    //     std::cout << "ERROR, problem bloc server" << std::endl;
-    //     return (true);
-    // }
+    if (this->ft_check_server())
+    {
+        std::cout << "ERROR, problem bloc server" << std::endl;
+        return (true);
+    }
     // std::cout << "lol ok " << std::endl;
     return (false);
 }
@@ -326,6 +326,14 @@ bool                            Parsing::ft_check_location( void )      // to do
     return (false);
 }
 
+/*
+**  ft_check_semicolon():
+**      This function will check if after a directive, there is a semi colon at the end.
+**      It will only checks the following directives:
+**          listen / server_name / index / autoindex / root / client_body_buffer_size / cgi_path / upload_path
+**
+**  ==> Returns 0 if there is no error, otherwise returns 1.
+*/
 bool                            Parsing::ft_check_semicolon( void )     // to do
 {
     std::vector<std::string>            directives;
@@ -336,14 +344,8 @@ bool                            Parsing::ft_check_semicolon( void )     // to do
     directives.push_back("autoindex");
     directives.push_back("root");
     directives.push_back("client_body_buffer_size");
-    directives.push_back("error_page");
-    directives.push_back("dav_methods");
     directives.push_back("cgi_path");
     directives.push_back("upload_path");
-    // directives.push_back("server");
-    // directives.push_back("location");
-    // directives.push_back("}");
-    // directives.push_back("{");
 
     std::vector<std::string>::iterator  it_b;
     for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
@@ -353,7 +355,9 @@ bool                            Parsing::ft_check_semicolon( void )     // to do
             if (*it_b == *it_direc)
             {
                 std::cout << "it_b = " << *it_b << " et it_direc = " << *it_direc <<  std::endl;
-                std::cout << "it_b ++ = " << *(++it_b) << std::endl;
+                std::string tmp = *(++it_b);
+                if (tmp[tmp.size() - 1] != ';')
+                    return (true);
             }
         }
     }
