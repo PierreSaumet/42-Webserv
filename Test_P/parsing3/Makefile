@@ -42,10 +42,11 @@ all: $(NAME)
 $(OBJECTS_FOLDER)%.o :	$(SRCS)%.cpp	$(INCLUDE) 
 	@mkdir -p	$(OBJECTS_FOLDER)
 	@echo "Compiling: $<"
-	@clang++ $(FLAGS) -c $< -o $@
+	clang++ $(FLAGS) -c $< -o $@
 
 $(NAME): $(OBJECTS)
-	@clang++ $(FLAGS) -o  $(NAME) $(OBJECTS)
+	@echo "\n"
+	clang++ $(FLAGS) -o  $(NAME) $(OBJECTS)
 
 .PHONY: clean
 clean:
