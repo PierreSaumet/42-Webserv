@@ -47,12 +47,12 @@ class Parsing {
 		bool                            ft_check_code_serv( int code ) const ;
 		bool                            ft_check_code_client( int code ) const;
 
-		bool                     ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server );
-		void                        ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index );
-		void                        ft_get_root( size_t k, std::vector<std::string> tmp, size_t index );
-		bool                        ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server );
-		size_t                      ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index );
-		size_t                      ft_get_error( size_t k, std::vector<std::string> tmp, size_t index );
+		bool      		               	ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool                        	ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server );
+		void                        	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index );
+		bool                        	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server );
+		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index );
+		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index );
 
 
 		std::string                     ft_delete_comm( std::string &line );

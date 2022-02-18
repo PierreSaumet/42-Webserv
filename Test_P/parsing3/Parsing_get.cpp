@@ -210,26 +210,42 @@ void            Parsing::ft_get_root(size_t k, std::vector<std::string> tmp, siz
 	return ;
 }
 
-void         Parsing::ft_get_server_name(size_t k, std::vector<std::string> tmp, size_t index)
+/*
+**	ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will checks the information given in the 'server_name' directive.
+**		It should only have digit and alphabetic characters.
+**
+//	==>	Returns 0 if no problem happens, otherwise returns 1.
+*/
+bool         Parsing::ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
 	size_t  len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 	{
-		std::cout << "Error, server_name directive should end with '\0'" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'server_name' directive, it should end with '\0'" << std::endl;
+		return (true);
+	}
+	size_t i;
+	i = 0;
+	while (isalnum(tmp[k][i]))
+		i++;
+	if (i + 1 < len)
+	{
+		std::cout << "Error, in 'server_name' directive, it should only have alphanumeric characters" << std::endl;
+		return (true);
 	}
 	if (tmp[k][len - 1] != ';')
 	{
-		std::cout << "Error, server_name directive should end with ';'" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'server_name' directive, it should end with ';'" << std::endl;
+		return (true);
 	}
-	this->_servers[index].name_server = tmp[k].substr(0, len - 1);
-	return ;
+	this->_servers[index_server].name_server = tmp[k].substr(0, len - 1);
+	return (false);
 }
 
 /*
-**  ft_get_listen( size_t km std::vector<std::string> tmp, size_t idnex_server )
+**  ft_get_listen( size_t km std::vector<std::string> tmp, size_t idnex_server ):
 **      This function will checks the informations given in the 'listen' directive.
 **      It should find a 'host' equal to '127.0.0.1', an 'port' > 1 and < 65535.
 **
