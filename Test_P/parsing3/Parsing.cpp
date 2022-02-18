@@ -105,22 +105,28 @@ bool                            Parsing::ft_check_data( void ) {
     //     std::cout << "ERROR, problem location" << std::endl;
     //     return (true);
     // }
-    // std::string serv = "server";
-    // std::string loc = "location";
-    // this->ft_get_scope(0);
-    // if (this->ft_check_server())
-    // {
-    //     std::cout << "ERROR, problem bloc server" << std::endl;
-    //     return (true);
-    // }
-    // std::cout << "lol ok " << std::endl;
+    std::string serv = "server";
+    std::string loc = "location";
+    this->ft_get_scope(0);
+    if (this->ft_check_server())
+    {
+        std::cout << "ERROR, problem bloc server" << std::endl;
+        return (true);
+    }
+    std::cout << "lol ok " << std::endl;
     return (false);
 }
 
-// retourne un vector avec les donnees comprises dans le scope
-std::vector<std::string>        Parsing::ft_get_scope(size_t index)
+
+/*
+**	ft_get_scope( size_t index ):
+**		This function will return the scope starting and the given 'index' argument.
+**
+**	==> It will return a std::vector<std::string> which contains the scope.
+*/
+std::vector<std::string>        Parsing::ft_get_scope( size_t index )
 {
-    std::cout << "Debut ft_get scope" << std::endl;
+    std::cout << "Debut ft_get scope   index = " << index << std::endl;
     size_t                  i = index;
     size_t                  count = 0;
     std::vector<std::string>::size_type sz = this->_data.size();
@@ -160,7 +166,7 @@ std::vector<std::string>        Parsing::ft_get_scope(size_t index)
 
 bool                            Parsing::ft_check_server( void )
 {
-    std::vector<std::string>::size_type sz = this->_data.size();
+    std::vector<std::string>::size_type size_data = this->_data.size();
     size_t                              i = 0;
     size_t                              count = 0;
     std::map<std::string, bool>            serv_dir;
@@ -169,7 +175,7 @@ bool                            Parsing::ft_check_server( void )
 
     std::cout << "\n\n" << std::endl;
     // on compte le nombre de server
-    while (i < sz)
+    while (i < size_data)
     {
         if (this->_data[i] == "server" && this->_data[i + 1] == "{")
             this->_nbr_servers++;
@@ -181,7 +187,7 @@ bool                            Parsing::ft_check_server( void )
     int y = 0;
     while (i < this->_nbr_servers)
     {
-       
+		
         std::vector<std::string>    truc = this->ft_get_scope(y);
         std::cout << "La taille de truc = " << truc.size() << std::endl;
         y = truc.size();
@@ -371,30 +377,25 @@ bool                            Parsing::ft_check_semicolon( void )     // to do
 bool                            Parsing::ft_check_number_of_bracket( void )
 {
     std::vector<std::string>::iterator  it_b;
+	std::size_t							find_open;
+	std::size_t							find_close;
     int                                 count = 0;
-    for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
+	
+	for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
     {
-		std::size_t	find_open;
-		std::size_t find_close;
 		find_open = (*it_b).find("{");
 		find_close = (*it_b).find("}");
 		if (find_open != std::string::npos)
 		{
 			if ((*it_b).compare("{") == 0)
-			{
 				count++;
-				//std::cout << "OUI open =" << *it_b << std::endl;
-			}
 			else
 				return (true);
 		}
 		if (find_close != std::string::npos)
 		{
 			if ((*it_b).compare("}") == 0)
-			{
 				count--;
-				//std::cout << "OUI close =" << *it_b << std::endl;
-			}
 			else
 				return (true);
 		}

@@ -3,7 +3,11 @@
 
 /*
 **  clang++ -Wall -Werror -Wextra -g -o test main.cpp Parsing.cpp && valgrind ./test
+
+
+**	clang++ -Wall -Werror -Wextra -g -o test main.cpp Parsing.cpp Parsing_get.cpp && ./test confs/test.conf
 */
+
 int             main(int argc, char **argv)
 {
     if (argc != 2)
