@@ -52,7 +52,7 @@ class Parsing {
 		bool                        	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool                        	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index );
-		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index );
+		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 
 
 		std::string                     ft_delete_comm( std::string &line );

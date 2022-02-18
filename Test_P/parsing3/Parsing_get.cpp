@@ -1,26 +1,32 @@
 #include "Headers/Parsing.hpp"
 # include <iostream>
 
-size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, size_t index )
+/*
+**	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'error_page' directive.
+**		It will check the error codes indicated and it will check if the files exist.
+**		It will save the data in a std::map<int, std::string>  container.
+**
+**	==> Returns the new increamentation of the parsing, otherwise returns -1 if an error occurs.
+*/
+size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	// on incremente k on passe errr_page
 	k += 1;
-
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
-		//std::cout << "\tLA tmp[k] = " << tmp[k] << std::endl;
+		std::cout << "\tLA tmp[k] = " << tmp[k] << std::endl;
 		int y = 0;
 		while (tmp[k][y])
 		{
 			if (isdigit(tmp[k][y]))
 			{
 				y++;
-				//std::cout << "NO problem " << std::endl;
 			}
 			else
 			{
 				std::cout << "Error: error_page directive should only have numbers then a directory!" << std::endl;
-				exit(EXIT_FAILURE);
+				return (-1);
 				//break;
 			}
 		}
@@ -29,50 +35,49 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 		{
 			std::cout << "EUh il faut quitter? " << std::endl;
 			std::cout << "car = " << this->ft_check_code_error(error_code) << std::endl;
-			exit(EXIT_FAILURE);
+			return (-1);
 		}
-		//std::cout << "ERROR = " << error_code << std::endl;
-		this->_servers[index].error_server.insert(std::pair<int, std::string>(error_code, "NULL"));
+		this->_servers[index_server].error_server.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
-	// on verifie le premier si c'est un point et le deuxieme un /
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 	{
 		std::cout << "Error, error_page directive should end with a directory or file" << std::endl;
-		exit(EXIT_FAILURE);
+		return (-1);
 	}
-	
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 	struct stat buffer;
 	if (stat(address.c_str(), &buffer) != 0)
 	{
 		std::cout << "Error, error_page directive, directory doesn't exist!" << std::endl;
-		exit(EXIT_FAILURE);
+		return (-1);
 	}
-
 	// on ajute l'addresse a toutes les erreurs
-	// std::map<int, std::string>::iterator it = this->_servers[index].error_server.begin();
-	// for (it = this->_servers[index].error_server.begin(); it != this->_servers[index].error_server.end(); it++)
-	// {
-	// 	if (it->second == "NULL")
-	// 		it->second = address;
-	// 	struct stat buff;
-	// 	std::string check_c = std::to_string(it->first);																// PROBLEME ICE
-	// 	check_c.append(".html");
-	// 	it->second.append("/");
-	// 	it->second.append(check_c);
-	// 	std::cout << "it->second = " << it->second << std::endl;
-	// 	if (stat(it->second.c_str(), &buff) != 0)
-	// 	{
-	// 		std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-	// 		exit(EXIT_FAILURE);
-	// 	}
-	// 	// (void)buff;
-	// }
-	/*
-	**  ne verifie pas si ;es fichiers sont vides ...
-	*/
-	
+	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
+	for (it = this->_servers[index_server].error_server.begin(); it != this->_servers[index_server].error_server.end(); it++)
+	{
+		struct stat buff;
+		std::stringstream ss;
+		std::string check_c;
+
+		if (it->second == "NULL")
+			it->second = address;
+		ss << it->first;
+		ss >> check_c;
+		check_c.append(".html");
+		it->second.append("/");
+		it->second.append(check_c);
+		if (stat(it->second.c_str(), &buff) < 0)
+		{
+			std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
+			return (-1);
+		}
+		if (buff.st_size == 0)
+		{
+			std::cout << "Error, error_page directive, file is empty" << std::endl;
+			return (-1);
+		}
+	}
 	k++;
 	return (k);
 }
@@ -325,7 +330,8 @@ bool					Parsing::ft_check_code_error( int code ) const
 	else
 	{
 		std::cout << "ERROR, code pas bon MERDE" << std::endl;
-		exit(EXIT_FAILURE);
+		return (1);
+		//exit(EXIT_FAILURE);
 		//throw Error(8, "Error, code error not correct", 1);
 		// std::cout << "ERROR CODE PAS VALIDE" << std::endl;
 		// exit(EXIT_FAILURE);

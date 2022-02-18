@@ -274,6 +274,14 @@ bool                            Parsing::ft_check_server( void )
 				std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
 				k += 2;
 			}
+			else if (truc[k] == "error_page")
+			{
+				std::cout << "go error_page " << std::endl;
+				k = this->ft_get_error(k, truc, i);
+				if (k < 0)
+					return (true);
+				//k += 3;
+			}
 			// else if (truc[k] == "dav_methods")
 			// {
 			// 	std::cout << "go dav_methods " << std::endl;
@@ -302,7 +310,8 @@ bool                            Parsing::ft_check_server( void )
 			else
 			{
 				std::cout << " EUH ERROR " << truc[k] << " et k = " << k << std::endl;
-				exit(EXIT_FAILURE);
+				return (true);
+				//exit(EXIT_FAILURE);
 				//break;
 			}
 		}
