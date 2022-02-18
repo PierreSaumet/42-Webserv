@@ -258,20 +258,22 @@ bool                            Parsing::ft_check_server( void )
 				std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
 				k += 2;
 			}
-			// else if (truc[k] == "root")
-			// {
-			// 	std::cout << "go root" << std::endl;
-			// 	this->ft_get_root(k ,truc, i);
-			// 	std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
-			// 	k += 2;
-			// }
-			// else if (truc[k] == "autoindex")
-			// {
-			// 	std::cout << "go autoindex " << std::endl;
-			// 	this->ft_get_autoindex(k, truc, i);
-			// 	std::cout << "\tauoindex = " << this->_servers[i].autoindex_server << std::endl;
-			// 	k += 2;
-			// }
+			else if (truc[k] == "autoindex")
+			{
+				std::cout << "go autoindex " << std::endl;
+				if (this->ft_get_autoindex(k, truc, i))
+					return (true);
+				std::cout << "\tautoindex = " << this->_servers[i].autoindex_server << std::endl;
+				k += 2;
+			}
+			else if (truc[k] == "root")
+			{
+				std::cout << "go root" << std::endl;
+				if (this->ft_get_root(k ,truc, i))
+					return (true);
+				std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
+				k += 2;
+			}
 			// else if (truc[k] == "dav_methods")
 			// {
 			// 	std::cout << "go dav_methods " << std::endl;

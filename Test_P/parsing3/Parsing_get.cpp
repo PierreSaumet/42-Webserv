@@ -156,7 +156,6 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 bool            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
-	std::cout << "Dans autoindex =" << tmp[k] << std::endl;
 	size_t  len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 	{
@@ -180,34 +179,42 @@ bool            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tm
 	return (false);
 }
 
-
-void            Parsing::ft_get_root(size_t k, std::vector<std::string> tmp, size_t index)
+/*
+**	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will checks the informations given in the 'root' directive.
+**		It will also checks if the folder exists.
+**
+**	==> Returns 0 if no problem happens, otherwise returns 1
+*/
+bool            Parsing::ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
+	struct stat buffer;
+	size_t  	len;
+	
 	k += 1;
-	size_t  len = tmp[k].size();
+	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 	{
-		std::cout << "Error, root directive should end with '\0'" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'root' directive, it should end with '\0'" << std::endl;
+		return (true);
 	}
 	if (tmp[k][len - 1] != ';')
 	{
-		std::cout << "Error, root directive should end with ';'" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'root' directive, it should end with ';'" << std::endl;
+		return (true);
 	}
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 	{
-		std::cout << "Error, root directive should start with './'" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'root' directive, it should start with './'" << std::endl;
+		return (true);
 	}
-	this->_servers[index].root_server = tmp[k].substr(0, len - 1);
-	struct stat buffer;
-	if (stat(this->_servers[index].root_server.c_str(), &buffer) != 0)
+	this->_servers[index_server].root_server = tmp[k].substr(0, len - 1);
+	if (stat(this->_servers[index_server].root_server.c_str(), &buffer) == -1)
 	{
-		std::cout << "Error, root directive doesn't exist!" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, 'root' directive doesn't exist!" << std::endl;
+		return (true);
 	}
-	return ;
+	return (false);
 }
 
 /*
@@ -215,7 +222,7 @@ void            Parsing::ft_get_root(size_t k, std::vector<std::string> tmp, siz
 **		This function will checks the information given in the 'server_name' directive.
 **		It should only have digit and alphabetic characters.
 **
-//	==>	Returns 0 if no problem happens, otherwise returns 1.
+**	==>	Returns 0 if no problem happens, otherwise returns 1.
 */
 bool         Parsing::ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
