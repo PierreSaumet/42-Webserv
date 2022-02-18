@@ -289,13 +289,13 @@ bool                            Parsing::ft_check_server( void )
 			// 	std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
 			// 	//k += 2;
 			// }
-			// else if (truc[k] == "error_page")
-			// {
-			// 	std::cout << "go error_page " << std::endl;
-			// 	k = this->ft_get_error(k, truc, i);
-				
-			// 	//k += 3;
-			// }
+			else if (truc[k] == "client_body_buffer_size")
+			{
+				std::cout << "go client_body_buffer_size" << std::endl;
+				if (this->ft_get_buffer_size(k, truc, i))
+					return (true);
+				k += 2;
+			}
 			// else if (truc[k] == "location")
 			// {
 			// 	std::cout << "go location " << std::endl;

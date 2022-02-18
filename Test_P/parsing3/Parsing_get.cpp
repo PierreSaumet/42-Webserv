@@ -1,6 +1,22 @@
 #include "Headers/Parsing.hpp"
 # include <iostream>
 
+
+
+bool			Parsing::ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server )
+{
+	std::cout << "dans buffer size" << std::endl;
+
+	// 8k ou 16k
+	//	8000 ou 16000
+	// post actions sent.
+	(void)k;
+	(void)tmp;
+	(void)index_server;
+	return (false);
+
+}
+
 /*
 **	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'error_page' directive.
@@ -83,7 +99,7 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 }
 
 
-size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index )
+size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	std::vector<std::string> methods;
 
@@ -93,33 +109,37 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 
 	// on incremente k 
 	k += 1;
-	std::cout << "tmp[k] = " << tmp[k] << std::endl;
+	std::cout << "tmp[k] = -" << tmp[k] << "-" << std::endl;
 
-	while (tmp[k][tmp[k].size() - 1] != ';')
+	//while (tmp[k][tmp[k].size() - 1] != ';')
+	while (1)
 	{
+		std::cout << "Dans la boucle " << std::endl;
 		if (tmp[k].compare("DELETE") == 0)
-			this->_servers[index].methods_server.push_back("DELETE");
+			this->_servers[index_server].methods_server.push_back("DELETE");
 		else if (tmp[k].compare("POST") == 0)
-			this->_servers[index].methods_server.push_back("POST");
+			this->_servers[index_server].methods_server.push_back("POST");
 		else if (tmp[k].compare("GET") == 0)
-			this->_servers[index].methods_server.push_back("GET");
+			this->_servers[index_server].methods_server.push_back("GET");
 		else
 		{
 			std::cout << "Error, dav_methods can only have DELETE POST and GET methods!" << std::endl;
-			exit(EXIT_FAILURE);
+			break;
+			//exit(EXIT_FAILURE);
 		}
 		std::cout << "tmp[k] TEST = " << tmp[k] << std::endl;
 		k++;
 	}
+	std::cout << "ici " << std::endl;
 	// Donc on peut en avoir que deux max pour l'instant
-	if (this->_servers[index].methods_server.size() > 2)
+	if (this->_servers[index_server].methods_server.size() > 2)
 	{
 		std::cout << "Error, dav_methods can only have 3 methods!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	
 	// on ajoute e dernier
-	this->_servers[index].methods_server.push_back(tmp[k].substr(0, tmp[k].size() - 1));
+	this->_servers[index_server].methods_server.push_back(tmp[k].substr(0, tmp[k].size() - 1));
 	k++;
 	// on verifie les doublons
 	size_t int_del = 0;
@@ -127,7 +147,7 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 	size_t int_post = 0;
 	
 	std::vector<std::string>::iterator it;
-	for (it = this->_servers[index].methods_server.begin(); it != this->_servers[index].methods_server.end(); it++)
+	for (it = this->_servers[index_server].methods_server.begin(); it != this->_servers[index_server].methods_server.end(); it++)
 	{
 		std::cout << "it = " << *it << std::endl;
 		if (*it == "DELETE")
