@@ -3,4 +3,27 @@ Description pour les fichiers confs.
 DIRECTIVES:
 	- listen:	On trouve cette directive seulement dans 'server'
 				Sets the address and port for ip.
-		ex:		listen          127.0.0.1:800;
+		ex:		listen          127.0.0.1:8080;
+				listen			localhost:8080;
+
+	- server_name:	On trouve cette directive seulement dans 'server'
+				Sets name of a virtual server. ONLY one name.
+		ex:		server_name		test1;
+				server_name		webserv;
+	
+	- autoindex:	On trouve cette directive dans 'server' et 'location'
+				Enables or disables the directory listing output.
+		ex:		autoindex		on;
+				autoindex		off;
+	
+	- root:		On trouve cette directive dans 'server' et 'location'
+				Sets the rot directory for requests.
+		ex:		root			./confs;
+				root			./dossierquelconque;
+	
+	- error_page:	On trouve cette directive dans 'server' et 'location'
+				Defines the URI that will be shown for the specified errors.
+		ex:		error_page		404 505 ./errors;
+				error_page		404 ./errors/;
+				error_page		501 ./errors/501.html;
+				error_page		404 501 ./errors/501.html;		== 404 and 501 will display the 501 error_page
