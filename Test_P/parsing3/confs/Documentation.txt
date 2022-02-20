@@ -1,0 +1,6 @@
+Description pour les fichiers confs.
+
+DIRECTIVES:
+	- listen:	On trouve cette directive seulement dans 'server'
+				Sets the address and port for ip.
+		ex:		listen          127.0.0.1:800;
