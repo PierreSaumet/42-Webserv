@@ -25,6 +25,7 @@ class Parsing {
 			bool                        autoindex_server;
 			size_t						buffer_size;
 			std::string					cgi_path;
+			std::string					upload_path;
 			std::vector<std::string>    methods_server;
 			std::map<int, std::string>  error_server;
 		}                               t_server;
@@ -55,6 +56,7 @@ class Parsing {
 		bool                        	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool							ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool							ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool							ft_get_upload_path( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 

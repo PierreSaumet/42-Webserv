@@ -303,6 +303,13 @@ bool                            Parsing::ft_check_server( void )
 					return (true);
 				k += 2;
 			}
+			else if (truc[k] == "upload_path")
+			{
+				std::cout << "go ft_get_upload_path " << std::endl;
+				if (this->ft_get_upload_path(k, truc, i))
+					return (true);
+				k += 2;
+			}
 			// else if (truc[k] == "location")
 			// {
 			// 	std::cout << "go location " << std::endl;

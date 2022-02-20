@@ -94,6 +94,37 @@ bool			Parsing::ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t 
 	return (false);
 }
 
+bool			Parsing::ft_get_upload_path( size_t k, std::vector<std::string> tmp, size_t index_server )
+{
+	struct stat buffer;
+	size_t  	len;
+	
+	k += 1;
+	len = tmp[k].size();
+	if (tmp[k][len] != '\0')
+	{
+		std::cout << "Error, in 'upload_path' directive, it should end with '\0'" << std::endl;
+		return (true);
+	}
+	if (tmp[k][len - 1] != ';')
+	{
+		std::cout << "Error, in 'upload_path' directive, it should end with ';'" << std::endl;
+		return (true);
+	}
+	if (tmp[k][0] != '.' || tmp[k][1] != '/')
+	{
+		std::cout << "Error, in 'upload_path' directive, it should start with './'" << std::endl;
+		return (true);
+	}
+	this->_servers[index_server].upload_path = tmp[k].substr(0, len - 1);
+	if (stat(this->_servers[index_server].upload_path.c_str(), &buffer) == -1)
+	{
+		std::cout << "Error, 'upload_path' directive doesn't exist!" << std::endl;
+		return (true);
+	}
+	return (false);
+}
+
 /*
 **	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'error_page' directive.
