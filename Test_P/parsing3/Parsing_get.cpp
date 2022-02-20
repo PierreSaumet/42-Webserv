@@ -2,19 +2,58 @@
 # include <iostream>
 
 
-
+/*
+**	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'client_body_buffer_size' directive.
+**		The information given is between 8000 (8k) and 16000 (16k) maximum.
+**		The information will be used for the 'POST' command.
+**
+**	==> Returns 1 if an error occurs, otherwise returns 0.
+*/
 bool			Parsing::ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	std::cout << "dans buffer size" << std::endl;
+	size_t		i;
+	int			buffer_size;
 
-	// 8k ou 16k
-	//	8000 ou 16000
-	// post actions sent.
-	(void)k;
-	(void)tmp;
-	(void)index_server;
+	k += 1;
+	i = 0;
+	buffer_size = 0;
+	while (isdigit(tmp[k][i]))
+		i++;
+	if (i == 0)
+	{
+		std::cout << "Error, in 'client_body_buffer_size' directive, it should only be digits." << std::endl;
+		return (true);
+	}
+	if (tmp[k][i] == 'k' && tmp[k][i + 1] == ';' && i + 1 == tmp[k].size() - 1 && tmp[k][i + 2] == '\0')
+	{
+		buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
+		if (buffer_size < 8 || buffer_size > 16)
+		{
+			std::cout << "Error, in 'client_body_buffer_size' directive, buffer size must be between 8k and 16k." << std::endl;
+			return (true);
+		}
+		this->_servers[index_server].buffer_size = buffer_size * 1000;
+	}
+	else
+	{
+		if (tmp[k][i] == ';' && i + 1 == tmp[k].size() && tmp[k][i + 1] == '\0')
+		{
+			buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
+			if (buffer_size < 8000 || buffer_size > 16000)
+			{
+				std::cout << "Error, in 'client_body_buffer_size' directive, buffer size must be between 8000 and 16000." << std::endl;
+				return (true);
+			}
+			this->_servers[index_server].buffer_size = buffer_size;
+		}
+		else
+		{
+			std::cout << "Error, in 'client_body_buffer_size' directive, informations are corrupted." << std::endl;
+			return (true);
+		}
+	}
 	return (false);
-
 }
 
 /*

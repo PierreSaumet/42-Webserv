@@ -23,7 +23,7 @@ class Parsing {
 			std::string                 name_server;
 			std::string                 root_server;
 			bool                        autoindex_server;
-			std::string					buffer_size;
+			size_t						buffer_size;
 			std::vector<std::string>    methods_server;
 			std::map<int, std::string>  error_server;
 		}                               t_server;
