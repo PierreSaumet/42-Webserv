@@ -394,7 +394,7 @@ bool         Parsing::ft_get_server_name( size_t k, std::vector<std::string> tmp
 /*
 **  ft_get_listen( size_t km std::vector<std::string> tmp, size_t idnex_server ):
 **      This function will checks the informations given in the 'listen' directive.
-**      It should find a 'host' equal to '127.0.0.1', an 'port' > 1 and < 65535.
+**      It should find a 'host' equal to '127.0.0.1' or 'localhost', an 'port' > 1 and < 65535.
 **
 **     ==> Returns 0 if no problem happens, otherwise returns 1.
 */
@@ -422,9 +422,9 @@ bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 		std::cout << "Error, in 'listen directive' it has bad host or port" << std::endl;
 		return (true);
 	}
-	if (tmp[k].compare(0, 10, "127.0.0.1:") != 0)
+	if (tmp[k].compare(0, 10, "127.0.0.1:") != 0 && tmp[k].compare(0, 10, "localhost:") != 0)
 	{
-		std::cout << "Error, in 'listen directive' host should be 127.0.0.1" << std::endl;
+		std::cout << "Error, in 'listen directive' host should be 127.0.0.1 or 'localhost'" << std::endl;
 		return (true);
 	}
 	size_t i = 9;
