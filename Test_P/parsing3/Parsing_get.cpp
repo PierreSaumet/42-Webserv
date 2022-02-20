@@ -56,10 +56,15 @@ bool			Parsing::ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size
 	return (false);
 }
 
+/*
+**	ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'cgi_path' directive.
+**		The information given is an fodler where we can find the data for the cgi.
+**
+**	==> Returns 1 if an error occurs, otherwise returns 0.
+*/
 bool			Parsing::ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	std::cout << "dans get cgi path " << std::endl;
-
 	struct stat buffer;
 	size_t  	len;
 	
