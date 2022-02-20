@@ -94,6 +94,13 @@ bool			Parsing::ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t 
 	return (false);
 }
 
+/*
+**	ft_get_upload_path( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'upload_path' directive.
+**		The information given is an fodler where we can find files uploaded.
+**
+**	==> Returns 1 if an error occurs, otherwise returns 0.
+*/
 bool			Parsing::ft_get_upload_path( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	struct stat buffer;
