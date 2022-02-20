@@ -296,6 +296,13 @@ bool                            Parsing::ft_check_server( void )
 					return (true);
 				k += 2;
 			}
+			else if (truc[k] == "cgi_path")
+			{
+				std::cout << "go cgi path" << std::endl;
+				if (this->ft_get_cgi_path(k, truc, i))
+					return (true);
+				k += 2;
+			}
 			// else if (truc[k] == "location")
 			// {
 			// 	std::cout << "go location " << std::endl;
