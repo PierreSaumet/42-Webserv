@@ -176,6 +176,10 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 		std::cout << "Error, error_page directive should end with a directory or file" << std::endl;
 		return (-1);
 	}
+
+	std::cout << "ICI TAILLE == " << this->_servers[index_server].error_server.size() << std::endl;
+
+
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 	struct stat buffer;
 	if (stat(address.c_str(), &buffer) != 0)
@@ -183,21 +187,42 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 		std::cout << "Error, error_page directive, directory doesn't exist!" << std::endl;
 		return (-1);
 	}
-	// on ajute l'addresse a toutes les erreurs
-	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
-	for (it = this->_servers[index_server].error_server.begin(); it != this->_servers[index_server].error_server.end(); it++)
-	{
-		struct stat buff;
-		std::stringstream ss;
-		std::string check_c;
 
+	if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
+	{
+		// on ajute l'addresse a toutes les erreurs
+		std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
+		for (it = this->_servers[index_server].error_server.begin(); it != this->_servers[index_server].error_server.end(); it++)
+		{
+			struct stat buff;
+			std::stringstream ss;
+			std::string check_c;
+
+			if (it->second == "NULL")
+				it->second = address;
+			ss << it->first;
+			ss >> check_c;
+			check_c.append(".html");
+			it->second.append("/");
+			it->second.append(check_c);
+			if (stat(it->second.c_str(), &buff) < 0)
+			{
+				std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
+				return (-1);
+			}
+			if (buff.st_size == 0)
+			{
+				std::cout << "Error, error_page directive, file is empty" << std::endl;
+				return (-1);
+			}
+		}
+	}
+	else		// only one error page
+	{
+		std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
 		if (it->second == "NULL")
 			it->second = address;
-		ss << it->first;
-		ss >> check_c;
-		check_c.append(".html");
-		it->second.append("/");
-		it->second.append(check_c);
+		struct stat buff;
 		if (stat(it->second.c_str(), &buff) < 0)
 		{
 			std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
@@ -208,6 +233,7 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 			std::cout << "Error, error_page directive, file is empty" << std::endl;
 			return (-1);
 		}
+
 	}
 	k++;
 	return (k);
