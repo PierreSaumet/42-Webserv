@@ -208,7 +208,7 @@ bool                            Parsing::ft_check_server( void )
 		serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
 		serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
 		serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
-		serv_dir.insert(std::pair<std::string, bool>("upload_path", false));
+		serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
 		// on parcoourt le vector et on verifie que nos directives sont presentes
 		size_t k = 0;
 		count = 0;
@@ -335,10 +335,10 @@ bool                            Parsing::ft_check_server( void )
 					return (true);
 				k += 2;
 			}
-			else if (truc[k] == "upload_path")
+			else if (truc[k] == "upload_store")
 			{
-				std::cout << "go ft_get_upload_path " << std::endl;
-				if (this->ft_get_upload_path(k, truc, i))
+				std::cout << "go ft_get_upload_store " << std::endl;
+				if (this->ft_get_upload_store(k, truc, i))
 					return (true);
 				k += 2;
 			}
@@ -413,7 +413,7 @@ bool                            Parsing::ft_check_location( void )      // to do
 **  ft_check_semicolon():
 **      This function will check if after a directive, there is a semi colon at the end.
 **      It will only checks the following directives:
-**          listen / server_name / index / autoindex / root / client_body_buffer_size / cgi_path / upload_path
+**          listen / server_name / index / autoindex / root / client_body_buffer_size / cgi_path / upload_store
 **
 **  ==> Returns 0 if there is no error, otherwise returns 1.
 */
@@ -428,7 +428,7 @@ bool                            Parsing::ft_check_semicolon( void )     // to do
 	directives.push_back("root");
 	directives.push_back("client_body_buffer_size");
 	directives.push_back("cgi_path");
-	directives.push_back("upload_path");
+	directives.push_back("upload_store");
 
 	std::vector<std::string>::iterator  it_b;
 	for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)

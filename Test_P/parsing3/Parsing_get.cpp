@@ -95,13 +95,13 @@ bool			Parsing::ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t 
 }
 
 /*
-**	ft_get_upload_path( size_t k, std::vector<std::string> tmp, size_t index_server ):
-**		This function will check the information given in the 'upload_path' directive.
+**	ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'upload_store' directive.
 **		The information given is an fodler where we can find files uploaded.
 **
 **	==> Returns 1 if an error occurs, otherwise returns 0.
 */
-bool			Parsing::ft_get_upload_path( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool			Parsing::ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	struct stat buffer;
 	size_t  	len;
@@ -110,23 +110,23 @@ bool			Parsing::ft_get_upload_path( size_t k, std::vector<std::string> tmp, size
 	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 	{
-		std::cout << "Error, in 'upload_path' directive, it should end with '\0'" << std::endl;
+		std::cout << "Error, in 'upload_store' directive, it should end with '\0'" << std::endl;
 		return (true);
 	}
 	if (tmp[k][len - 1] != ';')
 	{
-		std::cout << "Error, in 'upload_path' directive, it should end with ';'" << std::endl;
+		std::cout << "Error, in 'upload_store' directive, it should end with ';'" << std::endl;
 		return (true);
 	}
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 	{
-		std::cout << "Error, in 'upload_path' directive, it should start with './'" << std::endl;
+		std::cout << "Error, in 'upload_store' directive, it should start with './'" << std::endl;
 		return (true);
 	}
-	this->_servers[index_server].upload_path = tmp[k].substr(0, len - 1);
-	if (stat(this->_servers[index_server].upload_path.c_str(), &buffer) == -1)
+	this->_servers[index_server].upload_store = tmp[k].substr(0, len - 1);
+	if (stat(this->_servers[index_server].upload_store.c_str(), &buffer) == -1)
 	{
-		std::cout << "Error, 'upload_path' directive doesn't exist!" << std::endl;
+		std::cout << "Error, 'upload_store' directive doesn't exist!" << std::endl;
 		return (true);
 	}
 	return (false);
