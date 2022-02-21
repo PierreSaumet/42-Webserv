@@ -3,28 +3,6 @@
 
 
 /*
-**
-**	on doit avoir
-autoindex
-root
-error_page
-dav_method
-upload_path
-client_body_buffer_size
-*/
-size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_t index_server )
-{
-	std::cout << "\n\ndans location" << std::endl;
-	std::cout << "k = " << k << std::endl;
-	std::cout << "tmp[k] = " << tmp[k] << std::endl;
-	std::cout << "index = " << index_server << std::endl;
-
-	(void)k;
-	(void)tmp;
-	(void)index_server;
-	return (0);
-}
-/*
 **	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'client_body_buffer_size' directive.
 **		The information given is between 8000 (8k) and 16000 (16k) maximum.
