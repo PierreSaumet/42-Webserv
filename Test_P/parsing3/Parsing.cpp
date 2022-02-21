@@ -177,8 +177,16 @@ bool                            Parsing::ft_check_server( void )
 	// on compte le nombre de server
 	while (i < size_data)
 	{
-		if (this->_data[i] == "server" && this->_data[i + 1] == "{")
-			this->_nbr_servers++;
+		if (this->_data[i] == "server")
+		{
+			if (this->_data[i + 1] == "{")
+				this->_nbr_servers++;
+			else
+			{
+				std::cout << "Error, bloc server." << std::endl;
+				return (true);
+			}
+		}
 		i++;
 	}
 	std::cout << "nbr serv = " << this->_nbr_servers << std::endl;
@@ -191,7 +199,7 @@ bool                            Parsing::ft_check_server( void )
 		std::vector<std::string>    truc = this->ft_get_scope(y);
 		std::cout << "La taille de truc = " << truc.size() << std::endl;
 		y = truc.size();
-
+		std::cout << "\nla  y =  " << y << std::endl;
 		serv_dir.insert(std::pair<std::string, bool>("listen", false));
 		serv_dir.insert(std::pair<std::string, bool>("server_name", false));
 		serv_dir.insert(std::pair<std::string, bool>("error_page", false));
@@ -315,6 +323,11 @@ bool                            Parsing::ft_check_server( void )
 					return (true);
 				k += 2;
 			}
+			else if (truc[k] == "server" && truc[k + 1] == "{")
+			{
+				std::cout << "Error, a bloc server cannot have another bloc server inside." << std::endl;
+				return (true);
+			}
 			// else if (truc[k] == "location")
 			// {
 			// 	std::cout << "go location " << std::endl;
@@ -328,15 +341,19 @@ bool                            Parsing::ft_check_server( void )
 			// }
 			else
 			{
-				std::cout << " EUH ERROR " << truc[k] << " et k = " << k << std::endl;
-				return (true);
+				std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << truc[k] << std::endl;
+				break;
+				//std::cout << " EUH ERROR " << truc[k] << " et k = " << k << std::endl;
+				//if ()
+				//return (true);
 				//exit(EXIT_FAILURE);
 				//break;
 			}
 		}
 
-
+		std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;
 		i++;
+		
 	}
 	
 	return (false);
