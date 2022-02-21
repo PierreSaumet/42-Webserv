@@ -3,6 +3,28 @@
 
 
 /*
+**
+**	on doit avoir
+autoindex
+root
+error_page
+dav_method
+upload_path
+client_body_buffer_size
+*/
+size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_t index_server )
+{
+	std::cout << "\n\ndans location" << std::endl;
+	std::cout << "k = " << k << std::endl;
+	std::cout << "tmp[k] = " << tmp[k] << std::endl;
+	std::cout << "index = " << index_server << std::endl;
+
+	(void)k;
+	(void)tmp;
+	(void)index_server;
+	return (0);
+}
+/*
 **	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'client_body_buffer_size' directive.
 **		The information given is between 8000 (8k) and 16000 (16k) maximum.
@@ -33,7 +55,7 @@ bool			Parsing::ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size
 			std::cout << "Error, in 'client_body_buffer_size' directive, buffer size must be between 8k and 16k." << std::endl;
 			return (true);
 		}
-		this->_servers[index_server].buffer_size = buffer_size * 1000;
+		this->_servers[index_server].buffer_size_server = buffer_size * 1000;
 	}
 	else
 	{
@@ -45,7 +67,7 @@ bool			Parsing::ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size
 				std::cout << "Error, in 'client_body_buffer_size' directive, buffer size must be between 8000 and 16000." << std::endl;
 				return (true);
 			}
-			this->_servers[index_server].buffer_size = buffer_size;
+			this->_servers[index_server].buffer_size_server = buffer_size;
 		}
 		else
 		{
@@ -85,8 +107,8 @@ bool			Parsing::ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t 
 		std::cout << "Error, in 'cgi_path' directive, it should start with './'" << std::endl;
 		return (true);
 	}
-	this->_servers[index_server].cgi_path = tmp[k].substr(0, len - 1);
-	if (stat(this->_servers[index_server].cgi_path.c_str(), &buffer) == -1)
+	this->_servers[index_server].cgi_path_server = tmp[k].substr(0, len - 1);
+	if (stat(this->_servers[index_server].cgi_path_server.c_str(), &buffer) == -1)
 	{
 		std::cout << "Error, 'cgi_path' directive doesn't exist!" << std::endl;
 		return (true);
@@ -123,8 +145,8 @@ bool			Parsing::ft_get_upload_store( size_t k, std::vector<std::string> tmp, siz
 		std::cout << "Error, in 'upload_store' directive, it should start with './'" << std::endl;
 		return (true);
 	}
-	this->_servers[index_server].upload_store = tmp[k].substr(0, len - 1);
-	if (stat(this->_servers[index_server].upload_store.c_str(), &buffer) == -1)
+	this->_servers[index_server].upload_store_server = tmp[k].substr(0, len - 1);
+	if (stat(this->_servers[index_server].upload_store_server.c_str(), &buffer) == -1)
 	{
 		std::cout << "Error, 'upload_store' directive doesn't exist!" << std::endl;
 		return (true);

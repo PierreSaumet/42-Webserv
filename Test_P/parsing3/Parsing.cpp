@@ -113,6 +113,7 @@ bool                            Parsing::ft_check_data( void ) {
 		std::cout << "ERROR, problem bloc server" << std::endl;
 		return (true);
 	}
+
 	std::cout << "lol ok " << std::endl;
 	return (false);
 }
@@ -192,14 +193,14 @@ bool                            Parsing::ft_check_server( void )
 	std::cout << "nbr serv = " << this->_nbr_servers << std::endl;
 	// test fonction
 	i = 0;
-	int y = 0;
+	int server_size = 0;
 	while (i < this->_nbr_servers)
 	{
-		
-		std::vector<std::string>    truc = this->ft_get_scope(y);
-		std::cout << "La taille de truc = " << truc.size() << std::endl;
-		y = truc.size();
-		std::cout << "\nla  y =  " << y << std::endl;
+		///////////////// A DECOUPER FONCTION 1 //////////////////////////////////////////
+		std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
+		std::cout << "La taille de scope_server = " << scope_server.size() << std::endl;
+		server_size = scope_server.size();
+		std::cout << "\nla  server_size =  " << server_size << std::endl;
 		serv_dir.insert(std::pair<std::string, bool>("listen", false));
 		serv_dir.insert(std::pair<std::string, bool>("server_name", false));
 		serv_dir.insert(std::pair<std::string, bool>("error_page", false));
@@ -212,14 +213,14 @@ bool                            Parsing::ft_check_server( void )
 		// on parcoourt le vector et on verifie que nos directives sont presentes
 		size_t k = 0;
 		count = 0;
-		while (k < truc.size())
+		while (k < scope_server.size())
 		{
 			for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
 			{
 
-				if (it_b->first == truc[k])
+				if (it_b->first == scope_server[k])
 				{
-					if (truc[k] == "root")
+					if (scope_server[k] == "root")
 						std::cout << "icic k = " << k << std::endl;
 					count++;
 					if (it_b->second == false)
@@ -233,13 +234,13 @@ bool                            Parsing::ft_check_server( void )
 				}
 				
 			}
-			if (truc[k] == "location")
+			if (scope_server[k] == "location")
 			{
-				// std::vector<std::string>    truc = this->ft_get_scope(y);
+				// std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
 				std::cout << "\n\non trouve location" << std::endl;
-				std::cout << "Dans boucle truc[k] == " << truc[k] << std::endl;
+				std::cout << "Dans boucle scope_server[k] == " << scope_server[k] << std::endl;
 				std::cout << " k = " << k << std::endl;
-				std::cout << "y = " << y << std::endl;
+				std::cout << "server_size = " << server_size << std::endl;
 				std::vector<std::string>    scope_location = this->ft_get_scope(k + 1);
 				std::cout << "size_du scope location = " << scope_location.size() << std::endl;
 				k = k + scope_location.size();
@@ -249,13 +250,13 @@ bool                            Parsing::ft_check_server( void )
 
 			// else
 			// {
-			// 	std::cout << "ICI il y a une erreur = " << truc[k] << std::endl;
+			// 	std::cout << "ICI il y a une erreur = " << scope_server[k] << std::endl;
 			// 	return (true);
 			// }
-			//std::cout << "Dans boucle truc[k] == " << truc[k] << std::endl;
+			//std::cout << "Dans boucle scope_server[k] == " << scope_server[k] << std::endl;
 			k++;
 			std::cout << "fin de la boucle k = " <<  k << std::endl;
-			// if (k == truc.size())
+			// if (k == scope_server.size())
 			// 	break;
 		}
 
@@ -273,8 +274,10 @@ bool                            Parsing::ft_check_server( void )
 			std::cout << "\t directives in a bloc server before a location bloc" << std::endl;
 			return (true);
 		}
+		///////////////// A DECOUPER FIN FONCTION 1 //////////////////////////////////////////
 
-		std::cout << "truc[k] == " << truc[k - 1] << std::endl;
+
+		std::cout << "scope_server[k] == " << scope_server[k - 1] << std::endl;
 
 
 		// std::cout << "STOP " << std::endl;
@@ -285,52 +288,52 @@ bool                            Parsing::ft_check_server( void )
 
 		this->_servers.push_back(Parsing::t_server());
 		k = 1;
-		while (k < truc.size())
+		while (k < scope_server.size())
 		{
-			if (truc[k] == "listen")
+			if (scope_server[k] == "listen")
 			{
 				std::cout << "go listen" << std::endl;
-				if (this->ft_get_listen(k, truc, i))
+				if (this->ft_get_listen(k, scope_server, i))
 					return (true);
 				std::cout << "\thost = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
 				k += 2;
 			}
-			else if (truc[k] == "server_name")
+			else if (scope_server[k] == "server_name")
 			{
 				std::cout << "go server_name " << std::endl;
-				if (this->ft_get_server_name(k, truc, i))
+				if (this->ft_get_server_name(k, scope_server, i))
 					return (true);
 				std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
 				k += 2;
 			}
-			else if (truc[k] == "autoindex")
+			else if (scope_server[k] == "autoindex")
 			{
 				std::cout << "go autoindex " << std::endl;
-				if (this->ft_get_autoindex(k, truc, i))
+				if (this->ft_get_autoindex(k, scope_server, i))
 					return (true);
 				std::cout << "\tautoindex = " << this->_servers[i].autoindex_server << std::endl;
 				k += 2;
 			}
-			else if (truc[k] == "root")
+			else if (scope_server[k] == "root")
 			{
 				std::cout << "go root" << std::endl;
-				if (this->ft_get_root(k ,truc, i))
+				if (this->ft_get_root(k ,scope_server, i))
 					return (true);
 				std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
 				k += 2;
 			}
-			else if (truc[k] == "error_page")
+			else if (scope_server[k] == "error_page")
 			{
 				std::cout << "go error_page " << std::endl;
-				k = this->ft_get_error(k, truc, i);
+				k = this->ft_get_error(k, scope_server, i);
 				if (k < 0)
 					return (true);
 				//k += 3;
 			}
-			else if (truc[k] == "dav_methods")
+			else if (scope_server[k] == "dav_methods")
 			{
 				std::cout << "go dav_methods " << std::endl;
-				k = this->ft_get_methods(k, truc, i);
+				k = this->ft_get_methods(k, scope_server, i);
 				if (k == 0)
 				{
 					std::cout << "ERROR DANS DAV METHODS" << std::endl;
@@ -339,54 +342,58 @@ bool                            Parsing::ft_check_server( void )
 				std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
 				//k += 2;
 			}
-			else if (truc[k] == "client_body_buffer_size")
+			else if (scope_server[k] == "client_body_buffer_size")
 			{
 				std::cout << "go client_body_buffer_size" << std::endl;
-				if (this->ft_get_buffer_size(k, truc, i))
+				if (this->ft_get_buffer_size(k, scope_server, i))
 					return (true);
 				k += 2;
 			}
-			else if (truc[k] == "cgi_path")
+			else if (scope_server[k] == "cgi_path")
 			{
 				std::cout << "go cgi path" << std::endl;
-				if (this->ft_get_cgi_path(k, truc, i))
+				if (this->ft_get_cgi_path(k, scope_server, i))
 					return (true);
 				k += 2;
 			}
-			else if (truc[k] == "upload_store")
+			else if (scope_server[k] == "upload_store")
 			{
 				std::cout << "go ft_get_upload_store " << std::endl;
-				if (this->ft_get_upload_store(k, truc, i))
+				if (this->ft_get_upload_store(k, scope_server, i))
 					return (true);
 				k += 2;
 			}
-			else if (truc[k] == "server" && truc[k + 1] == "{")
+			else if (scope_server[k] == "server" && scope_server[k + 1] == "{")
 			{
 				std::cout << "Error, a bloc server cannot have another bloc server inside." << std::endl;
 				return (true);
 			}
-			// else if (truc[k] == "location")
-			// {
-			// 	std::cout << "go location " << std::endl;
-			// 	break;
-			// 	k += 2;
-			// }
-			// else if (truc[k] == "{" || truc[k] == "}")
+			else if (scope_server[k] == "location")
+			{
+				std::cout << "go location " << std::endl;
+				k = ft_get_location( k, scope_server, i);
+				if (k < 0)
+					return (true);
+				return (true);
+				break;
+				k += 2;
+			}
+			// else if (scope_server[k] == "{" || scope_server[k] == "}")
 			// {
 			// 	std::cout << " on coninue " << std::endl;
 			// 	k++;
 			// }
 			else
 			{
-				std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << truc[k] << std::endl;
-				if (truc[k] == "}")
+				std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << scope_server[k] << std::endl;
+				if (scope_server[k] == "}")
 					break;
 				else
 				{
 					std::cout << "INSTRUCTION NON RECONNU" << std::endl;
 					return (true);
 				}
-				//std::cout << " EUH ERROR " << truc[k] << " et k = " << k << std::endl;
+				//std::cout << " EUH ERROR " << scope_server[k] << " et k = " << k << std::endl;
 				//if ()
 				//return (true);
 				//exit(EXIT_FAILURE);

@@ -16,6 +16,17 @@ class Parsing {
 
 	public:
 
+		typedef struct					s_location {
+
+			std::string					name_location;
+			std::string                 root_location;
+			bool                        autoindex_location;
+			std::map<int, std::string>  error_location;
+			std::vector<std::string>    methods_location;
+			std::string					upload_store_location;
+			size_t						buffer_size_location;
+		}								t_location;
+
 		typedef struct                  s_server {
 
 			std::string                 host_server;
@@ -23,11 +34,13 @@ class Parsing {
 			std::string                 name_server;
 			std::string                 root_server;
 			bool                        autoindex_server;
-			size_t						buffer_size;
-			std::string					cgi_path;
-			std::string					upload_store;
+			size_t						buffer_size_server;
+			std::string					cgi_path_server;
+			std::string					upload_store_server;
 			std::vector<std::string>    methods_server;
 			std::map<int, std::string>  error_server;
+
+			std::vector<t_location>		location;
 		}                               t_server;
 
 		Parsing( std::string &configfile );
@@ -60,6 +73,7 @@ class Parsing {
 		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 
+		size_t							ft_get_location( size_t k, std::vector<std::string> tmp, size_t index_server );
 
 		std::string                     ft_delete_comm( std::string &line );
 		std::vector<std::string>        ft_get_scope( size_t index );
