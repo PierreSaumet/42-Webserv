@@ -216,8 +216,11 @@ bool                            Parsing::ft_check_server( void )
 		{
 			for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
 			{
+
 				if (it_b->first == truc[k])
 				{
+					if (truc[k] == "root")
+						std::cout << "icic k = " << k << std::endl;
 					count++;
 					if (it_b->second == false)
 						it_b->second = true;
@@ -231,14 +234,29 @@ bool                            Parsing::ft_check_server( void )
 				
 			}
 			if (truc[k] == "location")
-				break;
+			{
+				// std::vector<std::string>    truc = this->ft_get_scope(y);
+				std::cout << "\n\non trouve location" << std::endl;
+				std::cout << "Dans boucle truc[k] == " << truc[k] << std::endl;
+				std::cout << " k = " << k << std::endl;
+				std::cout << "y = " << y << std::endl;
+				std::vector<std::string>    scope_location = this->ft_get_scope(k + 1);
+				std::cout << "size_du scope location = " << scope_location.size() << std::endl;
+				k = k + scope_location.size();
+
+				//k++;
+			}
+
 			// else
 			// {
 			// 	std::cout << "ICI il y a une erreur = " << truc[k] << std::endl;
 			// 	return (true);
 			// }
-			std::cout << "Dans boucle truc[k] == " << truc[k] << std::endl;
+			//std::cout << "Dans boucle truc[k] == " << truc[k] << std::endl;
 			k++;
+			std::cout << "fin de la boucle k = " <<  k << std::endl;
+			// if (k == truc.size())
+			// 	break;
 		}
 
 
