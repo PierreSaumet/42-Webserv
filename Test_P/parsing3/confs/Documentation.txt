@@ -27,3 +27,10 @@ DIRECTIVES:
 				error_page		404 ./errors/;
 				error_page		501 ./errors/501.html;
 				error_page		404 501 ./errors/501.html;		== 404 and 501 will display the 501 error_page
+	
+	- dav_methods:	On trouve cette directive dans 'server' et 'location'
+				Allows the specified HTTP and WebDav methods. It supports usually PUT, DELETE, MKCOL, COPY and MOVE.
+				But for our program and subject, the following methods are supported:
+				POST GET DELETE.
+		ex:		dav_methods		POST GET DELETE;
+				dav_methods		DELETE;
