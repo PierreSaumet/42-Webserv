@@ -252,7 +252,13 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 	return (k);
 }
 
-
+/*
+**	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'dav_methods' directive.
+**		It only accept 3 methods: 'DELETE', 'GET' and 'POST'
+**
+**	==> Returns the next directive if no error occurs, otherwise display an error message and it returns 0.
+*/
 size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	std::vector<std::string> methods;
@@ -260,12 +266,7 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 	methods.push_back("DELETE");
 	methods.push_back("GET");
 	methods.push_back("POST");
-
-	// on incremente k 
 	k += 1;
-	std::cout << "tmp[k] = -" << tmp[k] << "-" << std::endl;
-
-	//while (tmp[k][tmp[k].size() - 1] != ';')
 	while (1)
 	{
 		std::cout << "Dans la boucle " << std::endl;
@@ -277,29 +278,37 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 			this->_servers[index_server].methods_server.push_back("GET");
 		else
 		{
-			std::cout << "Error, dav_methods can only have DELETE POST and GET methods!" << std::endl;
+			if (tmp[k].compare("DELETE;") == 0)
+				this->_servers[index_server].methods_server.push_back("DELETE");
+			else if (tmp[k].compare("POST;") == 0)
+				this->_servers[index_server].methods_server.push_back("POST");
+			else if (tmp[k].compare("GET;") == 0)
+				this->_servers[index_server].methods_server.push_back("GET");
+			else
+			{
+				std::cout << "Error, in 'dav_methods' directive, it can only have DELETE POST and GET methods!" << std::endl;
+				return (0);
+			}
 			break;
-			//exit(EXIT_FAILURE);
 		}
-		std::cout << "tmp[k] TEST = " << tmp[k] << std::endl;
 		k++;
 	}
-	std::cout << "ici " << std::endl;
-	// Donc on peut en avoir que deux max pour l'instant
-	if (this->_servers[index_server].methods_server.size() > 2)
+	if (this->_servers[index_server].methods_server.size() > 3 || this->_servers[index_server].methods_server.size() == 0)
 	{
-		std::cout << "Error, dav_methods can only have 3 methods!" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error, in 'dav_methods' directive, it can only have 3 methods maximum!" << std::endl;
+		return (0);
 	}
-	
-	// on ajoute e dernier
-	this->_servers[index_server].methods_server.push_back(tmp[k].substr(0, tmp[k].size() - 1));
 	k++;
+	if (tmp[k] == "GET" || tmp[k] == "GET;" || tmp[k] == "DELETE" || tmp[k] == "DELETE;" || tmp[k] == "POST" || tmp[k] == "POST;")
+	{
+		std::cout << "Error, in 'dav_methods' directive, methods are not correct." << std::endl;
+		return (0);
+	}
+
 	// on verifie les doublons
 	size_t int_del = 0;
 	size_t int_get = 0;
 	size_t int_post = 0;
-	
 	std::vector<std::string>::iterator it;
 	for (it = this->_servers[index_server].methods_server.begin(); it != this->_servers[index_server].methods_server.end(); it++)
 	{
@@ -312,16 +321,15 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 			int_get++;
 		else
 		{
-			std::cout << "Error, this method is unknow!" << std::endl;
-			exit(EXIT_FAILURE);
+			std::cout << "Error, in 'dav_methods' directive, this method is unkonwn." << std::endl;
+			return (0);
 		}
 		if (int_del > 1 || int_post > 1 || int_get > 1)
 		{
-			std::cout << "Error, dav_methods should not have doublons" << std::endl;
-			exit(EXIT_FAILURE);
+			std::cout << "Error, in 'dav_methods' directive, it should not have doublons." << std::endl;
+			return (0);
 		}
 	}
-
 	return (k);
 }
 

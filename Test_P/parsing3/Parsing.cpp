@@ -282,13 +282,18 @@ bool                            Parsing::ft_check_server( void )
 					return (true);
 				//k += 3;
 			}
-			// else if (truc[k] == "dav_methods")
-			// {
-			// 	std::cout << "go dav_methods " << std::endl;
-			// 	k = this->ft_get_methods(k, truc, i);
-			// 	std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
-			// 	//k += 2;
-			// }
+			else if (truc[k] == "dav_methods")
+			{
+				std::cout << "go dav_methods " << std::endl;
+				k = this->ft_get_methods(k, truc, i);
+				if (k == 0)
+				{
+					std::cout << "ERROR DANS DAV METHODS" << std::endl;
+					return (true);
+				}
+				std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
+				//k += 2;
+			}
 			else if (truc[k] == "client_body_buffer_size")
 			{
 				std::cout << "go client_body_buffer_size" << std::endl;
