@@ -20,5 +20,5 @@
 
 4) et il nous faut aussi
 	cgi_path 
-	upload_path
+	upload_store
 		on on va dire qu'on peut les trouver de partout

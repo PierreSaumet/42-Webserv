@@ -149,7 +149,7 @@ std::vector<Parsing::t_server>		Parsing::ft_initialize( std::string &line )
 	// tmp[0]._methods_server
 	tmp[0]._index_server = "NULL";
 	tmp[0]._cgi_path_server = "NULL";
-	tmp[0]._upload_path_server = "NULL";
+	tmp[0]._upload_store_server = "NULL";
 	this->_nbr_server = this->_count_bloc_server(line);
 	this->_check_bloc_server(line);
 	std::cout << "Bloc server are correct" << std::endl;

@@ -54,7 +54,7 @@ class Parsing
 
 			// perso
 			std::string		_cgi_path_server;
-			std::string		_upload_path_server;
+			std::string		_upload_store_server;
 
 			size_t			_number_of_location;
 
