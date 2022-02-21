@@ -226,12 +226,23 @@ bool                            Parsing::ft_check_server( void )
 						std::cout << "ERROR, bloc server cannot have doublon BNJJJJJJJJ: " << it_b->first << std::endl;
 						return (true);
 					}
+					//k++;
 				}
+				
 			}
 			if (truc[k] == "location")
 				break;
+			// else
+			// {
+			// 	std::cout << "ICI il y a une erreur = " << truc[k] << std::endl;
+			// 	return (true);
+			// }
+			std::cout << "Dans boucle truc[k] == " << truc[k] << std::endl;
 			k++;
 		}
+
+
+
 		std::cout << " COUT =  " << count << std::endl;
 		if (count != 9)
 		{
@@ -244,6 +255,14 @@ bool                            Parsing::ft_check_server( void )
 			std::cout << "\t directives in a bloc server before a location bloc" << std::endl;
 			return (true);
 		}
+
+		std::cout << "truc[k] == " << truc[k - 1] << std::endl;
+
+
+		// std::cout << "STOP " << std::endl;
+		// return (true);
+
+
 		serv_dir.clear();
 
 		this->_servers.push_back(Parsing::t_server());
@@ -342,7 +361,13 @@ bool                            Parsing::ft_check_server( void )
 			else
 			{
 				std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << truc[k] << std::endl;
-				break;
+				if (truc[k] == "}")
+					break;
+				else
+				{
+					std::cout << "INSTRUCTION NON RECONNU" << std::endl;
+					return (true);
+				}
 				//std::cout << " EUH ERROR " << truc[k] << " et k = " << k << std::endl;
 				//if ()
 				//return (true);
