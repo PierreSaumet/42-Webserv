@@ -30,30 +30,32 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 	// this->_servers[index_server].location++;
 	std::cout << " TAILLE DE location dans le server = " << this->_servers[index_server].location.size() << std::endl;
 	// on verifie qu'il y a / et quelaue chose apres et {
+
+	std::cout << "tmp[k] = " << tmp[k] << " et tmp [lk  2 ] = " << tmp[k + 2] << std::endl;
 	if (tmp[k] != "location" || tmp[k + 2] != "{")
 	{
-		std::cout << "Error, in 'location' directive, it needs 'location' + '/' + '{'." << std::endl;
-		return (-1);
+		std::cout << "ICI Error, in 'location' directive, it needs 'location' + '/' + '{'." << std::endl;
+		return (0);
 	}
-	if (tmp[k + 1][0] == '/')
+	// if (tmp[k + 1][0] == '/')
+	// {
+	// 	size_t i = 1;							// peut etre pas obligatoire
+	// 	while (isalpha(tmp[k + 1][i]))
+	// 		i++;
+	// 	if (tmp[k + 1].size() - 1 == i)
+	// 		if (tmp[k + 1][i + 1] != '/')
+	// 		{
+	// 			std::cout << "MERDE Error, in 'location' directive, it needs 'location' + '/' + '{'." << std::endl;
+	// 			return (0);
+	// 		}
+	// }
+	if (tmp[k + 1][0] != '/')
 	{
-		size_t i = 1;							// peut etre pas obligatoire
-		while (isalpha(tmp[k + 1][i]))
-			i++;
-		if (tmp[k + 1].size() - 1 == i)
-			if (tmp[k + 1][i + 1] != '/')
-			{
-				std::cout << "Error, in 'location' directive, it needs 'location' + '/' + '{'." << std::endl;
-				return (-1);
-			}
-	}
-	else if (tmp[k + 1][0] != '/')
-	{
-		std::cout << "Error, in 'location' directive, it needs 'location' + '/' + '{'." << std::endl;
-		return (-1);
+		std::cout << " LA Error, in 'location' directive, it needs 'location' + '/' + '{'." << std::endl;
+		return (0);
 	}
 	// et on recupere le nom 
-	size_t index_location = 0;				//	== a changer
+	size_t index_location = this->_servers[index_server].location.size() - 1;	
 	this->_servers[index_server].location[index_location].name_location = tmp[k + 1].substr(0, tmp[k + 1].size());
 	std::cout << "test nom = " << this->_servers[index_server].location[index_location].name_location << std::endl;
 
@@ -141,8 +143,14 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 		}
 		else
 		{
-			std::cout << "ELSE LOCATION  = " << scope_location[i] << std::endl;
-			break;
+			std::cout << "\n\nDANS ELSE LOCATION, tout est parse, il manque location et k == ." << scope_location[i] << std::endl;
+			if (scope_location[i] == "}")
+				break;
+			else
+			{
+				std::cout << "INSTRUCTION NON RECONNU" << std::endl;
+				return (-1);
+			}
 		}
 		//i++;
 	}
@@ -155,8 +163,14 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 	(void)index_server;
 
 	std::cout << "GOOD" << std::endl;
+	std::cout << "k = " << k << std::endl;
+	std::cout << "i = " << i << std::endl;
+	k += i + 1;
+	std::cout << "k = " << k << std::endl;
+	std::cout << "tmp[k] = " << tmp[k] << std::endl;
+	std::cout << "tmp size = " << tmp.size() << std::endl;
 	std::cout << "\n\n" << std::endl;
-	return (0);
+	return (k);
 }
 
 

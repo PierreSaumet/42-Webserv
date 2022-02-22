@@ -113,7 +113,7 @@ bool                            Parsing::ft_check_data( void ) {
 		std::cout << "ERROR, problem bloc server" << std::endl;
 		return (true);
 	}
-
+	this->display_all();
 	std::cout << "lol ok " << std::endl;
 	return (false);
 }
@@ -371,12 +371,14 @@ bool                            Parsing::ft_check_server( void )
 			else if (scope_server[k] == "location")
 			{
 				std::cout << "go location " << std::endl;
+				std::cout << "k = " << k << std::endl;
 				k = ft_get_location( k, scope_server, i);
-				if (k < 0)
+				std::cout << "fin de location : k = " << k << std::endl;
+				if (k == 0)
 					return (true);
-				return (true);
-				break;
-				k += 2;
+				// return (true);
+				// break;
+				// k += 2;
 			}
 			// else if (scope_server[k] == "{" || scope_server[k] == "}")
 			// {
