@@ -22,3 +22,41 @@ std::string                     Parsing::ft_delete_comm( std::string &line )
 	}
 	return (tmp);
 }
+
+
+
+/*
+**	ft_get_scope( size_t index ):
+**		This function will return the scope starting and the given 'index' argument.
+**
+**	==> It will return a std::vector<std::string> which contains the scope.
+*/
+std::vector<std::string>        Parsing::ft_get_scope( size_t index )
+{
+	std::vector<std::string>::iterator      it_b;
+	std::vector<std::string>::iterator      it_e;
+	std::vector<std::string>::size_type 	size_data = this->_data.size();
+	size_t                  				i = index;
+	size_t                  				count = 0;
+
+	while (i++ < size_data)
+	{
+		if (this->_data[i] == "{")
+		{
+			if (count == 0)
+				it_b = this->_data.begin() + i;
+			count++;
+		}
+		if (this->_data[i] == "}" && count != 0)
+		{
+			count--;
+			if (count == 0)
+			{
+				it_e = this->_data.begin() + i + 1;
+				break;
+			}
+		}
+	}
+	std::vector<std::string>    tmp(it_b, it_e);
+	return (tmp);
+}
