@@ -116,8 +116,18 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			std::cout << "FIN DE GET upload store location = " << this->_servers[index_server].location[index_location].upload_store_location << std::endl;
 			i += 2;
 		}
-		// else if (scope_location[i] == "client_body_buffer_size")
-		// 	std::cout << "go client_body_buffer_size = " << scope_location[i] << std::endl;
+		else if (scope_location[i] == "client_body_buffer_size")
+		{
+			std::cout << "go client_body_buffer_size = " << scope_location[i] << std::endl;
+			if (this->ft_get_buffer_size_location(i, scope_location, index_server, index_location))
+			{
+				std::cout << "Erreur dans get buffer size locatuon " << std::endl;
+				return (-1);
+			}
+			std::cout << "FIN DE GET get buffer location = " << this->_servers[index_server].location[index_location].buffer_size_location << std::endl;
+			i += 2;
+		
+		}
 		// else if (scope_location[i] == "error_page")
 		// 	std::cout << "go error_page = " << scope_location[i] << std::endl;
 		else
@@ -139,6 +149,62 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 	std::cout << "\n\n" << std::endl;
 	return (0);
 }
+
+
+/*
+**	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'client_body_buffer_size' directive.
+**		The information given is between 8000 (8k) and 16000 (16k) maximum.
+**		The information will be used for the 'POST' command.
+**
+**	==> Returns 1 if an error occurs, otherwise returns 0.
+*/
+bool			Parsing::ft_get_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+{
+	size_t		i;
+	int			buffer_size;
+
+	k += 1;
+	i = 0;
+	buffer_size = 0;
+	while (isdigit(tmp[k][i]))
+		i++;
+	if (i == 0)
+	{
+		std::cout << "Error, in 'client_body_buffer_size' directive, it should only be digits." << std::endl;
+		return (true);
+	}
+	if (tmp[k][i] == 'k' && tmp[k][i + 1] == ';' && i + 1 == tmp[k].size() - 1 && tmp[k][i + 2] == '\0')
+	{
+		buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
+		if (buffer_size < 8 || buffer_size > 16)
+		{
+			std::cout << "Error, in 'client_body_buffer_size' directive, buffer size must be between 8k and 16k." << std::endl;
+			return (true);
+		}
+		this->_servers[index_server].location[index_location].buffer_size_location = buffer_size * 1000;
+	}
+	else
+	{
+		if (tmp[k][i] == ';' && i + 1 == tmp[k].size() && tmp[k][i + 1] == '\0')
+		{
+			buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
+			if (buffer_size < 8000 || buffer_size > 16000)
+			{
+				std::cout << "Error, in 'client_body_buffer_size' directive, buffer size must be between 8000 and 16000." << std::endl;
+				return (true);
+			}
+			this->_servers[index_server].location[index_location].buffer_size_location = buffer_size;
+		}
+		else
+		{
+			std::cout << "Error, in 'client_body_buffer_size' directive, informations are corrupted." << std::endl;
+			return (true);
+		}
+	}
+	return (false);
+}
+
 
 /*
 **	ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):

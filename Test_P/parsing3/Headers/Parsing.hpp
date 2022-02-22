@@ -76,6 +76,7 @@ class Parsing {
 		bool           					ft_get_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool           					ft_get_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool							ft_get_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		bool							ft_get_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t                      	ft_get_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
 
 
