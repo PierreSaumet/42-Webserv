@@ -60,7 +60,6 @@ class Parsing {
 		bool                            ft_check_data( void );
 		bool                            ft_check_number_of_bracket( void );
 		bool                            ft_check_semicolon( void );
-		bool                            ft_check_location( void );
 		bool                            ft_check_server( void );
 		bool                            ft_check_code_error( int code ) const;
 		bool                            ft_check_code_serv( int code ) const ;

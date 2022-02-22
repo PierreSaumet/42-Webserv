@@ -103,14 +103,6 @@ bool                            Parsing::ft_check_data( void ) {
 	    std::cout << "ERROR, no semi colon" << std::endl;
 	    return (true);
 	}
-	// if (ft_check_location())					// a faire
-	// {
-	//     std::cout << "ERROR, pro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blem location" << std::endl;
-	//     return (true);
-	// }
-	// std::string serv = "server";
-	// std::string loc = "location";
-	// this->ft_get_scope(0);
 	if (this->ft_check_server())
 	{
 		std::cout << "ERROR, problem bloc server" << std::endl;
@@ -120,7 +112,6 @@ bool                            Parsing::ft_check_data( void ) {
 	std::cout << "lol ok " << std::endl;
 	return (false);
 }
-
 
 /*
 **	ft_get_scope( size_t index ):
@@ -142,10 +133,7 @@ std::vector<std::string>        Parsing::ft_get_scope( size_t index )
 		if (this->_data[i] == "{")
 		{
 			if (count == 0)
-			{
 				it_b = this->_data.begin() + i;
-				//std::cout << "la i = " << i << std::endl;
-			}
 			count++;
 		}
 		if (this->_data[i] == "}" && count != 0)
@@ -346,31 +334,6 @@ bool                            Parsing::ft_check_server( void )
 		
 	}
 	
-	return (false);
-}
-
-bool                            Parsing::ft_check_location( void )      // to do
-{
-	std::vector<std::string>::size_type sz = this->_data.size();
-	size_t i = 0;
-	while (i < sz)
-	{
-		std::cout << "val = " << this->_data[i] << std::endl;
-		if (this->_data[i] == "location")
-		{
-			if (this->_data[i + 1][0] != '/')
-			{
-				std::cout << "ERROR, after location should start with /" << std::endl;
-				return (true);
-			}
-			if (this->_data[i + 2] != "{")
-			{
-				std::cout << "ERROR, after location / should start with {" << std::endl;
-				return (true);
-			}
-		}
-		i++;
-	}
 	return (false);
 }
 
