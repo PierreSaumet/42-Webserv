@@ -87,7 +87,12 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			std::cout << "go dav_methods = " << scope_location[i] << std::endl;
 			
 			i = ft_get_methods_location(i, scope_location, index_server, index_location);
-		
+			if (i == 0)
+			{
+				std::cout << "Erreur dans get methods location" << std::endl;
+				return (-1);
+			}
+			std::cout << "FIN DE METHODS LOCATION = " << this->_servers[index_server].location[index_location].methods_location.size() << std::endl;
 		}
 		else if (scope_location[i] == "autoindex")
 			std::cout << "go autoindex = " << scope_location[i] << std::endl;
@@ -157,4 +162,89 @@ bool            Parsing::ft_get_root_location( size_t k, std::vector<std::string
 		return (true);
 	}
 	return (false);
+}
+
+
+
+/*
+**	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'dav_methods' directive.
+**		It only accept 3 methods: 'DELETE', 'GET' and 'POST'
+**
+**	==> Returns the next directive if no error occurs, otherwise display an error message and it returns 0.
+*/
+size_t          Parsing::ft_get_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+{
+	std::vector<std::string> methods;
+
+	methods.push_back("DELETE");
+	methods.push_back("GET");
+	methods.push_back("POST");
+	k += 1;
+	while (1)
+	{
+		
+
+		std::cout << "Dans la boucle " << std::endl;
+		if (tmp[k].compare("DELETE") == 0)
+			this->_servers[index_server].location[index_location].methods_location.push_back("DELETE");
+		else if (tmp[k].compare("POST") == 0)
+			this->_servers[index_server].location[index_location].methods_location.push_back("POST");
+		else if (tmp[k].compare("GET") == 0)
+			this->_servers[index_server].location[index_location].methods_location.push_back("GET");
+		else
+		{
+			if (tmp[k].compare("DELETE;") == 0)
+				this->_servers[index_server].location[index_location].methods_location.push_back("DELETE");
+			else if (tmp[k].compare("POST;") == 0)
+				this->_servers[index_server].location[index_location].methods_location.push_back("POST");
+			else if (tmp[k].compare("GET;") == 0)
+				this->_servers[index_server].location[index_location].methods_location.push_back("GET");
+			else
+			{
+				std::cout << "Error, in 'dav_methods' directive, it can only have DELETE POST and GET methods! 1" << std::endl;
+				return (0);
+			}
+			break;
+		}
+		k++;
+	}
+	if (this->_servers[index_server].location[index_location].methods_location.size() > 3 || this->_servers[index_server].location[index_location].methods_location.size() == 0)
+	{
+		std::cout << "Error, in 'dav_methods' directive, it can only have 3 methods maximum! 2" << std::endl;
+		return (0);
+	}
+	k++;
+	if (tmp[k] == "GET" || tmp[k] == "GET;" || tmp[k] == "DELETE" || tmp[k] == "DELETE;" || tmp[k] == "POST" || tmp[k] == "POST;")
+	{
+		std::cout << "Error, in 'dav_methods' directive, methods are not correct. 3" << std::endl;
+		return (0);
+	}
+
+	// on verifie les doublons
+	size_t int_del = 0;
+	size_t int_get = 0;
+	size_t int_post = 0;
+	std::vector<std::string>::iterator it;
+	for (it = this->_servers[index_server].location[index_location].methods_location.begin(); it != this->_servers[index_server].location[index_location].methods_location.end(); it++)
+	{
+		std::cout << "it = " << *it << std::endl;
+		if (*it == "DELETE")
+			int_del++;
+		else if (*it == "POST")
+			int_post++;
+		else if (*it == "GET")
+			int_get++;
+		else
+		{
+			std::cout << "Error, in 'dav_methods' directive, this method is unkonwn 4." << std::endl;
+			return (0);
+		}
+		if (int_del > 1 || int_post > 1 || int_get > 1)
+		{
+			std::cout << "Error, in 'dav_methods' directive, it should not have doublons. 5" << std::endl;
+			return (0);
+		}
+	}
+	return (k);
 }
