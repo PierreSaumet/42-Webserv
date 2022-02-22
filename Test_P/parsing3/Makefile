@@ -20,7 +20,8 @@ SRCS	= ./
 SOURCES			+=	main.cpp		\
 					Parsing.cpp		\
 					Parsing_get_server.cpp	\
-					Parsing_get_location.cpp
+					Parsing_get_location.cpp	\
+					to_delete.cpp
 					
 # INCLUDES =====================================================================
 INCLUDE 		+= 	Headers/Parsing.hpp

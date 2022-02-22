@@ -86,6 +86,10 @@ class Parsing {
 		std::string                     ft_delete_comm( std::string &line );
 		std::vector<std::string>        ft_get_scope( size_t index );
 
+
+
+		void							display_all( void );
+
 	private:
 		Parsing( void );
 
