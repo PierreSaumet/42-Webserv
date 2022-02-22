@@ -16,22 +16,25 @@ Parsing::Parsing( void ) : _name_of_file(NULL), _nbr_servers(0) {
 */
 Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_servers(0) {
 
-	if (!this->ft_check_conf_file())							// Check the configuration file
+	try
 	{
-		std::cout << "On continue" << std::endl;
-		this->_data = this->ft_get_data_container();
-		this->_nbr_servers = 0;
-	
-		if (this->ft_check_data() == true)						// Start the parsing
-			std::cout << "ERROR dans les data" << std::endl;
-		else
+		if (!this->ft_check_conf_file())
 		{
-			std::cout << "Parsing OK =) " << std::endl;
-			this->display_all();								// Display some informations ==> need to be delete
+			std::cout << "On continue" << std::endl;
+			this->_data = this->ft_get_data_container();
+			this->_nbr_servers = 0;
 		}
+		if (!this->ft_check_data())
+		{
+			std::cout << "On continue 2" << std::endl;
+		}
+	
 	}
-	else
-		std::cout << "On arrete" << std::endl;
+	catch(std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+	this->display_all();
 	return ;
 }
 
@@ -313,16 +316,14 @@ bool                            Parsing::ft_check_conf_file( void ) {
 	if (fs.is_open() == 0)
 	{
 		fs.close();
-		std::cout << "ERROR, configuration file doesn't exist" << std::endl;
-		return (true);
+		throw Error(1, "Error, the configuration file doesn't exist.", 0);
 	}
 	else
 	{
 		if (fs.peek() == std::string::traits_type::eof())
 		{
 			fs.close();
-			std::cout << "ERROR, configuration file is empty" << std::endl;
-			return (true);
+			throw Error(2, "Error, the configuration file is empty.", 0);;
 		}
 		else
 		{
@@ -331,8 +332,7 @@ bool                            Parsing::ft_check_conf_file( void ) {
 			if (pos_to_find == std::string::npos)
 			{
 				fs.close();
-				std::cout << "ERROR, configuration file must terminate with '.conf'" << std::endl;
-				return (true);
+				throw Error(3, "Error, the configuration file must terminate with '.conf'.", 0);
 			}
 			else
 			{
@@ -340,8 +340,7 @@ bool                            Parsing::ft_check_conf_file( void ) {
 				if (tmp_name.compare(pos_to_find, 6, ".conf\n") != 0)
 				{
 					fs.close();
-					std::cout << "ERROR, configuration file must have a different name and end exclusively with '.conf'" << std::endl;
-					return (true);
+					throw Error(4, "Error, the configuration file must have a different name and end exclusively with '.conf'.", 0);
 				}
 				fs.close();
 			}

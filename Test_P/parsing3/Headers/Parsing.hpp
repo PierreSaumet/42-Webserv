@@ -12,6 +12,8 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
+#include "Error.hpp"
+
 class Parsing {
 
 	public:

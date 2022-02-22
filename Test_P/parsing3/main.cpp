@@ -18,7 +18,15 @@ int             main(int argc, char **argv)
     else
     {
         std::string name = argv[1];
-        Parsing relou = Parsing(name);
+		Parsing relou = Parsing(name);
+        // try
+		// {
+		// 	Parsing relou = Parsing(name);
+		// }
+		// catch (std::exception &e)
+		// {
+		// 	std::cerr << e.what() << std::endl;
+		// }
     }
     return (0);
 }

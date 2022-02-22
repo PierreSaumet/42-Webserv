@@ -22,10 +22,12 @@ SOURCES			+=	main.cpp		\
 					Parsing_get_server.cpp	\
 					Parsing_get_location.cpp	\
 					Parsing_utils.cpp			\
+					Error.cpp					\
 					to_delete.cpp
 					
 # INCLUDES =====================================================================
-INCLUDE 		+= 	Headers/Parsing.hpp
+INCLUDE 		+= 	Headers/Parsing.hpp			\
+					Headers/Error.hpp
 
 # FLAGS ========================================================================
 FLAGS 			= -Wall -Wextra -Werror -g -std=c++98 
