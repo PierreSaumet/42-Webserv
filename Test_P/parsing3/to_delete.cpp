@@ -9,6 +9,8 @@ void		Parsing::display_all( void ) {
 
 	std::cout << "\n Serveur name = " << this->_servers[0].name_server << std::endl;
 	std::cout << "\n Host server = " << this->_servers[0].host_server << std::endl;
+	std::cout << "\n index server = " << this->_servers[0].index_server << std::endl;
+	std::cout << "\n autoindex server = " << this->_servers[0].autoindex_server << std::endl;
 	std::cout << "\n error server = " << this->_servers[0].methods_server.size() << std::endl;
 	std::cout << "\n location server = " << this->_servers[0].location.size() << std::endl;
 	std::cout << "\n location server name 0 = " << this->_servers[0].location[0].name_location << std::endl;

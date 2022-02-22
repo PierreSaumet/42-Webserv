@@ -206,10 +206,10 @@ bool                            Parsing::ft_check_server( void )
 		serv_dir.insert(std::pair<std::string, bool>("error_page", false));
 		serv_dir.insert(std::pair<std::string, bool>("root", false));
 		serv_dir.insert(std::pair<std::string, bool>("dav_methods", false));
-		serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
-		serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
-		serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
-		serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
+		// serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
+		// serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
+		// serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
+		// serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
 		serv_dir.insert(std::pair<std::string, bool>("index", false));
 		// on parcoourt le vector et on verifie que nos directives sont presentes
 		size_t k = 0;
@@ -264,7 +264,7 @@ bool                            Parsing::ft_check_server( void )
 
 
 		std::cout << " COUT =  " << count << std::endl;
-		if (count != 10)
+		if (count < 6)
 		{
 			std::cout << "Error, miss : ";
 			for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)

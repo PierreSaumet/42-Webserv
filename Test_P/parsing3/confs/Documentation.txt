@@ -52,14 +52,15 @@ DIRECTIVES:
 * Directives obligatoire actuellement 22/02/2022:
 	listen
 	root
-	autoindex
 	server_name
 	error_page
 	dav_methods
+	index 
+	
 	upload_store
 	client_body_buffer_size
 	cgi_path
-
+	autoindex
 	rajouter index ? 
 	et peut etre garder seulement:
 	- listen root server_name error_page et dav_methods
