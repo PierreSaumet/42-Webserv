@@ -130,6 +130,18 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			i += 2;
 		
 		}
+		else if (scope_location[i] == "index")
+		{
+			std::cout << "go index location  = " << scope_location[i] << std::endl;
+			if (this->ft_get_index_location(i, scope_location, index_server, index_location))
+			{
+				std::cout << "Erreur dans get index locatuon " << std::endl;
+				return (0);
+			}
+			std::cout << "FIN DE GET index location = " << this->_servers[index_server].location[index_location].buffer_size_location << std::endl;
+			i += 2;
+		
+		}
 		else if (scope_location[i] == "error_page")
 		{
 			std::cout << "go error_page = " << scope_location[i] << std::endl;
@@ -567,6 +579,19 @@ bool			Parsing::ft_get_index_location( size_t k, std::vector<std::string> tmp, s
 		std::cout << "Error, in 'index' directive, it should end with ';'" << std::endl;
 		return (true);
 	}
+
+	if (tmp[k].size() <= 6)
+	{
+		std::cout << "Error, in 'index' directive, it should have a proper name and end with '.html'." << std::endl;
+		return (true);
+	}
+	std::cout << "tmp[k] de truc = " << tmp[k][tmp[k].size() - 6] << std::endl;
+	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
+	{
+		std::cout << "Error, in 'index' directive, it should end with '.html'." << std::endl;
+		return (true);
+	}
+
 	this->_servers[index_server].location[index_location].index_location = tmp[k].substr(0, len - 1);
 	if (stat(this->_servers[index_server].location[index_location].index_location.c_str(), &buffer) == -1)
 	{

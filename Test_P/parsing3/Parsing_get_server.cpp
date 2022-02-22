@@ -579,6 +579,18 @@ bool					Parsing::ft_get_index( size_t k, std::vector<std::string> tmp, size_t i
 		std::cout << "Error, in 'index' directive, it should end with ';'" << std::endl;
 		return (true);
 	}
+	std::cout << "longueur de index = " << tmp[k].size() << std::endl;
+	if (tmp[k].size() <= 6)
+	{
+		std::cout << "Error, in 'index' directive, it should have a proper name and end with '.html'." << std::endl;
+		return (true);
+	}
+	std::cout << "tmp[k] de truc = " << tmp[k][tmp[k].size() - 6] << std::endl;
+	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
+	{
+		std::cout << "Error, in 'index' directive, it should end with '.html'." << std::endl;
+		return (true);
+	}
 	this->_servers[index_server].index_server = tmp[k].substr(0, len - 1);
 	if (stat(this->_servers[index_server].index_server.c_str(), &buffer) == -1)
 	{
