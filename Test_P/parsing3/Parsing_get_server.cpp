@@ -492,6 +492,19 @@ bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 		return (true);
 	}
 
+	if (index_server > 0)
+	{
+		size_t count = 0;
+		while (count < index_server)
+		{
+			if (this->_servers[index_server].port_server == this->_servers[count].port_server)
+			{
+				std::cout << "Error, in 'listen directive', bloc servers have the same port." << std::endl;
+				return (true);
+			}
+			count++;
+		}
+	}
 	// std::cout << "PARFAIT" << std::endl;
 	return false;
 }
