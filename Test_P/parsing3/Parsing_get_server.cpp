@@ -560,3 +560,35 @@ bool					Parsing::ft_check_code_client( int code ) const
 	else
 		return (true);
 }
+
+
+bool					Parsing::ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server )
+{
+	struct stat buffer;
+	size_t  	len;
+	
+	k += 1;
+	len = tmp[k].size();
+	if (tmp[k][len] != '\0')
+	{
+		std::cout << "Error, in 'index' directive, it should end with '\0'" << std::endl;
+		return (true);
+	}
+	if (tmp[k][len - 1] != ';')
+	{
+		std::cout << "Error, in 'index' directive, it should end with ';'" << std::endl;
+		return (true);
+	}
+	this->_servers[index_server].index_server = tmp[k].substr(0, len - 1);
+	if (stat(this->_servers[index_server].index_server.c_str(), &buffer) == -1)
+	{
+		std::cout << "Error, 'index' directive, file doesn't exist." << std::endl;
+		return (true);
+	}
+	if (buffer.st_size == 0)
+	{
+		std::cout << "Error, in 'index' directive, file is empty." << std::endl;
+		return (true);
+	}
+	return (false);
+}

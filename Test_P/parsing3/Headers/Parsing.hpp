@@ -20,6 +20,7 @@ class Parsing {
 
 			std::string					name_location;
 			std::string                 root_location;
+			std::string					index_location;
 			bool                        autoindex_location;
 			std::map<int, std::string>  error_location;
 			std::vector<std::string>    methods_location;
@@ -33,6 +34,7 @@ class Parsing {
 			size_t                      port_server;
 			std::string                 name_server;
 			std::string                 root_server;
+			std::string					index_server;
 			bool                        autoindex_server;
 			size_t						buffer_size_server;
 			std::string					cgi_path_server;
@@ -63,6 +65,7 @@ class Parsing {
 		bool                            ft_check_code_serv( int code ) const ;
 		bool                            ft_check_code_client( int code ) const;
 
+		// For server bloc
 		bool      		               	ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool                        	ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool                        	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server );
@@ -70,13 +73,16 @@ class Parsing {
 		bool							ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool							ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool							ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool							ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 
+		// For location bloc
 		bool           					ft_get_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool           					ft_get_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool							ft_get_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool							ft_get_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		bool							ft_get_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t          				ft_get_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t                      	ft_get_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
 

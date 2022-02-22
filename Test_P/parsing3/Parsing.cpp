@@ -210,6 +210,7 @@ bool                            Parsing::ft_check_server( void )
 		serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
 		serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
 		serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
+		serv_dir.insert(std::pair<std::string, bool>("index", false));
 		// on parcoourt le vector et on verifie que nos directives sont presentes
 		size_t k = 0;
 		count = 0;
@@ -263,7 +264,7 @@ bool                            Parsing::ft_check_server( void )
 
 
 		std::cout << " COUT =  " << count << std::endl;
-		if (count != 9)
+		if (count != 10)
 		{
 			std::cout << "Error, miss : ";
 			for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
@@ -380,11 +381,15 @@ bool                            Parsing::ft_check_server( void )
 				// break;
 				// k += 2;
 			}
-			// else if (scope_server[k] == "{" || scope_server[k] == "}")
-			// {
-			// 	std::cout << " on coninue " << std::endl;
-			// 	k++;
-			// }
+			else if (scope_server[k] == "index")
+			{
+				std::cout << "go index " << std::endl;
+				if (this->ft_get_index(k, scope_server, i))
+				{
+					return (true);
+				}
+				k += 2;
+			}
 			else
 			{
 				std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << scope_server[k] << std::endl;
@@ -456,6 +461,7 @@ bool                            Parsing::ft_check_semicolon( void )     // to do
 	directives.push_back("client_body_buffer_size");
 	directives.push_back("cgi_path");
 	directives.push_back("upload_store");
+	directives.push_back("index");
 
 	std::vector<std::string>::iterator  it_b;
 	for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
