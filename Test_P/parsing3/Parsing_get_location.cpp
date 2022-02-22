@@ -5,10 +5,10 @@
 /*
 **
 **	on doit avoir
-autoindex
-root
+autoindex				ok
+root					ok
 error_page
-dav_method
+dav_method				ok
 upload_path
 client_body_buffer_size
 */
@@ -73,7 +73,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 		{
 			std::cout << "go root  = " << scope_location[i] << std::endl;
 			
-			if (ft_get_root_location(i, scope_location, index_server, index_location))
+			if (this->ft_get_root_location(i, scope_location, index_server, index_location))
 			{
 				std::cout << "Erreur, dans get root location" << std::endl;
 				return (-1);
@@ -86,7 +86,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 		{
 			std::cout << "go dav_methods = " << scope_location[i] << std::endl;
 			
-			i = ft_get_methods_location(i, scope_location, index_server, index_location);
+			i = this->ft_get_methods_location(i, scope_location, index_server, index_location);
 			if (i == 0)
 			{
 				std::cout << "Erreur dans get methods location" << std::endl;
@@ -95,13 +95,31 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			std::cout << "FIN DE METHODS LOCATION = " << this->_servers[index_server].location[index_location].methods_location.size() << std::endl;
 		}
 		else if (scope_location[i] == "autoindex")
+		{
 			std::cout << "go autoindex = " << scope_location[i] << std::endl;
-		else if (scope_location[i] == "upload_path")
-			std::cout << "go upload_path = " << scope_location[i] << std::endl;
-		else if (scope_location[i] == "client_body_buffer_size")
-			std::cout << "go client_body_buffer_size = " << scope_location[i] << std::endl;
-		else if (scope_location[i] == "error_page")
-			std::cout << "go error_page = " << scope_location[i] << std::endl;
+			if (this->ft_get_autoindex_location(i, scope_location, index_server, index_location))
+			{
+				std::cout << "Erreur dans get autoidnex location" << std::endl;
+				return (-1);
+			}
+			std::cout << "FIN DE GET AUTOINDEX LOCATION = " <<  this->_servers[index_server].location[index_location].autoindex_location << std::endl;
+			i += 2;
+		}
+		else if (scope_location[i] == "upload_store")
+		{
+			std::cout << "go upload_store = " << scope_location[i] << std::endl;
+			if (this->ft_get_upload_store_location(i, scope_location, index_server, index_location))
+			{
+				std::cout << "Erreur dans get upload store location " << std::endl;
+				return (-1);
+			}
+			std::cout << "FIN DE GET upload store location = " << this->_servers[index_server].location[index_location].upload_store_location << std::endl;
+			i += 2;
+		}
+		// else if (scope_location[i] == "client_body_buffer_size")
+		// 	std::cout << "go client_body_buffer_size = " << scope_location[i] << std::endl;
+		// else if (scope_location[i] == "error_page")
+		// 	std::cout << "go error_page = " << scope_location[i] << std::endl;
 		else
 		{
 			std::cout << "ELSE LOCATION  = " << scope_location[i] << std::endl;
@@ -122,6 +140,77 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 	return (0);
 }
 
+/*
+**	ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'upload_store' directive.
+**		The information given is an fodler where we can find files uploaded.
+**
+**	==> Returns 1 if an error occurs, otherwise returns 0.
+*/
+bool			Parsing::ft_get_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+{
+	struct stat buffer;
+	size_t  	len;
+	
+	k += 1;
+	len = tmp[k].size();
+	if (tmp[k][len] != '\0')
+	{
+		std::cout << "Error, in 'upload_store' directive, it should end with '\0'" << std::endl;
+		return (true);
+	}
+	if (tmp[k][len - 1] != ';')
+	{
+		std::cout << "Error, in 'upload_store' directive, it should end with ';'" << std::endl;
+		return (true);
+	}
+	if (tmp[k][0] != '.' || tmp[k][1] != '/')
+	{
+		std::cout << "Error, in 'upload_store' directive, it should start with './'" << std::endl;
+		return (true);
+	}
+	this->_servers[index_server].location[index_location].upload_store_location = tmp[k].substr(0, len - 1);
+	if (stat(this->_servers[index_server].location[index_location].upload_store_location.c_str(), &buffer) == -1)
+	{
+		std::cout << "Error, 'upload_store' directive doesn't exist!" << std::endl;
+		return (true);
+	}
+	return (false);
+}
+
+
+/*
+**	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server):
+**      This function will checks the informations given in the 'autoindex' directive.
+**      It should find "on;" or "off;".
+**
+**     ==> Returns 0 if no problem happens, otherwise returns 1.
+*/
+bool            Parsing::ft_get_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+{
+	k += 1;
+	size_t  len = tmp[k].size();
+	if (tmp[k][len] != '\0')
+	{
+		std::cout << "Error, in 'autoindex' directive it should end with '\0'" << std::endl;
+		return (true);
+	}
+	if (tmp[k][len - 1] != ';')
+	{
+		std::cout << "Error, in 'autoindex' directive it should end with ';'" << std::endl;
+		return (true);
+	}
+	if (tmp[k].compare("on;") != 0 && tmp[k].compare("off;") != 0)
+	{
+		std::cout << "Error, in 'autoindex' directive it should be 'on' or 'off' " << std::endl;
+		return (true);
+	}
+	if (tmp[k].compare("on;") == 0)
+		 this->_servers[index_server].location[index_location].autoindex_location = true;
+	else
+		this->_servers[index_server].location[index_location].autoindex_location = false;
+	return (false);
+}
 
 
 /*
