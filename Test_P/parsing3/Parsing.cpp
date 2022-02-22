@@ -1,7 +1,7 @@
 #include "Headers/Parsing.hpp"
 #include <iostream>
 
-Parsing::Parsing( void ) : _name_of_file(NULL) {
+Parsing::Parsing( void ) : _name_of_file(NULL), _nbr_servers(0) {
 
 	return ;
 }
@@ -326,7 +326,7 @@ bool                            Parsing::ft_check_server( void )
 			{
 				std::cout << "go error_page " << std::endl;
 				k = this->ft_get_error(k, scope_server, i);
-				if (k < 0)
+				if (k == 0)
 					return (true);
 				//k += 3;
 			}

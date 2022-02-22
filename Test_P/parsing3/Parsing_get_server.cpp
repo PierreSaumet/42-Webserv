@@ -157,7 +157,7 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 			else
 			{
 				std::cout << "Error: error_page directive should only have numbers then a directory!" << std::endl;
-				return (-1);
+				return (0);
 				//break;
 			}
 		}

@@ -78,7 +78,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			if (this->ft_get_root_location(i, scope_location, index_server, index_location))
 			{
 				std::cout << "Erreur, dans get root location" << std::endl;
-				return (-1);
+				return (0);
 			}
 			std::cout << "FIN DE ROOT root location = " << this->_servers[index_server].location[index_location].root_location << std::endl;
 			std::cout << "i = " << i << " et scope_location[i] = " << scope_location[i] << std::endl;
@@ -92,7 +92,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			if (i == 0)
 			{
 				std::cout << "Erreur dans get methods location" << std::endl;
-				return (-1);
+				return (0);
 			}
 			std::cout << "FIN DE METHODS LOCATION = " << this->_servers[index_server].location[index_location].methods_location.size() << std::endl;
 		}
@@ -102,7 +102,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			if (this->ft_get_autoindex_location(i, scope_location, index_server, index_location))
 			{
 				std::cout << "Erreur dans get autoidnex location" << std::endl;
-				return (-1);
+				return (0);
 			}
 			std::cout << "FIN DE GET AUTOINDEX LOCATION = " <<  this->_servers[index_server].location[index_location].autoindex_location << std::endl;
 			i += 2;
@@ -113,7 +113,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			if (this->ft_get_upload_store_location(i, scope_location, index_server, index_location))
 			{
 				std::cout << "Erreur dans get upload store location " << std::endl;
-				return (-1);
+				return (0);
 			}
 			std::cout << "FIN DE GET upload store location = " << this->_servers[index_server].location[index_location].upload_store_location << std::endl;
 			i += 2;
@@ -124,7 +124,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			if (this->ft_get_buffer_size_location(i, scope_location, index_server, index_location))
 			{
 				std::cout << "Erreur dans get buffer size locatuon " << std::endl;
-				return (-1);
+				return (0);
 			}
 			std::cout << "FIN DE GET get buffer location = " << this->_servers[index_server].location[index_location].buffer_size_location << std::endl;
 			i += 2;
@@ -134,10 +134,10 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 		{
 			std::cout << "go error_page = " << scope_location[i] << std::endl;
 			i = ft_get_error_location(i, scope_location, index_server, index_location);
-			if (i < 0)
+			if (i == 0)
 			{
 				std::cout << "Erreur dans get erreur location " << std::endl;
-				return (-1);
+				return (0);
 			}
 			std::cout << "Fin de get error location = " << this->_servers[index_server].location[index_location].error_location.size() << std::endl;
 		}
@@ -149,7 +149,7 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			else
 			{
 				std::cout << "INSTRUCTION NON RECONNU" << std::endl;
-				return (-1);
+				return (0);
 			}
 		}
 		//i++;
@@ -198,8 +198,8 @@ size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::strin
 			}
 			else
 			{
-				std::cout << "Error: error_page directive should only have numbers then a directory!" << std::endl;
-				return (-1);
+				std::cout << "Error: in 'error_page' directive from a bloc server, it should have numbers and a directory ending by a semi colon." << std::endl;
+				return (0);
 				//break;
 			}
 		}
@@ -208,7 +208,7 @@ size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::strin
 		{
 			std::cout << "EUh il faut quitter? " << std::endl;
 			std::cout << "car = " << this->ft_check_code_error(error_code) << std::endl;
-			return (-1);
+			return (0);
 		}
 		this->_servers[index_server].location[index_location].error_location.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
@@ -216,14 +216,14 @@ size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::strin
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 	{
 		std::cout << "Error, error_page directive should end with a directory or file" << std::endl;
-		return (-1);
+		return (0);
 	}
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 	struct stat buffer;
 	if (stat(address.c_str(), &buffer) != 0)
 	{
 		std::cout << "Error, error_page directive, directory doesn't exist!" << std::endl;
-		return (-1);
+		return (0);
 	}
 
 	if (this->_servers[index_server].location[index_location].error_location.size() > 1)		// several error pages.
@@ -252,12 +252,12 @@ size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::strin
 			if (stat(it->second.c_str(), &buff) < 0)
 			{
 				std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-				return (-1);
+				return (0);
 			}
 			if (buff.st_size == 0)
 			{
 				std::cout << "Error, error_page directive, file is empty" << std::endl;
-				return (-1);
+				return (0);
 			}
 		}
 	}
@@ -282,12 +282,12 @@ size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::strin
 		if (stat(it->second.c_str(), &buff) < 0)
 		{
 			std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-			return (-1);
+			return (0);
 		}
 		if (buff.st_size == 0)
 		{
 			std::cout << "Error, error_page directive, file is empty" << std::endl;
-			return (-1);
+			return (0);
 		}
 	}
 	k++;
