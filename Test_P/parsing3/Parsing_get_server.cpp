@@ -107,6 +107,131 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 
 
 
+bool Parsing::ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i )
+{
+
+	while (k < scope_server.size())
+	{
+		if (scope_server[k] == "listen")
+		{
+			std::cout << "go listen" << std::endl;
+			if (this->ft_get_listen(k, scope_server, i))
+				return (true);
+			std::cout << "\thost = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
+			k += 2;
+		}
+		else if (scope_server[k] == "server_name")
+		{
+			std::cout << "go server_name " << std::endl;
+			if (this->ft_get_server_name(k, scope_server, i))
+				return (true);
+			std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
+			k += 2;
+		}
+		else if (scope_server[k] == "autoindex")
+		{
+			std::cout << "go autoindex " << std::endl;
+			if (this->ft_get_autoindex(k, scope_server, i))
+				return (true);
+			std::cout << "\tautoindex = " << this->_servers[i].autoindex_server << std::endl;
+			k += 2;
+		}
+		else if (scope_server[k] == "root")
+		{
+			std::cout << "go root" << std::endl;
+			if (this->ft_get_root(k ,scope_server, i))
+				return (true);
+			std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
+			k += 2;
+		}
+		else if (scope_server[k] == "error_page")
+		{
+			std::cout << "go error_page " << std::endl;
+			k = this->ft_get_error(k, scope_server, i);
+			if (k == 0)
+				return (true);
+			//k += 3;
+		}
+		else if (scope_server[k] == "dav_methods")
+		{
+			std::cout << "go dav_methods " << std::endl;
+			k = this->ft_get_methods(k, scope_server, i);
+			if (k == 0)
+			{
+				std::cout << "ERROR DANS DAV METHODS" << std::endl;
+				return (true);
+			}
+			std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
+			//k += 2;
+		}
+		else if (scope_server[k] == "client_body_buffer_size")
+		{
+			std::cout << "go client_body_buffer_size" << std::endl;
+			if (this->ft_get_buffer_size(k, scope_server, i))
+				return (true);
+			k += 2;
+		}
+		else if (scope_server[k] == "cgi_path")
+		{
+			std::cout << "go cgi path" << std::endl;
+			if (this->ft_get_cgi_path(k, scope_server, i))
+				return (true);
+			k += 2;
+		}
+		else if (scope_server[k] == "upload_store")
+		{
+			std::cout << "go ft_get_upload_store " << std::endl;
+			if (this->ft_get_upload_store(k, scope_server, i))
+				return (true);
+			k += 2;
+		}
+		else if (scope_server[k] == "server" && scope_server[k + 1] == "{")
+		{
+			std::cout << "Error, a bloc server cannot have another bloc server inside." << std::endl;
+			return (true);
+		}
+		else if (scope_server[k] == "location")
+		{
+			std::cout << "go location " << std::endl;
+			std::cout << "k = " << k << std::endl;
+			k = ft_get_location( k, scope_server, i);
+			std::cout << "fin de location : k = " << k << std::endl;
+			if (k == 0)
+				return (true);
+			// return (true);
+			// break;
+			// k += 2;
+		}
+		else if (scope_server[k] == "index")
+		{
+			std::cout << "go index " << std::endl;
+			if (this->ft_get_index(k, scope_server, i))
+			{
+				return (true);
+			}
+			k += 2;
+		}
+		else
+		{
+			std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << scope_server[k] << std::endl;
+			if (scope_server[k] == "}")
+				break;
+			else
+			{
+				std::cout << "INSTRUCTION NON RECONNU la" << std::endl;
+				return (true);
+			}
+			//std::cout << " EUH ERROR " << scope_server[k] << " et k = " << k << std::endl;
+			//if ()
+			//return (true);
+			//exit(EXIT_FAILURE);
+			//break;
+		}
+	}
+	return (false);
+}
+
+
 /*
 **	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'client_body_buffer_size' directive.
@@ -271,7 +396,7 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 		{
 			std::cout << "EUh il faut quitter? " << std::endl;
 			std::cout << "car = " << this->ft_check_code_error(error_code) << std::endl;
-			return (-1);
+			return (0);
 		}
 		this->_servers[index_server].error_server.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
@@ -279,14 +404,14 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 	{
 		std::cout << "Error, error_page directive should end with a directory or file" << std::endl;
-		return (-1);
+		return (0);
 	}
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 	struct stat buffer;
 	if (stat(address.c_str(), &buffer) != 0)
 	{
 		std::cout << "Error, error_page directive, directory doesn't exist!" << std::endl;
-		return (-1);
+		return (0);
 	}
 
 	if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
@@ -315,12 +440,12 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 			if (stat(it->second.c_str(), &buff) < 0)
 			{
 				std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-				return (-1);
+				return (0);
 			}
 			if (buff.st_size == 0)
 			{
 				std::cout << "Error, error_page directive, file is empty" << std::endl;
-				return (-1);
+				return (0);
 			}
 		}
 	}
@@ -345,12 +470,12 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 		if (stat(it->second.c_str(), &buff) < 0)
 		{
 			std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-			return (-1);
+			return (0);
 		}
 		if (buff.st_size == 0)
 		{
 			std::cout << "Error, error_page directive, file is empty" << std::endl;
-			return (-1);
+			return (0);
 		}
 	}
 	k++;

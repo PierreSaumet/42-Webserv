@@ -16,9 +16,12 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_se
 		this->_nbr_servers = 0;
 	
 		if (this->ft_check_data() == true)
-			//std::cout << "ERROR dans les data" << std::endl;
-
-		std::cout << "OK " << std::endl;
+			std::cout << "ERROR dans les data" << std::endl;
+		else
+		{
+			std::cout << "Parsing OK =) " << std::endl;
+			this->display_all();
+		}
 	}
 	else
 		std::cout << "On arrete" << std::endl;
@@ -113,7 +116,7 @@ bool                            Parsing::ft_check_data( void ) {
 		std::cout << "ERROR, problem bloc server" << std::endl;
 		return (true);
 	}
-	this->display_all();
+	
 	std::cout << "lol ok " << std::endl;
 	return (false);
 }
@@ -209,213 +212,134 @@ bool                            Parsing::ft_check_server( void )
 		}
 		else
 			std::cout << "GOOD" << std::endl;
-		// std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
-
-		/////////////// A DECOUPER FONCTION 1 //////////////////////////////////////////
-		// std::cout << "AVANT GET SCOPE server _ize = " << server_size << std::endl;
-		// std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
-		// std::cout << "APRES GET SCOPTE server _ize = " << server_size << std::endl;
-		// std::cout << "La taille de scope_server = " << scope_server.size() << std::endl;
-		// server_size = scope_server.size();
-		// std::cout << "\nla  server_size =  " << server_size << std::endl;
-
-		// serv_dir.insert(std::pair<std::string, bool>("listen", false));
-		// serv_dir.insert(std::pair<std::string, bool>("server_name", false));
-		// serv_dir.insert(std::pair<std::string, bool>("error_page", false));
-		// serv_dir.insert(std::pair<std::string, bool>("root", false));
-		// serv_dir.insert(std::pair<std::string, bool>("dav_methods", false));
-		// // serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
-		// // serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
-		// // serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
-		// // serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
-		// serv_dir.insert(std::pair<std::string, bool>("index", false));
-		// // on parcoourt le vector et on verifie que nos directives sont presentes
-		// size_t k = 0;
-		// count = 0;
-		// while (k < scope_server.size())
-		// {
-		// 	for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
-		// 	{
-
-		// 		if (it_b->first == scope_server[k])
-		// 		{
-		// 			if (scope_server[k] == "root")
-		// 				std::cout << "icic k = " << k << std::endl;
-		// 			count++;
-		// 			if (it_b->second == false)
-		// 				it_b->second = true;
-		// 			else
-		// 			{
-		// 				std::cout << "ERROR, bloc server cannot have doublon BNJJJJJJJJ: " << it_b->first << std::endl;
-		// 				return (true);
-		// 			}
-		// 			//k++;
-		// 		}
-				
-		// 	}
-		// 	if (scope_server[k] == "location")
-		// 	{
-		// 		// std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
-		// 		std::cout << "\n\non trouve location" << std::endl;
-		// 		std::cout << "Dans boucle scope_server[k] == " << scope_server[k] << std::endl;
-		// 		std::cout << " k = " << k << std::endl;
-		// 		std::cout << "server_size = " << server_size << std::endl;
-		// 		std::vector<std::string>    scope_location = this->ft_get_scope(k + 1);
-		// 		std::cout << "size_du scope location = " << scope_location.size() << std::endl;
-		// 		k = k + scope_location.size();
-
-		// 		//k++;
-		// 	}
-
-		// 	// else
-		// 	// {
-		// 	// 	std::cout << "ICI il y a une erreur = " << scope_server[k] << std::endl;
-		// 	// 	return (true);
-		// 	// }
-		// 	//std::cout << "Dans boucle scope_server[k] == " << scope_server[k] << std::endl;
-		// 	k++;
-		// 	std::cout << "fin de la boucle k = " <<  k << std::endl;
-		// 	// if (k == scope_server.size())
-		// 	// 	break;
-		// }
-		// std::cout << " COUT =  " << count << std::endl;
-		// if (count < 6)
-		// {
-		// 	std::cout << "Error, miss : ";
-		// 	for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
-		// 	{
-		// 		if (it_b->second == false)
-		// 			std::cout << "\"" << it_b->first << "\" ";
-		// 	}
-		// 	std::cout << "\t directives in a bloc server before a location bloc" << std::endl;
-		// 	return (true);
-		// }
-		// ///////////////// A DECOUPER FIN FONCTION 1 //////////////////////////////////////////
-		// std::cout << "scope_server[k] == " << scope_server[k - 1] << std::endl;
-		// serv_dir.clear();
-		// this->_servers.push_back(Parsing::t_server());
-
-
+	
 		size_t k = 0;
 		k = 1;
-		while (k < scope_server.size())
+		if (ft_find_directive_server(k, scope_server, i))
 		{
-			if (scope_server[k] == "listen")
-			{
-				std::cout << "go listen" << std::endl;
-				if (this->ft_get_listen(k, scope_server, i))
-					return (true);
-				std::cout << "\thost = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
-				k += 2;
-			}
-			else if (scope_server[k] == "server_name")
-			{
-				std::cout << "go server_name " << std::endl;
-				if (this->ft_get_server_name(k, scope_server, i))
-					return (true);
-				std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
-				k += 2;
-			}
-			else if (scope_server[k] == "autoindex")
-			{
-				std::cout << "go autoindex " << std::endl;
-				if (this->ft_get_autoindex(k, scope_server, i))
-					return (true);
-				std::cout << "\tautoindex = " << this->_servers[i].autoindex_server << std::endl;
-				k += 2;
-			}
-			else if (scope_server[k] == "root")
-			{
-				std::cout << "go root" << std::endl;
-				if (this->ft_get_root(k ,scope_server, i))
-					return (true);
-				std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
-				k += 2;
-			}
-			else if (scope_server[k] == "error_page")
-			{
-				std::cout << "go error_page " << std::endl;
-				k = this->ft_get_error(k, scope_server, i);
-				if (k == 0)
-					return (true);
-				//k += 3;
-			}
-			else if (scope_server[k] == "dav_methods")
-			{
-				std::cout << "go dav_methods " << std::endl;
-				k = this->ft_get_methods(k, scope_server, i);
-				if (k == 0)
-				{
-					std::cout << "ERROR DANS DAV METHODS" << std::endl;
-					return (true);
-				}
-				std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
-				//k += 2;
-			}
-			else if (scope_server[k] == "client_body_buffer_size")
-			{
-				std::cout << "go client_body_buffer_size" << std::endl;
-				if (this->ft_get_buffer_size(k, scope_server, i))
-					return (true);
-				k += 2;
-			}
-			else if (scope_server[k] == "cgi_path")
-			{
-				std::cout << "go cgi path" << std::endl;
-				if (this->ft_get_cgi_path(k, scope_server, i))
-					return (true);
-				k += 2;
-			}
-			else if (scope_server[k] == "upload_store")
-			{
-				std::cout << "go ft_get_upload_store " << std::endl;
-				if (this->ft_get_upload_store(k, scope_server, i))
-					return (true);
-				k += 2;
-			}
-			else if (scope_server[k] == "server" && scope_server[k + 1] == "{")
-			{
-				std::cout << "Error, a bloc server cannot have another bloc server inside." << std::endl;
-				return (true);
-			}
-			else if (scope_server[k] == "location")
-			{
-				std::cout << "go location " << std::endl;
-				std::cout << "k = " << k << std::endl;
-				k = ft_get_location( k, scope_server, i);
-				std::cout << "fin de location : k = " << k << std::endl;
-				if (k == 0)
-					return (true);
-				// return (true);
-				// break;
-				// k += 2;
-			}
-			else if (scope_server[k] == "index")
-			{
-				std::cout << "go index " << std::endl;
-				if (this->ft_get_index(k, scope_server, i))
-				{
-					return (true);
-				}
-				k += 2;
-			}
-			else
-			{
-				std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << scope_server[k] << std::endl;
-				if (scope_server[k] == "}")
-					break;
-				else
-				{
-					std::cout << "INSTRUCTION NON RECONNU" << std::endl;
-					return (true);
-				}
-				//std::cout << " EUH ERROR " << scope_server[k] << " et k = " << k << std::endl;
-				//if ()
-				//return (true);
-				//exit(EXIT_FAILURE);
-				//break;
-			}
+			std::cout << "ERREUR CATA" << std::endl;
+			return (true);
 		}
+		else
+			std::cout << "cool ca marche " << std::endl;
+		// while (k < scope_server.size())
+		// {
+		// 	if (scope_server[k] == "listen")
+		// 	{
+		// 		std::cout << "go listen" << std::endl;
+		// 		if (this->ft_get_listen(k, scope_server, i))
+		// 			return (true);
+		// 		std::cout << "\thost = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
+		// 		k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "server_name")
+		// 	{
+		// 		std::cout << "go server_name " << std::endl;
+		// 		if (this->ft_get_server_name(k, scope_server, i))
+		// 			return (true);
+		// 		std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
+		// 		k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "autoindex")
+		// 	{
+		// 		std::cout << "go autoindex " << std::endl;
+		// 		if (this->ft_get_autoindex(k, scope_server, i))
+		// 			return (true);
+		// 		std::cout << "\tautoindex = " << this->_servers[i].autoindex_server << std::endl;
+		// 		k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "root")
+		// 	{
+		// 		std::cout << "go root" << std::endl;
+		// 		if (this->ft_get_root(k ,scope_server, i))
+		// 			return (true);
+		// 		std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
+		// 		k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "error_page")
+		// 	{
+		// 		std::cout << "go error_page " << std::endl;
+		// 		k = this->ft_get_error(k, scope_server, i);
+		// 		if (k == 0)
+		// 			return (true);
+		// 		//k += 3;
+		// 	}
+		// 	else if (scope_server[k] == "dav_methods")
+		// 	{
+		// 		std::cout << "go dav_methods " << std::endl;
+		// 		k = this->ft_get_methods(k, scope_server, i);
+		// 		if (k == 0)
+		// 		{
+		// 			std::cout << "ERROR DANS DAV METHODS" << std::endl;
+		// 			return (true);
+		// 		}
+		// 		std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
+		// 		//k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "client_body_buffer_size")
+		// 	{
+		// 		std::cout << "go client_body_buffer_size" << std::endl;
+		// 		if (this->ft_get_buffer_size(k, scope_server, i))
+		// 			return (true);
+		// 		k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "cgi_path")
+		// 	{
+		// 		std::cout << "go cgi path" << std::endl;
+		// 		if (this->ft_get_cgi_path(k, scope_server, i))
+		// 			return (true);
+		// 		k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "upload_store")
+		// 	{
+		// 		std::cout << "go ft_get_upload_store " << std::endl;
+		// 		if (this->ft_get_upload_store(k, scope_server, i))
+		// 			return (true);
+		// 		k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "server" && scope_server[k + 1] == "{")
+		// 	{
+		// 		std::cout << "Error, a bloc server cannot have another bloc server inside." << std::endl;
+		// 		return (true);
+		// 	}
+		// 	else if (scope_server[k] == "location")
+		// 	{
+		// 		std::cout << "go location " << std::endl;
+		// 		std::cout << "k = " << k << std::endl;
+		// 		k = ft_get_location( k, scope_server, i);
+		// 		std::cout << "fin de location : k = " << k << std::endl;
+		// 		if (k == 0)
+		// 			return (true);
+		// 		// return (true);
+		// 		// break;
+		// 		// k += 2;
+		// 	}
+		// 	else if (scope_server[k] == "index")
+		// 	{
+		// 		std::cout << "go index " << std::endl;
+		// 		if (this->ft_get_index(k, scope_server, i))
+		// 		{
+		// 			return (true);
+		// 		}
+		// 		k += 2;
+		// 	}
+		// 	else
+		// 	{
+		// 		std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << scope_server[k] << std::endl;
+		// 		if (scope_server[k] == "}")
+		// 			break;
+		// 		else
+		// 		{
+		// 			std::cout << "INSTRUCTION NON RECONNU" << std::endl;
+		// 			return (true);
+		// 		}
+		// 		//std::cout << " EUH ERROR " << scope_server[k] << " et k = " << k << std::endl;
+		// 		//if ()
+		// 		//return (true);
+		// 		//exit(EXIT_FAILURE);
+		// 		//break;
+		// 	}
+		// }
 
 		std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;
 		i++;
@@ -506,21 +430,32 @@ bool                            Parsing::ft_check_number_of_bracket( void )
 	
 	for (it_b = this->_data.begin(); it_b != this->_data.end(); it_b++)
 	{
+		std::cout << "*it_b = " << *it_b << std::endl;
 		find_open = (*it_b).find("{");
 		find_close = (*it_b).find("}");
 		if (find_open != std::string::npos)
 		{
+			std::cout << "*it_b.size() = " << (*it_b).length() << std::endl; 
 			if ((*it_b).compare("{") == 0)
 				count++;
 			else
-				return (true);
+			{
+				if ((*it_b).length() == 1)
+					return (true);
+			}
 		}
 		if (find_close != std::string::npos)
 		{
 			if ((*it_b).compare("}") == 0)
 				count--;
 			else
-				return (true);
+			{
+				std::cout << "ICI *it_b = " << *it_b << std::endl;
+				std::cout << "*it_b.size() = " << (*it_b).length() << std::endl; 
+				// if ((*it_b).length() )
+				if ((*it_b).length() == 1)
+					return (true);
+			}
 		}
 	}
 	if (count == 0)
@@ -578,27 +513,6 @@ std::vector<std::string>        Parsing::ft_get_data_container( void ) {
 	return (tmp);
 }
 
-/*
-**	ft_delete_comm( std::string &line ):
-**		This function will delete all commentaries (starting with #) from the configuration file.
-**
-**	==> Returns the new string "tmp" which will contain all the configuration file.
-*/
-std::string                     Parsing::ft_delete_comm( std::string &line )
-{
-	std::string                 tmp = line;
-	size_t                      pos = 0;
-	size_t                      pos_end = 0;
-	while (1)
-	{
-		pos = tmp.find('#', pos);
-		if (pos == std::string::npos)
-			break;
-		pos_end = tmp.find('\n', pos);
-		tmp.erase(pos, pos_end - pos);
-	}
-	return (tmp);
-}
 
 /*
 **	ft_check_conf_file():

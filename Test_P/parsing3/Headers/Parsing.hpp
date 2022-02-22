@@ -43,6 +43,7 @@ class Parsing {
 			std::map<int, std::string>  error_server;
 
 			std::vector<t_location>		location;
+			size_t						nbr_location;
 		}                               t_server;
 
 		Parsing( std::string &configfile );
@@ -78,6 +79,8 @@ class Parsing {
 		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 
 		bool			ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size );
+		bool ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i );
+
 
 		// For location bloc
 		bool           					ft_get_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );

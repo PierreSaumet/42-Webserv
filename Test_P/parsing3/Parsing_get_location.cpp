@@ -26,7 +26,16 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 	// on ajoute un bloc location
 	this->_servers.push_back(Parsing::t_server());
 
+	if (this->_servers[index_server].location.size() == 0)
+		this->_servers[index_server].nbr_location = 1;
+	else
+		this->_servers[index_server].nbr_location += 1;
+
 	this->_servers[index_server].location.push_back(Parsing::t_location());
+	// if (this->_servers[index_server].location.size() == 1)
+	// 	this->_servers[index_server].nbr_location = 1;
+	// else
+	// 	this->_servers[index_server].nbr_location += 1;
 	// this->_servers[index_server].location++;
 	std::cout << " TAILLE DE location dans le server = " << this->_servers[index_server].location.size() << std::endl;
 	// on verifie qu'il y a / et quelaue chose apres et {
