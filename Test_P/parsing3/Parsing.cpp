@@ -121,14 +121,13 @@ bool                            Parsing::ft_check_data( void ) {
 */
 std::vector<std::string>        Parsing::ft_get_scope( size_t index )
 {
-	std::cout << "Debut ft_get scope   index = " << index << std::endl;
-	size_t                  i = index;
-	size_t                  count = 0;
-	std::vector<std::string>::size_type sz = this->_data.size();
 	std::vector<std::string>::iterator      it_b;
 	std::vector<std::string>::iterator      it_e;
-	std::cout << "size = " << this->_data.size() << std::endl;
-	while (i < sz)
+	std::vector<std::string>::size_type 	size_data = this->_data.size();
+	size_t                  				i = index;
+	size_t                  				count = 0;
+
+	while (i++ < size_data)
 	{
 		if (this->_data[i] == "{")
 		{
@@ -142,17 +141,11 @@ std::vector<std::string>        Parsing::ft_get_scope( size_t index )
 			if (count == 0)
 			{
 				it_e = this->_data.begin() + i + 1;
-				//std::cout << "ici i = " << i  << std::endl;
 				break;
 			}
 		}
-		i++;
 	}
 	std::vector<std::string>    tmp(it_b, it_e);
-	for (std::vector<std::string>::iterator test = tmp.begin(); test != tmp.end(); test++)
-	{
-		std::cout << "test = " << *test<< std::endl;
-	}
 	return (tmp);
 }
 
