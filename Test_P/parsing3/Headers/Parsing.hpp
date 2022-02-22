@@ -77,6 +77,8 @@ class Parsing {
 		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 
+		bool			ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size );
+
 		// For location bloc
 		bool           					ft_get_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool           					ft_get_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
