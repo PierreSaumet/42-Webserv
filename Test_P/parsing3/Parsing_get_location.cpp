@@ -5,12 +5,12 @@
 /*
 **
 **	on doit avoir
-autoindex				ok
-root					ok
+autoindex					ok
+root						ok
 error_page
-dav_method				ok
-upload_path
-client_body_buffer_size
+dav_method					ok
+upload_path					ok
+client_body_buffer_size		ok
 */
 
 /*
@@ -128,8 +128,17 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 			i += 2;
 		
 		}
-		// else if (scope_location[i] == "error_page")
-		// 	std::cout << "go error_page = " << scope_location[i] << std::endl;
+		else if (scope_location[i] == "error_page")
+		{
+			std::cout << "go error_page = " << scope_location[i] << std::endl;
+			i = ft_get_error_location(i, scope_location, index_server, index_location);
+			if (i < 0)
+			{
+				std::cout << "Erreur dans get erreur location " << std::endl;
+				return (-1);
+			}
+			std::cout << "Fin de get error location = " << this->_servers[index_server].location[index_location].error_location.size() << std::endl;
+		}
 		else
 		{
 			std::cout << "ELSE LOCATION  = " << scope_location[i] << std::endl;
@@ -148,6 +157,127 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 	std::cout << "GOOD" << std::endl;
 	std::cout << "\n\n" << std::endl;
 	return (0);
+}
+
+
+/*
+**	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'error_page' directive.
+**		It will check the error codes indicated and it will check if the files exist.
+**		It will save the data in a std::map<int, std::string>  container.
+**
+**	==> Returns the new increamentation of the parsing, otherwise returns -1 if an error occurs.
+*/
+size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+{
+	// on incremente k on passe errr_page
+	k += 1;
+	while (tmp[k][tmp[k].size() - 1] != ';')
+	{
+		std::cout << "\tLA tmp[k] = " << tmp[k] << std::endl;
+		int y = 0;
+		while (tmp[k][y])
+		{
+			if (isdigit(tmp[k][y]))
+			{
+				y++;
+			}
+			else
+			{
+				std::cout << "Error: error_page directive should only have numbers then a directory!" << std::endl;
+				return (-1);
+				//break;
+			}
+		}
+		int error_code = std::strtol(tmp[k].c_str(), NULL, 10);
+		if (this->ft_check_code_error(error_code) == 1)
+		{
+			std::cout << "EUh il faut quitter? " << std::endl;
+			std::cout << "car = " << this->ft_check_code_error(error_code) << std::endl;
+			return (-1);
+		}
+		this->_servers[index_server].location[index_location].error_location.insert(std::pair<int, std::string>(error_code, "NULL"));
+		k++;
+	}
+	if (tmp[k][0] != '.' || tmp[k][1] != '/')
+	{
+		std::cout << "Error, error_page directive should end with a directory or file" << std::endl;
+		return (-1);
+	}
+	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
+	struct stat buffer;
+	if (stat(address.c_str(), &buffer) != 0)
+	{
+		std::cout << "Error, error_page directive, directory doesn't exist!" << std::endl;
+		return (-1);
+	}
+
+	if (this->_servers[index_server].location[index_location].error_location.size() > 1)		// several error pages.
+	{
+		// on ajute l'addresse a toutes les erreurs
+		std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();
+		for (it = this->_servers[index_server].location[index_location].error_location.begin(); it != this->_servers[index_server].location[index_location].error_location.end(); it++)
+		{
+			struct stat buff;
+
+			if (it->second == "NULL")
+				it->second = address;
+
+			std::size_t found = it->second.find(".html");
+			if (found == std::string::npos)
+			{
+				std::stringstream ss;
+				std::string check_c;
+				ss << it->first;
+				ss >> check_c;
+				check_c.append(".html");
+				if (it->second[it->second.size() - 1] != '/')
+					it->second.append("/");
+				it->second.append(check_c);
+			}
+			if (stat(it->second.c_str(), &buff) < 0)
+			{
+				std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
+				return (-1);
+			}
+			if (buff.st_size == 0)
+			{
+				std::cout << "Error, error_page directive, file is empty" << std::endl;
+				return (-1);
+			}
+		}
+	}
+	else		// only one error page
+	{
+		std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();
+		if (it->second == "NULL")
+			it->second = address;
+		struct stat buff;
+		std::size_t found = it->second.find(".html");
+		if (found == std::string::npos)
+		{
+			std::stringstream ss;
+			std::string check_c;
+			ss << it->first;
+			ss >> check_c;
+			check_c.append(".html");
+			if (it->second[it->second.size() - 1] != '/')
+				it->second.append("/");
+			it->second.append(check_c);
+		}
+		if (stat(it->second.c_str(), &buff) < 0)
+		{
+			std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
+			return (-1);
+		}
+		if (buff.st_size == 0)
+		{
+			std::cout << "Error, error_page directive, file is empty" << std::endl;
+			return (-1);
+		}
+	}
+	k++;
+	return (k);
 }
 
 
