@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Parsing.hpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: psaumet <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/06/01 11:07:34 by psaumet           #+#    #+#             */
+/*   Updated: 2021/06/01 11:07:42 by psaumet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef PARSING_HPP
 # define PARSING_HPP
@@ -48,17 +59,25 @@ class Parsing {
 			size_t						nbr_location;
 		}                               t_server;
 
+		/*
+		**	Canonical Form
+		*/
 		Parsing( std::string &configfile );
 		~Parsing( void );
 		Parsing( const Parsing &copy );
 
+		/*
+		**	Overload operator '='
+		*/
 		Parsing                         &operator=( const Parsing &element );
 
-		bool                            ft_check_conf_file( void );
 		
+		/*
+		**	Functions used to checks if the configuration file is valid.
+		*/
 		std::vector<std::string>        ft_get_data_container( void );
 		std::vector<t_server>           ft_get_server( void );
-
+		bool                            ft_check_conf_file( void );
 		bool                            ft_check_data( void );
 		bool                            ft_check_number_of_bracket( void );
 		bool                            ft_check_semicolon( void );
@@ -67,7 +86,12 @@ class Parsing {
 		bool                            ft_check_code_serv( int code ) const ;
 		bool                            ft_check_code_client( int code ) const;
 
-		// For server bloc
+		std::string                     ft_delete_comm( std::string &line );
+		std::vector<std::string>        ft_get_scope( size_t index );
+
+		/*
+		**	Functions used to get the data from multiple directives stored in a server block.
+		*/
 		bool      		               	ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool                        	ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server );
 		bool                        	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server );
@@ -79,11 +103,12 @@ class Parsing {
 		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 
-		bool			ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size );
-		bool ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i );
+		bool							ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size );
+		bool 							ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i );
 
-
-		// For location bloc
+		/*
+		**	Functions used to get the data from multiple directives stored in a location block.
+		*/
 		bool           					ft_get_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool           					ft_get_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool							ft_get_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
@@ -92,14 +117,11 @@ class Parsing {
 		size_t          				ft_get_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t                      	ft_get_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
 
-
 		size_t							ft_get_location( size_t k, std::vector<std::string> tmp, size_t index_server );
 
-		std::string                     ft_delete_comm( std::string &line );
-		std::vector<std::string>        ft_get_scope( size_t index );
-
-
-
+		/*
+		**	Need to be delete.
+		*/
 		void							display_all( void );
 
 	private:
@@ -109,7 +131,6 @@ class Parsing {
 		std::vector<std::string>        _data;
 		size_t                          _nbr_servers;
 		std::vector<t_server>           _servers;
-	
 
 };
 

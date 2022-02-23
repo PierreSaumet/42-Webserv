@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
 #include "Headers/Parsing.hpp"
+#include <iostream>
 
 /*
 **	ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size ):
@@ -278,7 +278,6 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
-		std::cout << "\tLA tmp[k] = " << tmp[k] << std::endl;
 		int y = 0;
 		while (tmp[k][y])
 		{
@@ -375,7 +374,6 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 	k += 1;
 	while (1)
 	{
-		std::cout << "Dans la boucle " << std::endl;
 		if (tmp[k].compare("DELETE") == 0)
 			this->_servers[index_server].methods_server.push_back("DELETE");
 		else if (tmp[k].compare("POST") == 0)
@@ -409,7 +407,6 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 	std::vector<std::string>::iterator it;
 	for (it = this->_servers[index_server].methods_server.begin(); it != this->_servers[index_server].methods_server.end(); it++)
 	{
-		std::cout << "it = " << *it << std::endl;
 		if (*it == "DELETE")
 			int_del++;
 		else if (*it == "POST")

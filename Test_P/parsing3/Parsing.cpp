@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Parsing.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: psaumet <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/06/01 11:07:34 by psaumet           #+#    #+#             */
+/*   Updated: 2021/06/01 11:07:42 by psaumet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Headers/Parsing.hpp"
 #include <iostream>
 
@@ -20,15 +32,16 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_se
 	{
 		if (!this->ft_check_conf_file())
 		{
-			std::cout << "On continue" << std::endl;
+			//std::cout << "On continue" << std::endl;
 			this->_data = this->ft_get_data_container();
 			this->_nbr_servers = 0;
 			
 		}
 		if (!this->ft_check_data())
 		{
-			std::cout << "On continue 2" << std::endl;
-			this->display_all();
+			//std::cout << "On continue 2" << std::endl;
+			//this->display_all();
+			std::cout << GREEN << "Parsing is terminated" << CLEAR << std::endl;
 		}
 	}
 	catch(std::exception &e)
@@ -94,7 +107,7 @@ bool                            Parsing::ft_check_data( void )
 		std::cout << "ERROR, problem bloc server" << std::endl;
 		return (true);
 	}
-	std::cout << "lol ok " << std::endl;
+	// std::cout << "lol ok " << std::endl;
 	return (false);
 }
 
@@ -135,9 +148,9 @@ bool                            Parsing::ft_check_server( void )
 			return (true);
 		if (ft_find_directive_server(1, scope_server, i))
 			return (true);
-		else
-			std::cout << "cool ca marche " << std::endl;
-		std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;
+		// else
+		// 	std::cout << "cool ca marche " << std::endl;
+		// std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;
 		i++;
 	}
 	return (false);

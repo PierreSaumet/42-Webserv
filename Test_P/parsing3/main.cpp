@@ -1,13 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: psaumet <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/06/01 11:07:34 by psaumet           #+#    #+#             */
+/*   Updated: 2021/06/01 11:07:42 by psaumet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Headers/Parsing.hpp"
 #include <iostream>
 
 /*
-**  clang++ -Wall -Werror -Wextra -g -o test main.cpp Parsing.cpp && valgrind ./test
-
-
-**	clang++ -Wall -Werror -Wextra -g -o test main.cpp Parsing.cpp Parsing_get.cpp && ./test confs/test.conf
+**	 main(int argc, char **argv):
+**		This is the 'main' function.
 */
-
 int             main(int argc, char **argv)
 {
     if (argc != 2)
@@ -18,15 +27,7 @@ int             main(int argc, char **argv)
     else
     {
         std::string name = argv[1];
-		Parsing relou = Parsing(name);
-        // try
-		// {
-		// 	Parsing relou = Parsing(name);
-		// }
-		// catch (std::exception &e)
-		// {
-		// 	std::cerr << e.what() << std::endl;
-		// }
+		Parsing test1 = Parsing(name);
     }
     return (0);
 }

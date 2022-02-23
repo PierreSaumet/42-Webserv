@@ -114,7 +114,6 @@ size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::strin
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
-		std::cout << "\tLA tmp[k] = " << tmp[k] << std::endl;
 		int y = 0;
 		while (tmp[k][y])
 		{
@@ -360,7 +359,6 @@ size_t          Parsing::ft_get_methods_location( size_t k, std::vector<std::str
 	std::vector<std::string>::iterator it;
 	for (it = this->_servers[index_server].location[index_location].methods_location.begin(); it != this->_servers[index_server].location[index_location].methods_location.end(); it++)
 	{
-		std::cout << "it = " << *it << std::endl;
 		if (*it == "DELETE")
 			int_del++;
 		else if (*it == "POST")
