@@ -84,7 +84,7 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 **	ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i )
 **		This function will simply find the directive and retrive the corresponding data.
 **
-**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
+**	==> It returns 1 if an error occurs, otherwise it returns 0.
 */
 bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i )
 {
@@ -163,19 +163,14 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 		}
 		else
 		{
-			std::cout << "\n\nDANS ELSE, tout est parse, il manque location et k == ." << scope_server[k] << std::endl;
 			if (scope_server[k] == "}")
 				break;
 			else
-			{
-				std::cout << "INSTRUCTION NON RECONNU la" << std::endl;
-				return (true);
-			}
+				throw Error(14, "Error, unrecognized directive.", 1);
 		}
 	}
 	return (false);
 }
-
 
 /*
 **	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
@@ -584,31 +579,22 @@ bool            Parsing::ft_get_root( size_t k, std::vector<std::string> tmp, si
 **		This function will checks the information given in the 'server_name' directive.
 **		It should only have digit and alphabetic characters.
 **
-**	==>	Returns 0 if no problem happens, otherwise returns 1.
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool         Parsing::ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool         	Parsing::ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
 	size_t  len = tmp[k].size();
 	if (tmp[k][len] != '\0')
-	{
-		std::cout << "Error, in 'server_name' directive, it should end with '\0'" << std::endl;
-		return (true);
-	}
+		throw Error(23, "Error, in 'server_name' directive, it should end with '\0'.", 1);
 	size_t i;
 	i = 0;
 	while (isalnum(tmp[k][i]))
 		i++;
 	if (i + 1 < len)
-	{
-		std::cout << "Error, in 'server_name' directive, it should only have alphanumeric characters" << std::endl;
-		return (true);
-	}
+		throw Error(24, "Error, in 'server_name' directive, it should only have alphanumeric characters.", 1);
 	if (tmp[k][len - 1] != ';')
-	{
-		std::cout << "Error, in 'server_name' directive, it should end with ';'" << std::endl;
-		return (true);
-	}
+		throw Error(25, "Error, in 'server_name' directive, it should end with ';'.", 1);
 	this->_servers[index_server].name_server = tmp[k].substr(0, len - 1);
 	return (false);
 }
@@ -618,9 +604,9 @@ bool         Parsing::ft_get_server_name( size_t k, std::vector<std::string> tmp
 **      This function will checks the informations given in the 'listen' directive.
 **      It should find a 'host' equal to '127.0.0.1' or 'localhost', an 'port' > 1 and < 65535.
 **
-**     ==> Returns 0 if no problem happens, otherwise returns 1.
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server) 
+bool        	Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server) 
 {
 	k += 1;
 	size_t      len = tmp[k].size();
@@ -659,10 +645,7 @@ bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 	return false;
 }
 
-
-
-
-bool					Parsing::ft_check_code_error( int code ) const
+bool			Parsing::ft_check_code_error( int code ) const
 {
 	// if (server_code_error(code) == 1 || client_code_error(code) == 1)
 	// 	return (1);
@@ -686,33 +669,41 @@ bool					Parsing::ft_check_code_error( int code ) const
 
 /*
 **	Parsing::server_code_error():
-**		Check iff the given code is a server code.
-**		if not, return 1.
+**		Check if the given code is a server code.
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool					Parsing::ft_check_code_serv( int code ) const
+bool			Parsing::ft_check_code_serv( int code ) const
 {
 	if ((code >= 500 && code <= 508) || code == 510 || code == 511)
 		return (false);
 	else
-		return (true);
+		throw Error(101, "Error, wrong code server.", 1);
 }
 
 /*
 **	Parsing::client_code_error():
 **		Check if the given code is a client code.
-**		If not, return 1;
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool					Parsing::ft_check_code_client( int code ) const
+bool			Parsing::ft_check_code_client( int code ) const
 {
 	if ((code >= 400 && code <= 417) || (code >= 421 && code <= 426) 
 			|| code == 428 || code == 429 || code == 431 || code == 451 )		// || code == 499 pour NGINX
 		return (false);
 	else
-		return (true);
+		throw Error(100, "Error, wrong code client.", 1);
 }
 
-
-bool					Parsing::ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server )
+/*
+**	ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function will check the information given in the 'index' directive.
+**		The file should exist and not be empty.
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
+*/
+bool			Parsing::ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	struct stat buffer;
 	size_t  	len;
@@ -720,37 +711,17 @@ bool					Parsing::ft_get_index( size_t k, std::vector<std::string> tmp, size_t i
 	k += 1;
 	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
-	{
-		std::cout << "Error, in 'index' directive, it should end with '\0'" << std::endl;
-		return (true);
-	}
+		throw Error(26, "Error, in 'index' directive, it should end with '\0'.", 1);
 	if (tmp[k][len - 1] != ';')
-	{
-		std::cout << "Error, in 'index' directive, it should end with ';'" << std::endl;
-		return (true);
-	}
-	std::cout << "longueur de index = " << tmp[k].size() << std::endl;
+		throw Error(27, "Error, in 'index' directive, it should end with ';'.", 1);
 	if (tmp[k].size() <= 6)
-	{
-		std::cout << "Error, in 'index' directive, it should have a proper name and end with '.html'." << std::endl;
-		return (true);
-	}
-	std::cout << "tmp[k] de truc = " << tmp[k][tmp[k].size() - 6] << std::endl;
+		throw Error(28, "Error, in 'index' directive, it should have a proper name and end with '.html'.", 1);
 	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
-	{
-		std::cout << "Error, in 'index' directive, it should end with '.html'." << std::endl;
-		return (true);
-	}
+		throw Error(29, "Error, in 'index' directive, it should end with '.html'.", 1);
 	this->_servers[index_server].index_server = tmp[k].substr(0, len - 1);
 	if (stat(this->_servers[index_server].index_server.c_str(), &buffer) == -1)
-	{
-		std::cout << "Error, 'index' directive, file doesn't exist." << std::endl;
-		return (true);
-	}
+		throw Error(30, "Error, in 'index' directive, file doesn't exist.", 1);
 	if (buffer.st_size == 0)
-	{
-		std::cout << "Error, in 'index' directive, file is empty." << std::endl;
-		return (true);
-	}
+		throw Error(31, "Error, in 'index' directive, file is empty.", 1);
 	return (false);
 }
