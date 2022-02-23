@@ -12,6 +12,7 @@
 
 #include "Headers/Parsing.hpp"
 #include "Headers/HttpServer.hpp"
+#include "Headers/Error.hpp"
 #include <iostream>
 
 /*
@@ -20,21 +21,26 @@
 */
 int             main(int argc, char **argv)
 {
-    if (argc != 2)
+	if (signal(SIGINT, HttpServer::handler_signal) == SIG_ERR)
+		exit(EXIT_FAILURE);
+    if (argc == 1)
     {
-        std::cout << "Error, need one argument!" << std::endl;
-        return (1);
+		std::string name("./confs/test1.conf");
+		Parsing test1 = Parsing(name);
     }
-    else
+    else if (argc == 2)
     {
-		if (signal(SIGINT, HttpServer::handler_signal) == SIG_ERR)
-			exit(EXIT_FAILURE);
         std::string name = argv[1];
 		Parsing test1 = Parsing(name);
+	}
+	else
+	{
+		std::cerr << RED << "Error, in the argument given." << CLEAR << std::endl;
+	}
+	// Testing signal
+	raise(SIGINT);
+	std::cout << "int sig = " << HttpServer::int_signal << std::endl;
 
-		// Testing signal
-		raise(SIGINT);
-		std::cout << "int sig = " << HttpServer::int_signal << std::endl;
-    }
+
     return (0);
 }
