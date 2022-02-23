@@ -102,6 +102,54 @@ class Error: public std::exception
 							=	42	==> in 'dav_methods' directive, this method is unkonwn.
 							=	43	==> in 'dav_methods' directive, it should not have doublons.
 
+							=	44	==>	in 'error_page' directive, it should only have numbers then a directory!
+							=	45	==>	in 'error_page' directive should end with a directory or file
+							=	46	==>	in 'error_page' directive, the directory doesn't exist!
+							=	47	==>	in 'error_page' directive, it cannot find the error file.
+							=	48	==>	in 'error_page' directive, the file is empty.
+							=	49	==>	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 							=	100	==>	wrong code client.
 							=	101	==> wrong code server.

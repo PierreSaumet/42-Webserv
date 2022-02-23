@@ -321,39 +321,25 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 		while (tmp[k][y])
 		{
 			if (isdigit(tmp[k][y]))
-			{
 				y++;
-			}
 			else
-			{
-				std::cout << "Error: error_page directive should only have numbers then a directory!" << std::endl;
-				return (0);
-				//break;
-			}
+				throw Error(44, "Error: in 'error_page' directive, it should only have numbers then a directory!", 1);
 		}
 		int error_code = std::strtol(tmp[k].c_str(), NULL, 10);
 		if (this->ft_check_code_error(error_code) == 1)
-		{
-			std::cout << "EUh il faut quitter? " << std::endl;
-			std::cout << "car = " << this->ft_check_code_error(error_code) << std::endl;
 			return (0);
-		}
 		this->_servers[index_server].error_server.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 	{
-		std::cout << "Error, error_page directive should end with a directory or file" << std::endl;
+		throw Error(45, "Error, in 'error_page' directive, it should end with a directory or file.", 1);
 		return (0);
 	}
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 	struct stat buffer;
 	if (stat(address.c_str(), &buffer) != 0)
-	{
-		std::cout << "Error, error_page directive, directory doesn't exist!" << std::endl;
-		return (0);
-	}
-
+		throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
 	if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
 	{
 		// on ajute l'addresse a toutes les erreurs
@@ -378,15 +364,9 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 				it->second.append(check_c);
 			}
 			if (stat(it->second.c_str(), &buff) < 0)
-			{
-				std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-				return (0);
-			}
+				throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
 			if (buff.st_size == 0)
-			{
-				std::cout << "Error, error_page directive, file is empty" << std::endl;
-				return (0);
-			}
+				throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
 		}
 	}
 	else		// only one error page
@@ -408,15 +388,9 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 			it->second.append(check_c);
 		}
 		if (stat(it->second.c_str(), &buff) < 0)
-		{
-			std::cout << "Error, error_page directive, cannot find the error file" << std::endl;
-			return (0);
-		}
+			throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
 		if (buff.st_size == 0)
-		{
-			std::cout << "Error, error_page directive, file is empty" << std::endl;
-			return (0);
-		}
+			throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
 	}
 	k++;
 	return (k);
