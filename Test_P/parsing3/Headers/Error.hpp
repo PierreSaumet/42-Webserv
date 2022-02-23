@@ -90,7 +90,7 @@ class Error: public std::exception
 							=	32	==>	 in 'root' directive, it should end with '\0'.
 							=	33	==>	in 'root' directive, it should end with ';'.
 							=	34	==> in 'root' directive, it should start with './'.
-							=	35	==>	'root' directive doesn't exist!.
+							=	35	==>	in 'root' directive doesn't exist!.
 
 							=	36	==>	in 'autoindex' directive it should end with '\0'.
 							=	37	==>	in 'autoindex' directive it should end with ';'.
@@ -118,11 +118,12 @@ class Error: public std::exception
 							=	55	==> in 'cgi_path' directive, it should start with './'.
 							=	56	==>	in 'cgi_path' directive, the folder doesn't exist!
 
+							=	57	==>	in 'client_body_buffer_size' directive, it should only be digits.
+							=	58	==>	in 'client_body_buffer_size' directive, buffer size must be between 8k and 16k.
+							=	59	==>	in 'client_body_buffer_size' directive, buffer size must be between 8000 and 16000.
+							=	60	==>	in 'client_body_buffer_size' directive, informations are corrupted.
 
-
-
-
-
+							=	61	==>	a bloc server cannot have another bloc server inside.
 
 
 
