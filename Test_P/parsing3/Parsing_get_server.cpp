@@ -14,7 +14,11 @@
 #include "Headers/Parsing.hpp"
 
 /*
+**	ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size ):
+**		This function will check if the mandatory directive server are present and
+**		if there is no doublon.
 **
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
 bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size )
 {
@@ -53,45 +57,24 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 		}
 		k++;
 	}
-
-
-
-	
 	for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
 	{
 		if (it_b->second == false)
 		{
 			if (it_b->first == "listen")
-			{
-				std::cout << "MISS listen" << std::endl;
-				return (true);			
-			}
+				throw Error(8, "Error, in 'server block', 'listen' directive is missing.", 1);
+			if (it_b->first == "server_name")
+				throw Error(9, "Error, in 'server block', 'server_name' directive is missing.", 1);
+			if (it_b->first == "root")
+				throw Error(10, "Error, in 'server block', 'root' directive is missing.", 1);
+			if (it_b->first == "error_page")
+				throw Error(11, "Error, in 'server block', 'error_page' directive is missing.", 1);
+			if (it_b->first == "dav_methdods")
+				throw Error(12, "Error, in 'server block', 'dav_methdods' directive is missing.", 1);
+			if (it_b->first == "index")
+				throw Error(13, "Error, in 'server block', 'index' directive is missing.", 1);
 		}
 	}
-	std::cout << " COUT =  " << count << std::endl;
-	if (count < 6)
-	{
-		std::cout << "Error, miss : ";
-		for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
-		{
-			if (it_b->second == false)
-				std::cout << "\"" << it_b->first << "\" ";
-		}
-		std::cout << "\t directives in a bloc server before a location bloc" << std::endl;
-		return (true);
-	}
-	///////////////// A DECOUPER FIN FONCTION 1 //////////////////////////////////////////
-
-
-	std::cout << "scope_server[k] == " << scope_server[k - 1] << std::endl;
-
-
-	// std::cout << "STOP " << std::endl;
-	// return (true);
-
-
-	serv_dir.clear();
-
 	this->_servers.push_back(Parsing::t_server());
 	return (false);
 }

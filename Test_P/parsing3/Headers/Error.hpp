@@ -62,6 +62,8 @@ class Error: public std::exception
 							=	9	==>	miss 'server_name' directive.
 							=	10	==> miss 'root' directive.
 							=	11	==>	miss 'error_page' directive.
+							=	12	==>	miss 'dav_methdods' directive.
+							=	13	==> miss 'index' directive.
 
 throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
