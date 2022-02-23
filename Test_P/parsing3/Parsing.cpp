@@ -134,10 +134,7 @@ bool                            Parsing::ft_check_server( void )
 		if (ft_check_directive_server(scope_server, server_size))
 			return (true);
 		if (ft_find_directive_server(1, scope_server, i))
-		{
-			std::cout << "ERREUR CATA" << std::endl;
 			return (true);
-		}
 		else
 			std::cout << "cool ca marche " << std::endl;
 		std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;

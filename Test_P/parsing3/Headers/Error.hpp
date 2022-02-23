@@ -107,8 +107,16 @@ class Error: public std::exception
 							=	46	==>	in 'error_page' directive, the directory doesn't exist!
 							=	47	==>	in 'error_page' directive, it cannot find the error file.
 							=	48	==>	in 'error_page' directive, the file is empty.
-							=	49	==>	
+							
+							=	49	==>	in 'upload_store' directive, it should end with '\0'.
+							=	50	==>  in 'upload_store' directive, it should end with ';'
+							=	51	==> in 'upload_store' directive, it should start with './'
+							=	52	==> in  'upload_store' directive , the folder doesn't exist!
 
+							=	53	==>	in 'cgi_path' directive, it should end with '\0'.
+							=	54	==>in 'cgi_path' directive, it should end with ';'.
+							=	55	==> in 'cgi_path' directive, it should start with './'.
+							=	56	==>	in 'cgi_path' directive, the folder doesn't exist!
 
 
 
