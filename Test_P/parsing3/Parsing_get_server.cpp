@@ -541,7 +541,7 @@ bool            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tm
 **		This function will checks the informations given in the 'root' directive.
 **		It will also checks if the folder exists.
 **
-**	==> Returns 0 if no problem happens, otherwise returns 1
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
 bool            Parsing::ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
@@ -551,26 +551,14 @@ bool            Parsing::ft_get_root( size_t k, std::vector<std::string> tmp, si
 	k += 1;
 	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
-	{
-		std::cout << "Error, in 'root' directive, it should end with '\0'" << std::endl;
-		return (true);
-	}
+		throw Error(32, "Error, in 'root' directive, it should end with '\0'.", 0);
 	if (tmp[k][len - 1] != ';')
-	{
-		std::cout << "Error, in 'root' directive, it should end with ';'" << std::endl;
-		return (true);
-	}
+		throw Error(33, "Error, in 'root' directive, it should end with ';'.", 0);
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
-	{
-		std::cout << "Error, in 'root' directive, it should start with './'" << std::endl;
-		return (true);
-	}
+		throw Error(34, "Error, in 'root' directive, it should start with './'." , 0);
 	this->_servers[index_server].root_server = tmp[k].substr(0, len - 1);
 	if (stat(this->_servers[index_server].root_server.c_str(), &buffer) == -1)
-	{
-		std::cout << "Error, 'root' directive doesn't exist!" << std::endl;
-		return (true);
-	}
+		throw Error(35, "Error, 'root' directive doesn't exist!.", 0);
 	return (false);
 }
 
@@ -645,56 +633,6 @@ bool        	Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 	return false;
 }
 
-bool			Parsing::ft_check_code_error( int code ) const
-{
-	// if (server_code_error(code) == 1 || client_code_error(code) == 1)
-	// 	return (1);
-	// else
-	// 	return (0);
-	if (code > 399 && code < 500)
-		return (this->ft_check_code_client(code));
-	else if (code > 499 && code < 600)
-		return (this->ft_check_code_serv(code));
-	else
-	{
-		std::cout << "ERROR, code pas bon MERDE" << std::endl;
-		return (1);
-		//exit(EXIT_FAILURE);
-		//throw Error(8, "Error, code error not correct", 1);
-		// std::cout << "ERROR CODE PAS VALIDE" << std::endl;
-		// exit(EXIT_FAILURE);
-	}
-	//return ( client_code_error(code));
-}
-
-/*
-**	Parsing::server_code_error():
-**		Check if the given code is a server code.
-**
-**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
-*/
-bool			Parsing::ft_check_code_serv( int code ) const
-{
-	if ((code >= 500 && code <= 508) || code == 510 || code == 511)
-		return (false);
-	else
-		throw Error(101, "Error, wrong code server.", 1);
-}
-
-/*
-**	Parsing::client_code_error():
-**		Check if the given code is a client code.
-**
-**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
-*/
-bool			Parsing::ft_check_code_client( int code ) const
-{
-	if ((code >= 400 && code <= 417) || (code >= 421 && code <= 426) 
-			|| code == 428 || code == 429 || code == 431 || code == 451 )		// || code == 499 pour NGINX
-		return (false);
-	else
-		throw Error(100, "Error, wrong code client.", 1);
-}
 
 /*
 **	ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server ):

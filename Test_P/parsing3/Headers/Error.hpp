@@ -87,10 +87,15 @@ class Error: public std::exception
 							=	30	==>	in 'index' directive, file doesn't exist.
 							=	31	==>	in 'index' directive, file is empty.
 
+							=	32	==>	 in 'root' directive, it should end with '\0'.
+							=	33	==>	in 'root' directive, it should end with ';'.
+							=	34	==> in 'root' directive, it should start with './'.
+							=	35	==>	'root' directive doesn't exist!.
 
 
 
 
+							
 							=	100	==>	wrong code client.
 							=	101	==> wrong code server.
 

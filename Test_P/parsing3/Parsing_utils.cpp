@@ -23,8 +23,6 @@ std::string                     Parsing::ft_delete_comm( std::string &line )
 	return (tmp);
 }
 
-
-
 /*
 **	ft_get_scope( size_t index ):
 **		This function will return the scope starting and the given 'index' argument.
@@ -59,4 +57,49 @@ std::vector<std::string>        Parsing::ft_get_scope( size_t index )
 	}
 	std::vector<std::string>    tmp(it_b, it_e);
 	return (tmp);
+}
+
+/*
+**	ft_check_code_serv( int code ) const:
+**		Check if the given code is a server code.
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
+*/
+bool			Parsing::ft_check_code_serv( int code ) const
+{
+	if ((code >= 500 && code <= 508) || code == 510 || code == 511)
+		return (false);
+	else
+		throw Error(101, "Error, wrong code server.", 1);
+}
+
+/*
+**	ft_check_code_client( int code ) const:
+**		Check if the given code is a client code.
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
+*/
+bool			Parsing::ft_check_code_client( int code ) const
+{
+	if ((code >= 400 && code <= 417) || (code >= 421 && code <= 426) 
+			|| code == 428 || code == 429 || code == 431 || code == 451 )		// || code == 499 pour NGINX
+		return (false);
+	else
+		throw Error(100, "Error, wrong code client.", 1);
+}
+
+/*
+**	ft_check_code_error( int code ) const:
+**		This function check the given argument and it uses the corresponding function.
+**
+**	==>	It returns ! if an error occurs.
+*/
+bool			Parsing::ft_check_code_error( int code ) const
+{
+	if (code > 399 && code < 500)
+		return (this->ft_check_code_client(code));
+	else if (code > 499 && code < 600)
+		return (this->ft_check_code_serv(code));
+	else
+		return (true);
 }
