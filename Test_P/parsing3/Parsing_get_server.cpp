@@ -80,81 +80,66 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 }
 
 
-
-bool Parsing::ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i )
+/*
+**	ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i )
+**		This function will simply find the directive and retrive the corresponding data.
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
+*/
+bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i )
 {
-
 	while (k < scope_server.size())
 	{
 		if (scope_server[k] == "listen")
 		{
-			std::cout << "go listen" << std::endl;
 			if (this->ft_get_listen(k, scope_server, i))
 				return (true);
-			std::cout << "\thost = " << this->_servers[i].host_server << " et port = " << this->_servers[i].port_server << std::endl;
 			k += 2;
 		}
 		else if (scope_server[k] == "server_name")
 		{
-			std::cout << "go server_name " << std::endl;
 			if (this->ft_get_server_name(k, scope_server, i))
 				return (true);
-			std::cout << "\tserver_name = " << this->_servers[i].name_server << std::endl;
 			k += 2;
 		}
 		else if (scope_server[k] == "autoindex")
 		{
-			std::cout << "go autoindex " << std::endl;
 			if (this->ft_get_autoindex(k, scope_server, i))
 				return (true);
-			std::cout << "\tautoindex = " << this->_servers[i].autoindex_server << std::endl;
 			k += 2;
 		}
 		else if (scope_server[k] == "root")
 		{
-			std::cout << "go root" << std::endl;
 			if (this->ft_get_root(k ,scope_server, i))
 				return (true);
-			std::cout << "\troot = " << this->_servers[i].root_server << std::endl;
 			k += 2;
 		}
 		else if (scope_server[k] == "error_page")
 		{
-			std::cout << "go error_page " << std::endl;
 			k = this->ft_get_error(k, scope_server, i);
 			if (k == 0)
 				return (true);
-			//k += 3;
 		}
 		else if (scope_server[k] == "dav_methods")
 		{
-			std::cout << "go dav_methods " << std::endl;
 			k = this->ft_get_methods(k, scope_server, i);
 			if (k == 0)
-			{
-				std::cout << "ERROR DANS DAV METHODS" << std::endl;
 				return (true);
-			}
-			std::cout << "\tmedhods 1 = " << this->_servers[i].methods_server[0] << std::endl;
-			//k += 2;
 		}
 		else if (scope_server[k] == "client_body_buffer_size")
 		{
-			std::cout << "go client_body_buffer_size" << std::endl;
 			if (this->ft_get_buffer_size(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "cgi_path")
 		{
-			std::cout << "go cgi path" << std::endl;
 			if (this->ft_get_cgi_path(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "upload_store")
 		{
-			std::cout << "go ft_get_upload_store " << std::endl;
 			if (this->ft_get_upload_store(k, scope_server, i))
 				return (true);
 			k += 2;
@@ -166,23 +151,14 @@ bool Parsing::ft_find_directive_server( size_t k, std::vector<std::string> scope
 		}
 		else if (scope_server[k] == "location")
 		{
-			std::cout << "go location " << std::endl;
-			std::cout << "k = " << k << std::endl;
 			k = ft_get_location( k, scope_server, i);
-			std::cout << "fin de location : k = " << k << std::endl;
 			if (k == 0)
 				return (true);
-			// return (true);
-			// break;
-			// k += 2;
 		}
 		else if (scope_server[k] == "index")
 		{
-			std::cout << "go index " << std::endl;
 			if (this->ft_get_index(k, scope_server, i))
-			{
 				return (true);
-			}
 			k += 2;
 		}
 		else
@@ -195,11 +171,6 @@ bool Parsing::ft_find_directive_server( size_t k, std::vector<std::string> scope
 				std::cout << "INSTRUCTION NON RECONNU la" << std::endl;
 				return (true);
 			}
-			//std::cout << " EUH ERROR " << scope_server[k] << " et k = " << k << std::endl;
-			//if ()
-			//return (true);
-			//exit(EXIT_FAILURE);
-			//break;
 		}
 	}
 	return (false);
@@ -654,65 +625,37 @@ bool         Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 	k += 1;
 	size_t      len = tmp[k].size();
 	if (tmp[k][len] != '\0')
-	{
-		std::cout << "Error, in 'listen directive' it should end with \0" << std::endl;
-		return (true);
-	}
+		throw Error(15, "Error, in 'listen directive' it should end with '\0'.", 1);
 	if (tmp[k][len - 1] != ';')
-	{
-		std::cout << "Error, in 'listen directive' it should end with ';'" << std::endl;
-		return (true);
-	}
+		throw Error(16, "Error, in 'listen directive' it should end with ';'.", 1);
 	if (tmp[k].find(":", 0) == std::string::npos)
-	{
-		std::cout << "Error, in 'listen directive' it should have a ':' between host and port" << std::endl;
-		return (true);
-	}
+		throw Error(17, "Error, in 'listen directive' it should have a ':' between host and port.", 1);
 	if (len > 15)
-	{
-		std::cout << "Error, in 'listen directive' it has bad host or port" << std::endl;
-		return (true);
-	}
+		throw Error(18, "Error, in 'listen directive' it has bad host or port.", 1);
 	if (tmp[k].compare(0, 10, "127.0.0.1:") != 0 && tmp[k].compare(0, 10, "localhost:") != 0)
-	{
-		std::cout << "Error, in 'listen directive' host should be 127.0.0.1 or 'localhost'" << std::endl;
-		return (true);
-	}
+		throw Error(19, "Error, in 'listen directive' host should be 127.0.0.1 or 'localhost'.", 1);
+
 	size_t i = 9;
 	while (++i < tmp[k].size())
 	{
 		if (isdigit(tmp[k][i]) == 0)
 			if (i < tmp[k].size() - 1)
-			{
-				std::cout << "Error, in 'listen directive' port should only have digit and a semicolon at the end"<< std::endl;
-				return (true);
-			}
+				throw Error(20, "Error, in 'listen directive' port should only have digit and a semicolon at the end.", 1);
 	}
 	this->_servers[index_server].host_server = tmp[k].substr(0, 9);
 	this->_servers[index_server].port_server = std::strtol(tmp[k].substr(10, 4).c_str(), NULL, 10);
 	if (this->_servers[index_server].port_server < 0 || this->_servers[index_server].port_server > 65535)
-	{
-		std::cout << "Error, in 'listen directive'  port should be between 0 and 65535" << std::endl;
-		return (true);
-	}
-
+		throw Error(21, "Error, in 'listen directive'  port should be between 0 and 65535.", 1);
 	if (index_server > 0)
 	{
-		size_t count = 0;
-		while (count < index_server)
+		i = 0;
+		while (i < index_server)
 		{
-			if (this->_servers[index_server].port_server == this->_servers[count].port_server)
-			{
-
-				std::cout << "Error, in 'listen directive', bloc servers have the same port." << std::endl;
-				std::cout << " 0 = " << this->_servers[count].port_server << std::endl;
-				std::cout << " et index_server = " << index_server << " et = " << this->_servers[index_server].port_server << std::endl;
-				return (true);
-			}
-			count++;
+			if (this->_servers[index_server].port_server == this->_servers[i].port_server)
+				throw Error(22, "Error, in 'listen directive'  bloc servers have the same port.", 1);
+			i++;
 		}
 	}
-	// std::cout << "PARFAIT" << std::endl;
 	return false;
 }
 

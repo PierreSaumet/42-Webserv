@@ -65,6 +65,10 @@ class Error: public std::exception
 							=	12	==>	miss 'dav_methdods' directive.
 							=	13	==> miss 'index' directive.
 
+							=	15	==> in 'listen directive' it should end with \0
+							=	16	==>	in 'listen directive' it should end with ';'
+							=	17	==> in 'listen directive' it should have a ':' between host and port.
+
 throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 

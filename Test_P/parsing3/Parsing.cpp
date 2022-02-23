@@ -132,12 +132,7 @@ bool                            Parsing::ft_check_server( void )
 		std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
 		server_size = scope_server.size();
 		if (ft_check_directive_server(scope_server, server_size))
-		{
-			std::cout << "ERROR LA :ERDEEEEEEEEE" << std::endl;
 			return (true);
-		}
-		else
-			std::cout << "GOOD" << std::endl;
 		if (ft_find_directive_server(1, scope_server, i))
 		{
 			std::cout << "ERREUR CATA" << std::endl;
