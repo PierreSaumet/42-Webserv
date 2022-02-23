@@ -92,10 +92,17 @@ class Error: public std::exception
 							=	34	==> in 'root' directive, it should start with './'.
 							=	35	==>	'root' directive doesn't exist!.
 
-
-
-
+							=	36	==>	in 'autoindex' directive it should end with '\0'.
+							=	37	==>	in 'autoindex' directive it should end with ';'.
+							=	38	==> in 'autoindex' directive it should be 'on' or 'off'.
 							
+							=	39	==>	in 'dav_methods' directive, it can only have DELETE POST and GET methods!
+							=	40	==>	in 'dav_methods' directive, it can only have 3 methods maximum!
+							=	41	==>	in 'dav_methods' directive, methods are not correct.
+							=	42	==> in 'dav_methods' directive, this method is unkonwn.
+							=	43	==> in 'dav_methods' directive, it should not have doublons.
+
+
 							=	100	==>	wrong code client.
 							=	101	==> wrong code server.
 
@@ -108,4 +115,4 @@ throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 */		
 
-#endif
+#endif	

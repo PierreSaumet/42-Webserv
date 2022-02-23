@@ -427,7 +427,7 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 **		This function will check the information given in the 'dav_methods' directive.
 **		It only accept 3 methods: 'DELETE', 'GET' and 'POST'
 **
-**	==> Returns the next directive if no error occurs, otherwise display an error message and it returns 0.
+**	==>	If an error occurs, throw an Error message. Otherwise it returns k.
 */
 size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
@@ -455,27 +455,18 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 			else if (tmp[k].compare("GET;") == 0)
 				this->_servers[index_server].methods_server.push_back("GET");
 			else
-			{
-				std::cout << "Error, in 'dav_methods' directive, it can only have DELETE POST and GET methods!" << std::endl;
-				return (0);
-			}
+				throw Error(39, "Error, in 'dav_methods' directive, it can only have DELETE POST and GET methods!", 0);
 			break;
 		}
 		k++;
 	}
 	if (this->_servers[index_server].methods_server.size() > 3 || this->_servers[index_server].methods_server.size() == 0)
-	{
-		std::cout << "Error, in 'dav_methods' directive, it can only have 3 methods maximum!" << std::endl;
-		return (0);
-	}
+		throw Error(40, "Error,  in 'dav_methods' directive, it can only have 3 methods maximum!", 0);
 	k++;
 	if (tmp[k] == "GET" || tmp[k] == "GET;" || tmp[k] == "DELETE" || tmp[k] == "DELETE;" || tmp[k] == "POST" || tmp[k] == "POST;")
-	{
-		std::cout << "Error, in 'dav_methods' directive, methods are not correct." << std::endl;
-		return (0);
-	}
+		throw Error(41, "Error, in 'dav_methods' directive, methods are not correct.", 0);
 
-	// on verifie les doublons
+	// Checks Doublons.
 	size_t int_del = 0;
 	size_t int_get = 0;
 	size_t int_post = 0;
@@ -490,15 +481,9 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 		else if (*it == "GET")
 			int_get++;
 		else
-		{
-			std::cout << "Error, in 'dav_methods' directive, this method is unkonwn." << std::endl;
-			return (0);
-		}
+			throw Error(42, "Error, in 'dav_methods' directive, this method is unkonwn.", 0);
 		if (int_del > 1 || int_post > 1 || int_get > 1)
-		{
-			std::cout << "Error, in 'dav_methods' directive, it should not have doublons." << std::endl;
-			return (0);
-		}
+			throw Error(43, "Error, in 'dav_methods' directive, it should not have doublons.", 0);
 	}
 	return (k);
 }
@@ -508,27 +493,18 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 **      This function will checks the informations given in the 'autoindex' directive.
 **      It should find "on;" or "off;".
 **
-**     ==> Returns 0 if no problem happens, otherwise returns 1.
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
 bool            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
 	size_t  len = tmp[k].size();
 	if (tmp[k][len] != '\0')
-	{
-		std::cout << "Error, in 'autoindex' directive it should end with '\0'" << std::endl;
-		return (true);
-	}
+		throw Error(36, "Error, in 'autoindex' directive it should end with '\0'.", 0);
 	if (tmp[k][len - 1] != ';')
-	{
-		std::cout << "Error, in 'autoindex' directive it should end with ';'" << std::endl;
-		return (true);
-	}
+		throw Error(37, "Error, in 'autoindex' directive it should end with ';'.", 0);
 	if (tmp[k].compare("on;") != 0 && tmp[k].compare("off;") != 0)
-	{
-		std::cout << "Error, in 'autoindex' directive it should be 'on' or 'off' " << std::endl;
-		return (true);
-	}
+		throw Error(38, "Error, in 'autoindex' directive it should be 'on' or 'off'.", 0);
 	if (tmp[k].compare("on;") == 0)
 		this->_servers[index_server].autoindex_server = true;
 	else
