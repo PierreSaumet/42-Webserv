@@ -41,6 +41,10 @@ int             main(int argc, char **argv)
 	raise(SIGINT);
 	std::cout << "int sig = " << HttpServer::int_signal << std::endl;
 
+	// if (&signal != 0)
+	// {
+	// 	std::cout << "ERREUR AHAHAH" << std::endl;
+	// }
 
     return (0);
 }

@@ -130,37 +130,7 @@ class Error: public std::exception
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+							=	99	==>	'wrong argument given'.
 							=	100	==>	wrong code client.
 							=	101	==> wrong code server.
 
