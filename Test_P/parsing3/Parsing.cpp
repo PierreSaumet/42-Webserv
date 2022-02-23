@@ -23,18 +23,19 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_se
 			std::cout << "On continue" << std::endl;
 			this->_data = this->ft_get_data_container();
 			this->_nbr_servers = 0;
+			
 		}
 		if (!this->ft_check_data())
 		{
 			std::cout << "On continue 2" << std::endl;
+			this->display_all();
 		}
-	
 	}
 	catch(std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	this->display_all();
+
 	return ;
 }
 
@@ -74,35 +75,20 @@ Parsing                         &Parsing::operator=( const Parsing &element ) {
 **		This function is the main function for the parsing.
 **		It will check that everything is in order.
 **
-**	==>	Returns 1 if an error occurs, otherwise returns 0.
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
 bool                            Parsing::ft_check_data( void )
 {
 	if (this->_data.empty())
-	{
-		std::cout << "ERROR, data empty" << std::endl;
-		return (true);
-	}
+		throw Error(1, "Error, the data for the parsing are empty.", 1);
 	if (this->_data[0] != "server" || this->_data[1] != "{")
-	{
-		std::cout << "ERROR, should start with 'server' and '{'" << std::endl;
-		return (true);
-	}
+		throw Error(2, "Error, the configuration file should start with 'server' and '{'.", 1);
 	if (this->_data[this->_data.size() - 2] != "}" && this->_data[this->_data.size() - 1] == "")
-	{
-		std::cout << "Error, should end by '}'" << std::endl;
-		return (true);
-	}
+		throw Error(3, "Error, the configuration file should end by '}'.", 1);
 	if (this->ft_check_number_of_bracket())
-	{
-		std::cout << "ERROR, problem with bracket" << std::endl;
-		return (true);
-	}
+		throw Error(4, "Error, the configuration file has a problem with brackets.", 1);
 	if (this->ft_check_semicolon())
-	{
-	    std::cout << "ERROR, no semi colon" << std::endl;
-	    return (true);
-	}
+		throw Error(5, "Error, the configuration file miss one or multiple semi colon.", 1);
 	if (this->ft_check_server())
 	{
 		std::cout << "ERROR, problem bloc server" << std::endl;
@@ -136,10 +122,7 @@ bool                            Parsing::ft_check_server( void )
 			if (this->_data[i + 1] == "{")
 				this->_nbr_servers++;
 			else
-			{
-				std::cout << "Error, bloc server." << std::endl;
-				return (true);
-			}
+				throw Error(6, "Error, a block server should start with 'server' and '{'.", 1);
 		}
 		i++;
 	}
@@ -269,26 +252,25 @@ std::vector<std::string>        Parsing::ft_get_data_container( void ) {
 	if (fs.is_open() == 0)
 	{
 		fs.close();
-		std::cout << "ERROR, configuration file doesn't exist" << std::endl;
-		return (tmp);
+		throw Error(1, "Error, the configuration file doesn't exist.", 0);
 	}
 	else
 	{
 		char                    *data;
 		std::stringstream       buffer;
 		std::string             line;
-		buffer << fs.rdbuf();						// recupere tous le fichier dans un buffer
-		line = buffer.str();						//	mets le buffer dans une string pour la traiter
-		line = this->ft_delete_comm(line);			//	supprime tous les commentaires
-		data = std::strtok(&line[0], " \t\n\v\r\f");	// on divise notre string en morceaux tous les types d'espaces
+		buffer << fs.rdbuf();
+		line = buffer.str();
+		line = this->ft_delete_comm(line);
+		data = std::strtok(&line[0], " \t\n\v\r\f");
 		if (data == NULL)
 		{
 			fs.close();
-			std::cout << "ERROR, configuration file is empty after deleting commentaries.\n";
+			throw Error(2, "Error, the configuration file is empty.", 0);
 		}
 		else
 		{
-			while (data)								// on met toutes les valeurs dans un container vector
+			while (data)
 			{
 				tmp.push_back(data);
 				data = strtok(NULL, " \t\n\v\r\f");		

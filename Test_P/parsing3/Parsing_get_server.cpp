@@ -4,7 +4,6 @@
 /*
 **
 */
-
 bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size )
 {
 ///////////////// A DECOUPER FONCTION 1 //////////////////////////////////////////

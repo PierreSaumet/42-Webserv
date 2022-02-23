@@ -41,11 +41,15 @@ class Error: public std::exception
 **							=	3	==> file must terminate with '.conf'.
 							=	4	==> file have a wrong name or a bad ending.
 
+		Level_error	=	1	==>	Parsing of the configuration file
+			number_error	=	1	==>	data is emtpy.
+							=	2	==> should start with 'server' and '{'.
+							=	3	==>	should end with '}'.
+							=	4	==> problem with bracket.
+							=	5	==> missing a semi colon.
+							=	6	==>	block server should start with 'server' and '{'.
 
-
-
-
-
+throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 
 
