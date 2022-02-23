@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   HttpServer.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psaumet <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,31 +10,36 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Headers/Parsing.hpp"
-#include "Headers/HttpServer.hpp"
+#ifndef HTTPSERVER_HPP
+# define HTTPSERVER_HPP
+
 #include <iostream>
+#include <signal.h>
 
-/*
-**	 main(int argc, char **argv):
-**		This is the 'main' function.
-*/
-int             main(int argc, char **argv)
-{
-    if (argc != 2)
-    {
-        std::cout << "Error, need one argument!" << std::endl;
-        return (1);
-    }
-    else
-    {
-		if (signal(SIGINT, HttpServer::handler_signal) == SIG_ERR)
-			exit(EXIT_FAILURE);
-        std::string name = argv[1];
-		Parsing test1 = Parsing(name);
+class HttpServer {
 
-		// Testing signal
-		raise(SIGINT);
-		std::cout << "int sig = " << HttpServer::int_signal << std::endl;
-    }
-    return (0);
-}
+	public:
+		/*
+		**	Canonical Form
+		*/
+		HttpServer( void );
+		HttpServer( const HttpServer &copy );
+		~HttpServer( void);
+
+		/*
+		**	Overload operator '='
+		*/
+		HttpServer			&operator=( const HttpServer &element );
+
+		/*
+		**	Functions used for the signal handler
+		*/
+		static int			int_signal;
+		static void			handler_signal( int num );
+
+	private:
+
+	protected:
+};
+
+#endif

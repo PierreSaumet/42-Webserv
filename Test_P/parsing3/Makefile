@@ -22,11 +22,13 @@ SOURCES			+=	main.cpp		\
 					Parsing_get_server.cpp	\
 					Parsing_get_location.cpp	\
 					Parsing_utils.cpp			\
+					HttpServer.cpp				\
 					Error.cpp					\
 					to_delete.cpp
 					
 # INCLUDES =====================================================================
 INCLUDE 		+= 	Headers/Parsing.hpp			\
+					Headers/HttpServer.hpp		\
 					Headers/Error.hpp
 
 # FLAGS ========================================================================

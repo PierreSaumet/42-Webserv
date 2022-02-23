@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   HttpServer.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psaumet <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,31 +10,51 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Headers/Parsing.hpp"
 #include "Headers/HttpServer.hpp"
-#include <iostream>
 
 /*
-**	 main(int argc, char **argv):
-**		This is the 'main' function.
+**	HttpServer Empty Constructor.
 */
-int             main(int argc, char **argv)
-{
-    if (argc != 2)
-    {
-        std::cout << "Error, need one argument!" << std::endl;
-        return (1);
-    }
-    else
-    {
-		if (signal(SIGINT, HttpServer::handler_signal) == SIG_ERR)
-			exit(EXIT_FAILURE);
-        std::string name = argv[1];
-		Parsing test1 = Parsing(name);
+HttpServer::HttpServer( void ) {
 
-		// Testing signal
-		raise(SIGINT);
-		std::cout << "int sig = " << HttpServer::int_signal << std::endl;
-    }
-    return (0);
+	return ;
+}
+
+/*
+**	HttpServer Copy Constructor
+*/
+HttpServer::HttpServer( const HttpServer &copy ) {
+
+	(void)copy;
+	return ;
+}
+
+/*
+**	HttpServer Destructor.
+*/
+HttpServer::~HttpServer( void ) {
+
+	return ;
+}
+
+/*
+**	HttpServer Overload Operator '='
+*/
+HttpServer			&HttpServer::operator=( const HttpServer &element ) {
+
+	if (this != &element)
+	{
+
+	}
+	return (*this);
+}
+
+/*
+**	
+*/
+int					HttpServer::int_signal = 0;
+void				HttpServer::handler_signal( int num )
+{
+	int_signal = num;
+	return ;
 }
