@@ -20,6 +20,7 @@ _number_error(number), _line_error(line), _level_error(level) {
 
 const char* Error::what() const throw() {
 
+	std::cerr << RED << "Lvl: " << this->_level_error << " nbr: " << this->_number_error << " - " << CLEAR;
     return (this->_line_error.c_str());
 }
 

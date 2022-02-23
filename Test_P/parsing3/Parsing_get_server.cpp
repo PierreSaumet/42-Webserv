@@ -1,81 +1,73 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Parsing_get_server.cpp                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: psaumet <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/06/01 11:07:34 by psaumet           #+#    #+#             */
+/*   Updated: 2021/06/01 11:07:42 by psaumet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <iostream>
 #include "Headers/Parsing.hpp"
-# include <iostream>
 
 /*
 **
 */
 bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size )
 {
-///////////////// A DECOUPER FONCTION 1 //////////////////////////////////////////
-	std::map<std::string, bool>            serv_dir;
-	size_t count = 0;
-	// size_t server_size = 0;
-	// std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
-	std::cout << "La taille de scope_server = " << scope_server.size() << std::endl;
+	std::map<std::string, bool>            	serv_dir;
+	size_t 									count = 0;
+	size_t 									k = 0;
 	server_size = scope_server.size();
-	std::cout << "\nla  server_size =  " << server_size << std::endl;
 	serv_dir.insert(std::pair<std::string, bool>("listen", false));
 	serv_dir.insert(std::pair<std::string, bool>("server_name", false));
 	serv_dir.insert(std::pair<std::string, bool>("error_page", false));
 	serv_dir.insert(std::pair<std::string, bool>("root", false));
 	serv_dir.insert(std::pair<std::string, bool>("dav_methods", false));
-	// serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
-	// serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
-	// serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
-	// serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
 	serv_dir.insert(std::pair<std::string, bool>("index", false));
-	// on parcoourt le vector et on verifie que nos directives sont presentes
-	size_t k = 0;
-	count = 0;
+	serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
+	serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
+	serv_dir.insert(std::pair<std::string, bool>("client_body_buffer_size", false));
+	serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
+	
 	while (k < scope_server.size())
 	{
 		for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
 		{
-
 			if (it_b->first == scope_server[k])
 			{
-				if (scope_server[k] == "root")
-					std::cout << "icic k = " << k << std::endl;
 				count++;
 				if (it_b->second == false)
 					it_b->second = true;
 				else
-				{
-					std::cout << "ERROR, bloc server cannot have doublon BNJJJJJJJJ: " << it_b->first << std::endl;
-					return (true);
-				}
-				//k++;
+					throw Error(7, "Error, in 'server block', it has a doublon.", 1);
 			}
-			
 		}
 		if (scope_server[k] == "location")
 		{
-			// std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
-			std::cout << "\n\non trouve location" << std::endl;
-			std::cout << "Dans boucle scope_server[k] == " << scope_server[k] << std::endl;
-			std::cout << " k = " << k << std::endl;
-			std::cout << "server_size = " << server_size << std::endl;
 			std::vector<std::string>    scope_location = this->ft_get_scope(k + 1);
-			std::cout << "size_du scope location = " << scope_location.size() << std::endl;
 			k = k + scope_location.size();
-
-			//k++;
 		}
-
-		// else
-		// {
-		// 	std::cout << "ICI il y a une erreur = " << scope_server[k] << std::endl;
-		// 	return (true);
-		// }
-		//std::cout << "Dans boucle scope_server[k] == " << scope_server[k] << std::endl;
 		k++;
-		std::cout << "fin de la boucle k = " <<  k << std::endl;
-		// if (k == scope_server.size())
-		// 	break;
 	}
 
 
 
+	
+	for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
+	{
+		if (it_b->second == false)
+		{
+			if (it_b->first == "listen")
+			{
+				std::cout << "MISS listen" << std::endl;
+				return (true);			
+			}
+		}
+	}
 	std::cout << " COUT =  " << count << std::endl;
 	if (count < 6)
 	{
