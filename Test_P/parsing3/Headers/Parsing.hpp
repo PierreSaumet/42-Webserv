@@ -76,7 +76,6 @@ class Parsing {
 		**	Functions used to checks if the configuration file is valid.
 		*/
 		std::vector<std::string>        ft_get_data_container( void );
-		std::vector<t_server>           ft_get_server( void );
 		bool                            ft_check_conf_file( void );
 		bool                            ft_check_data( void );
 		bool                            ft_check_number_of_bracket( void );
@@ -90,34 +89,34 @@ class Parsing {
 		std::vector<std::string>        ft_get_scope( size_t index );
 
 		/*
-		**	Functions used to get the data from multiple directives stored in a server block.
+		**	Functions used to find the data from multiple directives stored in a server block.
 		*/
-		bool      		               	ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server );
-		bool                        	ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server );
-		bool                        	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server );
-		bool                        	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server );
-		bool							ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server );
-		bool							ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server );
-		bool							ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server );
-		bool							ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server );
-		size_t                      	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
-		size_t                      	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool      		               	ft_find_listen( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool                        	ft_find_server_name( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool                        	ft_find_root( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool                        	ft_find_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool							ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool							ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool							ft_find_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool							ft_find_index( size_t k, std::vector<std::string> tmp, size_t index_server );
+		size_t                      	ft_find_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
+		size_t                      	ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server );
 
 		bool							ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size );
 		bool 							ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i );
 
 		/*
-		**	Functions used to get the data from multiple directives stored in a location block.
+		**	Functions used to find the data from multiple directives stored in a location block.
 		*/
-		bool           					ft_get_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
-		bool           					ft_get_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
-		bool							ft_get_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
-		bool							ft_get_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
-		bool							ft_get_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
-		size_t          				ft_get_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
-		size_t                      	ft_get_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
+		bool           					ft_find_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		bool           					ft_find_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		bool							ft_find_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		bool							ft_find_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		bool							ft_find_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		size_t          				ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		size_t                      	ft_find_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
 
-		size_t							ft_get_location( size_t k, std::vector<std::string> tmp, size_t index_server );
+		size_t							ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server );
 
 		/*
 		**	Need to be delete.

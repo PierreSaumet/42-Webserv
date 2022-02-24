@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <signal.h>
+#include "Parsing.hpp"
 
 class HttpServer {
 
@@ -23,6 +24,7 @@ class HttpServer {
 		**	Canonical Form
 		*/
 		HttpServer( void );
+		HttpServer( std::string &configfile );
 		HttpServer( const HttpServer &copy );
 		~HttpServer( void);
 
@@ -38,6 +40,7 @@ class HttpServer {
 		static void			handler_signal( int num );
 
 	private:
+		Parsing				*_data;
 
 	protected:
 };

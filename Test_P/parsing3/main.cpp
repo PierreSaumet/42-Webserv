@@ -31,15 +31,16 @@ int             main(int argc, char **argv)
     else if (argc == 2)
     {
         std::string name = argv[1];
-		Parsing test1 = Parsing(name);
+		 Parsing test1 = Parsing(name);
+		//HttpServer server_1(name);
 	}
 	else
 	{
 		std::cerr << RED << "Error, in the argument given." << CLEAR << std::endl;
 	}
 	// Testing signal
-	raise(SIGINT);
-	std::cout << "int sig = " << HttpServer::int_signal << std::endl;
+	// raise(SIGINT);
+	// std::cout << "int sig = " << HttpServer::int_signal << std::endl;
 
 	// if (&signal != 0)
 	// {

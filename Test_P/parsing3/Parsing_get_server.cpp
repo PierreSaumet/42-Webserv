@@ -92,55 +92,55 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 	{
 		if (scope_server[k] == "listen")
 		{
-			if (this->ft_get_listen(k, scope_server, i))
+			if (this->ft_find_listen(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "server_name")
 		{
-			if (this->ft_get_server_name(k, scope_server, i))
+			if (this->ft_find_server_name(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "autoindex")
 		{
-			if (this->ft_get_autoindex(k, scope_server, i))
+			if (this->ft_find_autoindex(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "root")
 		{
-			if (this->ft_get_root(k ,scope_server, i))
+			if (this->ft_find_root(k ,scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "error_page")
 		{
-			k = this->ft_get_error(k, scope_server, i);
+			k = this->ft_find_error(k, scope_server, i);
 			if (k == 0)
 				return (true);
 		}
 		else if (scope_server[k] == "dav_methods")
 		{
-			k = this->ft_get_methods(k, scope_server, i);
+			k = this->ft_find_methods(k, scope_server, i);
 			if (k == 0)
 				return (true);
 		}
 		else if (scope_server[k] == "client_body_buffer_size")
 		{
-			if (this->ft_get_buffer_size(k, scope_server, i))
+			if (this->ft_find_buffer_size(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "cgi_path")
 		{
-			if (this->ft_get_cgi_path(k, scope_server, i))
+			if (this->ft_find_cgi_path(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
 		else if (scope_server[k] == "upload_store")
 		{
-			if (this->ft_get_upload_store(k, scope_server, i))
+			if (this->ft_find_upload_store(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
@@ -148,13 +148,13 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 			throw Error(61, "Error, a bloc server cannot have another bloc server inside.", 1);
 		else if (scope_server[k] == "location")
 		{
-			k = ft_get_location( k, scope_server, i);
+			k = ft_find_directive_location( k, scope_server, i);
 			if (k == 0)
 				return (true);
 		}
 		else if (scope_server[k] == "index")
 		{
-			if (this->ft_get_index(k, scope_server, i))
+			if (this->ft_find_index(k, scope_server, i))
 				return (true);
 			k += 2;
 		}
@@ -170,14 +170,14 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 }
 
 /*
-**	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'client_body_buffer_size' directive.
 **		The information given is between 8000 (8k) and 16000 (16k) maximum.
 **		The information will be used for the 'POST' command.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool			Parsing::ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool			Parsing::ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	size_t		i;
 	int			buffer_size;
@@ -213,13 +213,13 @@ bool			Parsing::ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size
 }
 
 /*
-**	ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'cgi_path' directive.
 **		The information given is an fodler where we can find the data for the cgi.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool			Parsing::ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	struct stat buffer;
 	size_t  	len;
@@ -239,13 +239,13 @@ bool			Parsing::ft_get_cgi_path( size_t k, std::vector<std::string> tmp, size_t 
 }
 
 /*
-**	ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'upload_store' directive.
 **		The information given is an fodler where we can find files uploaded.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool			Parsing::ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	struct stat buffer;
 	size_t  	len;
@@ -265,14 +265,14 @@ bool			Parsing::ft_get_upload_store( size_t k, std::vector<std::string> tmp, siz
 }
 
 /*
-**	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'error_page' directive.
 **		It will check the error codes indicated and it will check if the files exist.
 **		It will save the data in a std::map<int, std::string>  container.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns k.
 */
-size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server )
+size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	// on incremente k on passe errr_page
 	k += 1;
@@ -358,13 +358,13 @@ size_t          Parsing::ft_get_error( size_t k, std::vector<std::string> tmp, s
 }
 
 /*
-**	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_methods( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'dav_methods' directive.
 **		It only accept 3 methods: 'DELETE', 'GET' and 'POST'
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns k.
 */
-size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server )
+size_t          Parsing::ft_find_methods( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	std::vector<std::string> methods;
 
@@ -422,13 +422,13 @@ size_t          Parsing::ft_get_methods( size_t k, std::vector<std::string> tmp,
 }
 
 /*
-**	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server):
+**	ft_find_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server):
 **      This function will checks the informations given in the 'autoindex' directive.
 **      It should find "on;" or "off;".
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool            Parsing::ft_find_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
 	size_t  len = tmp[k].size();
@@ -446,13 +446,13 @@ bool            Parsing::ft_get_autoindex( size_t k, std::vector<std::string> tm
 }
 
 /*
-**	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_root( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will checks the informations given in the 'root' directive.
 **		It will also checks if the folder exists.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool            Parsing::ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool            Parsing::ft_find_root( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	struct stat buffer;
 	size_t  	len;
@@ -472,13 +472,13 @@ bool            Parsing::ft_get_root( size_t k, std::vector<std::string> tmp, si
 }
 
 /*
-**	ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_server_name( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will checks the information given in the 'server_name' directive.
 **		It should only have digit and alphabetic characters.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool         	Parsing::ft_get_server_name( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool         	Parsing::ft_find_server_name( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
 	size_t  len = tmp[k].size();
@@ -497,13 +497,13 @@ bool         	Parsing::ft_get_server_name( size_t k, std::vector<std::string> tm
 }
 
 /*
-**  ft_get_listen( size_t km std::vector<std::string> tmp, size_t idnex_server ):
+**  ft_find_listen( size_t km std::vector<std::string> tmp, size_t idnex_server ):
 **      This function will checks the informations given in the 'listen' directive.
 **      It should find a 'host' equal to '127.0.0.1' or 'localhost', an 'port' > 1 and < 65535.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool        	Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, size_t index_server) 
+bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, size_t index_server) 
 {
 	k += 1;
 	size_t      len = tmp[k].size();
@@ -544,13 +544,13 @@ bool        	Parsing::ft_get_listen( size_t k, std::vector<std::string> tmp, siz
 
 
 /*
-**	ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_index( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'index' directive.
 **		The file should exist and not be empty.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool			Parsing::ft_get_index( size_t k, std::vector<std::string> tmp, size_t index_server )
+bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	struct stat buffer;
 	size_t  	len;

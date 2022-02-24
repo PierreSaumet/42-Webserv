@@ -14,13 +14,13 @@
 #include <iostream>
 
 /*
-**	ft_get_location( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check if the location block is correct.
 **		Then, it will get data from the directive
 **
 **	==>	It returns 0 if an error occurs, otherwise it returns k.
 */
-size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_t index_server )
+size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	// Adding a block server
 	this->_servers.push_back(Parsing::t_server());
@@ -49,43 +49,43 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 	{
 		if (scope_location[i] == "root")
 		{
-			if (this->ft_get_root_location(i, scope_location, index_server, index_location))
+			if (this->ft_find_root_location(i, scope_location, index_server, index_location))
 				return (0);
 			i += 2;
 		}
 		else if (scope_location[i] == "dav_methods")
 		{
-			i = this->ft_get_methods_location(i, scope_location, index_server, index_location);
+			i = this->ft_find_methods_location(i, scope_location, index_server, index_location);
 			if (i == 0)
 				return (0);
 		}
 		else if (scope_location[i] == "autoindex")
 		{
-			if (this->ft_get_autoindex_location(i, scope_location, index_server, index_location))
+			if (this->ft_find_autoindex_location(i, scope_location, index_server, index_location))
 				return (0);
 			i += 2;
 		}
 		else if (scope_location[i] == "upload_store")
 		{
-			if (this->ft_get_upload_store_location(i, scope_location, index_server, index_location))
+			if (this->ft_find_upload_store_location(i, scope_location, index_server, index_location))
 				return (0);
 			i += 2;
 		}
 		else if (scope_location[i] == "client_body_buffer_size")
 		{
-			if (this->ft_get_buffer_size_location(i, scope_location, index_server, index_location))
+			if (this->ft_find_buffer_size_location(i, scope_location, index_server, index_location))
 				return (0);
 			i += 2;
 		}
 		else if (scope_location[i] == "index")
 		{
-			if (this->ft_get_index_location(i, scope_location, index_server, index_location))
+			if (this->ft_find_index_location(i, scope_location, index_server, index_location))
 				return (0);
 			i += 2;
 		}
 		else if (scope_location[i] == "error_page")
 		{
-			i = ft_get_error_location(i, scope_location, index_server, index_location);
+			i = ft_find_error_location(i, scope_location, index_server, index_location);
 			if (i == 0)
 				return (0);
 		}
@@ -102,14 +102,14 @@ size_t			Parsing::ft_get_location( size_t k, std::vector<std::string> tmp, size_
 }
 
 /*
-**	ft_get_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'error_page' directive fron a location blok.
 **		It will check the error codes indicated and it will check if the files exist.
 **		It will save the data in a std::map<int, std::string>  container.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns k.
 */
-size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
@@ -190,14 +190,14 @@ size_t          Parsing::ft_get_error_location( size_t k, std::vector<std::strin
 }
 
 /*
-**	ft_get_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'client_body_buffer_size' directive from a location block.
 **		The information given is between 8000 (8k) and 16000 (16k) maximum.
 **		The information will be used for the 'POST' command.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool			Parsing::ft_get_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+bool			Parsing::ft_find_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	size_t		i;
 	int			buffer_size;
@@ -232,13 +232,13 @@ bool			Parsing::ft_get_buffer_size_location( size_t k, std::vector<std::string> 
 }
 
 /*
-**	ft_get_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'upload_store' directive from a location block.
 **		The information given is an fodler where we can find files uploaded.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool			Parsing::ft_get_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+bool			Parsing::ft_find_upload_store_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	struct stat buffer;
 	size_t  	len;
@@ -258,13 +258,13 @@ bool			Parsing::ft_get_upload_store_location( size_t k, std::vector<std::string>
 }
 
 /*
-**	ft_get_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server):
+**	ft_find_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server):
 **      This function will checks the informations given in the 'autoindex' directive from a location bloc.
 **      It should find "on;" or "off;".
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool            Parsing::ft_get_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+bool            Parsing::ft_find_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	k += 1;
 	size_t  len = tmp[k].size();
@@ -283,14 +283,14 @@ bool            Parsing::ft_get_autoindex_location( size_t k, std::vector<std::s
 
 
 /*
-**	ft_get_root( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_root( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will checks the informations given in the 'root' directive from a location block.
-**			It is the same fonction as 'ft_get_root'.
+**			It is the same fonction as 'ft_find_root'.
 **		It will also checks if the folder exists.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool            Parsing::ft_get_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+bool            Parsing::ft_find_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	struct stat buffer;
 	size_t  	len;
@@ -310,13 +310,13 @@ bool            Parsing::ft_get_root_location( size_t k, std::vector<std::string
 }
 
 /*
-**	ft_get_methods( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_methods( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'dav_methods' directive from a location block.
 **		It only accept 3 methods: 'DELETE', 'GET' and 'POST'
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns k.
 */
-size_t          Parsing::ft_get_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+size_t          Parsing::ft_find_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	std::vector<std::string> methods;
 
@@ -374,13 +374,13 @@ size_t          Parsing::ft_get_methods_location( size_t k, std::vector<std::str
 }
 
 /*
-**	ft_get_index_location( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**	ft_find_index_location( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will check the information given in the 'index' directive from a location block.
 **		The file should exist and not be empty.
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-bool			Parsing::ft_get_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
+bool			Parsing::ft_find_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	struct stat buffer;
 	size_t  	len;
