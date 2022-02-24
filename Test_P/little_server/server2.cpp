@@ -70,7 +70,7 @@ int				main( void )
 
 /*
 **	Tous fonctionne bien, on compile et on lance le programme
-		c++ -o server server.cpp
+		c++ -o server server2.cpp
 		./server
 	autre terminal on lance :
 		telnet localhost 9999
