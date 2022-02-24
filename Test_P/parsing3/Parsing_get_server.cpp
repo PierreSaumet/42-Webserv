@@ -75,7 +75,7 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 				throw Error(13, "Error, in 'server block', 'index' directive is missing.", 1);
 		}
 	}
-	this->_servers.push_back(Parsing::t_server());
+	this->_servers.push_back(t_server());
 	return (false);
 }
 

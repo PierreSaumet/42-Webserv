@@ -23,14 +23,14 @@
 size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	// Adding a block server
-	this->_servers.push_back(Parsing::t_server());
+	this->_servers.push_back(t_server());
 
 	if (this->_servers[index_server].location.size() == 0)
 		this->_servers[index_server].nbr_location = 1;
 	else
 		this->_servers[index_server].nbr_location += 1;
 
-	this->_servers[index_server].location.push_back(Parsing::t_location());
+	this->_servers[index_server].location.push_back(t_location());
 	if (tmp[k] != "location" || tmp[k + 2] != "{")
 		throw Error(62, "Error,  in 'location' directive, it needs 'location' + '/' + '{'.", 1);
 	if (tmp[k + 1][0] != '/')

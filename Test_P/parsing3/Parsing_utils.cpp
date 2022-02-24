@@ -14,6 +14,20 @@
 #include <iostream>
 
 /*
+**	Getters need to be moved to Parsing_getters.cpp
+*/
+std::vector<t_server>			Parsing::ft_get_servers( void )
+{
+	return (this->_servers);
+}
+
+std::string								Parsing::ft_get_name_of_file( void )
+{
+	return (this->_name_of_file);
+}
+
+
+/*
 **	ft_delete_comm( std::string &line ):
 **		This function will delete all commentaries (starting with #) from the configuration file.
 **

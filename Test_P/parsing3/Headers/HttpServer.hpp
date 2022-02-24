@@ -41,6 +41,7 @@ class HttpServer {
 
 	private:
 		Parsing				*_data;
+		std::vector<t_server>           _servers;
 
 	protected:
 };

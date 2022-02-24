@@ -25,11 +25,7 @@
 
 #include "Error.hpp"
 
-class Parsing {
-
-	public:
-
-		typedef struct					s_location {
+typedef struct					s_location {
 
 			std::string					name_location;
 			std::string                 root_location;
@@ -58,6 +54,15 @@ class Parsing {
 			std::vector<t_location>		location;
 			size_t						nbr_location;
 		}                               t_server;
+
+
+
+
+class Parsing {
+
+	public:
+
+		
 
 		/*
 		**	Canonical Form
@@ -117,6 +122,12 @@ class Parsing {
 		size_t                      	ft_find_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
 
 		size_t							ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server );
+
+		/*
+		**	Getters
+		*/
+		std::vector<t_server>			ft_get_servers( void );
+		std::string						ft_get_name_of_file( void );
 
 		/*
 		**	Need to be delete.
