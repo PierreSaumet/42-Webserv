@@ -89,6 +89,7 @@ char response[] = "HTTP/1.1 200 OK\r\n"
 " text-shadow: 0 0 2mm red}</style></head>"
 "<body><h1>HELLO PIERRE</h1></body></html>\r\n";
 
+#include <arpa/inet.h>
 int					HttpServer::ft_create_servers( void ) {
 
 	//	Cette fonction va creer les servers.
@@ -110,12 +111,22 @@ int					HttpServer::ft_create_servers( void ) {
 		int enable = 0;
 		struct sockaddr_in svr_addr;
 
+		svr_addr.sin_family = AF_INET;
+  		svr_addr.sin_addr.s_addr = inet_addr("127.0.0.1");				 //INADDR_ANY;
+		svr_addr.sin_port = htons(this->_servers[0].port_server);
 		this->_sock = socket(AF_INET, SOCK_STREAM, 0);
+
+
 		if (this->_sock < 0)
 			throw Error(1, "Error, 'creation of server', cannot create a socket.", 2);
 		if (setsockopt(this->_sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
 			throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
-	
+		if (bind(this->_sock, (struct sockaddr *) &svr_addr, sizeof(svr_addr)) < 0)
+		{
+    		if (close(this->_sock) < 0)
+				throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
+			throw Error(4, "Error, 'creation of server'. cannot bind socket.", 2);
+  		}
 	}
 	catch (std::exception &e)
 	{
