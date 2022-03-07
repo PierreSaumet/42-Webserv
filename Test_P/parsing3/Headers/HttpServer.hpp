@@ -15,7 +15,19 @@
 
 #include <iostream>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <err.h>
 #include "Parsing.hpp"
+
+
+
 
 class HttpServer {
 
@@ -34,10 +46,22 @@ class HttpServer {
 		HttpServer			&operator=( const HttpServer &element );
 
 		/*
+		**	Functions TESTING used to display pierre.
+		*/
+		int					ft_test( void );
+
+		/*
+		**	Functions used to creates server
+		*/
+		int					ft_create_servers( void );
+
+
+		/*
 		**	Functions used for the signal handler
 		*/
 		static int			int_signal;
 		static void			handler_signal( int num );
+
 
 	private:
 		Parsing				*_data;

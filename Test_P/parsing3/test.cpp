@@ -18,6 +18,7 @@ char response[] = "HTTP/1.1 200 OK\r\n"
  
 int main()
 {
+
   int one = 1, client_fd;
   struct sockaddr_in svr_addr, cli_addr;
   socklen_t sin_len = sizeof(cli_addr);

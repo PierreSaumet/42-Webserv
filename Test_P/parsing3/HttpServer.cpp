@@ -37,6 +37,10 @@ HttpServer::HttpServer( std::string &configfile) {
 	this->_servers = this->_data->ft_get_servers();
 	std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
 	std::cout << "Ici" << std::endl;
+
+
+	// this->ft_test();
+	this->ft_create_servers();
 	return ;
 }
 
@@ -70,6 +74,101 @@ HttpServer			&HttpServer::operator=( const HttpServer &element ) {
 	}
 	return (*this);
 }
+
+
+
+ /*
+ **"HTTP/1.1 200 OK\r\n"
+"Content-Type: text/html; charset=UTF-8\r\n\r\n"
+ */
+char response[] = "HTTP/1.1 200 OK\r\n"
+"Content-Type: text/html; charset=UTF-8\r\n\r\n"
+"<!DOCTYPE html><html><head><title>Bye-bye baby bye-bye</title>"
+"<style>body { background-color: #111 }"
+"h1 { font-size:4cm; text-align: center; color: black;"
+" text-shadow: 0 0 2mm red}</style></head>"
+"<body><h1>HELLO PIERRE</h1></body></html>\r\n";
+
+int					HttpServer::ft_create_servers( void ) {
+
+	//	Cette fonction va creer les servers.
+	try
+	{
+		int			i;
+
+		i = 0;
+		size_t nbr_server = this->_data->ft_get_nbr_servers();
+		std::cout << "IL y a " << nbr_server << std::endl;
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+
+
+	return (0);
+}
+
+
+/*
+** function testing display pierre
+*/
+int		HttpServer::ft_test( void ) 
+{
+	std::cout << "dans test" << std::endl;
+
+  int one = 1, client_fd;
+  struct sockaddr_in svr_addr, cli_addr;
+  socklen_t sin_len = sizeof(cli_addr);
+ 
+  int sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (sock < 0)
+    err(1, "can't open socket");
+ 
+  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int));
+ 
+  int port = 8080;
+  svr_addr.sin_family = AF_INET;
+  svr_addr.sin_addr.s_addr = INADDR_ANY;
+  svr_addr.sin_port = htons(port);
+ 
+  if (bind(sock, (struct sockaddr *) &svr_addr, sizeof(svr_addr)) == -1) {
+    close(sock);
+    err(1, "Can't bind");
+  }
+ 
+  listen(sock, 5);
+
+
+
+
+
+
+
+
+
+  while (1) {
+    client_fd = accept(sock, (struct sockaddr *) &cli_addr, &sin_len);
+    printf("got connection\n");
+ 
+    if (client_fd == -1) {
+      perror("Can't accept");
+      continue;
+	sleep(10);
+	exit(-1);
+    }
+ 
+    write(client_fd, response, sizeof(response) - 1); /*-1:'\0'*/
+    close(client_fd);
+  }
+
+
+	return (0);
+}
+
+
+
+
 
 /*
 **	

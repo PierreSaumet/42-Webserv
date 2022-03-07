@@ -21,11 +21,15 @@ std::vector<t_server>			Parsing::ft_get_servers( void )
 	return (this->_servers);
 }
 
-std::string								Parsing::ft_get_name_of_file( void )
+std::string						Parsing::ft_get_name_of_file( void )
 {
 	return (this->_name_of_file);
 }
 
+size_t							Parsing::ft_get_nbr_servers( void )
+{
+	return (this->_nbr_servers);
+}
 
 /*
 **	ft_delete_comm( std::string &line ):

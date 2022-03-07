@@ -128,7 +128,7 @@ class Parsing {
 		*/
 		std::vector<t_server>			ft_get_servers( void );
 		std::string						ft_get_name_of_file( void );
-
+		size_t							ft_get_nbr_servers( void );
 		/*
 		**	Need to be delete.
 		*/
