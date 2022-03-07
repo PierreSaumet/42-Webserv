@@ -67,6 +67,11 @@ class HttpServer {
 		Parsing				*_data;
 		std::vector<t_server>           _servers;
 
+
+		// test
+		int	_sock;
+		
+
 	protected:
 };
 

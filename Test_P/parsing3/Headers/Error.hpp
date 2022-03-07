@@ -134,6 +134,11 @@ class Error: public std::exception
 							=	100	==>	wrong code client.
 							=	101	==> wrong code server.
 
+
+		Level_error	=	2	==>	HttpServer creation
+			number_error	=	1	==>	cannot create a socket.
+							=	2	==>	cannot set up the socket options.
+
 throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 

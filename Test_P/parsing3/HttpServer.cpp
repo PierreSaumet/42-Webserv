@@ -98,7 +98,24 @@ int					HttpServer::ft_create_servers( void ) {
 
 		i = 0;
 		size_t nbr_server = this->_data->ft_get_nbr_servers();
-		std::cout << "IL y a " << nbr_server << std::endl;
+		std::cout << "IL y a " << nbr_server << " servers" << std::endl;
+		
+		
+		// while (i < nbr_server)
+		// {
+
+		// 	i++;
+		// }
+
+		int enable = 0;
+		struct sockaddr_in svr_addr;
+
+		this->_sock = socket(AF_INET, SOCK_STREAM, 0);
+		if (this->_sock < 0)
+			throw Error(1, "Error, 'creation of server', cannot create a socket.", 2);
+		if (setsockopt(this->_sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+			throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
+	
 	}
 	catch (std::exception &e)
 	{
