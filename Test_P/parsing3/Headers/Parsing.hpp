@@ -37,7 +37,7 @@ typedef struct					s_location {
 			size_t						buffer_size_location;
 		}								t_location;
 
-		typedef struct                  s_server {
+typedef struct                  s_server {
 
 			std::string                 host_server;
 			size_t                      port_server;

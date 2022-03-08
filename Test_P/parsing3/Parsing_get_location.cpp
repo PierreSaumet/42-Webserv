@@ -23,7 +23,8 @@
 size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	// Adding a block server
-	this->_servers.push_back(t_server());
+	//this->_servers.push_back(t_server());
+	//std::cout << "dans finddirective location On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
 
 	if (this->_servers[index_server].location.size() == 0)
 		this->_servers[index_server].nbr_location = 1;

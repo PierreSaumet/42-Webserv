@@ -76,6 +76,7 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 		}
 	}
 	this->_servers.push_back(t_server());
+	std::cout << "On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
 	return (false);
 }
 

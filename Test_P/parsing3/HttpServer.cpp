@@ -39,6 +39,7 @@ HttpServer::HttpServer( std::string &configfile) {
 		//std::cout << this->_data->display_all() << std::endl;
 
 		std::cout << "name = " << this->_data->ft_get_name_of_file() << std::endl;
+
 		this->_servers = this->_data->ft_get_servers();
 		std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
 		std::cout << "Ici" << std::endl;
@@ -111,9 +112,19 @@ int					HttpServer::ft_create_servers( void ) {
 
 		i = 0;
 		size_t nbr_server = this->_data->ft_get_nbr_servers();
-		std::cout << "IL y a " << nbr_server << " servers" << std::endl;
+		std::cout << "\n\nIL y a " << nbr_server << " servers" << std::endl;
 		
+		std::cout << "taille de this->server = " << this->_servers.size() << std::endl;
+		std::cout << "truc server[0] " << this->_servers[0].name_server << std::endl;
+		std::cout << "truc server[1] " << this->_servers[1].name_server << std::endl;
+		// std::cout << "truc server[2] " << this->_servers[2].name_server << std::endl;
+		// std::cout << "truc server[3] " << this->_servers[3].name_server << std::endl;
 		
+		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
+		{
+			
+		}
+
 		// while (i < nbr_server)
 		// {
 
