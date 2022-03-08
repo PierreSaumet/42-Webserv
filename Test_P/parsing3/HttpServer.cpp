@@ -113,43 +113,30 @@ int					HttpServer::ft_create_servers( void ) {
 		i = 0;
 		size_t nbr_server = this->_data->ft_get_nbr_servers();
 		std::cout << "\n\nIL y a " << nbr_server << " servers" << std::endl;
-		
-		std::cout << "taille de this->server = " << this->_servers.size() << std::endl;
-		std::cout << "truc server[0] " << this->_servers[0].name_server << std::endl;
-		std::cout << "truc server[1] " << this->_servers[1].name_server << std::endl;
-		// std::cout << "truc server[2] " << this->_servers[2].name_server << std::endl;
-		// std::cout << "truc server[3] " << this->_servers[3].name_server << std::endl;
-		
+
 		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 		{
+			this->_http_servers.push_back(t_http_server());
+
+			this->_http_servers[i].enable = 0;
+			this->_http_servers[i].svr_addr.sin_family = AF_INET;
+			this->_http_servers[i].svr_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+			this->_http_servers[i].svr_addr.sin_port = htons(this->_servers[i].port_server);
 			
+			this->_http_servers[i].sock = socket(AF_INET, SOCK_STREAM, 0);
+			if (this->_http_servers[i].sock < 0)
+				throw Error(1, "Error, 'creation of server', cannot create a socket.", 2);
+			if (setsockopt(this->_http_servers[i].sock, SOL_SOCKET, SO_REUSEADDR, &this->_http_servers[i].enable, sizeof(int)) < 0)
+				throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
+			if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
+			{
+				if (close(this->_http_servers[i].sock) < 0)
+					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
+				throw Error(4, "Error, 'creation of server'. cannot bind socket.", 2);
+			}
+			std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
+			std::cout << std::endl;
 		}
-
-		// while (i < nbr_server)
-		// {
-
-		// 	i++;
-		// }
-
-		int enable = 0;
-		struct sockaddr_in svr_addr;
-
-		svr_addr.sin_family = AF_INET;
-  		svr_addr.sin_addr.s_addr = inet_addr("127.0.0.1");				 //INADDR_ANY;
-		svr_addr.sin_port = htons(this->_servers[0].port_server);
-		this->_sock = socket(AF_INET, SOCK_STREAM, 0);
-
-
-		if (this->_sock < 0)
-			throw Error(1, "Error, 'creation of server', cannot create a socket.", 2);
-		if (setsockopt(this->_sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-			throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
-		if (bind(this->_sock, (struct sockaddr *) &svr_addr, sizeof(svr_addr)) < 0)
-		{
-    		if (close(this->_sock) < 0)
-				throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
-			throw Error(4, "Error, 'creation of server'. cannot bind socket.", 2);
-  		}
 	}
 	catch (std::exception &e)
 	{

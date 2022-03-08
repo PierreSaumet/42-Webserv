@@ -32,6 +32,13 @@
 class HttpServer {
 
 	public:
+
+		typedef struct			s_http_server {
+
+			int					enable;
+			struct sockaddr_in	svr_addr;
+			int					sock;
+		}						t_http_server;
 		/*
 		**	Canonical Form
 		*/
@@ -69,7 +76,8 @@ class HttpServer {
 
 
 		// test
-		int	_sock;
+		// int	_sock;
+		std::vector<t_http_server>		_http_servers;
 		
 
 	protected:
