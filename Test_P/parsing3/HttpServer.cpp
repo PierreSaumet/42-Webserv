@@ -45,8 +45,8 @@ HttpServer::HttpServer( std::string &configfile) {
 		std::cout << "Ici" << std::endl;
 
 		
-		// this->ft_test();
-		this->ft_create_servers();
+		this->ft_test();
+		//this->ft_create_servers();
 	}
 	catch (std::exception &e)
 	{
@@ -96,11 +96,11 @@ HttpServer			&HttpServer::operator=( const HttpServer &element ) {
  */
 char response[] = "HTTP/1.1 200 OK\r\n"
 "Content-Type: text/html; charset=UTF-8\r\n\r\n"
-"<!DOCTYPE html><html><head><title>Bye-bye baby bye-bye</title>"
+"<!DOCTYPE html><html><head><title>Hello World</title>"
 "<style>body { background-color: #111 }"
 "h1 { font-size:4cm; text-align: center; color: black;"
 " text-shadow: 0 0 2mm red}</style></head>"
-"<body><h1>HELLO PIERRE</h1></body></html>\r\n";
+"<body><h1>TEST Webserv</h1></body></html>\r\n";
 
 #include <arpa/inet.h>
 int					HttpServer::ft_create_servers( void ) {
@@ -140,10 +140,10 @@ int					HttpServer::ft_create_servers( void ) {
 			std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
 			std::cout << std::endl;
 		}
-		while (1)
-		{
-			
-		}
+		// while (1)
+		// {
+
+		// }
 	}
 	catch (std::exception &e)
 	{
@@ -188,7 +188,7 @@ int		HttpServer::ft_test( void )
 
 
 
-
+	// TEST pour ouvrir et afficher le fichier index.html
 
 
 
@@ -199,12 +199,14 @@ int		HttpServer::ft_test( void )
     if (client_fd == -1) {
       perror("Can't accept");
       continue;
-	sleep(10);
-	exit(-1);
+	// sleep(10);
+	// exit(-1);
     }
- 
-    write(client_fd, response, sizeof(response) - 1); /*-1:'\0'*/
+	
+	//write(client_fd, this->_servers[0].index_server.c_str(), sizeof(this->_servers[0].index_server.c_str()) - 1);
+   // write(client_fd, response, sizeof(response) - 1); /*-1:'\0'*/
     close(client_fd);
+	break;
   }
 
 
