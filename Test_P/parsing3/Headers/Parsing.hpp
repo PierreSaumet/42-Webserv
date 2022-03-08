@@ -129,6 +129,7 @@ class Parsing {
 		std::vector<t_server>			ft_get_servers( void );
 		std::string						ft_get_name_of_file( void );
 		size_t							ft_get_nbr_servers( void );
+		size_t							ft_get_error( void );
 		/*
 		**	Need to be delete.
 		*/
@@ -141,6 +142,7 @@ class Parsing {
 		std::vector<std::string>        _data;
 		size_t                          _nbr_servers;
 		std::vector<t_server>           _servers;
+		size_t							_error;
 
 };
 

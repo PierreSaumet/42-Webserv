@@ -29,18 +29,30 @@ HttpServer::HttpServer( void ) {
 HttpServer::HttpServer( std::string &configfile) {
 
 	std::cout << "Constructor avec argument "<< std::endl;
-	this->_data = new Parsing(configfile);
-	//std::cout << "display name of file = " << this->_data->_name_of_file << std::end;
-	//std::cout << this->_data->display_all() << std::endl;
-
-	std::cout << "name = " << this->_data->ft_get_name_of_file() << std::endl;
-	this->_servers = this->_data->ft_get_servers();
-	std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
-	std::cout << "Ici" << std::endl;
+	try {
+		this->_data = new Parsing(configfile);
+		if (this->_data->ft_get_error() == 1)
+			return ;
 
 
-	// this->ft_test();
-	this->ft_create_servers();
+		//std::cout << "display name of file = " << this->_data->_name_of_file << std::end;
+		//std::cout << this->_data->display_all() << std::endl;
+
+		std::cout << "name = " << this->_data->ft_get_name_of_file() << std::endl;
+		this->_servers = this->_data->ft_get_servers();
+		std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
+		std::cout << "Ici" << std::endl;
+
+		
+		// this->ft_test();
+		this->ft_create_servers();
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+	
+	
 	return ;
 }
 

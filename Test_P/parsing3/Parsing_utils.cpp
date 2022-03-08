@@ -31,6 +31,11 @@ size_t							Parsing::ft_get_nbr_servers( void )
 	return (this->_nbr_servers);
 }
 
+size_t							Parsing::ft_get_error( void )
+{
+	return (this->_error);
+}
+
 /*
 **	ft_delete_comm( std::string &line ):
 **		This function will delete all commentaries (starting with #) from the configuration file.

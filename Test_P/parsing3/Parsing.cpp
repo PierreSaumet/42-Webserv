@@ -16,7 +16,7 @@
 /*
 **	Parsing empty constructor.
 */
-Parsing::Parsing( void ) : _name_of_file(NULL), _nbr_servers(0) {
+Parsing::Parsing( void ) : _name_of_file(NULL), _nbr_servers(0), _error(0) {
 
 	return ;
 }
@@ -26,7 +26,7 @@ Parsing::Parsing( void ) : _name_of_file(NULL), _nbr_servers(0) {
 **		It takes one argument corresponding to the name of the configuration file.
 **		It checks of this file is correct and starts the parsing with the function 'ft_check_data'.
 */
-Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_servers(0) {
+Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_servers(0), _error(0) {
 
 	try
 	{
@@ -46,6 +46,7 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_se
 	}
 	catch(std::exception &e)
 	{
+		this->_error = 1;
 		std::cerr << e.what() << std::endl;
 	}
 
