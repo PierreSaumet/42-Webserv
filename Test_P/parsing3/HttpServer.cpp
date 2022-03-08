@@ -132,10 +132,17 @@ int					HttpServer::ft_create_servers( void ) {
 			{
 				if (close(this->_http_servers[i].sock) < 0)
 					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
-				throw Error(4, "Error, 'creation of server'. cannot bind socket.", 2);
+				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 			}
+			if (listen(this->_http_servers[i].sock, 32) < 0)
+				throw Error(5, "Error, 'creation of server', cannot listen.", 2);
+
 			std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
 			std::cout << std::endl;
+		}
+		while (1)
+		{
+			
 		}
 	}
 	catch (std::exception &e)
