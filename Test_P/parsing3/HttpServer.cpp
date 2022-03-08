@@ -204,9 +204,55 @@ int		HttpServer::ft_test( void )
     }
 	
 	//write(client_fd, this->_servers[0].index_server.c_str(), sizeof(this->_servers[0].index_server.c_str()) - 1);
-   // write(client_fd, response, sizeof(response) - 1); /*-1:'\0'*/
+   
+	std::string filename(this->_servers[0].index_server.c_str());
+	std::string file_contents;
+
+	struct stat sb;
+	std::string res;
+
+	FILE *input_file = fopen(filename.c_str(), "r");
+	if (input_file == NULL)
+	{
+		std::cout << "ECHEC open " << std::endl;
+		return (1);
+	}
+	stat(filename.c_str(), &sb);
+	res.resize(sb.st_size + 100);
+	
+
+	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+	fclose(input_file);
+
+	
+	// file_contents = res;
+	// std::string *relou = std::remove(res.begin(), res.end(), "\t");
+	// res.erase(relou.begin(), relou.end());
+
+	// file_contents = std::strtok(&res[0], " \t\n\v\r\f");
+	file_contents = res;
+	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n");
+	// std::cout << "TEST = " << file_contents << std::endl;
+	// std::cout << "sizeof file content " << file_contents.size() << std::endl;
+	// std::cout << "sizeof file content .c_str()" << sizeof(file_contents.c_str()) << std::endl;
+	// int lol2 = write(1, file_contents.c_str(), file_contents.size());
+	// std::cout << "\nreturn write qui marche PAS  = " << lol2 << std::endl;
+	// std::cout << "\n\n" << std::endl;
+
+	int lol2 = write(client_fd, file_contents.c_str(), file_contents.size());
+	std::cout << "\nreturn write qui marche PAS  = " << lol2 << std::endl;
+
+
+	// lol2 = write(client_fd, file_contents.c_str(), sizeof(file_contents) -1);
+	// std::cout << "\nreturn write qui marche PAS  = " << lol2 <<std::endl;
+	// sleep(10);
+	// ca marche
+	// std::cout << "TEST = " << response << std::endl;
+   	// int lol = write(client_fd, response, sizeof(response) - 1); /*-1:'\0'*/
+	// write(1, response, sizeof(response) -1);
+	// std::cout << "return write qui marche = " << lol <<std::endl;
     close(client_fd);
-	break;
+	// break;
   }
 
 
