@@ -338,6 +338,11 @@ int		HttpServer::ft_test_main_loop_server( void )
 	{
 		try {
 			ft_gerer_les_connections_avec_select();
+			std::cout << "euh return select = " << this->_return_select << std::endl;
+			if (this->_return_select != 0) // cas ou on obtient quelque chose, genre un mec se connecte et bah envoie des donnes ?
+			{
+				
+			}		
 		}
 		catch (std::exception &e)
 		{
@@ -345,7 +350,7 @@ int		HttpServer::ft_test_main_loop_server( void )
 		}
 		std::cout << "ici " << std::endl;
 		// fonction qui va gerer les connections avec select.
-		break;
+		//break;
 	}
 	return (0);
 }
