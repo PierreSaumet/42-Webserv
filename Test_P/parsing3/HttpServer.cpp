@@ -26,7 +26,7 @@ HttpServer::HttpServer( void ) {
 /*
 **	HttpServer Constructor with argument.
 */
-HttpServer::HttpServer( std::string &configfile) {
+HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) {
 
 	std::cout << "Constructor avec argument "<< std::endl;
 	try {
@@ -138,7 +138,7 @@ int					HttpServer::ft_create_servers( void ) {
 					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
 				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 			}
-			if (listen(this->_http_servers[i].sock, 32) < 0)
+			if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
 			{
 				if (close(this->_http_servers[i].sock) < 0)
 					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);

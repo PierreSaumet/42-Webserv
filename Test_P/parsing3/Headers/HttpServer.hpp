@@ -78,6 +78,7 @@ class HttpServer {
 		// test
 		// int	_sock;
 		std::vector<t_http_server>		_http_servers;
+		int								_max_connections;
 		
 
 	protected:
