@@ -33,12 +33,23 @@ class HttpServer {
 
 	public:
 
+		// structure utilise pour les socket et informatons des servers genre port 8080 ou autre
 		typedef struct			s_http_server {
 
 			int					enable;
 			struct sockaddr_in	svr_addr;
 			int					sock;
 		}						t_http_server;
+
+		// structure utilise pour les socket et informations des clients genre port 8080 ou autre
+		typedef struct			s_client_socket {
+
+			int					client_socket;
+			struct sockaddr_in	client_addr;
+
+		}						t_client_socket;
+
+
 		/*
 		**	Canonical Form
 		*/
@@ -83,6 +94,7 @@ class HttpServer {
 		int								_max_connections;
 		fd_set							_read_fs;
 		fd_set							_write_fs;
+		std::vector<t_client_socket>	_all_client_socket;	// va posseder toutes les conenctions. peut etre mettre en list
 		
 
 	protected:

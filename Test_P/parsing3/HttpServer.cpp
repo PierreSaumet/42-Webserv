@@ -285,13 +285,11 @@ void				HttpServer::handler_signal( int num )
 void	HttpServer::ft_gerer_les_connections_avec_select( void )
 {
 	// 1) vider l'ensemble de lecture et d'ecriture
-		std::cout << "ca pete ici ? " << std::endl;
 	FD_ZERO(&this->_read_fs);
-	std::cout << "le eme " << std::endl;
 	FD_ZERO(&this->_write_fs);
 
-	std::cout << "ca pete ici ? " << std::endl;
-	/// 2) on ajoute le fd a l'ensemble des servers
+	// std::cout << "ca pete ici ? " << std::endl;
+	/// 2) on ajoute le l'ensemble de lecture a l'ensemble des servers
 	std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
 	std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
 
@@ -300,6 +298,8 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 	{
 		FD_SET(it_b->sock, &this->_read_fs);
 	}
+
+	// 3) on ajoute l'ensemble de lecture et ecriture aux clients? 
 }
 
 
@@ -311,7 +311,7 @@ int		HttpServer::ft_test_main_loop_server( void )
 	std::cout << "Dans la boucle principale" << std::endl;
 
 
-this->_http_servers.push_back(t_http_server());
+
 	std::cout << "signal = " << int_signal << std::endl;
 	while (int_signal == 0)
 	{
