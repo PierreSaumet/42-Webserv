@@ -130,17 +130,20 @@ int					HttpServer::ft_create_servers( void ) {
 				throw Error(1, "Error, 'creation of server', cannot create a socket.", 2);
 			if (setsockopt(this->_http_servers[i].sock, SOL_SOCKET, SO_REUSEADDR, &this->_http_servers[i].enable, sizeof(int)) < 0)
 			{
+				// il faut fermer les socket ? tous les sockets < ==========================================
 				if (close(this->_http_servers[i].sock) < 0)
 					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);	throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
 			}
 			if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
 			{
+				// il faut fermer les socket ? tous les sockets < ==========================================
 				if (close(this->_http_servers[i].sock) < 0)
 					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
 				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 			}
 			if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
 			{
+				// il faut fermer les socket ? tous les sockets < ==========================================
 				if (close(this->_http_servers[i].sock) < 0)
 					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
 				throw Error(5, "Error, 'creation of server', cannot listen.", 2);
@@ -300,6 +303,24 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 	}
 
 	// 3) on ajoute l'ensemble de lecture et ecriture aux clients? 
+	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
+	std::vector<t_client_socket>::iterator it_e_client = this->_all_client_socket.end();
+	for (it_b_client = this->_all_client_socket.begin(); it_b_client != it_e_client; it_b_client++)
+	{
+		FD_SET(it_b_client->client_socket, &this->_read_fs);
+		FD_SET(it_b_client->client_socket, &this->_write_fs);
+	}
+
+
+	// manque le fait d;ajouter des nouvelles connections?
+
+	// 4 ) select ? 
+	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL) < 0))
+	{
+		// il faut fermer les socket ? tous les sockets < ==========================================
+		throw Error(5, "Error, 'main loop server', cannot select().", 2);
+	}
+	return ;
 }
 
 
@@ -315,7 +336,13 @@ int		HttpServer::ft_test_main_loop_server( void )
 	std::cout << "signal = " << int_signal << std::endl;
 	while (int_signal == 0)
 	{
-		ft_gerer_les_connections_avec_select();
+		try {
+			ft_gerer_les_connections_avec_select();
+		}
+		catch (std::exception &e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
 		std::cout << "ici " << std::endl;
 		// fonction qui va gerer les connections avec select.
 		break;

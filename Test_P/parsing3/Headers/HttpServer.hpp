@@ -95,7 +95,7 @@ class HttpServer {
 		fd_set							_read_fs;
 		fd_set							_write_fs;
 		std::vector<t_client_socket>	_all_client_socket;	// va posseder toutes les conenctions. peut etre mettre en list
-		
+		int								_return_select;
 
 	protected:
 };

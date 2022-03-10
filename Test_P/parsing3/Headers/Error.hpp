@@ -140,6 +140,7 @@ class Error: public std::exception
 							=	2	==>	cannot set up the socket options.
 							=	3	==>	cannot bind socket.
 							=	4	==>	cannot listen.		
+							=	5	==>	cannot select.
 throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 
