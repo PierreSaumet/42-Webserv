@@ -47,6 +47,7 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) {
 		
 		//this->ft_test();
 		this->ft_create_servers();
+		this->ft_test_main_loop_server();
 	}
 	catch (std::exception &e)
 	{
@@ -160,6 +161,7 @@ int					HttpServer::ft_create_servers( void ) {
 
 	return (0);
 }
+
 
 
 /*
@@ -278,4 +280,45 @@ void				HttpServer::handler_signal( int num )
 {
 	int_signal = num;
 	return ;
+}
+
+void	HttpServer::ft_gerer_les_connections_avec_select( void )
+{
+	// 1) vider l'ensemble de lecture et d'ecriture
+		std::cout << "ca pete ici ? " << std::endl;
+	FD_ZERO(&this->_read_fs);
+	std::cout << "le eme " << std::endl;
+	FD_ZERO(&this->_write_fs);
+
+	std::cout << "ca pete ici ? " << std::endl;
+	/// 2) on ajoute le fd a l'ensemble des servers
+	std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
+	std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
+
+	std::cout << "la taille = " << this->_http_servers.size() << std::endl;
+	for (it_b = this->_http_servers.begin(); it_b != it_e; it_b++)
+	{
+		FD_SET(it_b->sock, &this->_read_fs);
+	}
+}
+
+
+/*
+**	Test de la boucle principal qui va tout faire.
+*/
+int		HttpServer::ft_test_main_loop_server( void )
+{
+	std::cout << "Dans la boucle principale" << std::endl;
+
+
+this->_http_servers.push_back(t_http_server());
+	std::cout << "signal = " << int_signal << std::endl;
+	while (int_signal == 0)
+	{
+		ft_gerer_les_connections_avec_select();
+		std::cout << "ici " << std::endl;
+		// fonction qui va gerer les connections avec select.
+		break;
+	}
+	return (0);
 }

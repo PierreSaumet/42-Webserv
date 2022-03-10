@@ -61,6 +61,8 @@ class HttpServer {
 		**	Functions used to creates server
 		*/
 		int					ft_create_servers( void );
+		int					ft_test_main_loop_server( void );
+		void				ft_gerer_les_connections_avec_select( void );
 
 
 		/*
@@ -79,6 +81,8 @@ class HttpServer {
 		// int	_sock;
 		std::vector<t_http_server>		_http_servers;
 		int								_max_connections;
+		fd_set							_read_fs;
+		fd_set							_write_fs;
 		
 
 	protected:
