@@ -453,7 +453,7 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "test de send = " << test << std::endl;
 				// exit(1);
 			}
-			sleep(10);
+			// sleep(10);
 		}
 		// else
 		// {
@@ -466,6 +466,42 @@ int 		HttpServer::ft_test_writing( void )
 	return (0);
 }
 
+/*
+*	**	Testing writing
+*/
+int		HttpServer::ft_test_reading( void )
+{
+	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
+	std::vector<t_client_socket>::iterator it_e_client = this->_all_client_socket.end();
+
+	for (; it_b_client != it_e_client; it_b_client++)
+	{
+		char buffer[1024 + 1];
+		memset((char *)buffer, 0, 1024 + 1);
+
+		std::cout << "dans la boucle read" << std::endl;
+		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
+		{
+			int longue_message;
+
+			longue_message = recv(it_b_client->client_socket, buffer, 1024, 0);
+			if (longue_message <= 0)
+			{
+				std::cout << "kek erreur recv" << std::endl;
+				std::cout << "message taille recu = " << longue_message << std::endl;
+				// exit(1);
+				return (1);
+			}
+			else
+			{
+				std::cout << "mesasge good" << std::endl;
+				std::cout << "MESSAGE = " << longue_message << std::endl;
+			}
+		}
+	}
+
+	return (0);
+}
 
 /*
 **	Test de la boucle principal qui va tout faire.
@@ -490,6 +526,8 @@ int		HttpServer::ft_test_main_loop_server( void )
 				// on va verifier si un fd est dans un emselbe
 				this->ft_verifier_ensemble_isset();
 				if (this->ft_test_writing() == 1)
+					return (1);
+				if (this->ft_test_reading() == 1)
 					return (1);
 			}		
 		}
