@@ -45,9 +45,10 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) {
 		std::cout << "Ici" << std::endl;
 
 		
-		this->ft_test();
-		// this->ft_create_servers();
-		// this->ft_test_main_loop_server();
+		// this->ft_test();
+		if (this->ft_create_servers() == 1)
+			return ;
+		this->ft_test_main_loop_server();
 	}
 	catch (std::exception &e)
 	{
@@ -168,6 +169,7 @@ int					HttpServer::ft_create_servers( void ) {
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
+		return (1);
 	}
 
 
@@ -387,6 +389,93 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 		}
 	}
 }
+/*
+**	Test on essaie d'ecrire
+*/
+int 		HttpServer::ft_test_writing( void )
+{
+	std::cout << "Dans ft _test_writing" << std::endl;
+
+	// on test les ip des clients
+	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
+	std::vector<t_client_socket>::iterator it_e_client = this->_all_client_socket.end();
+
+	for (; it_b_client != it_e_client; it_b_client++)
+	{
+		int test;
+
+		std::cout << "dans la boucle de test writing lol " << std::endl;
+		std::cout << "it->b.sock = " << it_b_client->client_socket << std::endl;
+		sleep(1);
+		std::string filename(this->_servers[0].index_server.c_str());
+		std::string file_contents;
+
+		struct stat sb;
+		std::string res;
+
+		FILE *input_file = fopen(filename.c_str(), "r");
+		if (input_file == NULL)
+		{
+			std::cout << "ECHEC open " << std::endl;
+			return (1);
+		}
+		stat(filename.c_str(), &sb);
+		res.resize(sb.st_size + 100);
+		
+		std::cout << "ici" << std::endl;
+		fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+		fclose(input_file);
+
+		std::cout << "ici 2" << std::endl;
+
+		file_contents = res;
+		file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n");
+
+		std::cout << "ici 3" << std::endl;
+		// int lol2 = write(client_fd, file_contents.c_str(), file_contents.size());
+		// std::cout << "\nreturn write qui marche PAS  = " << lol2 << std::endl;
+
+		//std::cout << "FILE = " << file_contents << std::endl;
+
+		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
+		{
+			std::cout << "LAAA =)" << std::endl;
+			// exit(1);
+			test = send(it_b_client->client_socket, file_contents.c_str(),  file_contents.size(), 0);
+			if (test < 0)
+			{
+				std::cout << "test < 0 = " << test << std::endl;
+				exit(1);
+			}
+			else if (test == 0)
+			{
+				std::cout << "mince return send == 0" << std::endl;
+				return (1);
+			}
+			else if (test == 13)
+			{
+				std::cout << "on a pas la permission decrire lol " << std::endl;
+				return (1);
+			}
+			else
+			{
+				std::cout << "ca marche " << std::endl;
+				std::cout << "test de send = " << test << std::endl;
+				// exit(1);
+			}
+			sleep(10);
+		}
+		// else
+		// {
+		// 	std::cout << "FD_isset marche pas en writre" << std::endl;
+		// }
+		
+		
+	}
+
+	return (0);
+}
+
 
 /*
 **	Test de la boucle principal qui va tout faire.
@@ -410,16 +499,21 @@ int		HttpServer::ft_test_main_loop_server( void )
 				std::cout << "dans if return select" << std::endl;
 				// on va verifier si un fd est dans un emselbe
 				this->ft_verifier_ensemble_isset();
+				if (this->ft_test_writing() == 1)
+					return (1);
 			}		
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
+			std::cout << "dans catch error main loop " << std::endl;
 			break ;
 		}
 		// std::cout << "ici " << std::endl;
 		// fonction qui va gerer les connections avec select.
 		//break;
 	}
+
+	std::cout << "FIN DU PROGRAMME " << std::endl;
 	return (0);
 }

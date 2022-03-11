@@ -76,7 +76,7 @@ class HttpServer {
 		int					ft_test_main_loop_server( void );
 		void				ft_gerer_les_connections_avec_select( void );
 		void				ft_verifier_ensemble_isset( void );
-
+		int					ft_test_writing( void );
 
 		/*
 		**	Functions used for the signal handler
