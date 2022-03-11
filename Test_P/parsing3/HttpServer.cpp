@@ -337,9 +337,23 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 	std::cout << "dans isset enselbe, size du server = " << this->_http_servers.size() << std::endl;
 	for (; it_b != it_e; it_b++)
 	{
+		int		socket_new_client;
+		struct sockaddr_in	addr_new_client;
+		socklen_t	size_addr_new_client = sizeof(addr_new_client);
+
 		if (FD_ISSET(it_b->sock, &this->_read_fs))
 		{
-			std::cout << "DANS FD_ISSET positif" << std::endl;
+			std::cout << "DANS FD_ISSET positif" << std::endl; // on recoit une demande d'un cliebt
+			socket_new_client = accept(it_b->sock, (struct sockaddr *)&addr_new_client, &size_addr_new_client);		
+			if (socket_new_client < 0)
+			{
+				std::cout << "MERDE ERREUR ACCEPT" << std::endl;
+				throw Error(6, "Error, 'main loop server', server cannot accept() a client.", 2);
+			}
+			else
+			{
+				std::cout << GREEN << "nouvelle connection client avec le server " << CLEAR << std::endl;
+			}
 		}
 	}
 }
@@ -362,6 +376,7 @@ int		HttpServer::ft_test_main_loop_server( void )
 			std::cout << "apres select = " << this->_return_select << std::endl;
 			if (this->_return_select != 0) // cas ou on obtient quelque chose, genre un mec se connecte et bah envoie des donnes ?
 			{
+				// du coup note socket server est pret a etre lu
 				std::cout << "dans if return select" << std::endl;
 				// on va verifier si un fd est dans un emselbe
 				this->ft_verifier_ensemble_isset();

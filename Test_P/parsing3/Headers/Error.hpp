@@ -141,6 +141,7 @@ class Error: public std::exception
 							=	3	==>	cannot bind socket.
 							=	4	==>	cannot listen.		
 							=	5	==>	cannot select.
+							=	6	==>	server cannot accept() a client.
 throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 
