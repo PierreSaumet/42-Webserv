@@ -296,7 +296,7 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 	std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
 	std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
 
-	std::cout << "la taille = " << this->_http_servers.size() << std::endl;
+	//std::cout << "la taille = " << this->_http_servers.size() << std::endl;
 	for (it_b = this->_http_servers.begin(); it_b != it_e; it_b++)
 	{
 		FD_SET(it_b->sock, &this->_read_fs);
@@ -315,14 +315,34 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 	// manque le fait d;ajouter des nouvelles connections?
 
 	// 4 ) select ? 
-	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL) < 0))
+	std::cout << "return de select = " << select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL) << std::endl;
+	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0)
 	{
 		// il faut fermer les socket ? tous les sockets < ==========================================
 		throw Error(5, "Error, 'main loop server', cannot select().", 2);
 	}
+	std::cout << "ICI return select = " << this->_return_select << std::endl;
 	return ;
 }
 
+/*
+**	Test apres select il faut verifier si le fd est compris dans l'ensemble
+**	avec fd_ISSET
+*/
+void		HttpServer::ft_verifier_ensemble_isset( void )
+{
+	std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
+	std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
+
+	std::cout << "dans isset enselbe, size du server = " << this->_http_servers.size() << std::endl;
+	for (; it_b != it_e; it_b++)
+	{
+		if (FD_ISSET(it_b->sock, &this->_read_fs))
+		{
+			std::cout << "DANS FD_ISSET positif" << std::endl;
+		}
+	}
+}
 
 /*
 **	Test de la boucle principal qui va tout faire.
@@ -337,18 +357,22 @@ int		HttpServer::ft_test_main_loop_server( void )
 	while (int_signal == 0)
 	{
 		try {
-			ft_gerer_les_connections_avec_select();
-			std::cout << "euh return select = " << this->_return_select << std::endl;
+			std::cout << "avant select = " << this->_return_select << std::endl;
+			this->ft_gerer_les_connections_avec_select();
+			std::cout << "apres select = " << this->_return_select << std::endl;
 			if (this->_return_select != 0) // cas ou on obtient quelque chose, genre un mec se connecte et bah envoie des donnes ?
 			{
-				
+				std::cout << "dans if return select" << std::endl;
+				// on va verifier si un fd est dans un emselbe
+				this->ft_verifier_ensemble_isset();
 			}		
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
+			break ;
 		}
-		std::cout << "ici " << std::endl;
+		// std::cout << "ici " << std::endl;
 		// fonction qui va gerer les connections avec select.
 		//break;
 	}
