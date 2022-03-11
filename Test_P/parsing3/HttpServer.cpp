@@ -447,16 +447,6 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "test < 0 = " << test << std::endl;
 				exit(1);
 			}
-			else if (test == 0)
-			{
-				std::cout << "mince return send == 0" << std::endl;
-				return (1);
-			}
-			else if (test == 13)
-			{
-				std::cout << "on a pas la permission decrire lol " << std::endl;
-				return (1);
-			}
 			else
 			{
 				std::cout << "ca marche " << std::endl;
