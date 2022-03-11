@@ -45,9 +45,9 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) {
 		std::cout << "Ici" << std::endl;
 
 		
-		//this->ft_test();
-		this->ft_create_servers();
-		this->ft_test_main_loop_server();
+		this->ft_test();
+		// this->ft_create_servers();
+		// this->ft_test_main_loop_server();
 	}
 	catch (std::exception &e)
 	{
@@ -323,6 +323,7 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 
 
 	// manque le fait d;ajouter des nouvelles connections?
+	//  ==> dy coupt c'est la fonction ft_verirfier_ensemble_isset
 
 	// 4 ) select ? 
 	std::cout << "return de select = " << select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL) << std::endl;
