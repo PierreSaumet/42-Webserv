@@ -27,6 +27,7 @@
 #include "Parsing.hpp"
 #include <algorithm>
 
+#include <fcntl.h>
 
 
 class HttpServer {

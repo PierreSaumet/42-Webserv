@@ -127,25 +127,34 @@ int					HttpServer::ft_create_servers( void ) {
 			
 			this->_http_servers[i].sock = socket(AF_INET, SOCK_STREAM, 0);
 			if (this->_http_servers[i].sock < 0)
-				throw Error(1, "Error, 'creation of server', cannot create a socket.", 2);
+				throw Error(0, "Error, 'creation of server', cannot create a socket.", 2);
 			if (setsockopt(this->_http_servers[i].sock, SOL_SOCKET, SO_REUSEADDR, &this->_http_servers[i].enable, sizeof(int)) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
 				if (close(this->_http_servers[i].sock) < 0)
-					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);	throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
+				{
+					close(this->_http_servers[i].sock);
+					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);	throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
+				}
 			}
 			if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
 				if (close(this->_http_servers[i].sock) < 0)
-					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
+				{
+					close(this->_http_servers[i].sock);
+					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
+				}
 				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 			}
 			if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
 				if (close(this->_http_servers[i].sock) < 0)
-					throw Error(3, "Error, 'creation of server', cannot close socket.", 2);
+				{
+					close(this->_http_servers[i].sock);
+					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
+				}
 				throw Error(5, "Error, 'creation of server', cannot listen.", 2);
 			}
 			std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
@@ -305,6 +314,7 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 	// 3) on ajoute l'ensemble de lecture et ecriture aux clients? 
 	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
 	std::vector<t_client_socket>::iterator it_e_client = this->_all_client_socket.end();
+	std::cout << "taille des clients = " << this->_all_client_socket.size() << std::endl;
 	for (it_b_client = this->_all_client_socket.begin(); it_b_client != it_e_client; it_b_client++)
 	{
 		FD_SET(it_b_client->client_socket, &this->_read_fs);
@@ -353,6 +363,24 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 			else
 			{
 				std::cout << GREEN << "nouvelle connection client avec le server " << CLEAR << std::endl;
+				// maintenant on modifi l'etat du fd avec fcntl pour le mettre en non bloquand
+				if (fcntl(socket_new_client, F_SETFL, O_NONBLOCK) < 0)
+				{
+					std::cout << "MERDE ERREUR FCNTL" << std::endl;
+					throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
+				}
+				else
+				{
+					// on ajoute le nouveau client.
+					t_client_socket new_client;
+
+					new_client.client_socket = socket_new_client;
+					std::cout << "nouveau client = " << new_client.client_socket << std::endl;
+					new_client.client_addr = addr_new_client;
+					this->_all_client_socket.push_back(new_client);
+					std::cout << "TAILLE MAINTENANT APRES AJOUT DUN CLIENT " << this->_all_client_socket.size() << std::endl;
+
+				}		
 			}
 		}
 	}

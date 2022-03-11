@@ -136,12 +136,14 @@ class Error: public std::exception
 
 
 		Level_error	=	2	==>	HttpServer creation
-			number_error	=	1	==>	cannot create a socket.
+			number_error	=	0	==>	cannot create a socket.
+							=	1	==>	cannot close the socket.
 							=	2	==>	cannot set up the socket options.
 							=	3	==>	cannot bind socket.
 							=	4	==>	cannot listen.		
 							=	5	==>	cannot select.
 							=	6	==>	server cannot accept() a client.
+							=	7	==>	server cannot change FD client with fcntl().
 throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 
