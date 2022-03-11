@@ -376,6 +376,7 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 
 					new_client.client_socket = socket_new_client;
 					std::cout << "nouveau client = " << new_client.client_socket << std::endl;
+					// sleep(10);
 					new_client.client_addr = addr_new_client;
 					this->_all_client_socket.push_back(new_client);
 					std::cout << "TAILLE MAINTENANT APRES AJOUT DUN CLIENT " << this->_all_client_socket.size() << std::endl;
