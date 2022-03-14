@@ -327,12 +327,9 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 		FD_SET(it_b_client->client_socket, &this->_write_fs);
 	}
 
-
 	// manque le fait d;ajouter des nouvelles connections?
 	//  ==> dy coupt c'est la fonction ft_verirfier_ensemble_isset
-
 	// 4 ) select ? 
-	std::cout << "return de select = " << select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL) << std::endl;
 	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0)
 	{
 		// il faut fermer les socket ? tous les sockets < ==========================================
@@ -399,13 +396,8 @@ int 		HttpServer::ft_test_writing( void )
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
 		int test;
-
-		std::cout << "dans la boucle de test writing lol " << std::endl;
-		std::cout << "it->b.sock = " << it_b_client->client_socket << std::endl;
-		sleep(1);
-		std::string filename(this->_servers[0].index_server.c_str());
+		std::string filename(this->_servers[0].index_server.c_str());				// a changer, car la ca affiche seuelemtn l'index.html
 		std::string file_contents;
-
 		struct stat sb;
 		std::string res;
 
@@ -417,21 +409,10 @@ int 		HttpServer::ft_test_writing( void )
 		}
 		stat(filename.c_str(), &sb);
 		res.resize(sb.st_size + 100);
-		
-		std::cout << "ici" << std::endl;
 		fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
 		fclose(input_file);
-
-		std::cout << "ici 2" << std::endl;
-
 		file_contents = res;
 		file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n");
-
-		std::cout << "ici 3" << std::endl;
-		// int lol2 = write(client_fd, file_contents.c_str(), file_contents.size());
-		// std::cout << "\nreturn write qui marche PAS  = " << lol2 << std::endl;
-
-		//std::cout << "FILE = " << file_contents << std::endl;
 
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
@@ -447,18 +428,9 @@ int 		HttpServer::ft_test_writing( void )
 			{
 				std::cout << "ca marche " << std::endl;
 				std::cout << "test de send = " << test << std::endl;
-				// exit(1);
 			}
-			// sleep(10);
 		}
-		// else
-		// {
-		// 	std::cout << "FD_isset marche pas en writre" << std::endl;
-		// }
-		
-		
 	}
-
 	return (0);
 }
 
