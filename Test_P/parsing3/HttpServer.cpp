@@ -477,16 +477,12 @@ int		HttpServer::ft_test_reading( void )
 int		HttpServer::ft_test_main_loop_server( void )
 {
 	std::cout << "Dans la boucle principale" << std::endl;
-
-
-
 	std::cout << "signal = " << int_signal << std::endl;
 	while (int_signal == 0)
 	{
 		try {
-			std::cout << "avant select = " << this->_return_select << std::endl;
+			
 			this->ft_gerer_les_connections_avec_select();
-			std::cout << "apres select = " << this->_return_select << std::endl;
 			if (this->_return_select != 0) // cas ou on obtient quelque chose, genre un mec se connecte et bah envoie des donnes ?
 			{
 				// du coup note socket server est pret a etre lu
@@ -505,9 +501,6 @@ int		HttpServer::ft_test_main_loop_server( void )
 			std::cout << "dans catch error main loop " << std::endl;
 			break ;
 		}
-		// std::cout << "ici " << std::endl;
-		// fonction qui va gerer les connections avec select.
-		//break;
 	}
 
 	std::cout << "FIN DU PROGRAMME " << std::endl;
