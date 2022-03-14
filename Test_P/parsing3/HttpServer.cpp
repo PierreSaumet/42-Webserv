@@ -296,6 +296,10 @@ void				HttpServer::handler_signal( int num )
 	return ;
 }
 
+/*
+**	This functions setup the server socket with a fd for reading and setup the client socket with
+**	a reading and writing socket.
+*/
 void	HttpServer::ft_gerer_les_connections_avec_select( void )
 {
 	// 1) vider l'ensemble de lecture et d'ecriture
@@ -356,22 +360,16 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 
 		if (FD_ISSET(it_b->sock, &this->_read_fs))
 		{
-			std::cout << "DANS FD_ISSET positif" << std::endl; // on recoit une demande d'un cliebt
+			// on recoit une demande d'un cliebt
 			socket_new_client = accept(it_b->sock, (struct sockaddr *)&addr_new_client, &size_addr_new_client);		
 			if (socket_new_client < 0)
-			{
-				std::cout << "MERDE ERREUR ACCEPT" << std::endl;
 				throw Error(6, "Error, 'main loop server', server cannot accept() a client.", 2);
-			}
 			else
 			{
 				std::cout << GREEN << "nouvelle connection client avec le server " << CLEAR << std::endl;
 				// maintenant on modifi l'etat du fd avec fcntl pour le mettre en non bloquand
 				if (fcntl(socket_new_client, F_SETFL, O_NONBLOCK) < 0)
-				{
-					std::cout << "MERDE ERREUR FCNTL" << std::endl;
 					throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
-				}
 				else
 				{
 					// on ajoute le nouveau client.
@@ -382,8 +380,6 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 					// sleep(10);
 					new_client.client_addr = addr_new_client;
 					this->_all_client_socket.push_back(new_client);
-					std::cout << "TAILLE MAINTENANT APRES AJOUT DUN CLIENT " << this->_all_client_socket.size() << std::endl;
-
 				}		
 			}
 		}
