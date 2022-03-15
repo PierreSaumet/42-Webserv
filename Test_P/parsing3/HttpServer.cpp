@@ -382,6 +382,33 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 		}
 	}
 }
+
+std::string		HttpServer::ft_settup_http_response( void )
+{
+	// fonction to create the response to display
+	// Now only display the index.
+
+	std::string filename(this->_servers[0].index_server.c_str());				// a changer, car la ca affiche seuelemtn l'index.html
+	std::string file_contents;
+	struct stat sb;
+	std::string res;
+
+	FILE *input_file = fopen(filename.c_str(), "r");
+	if (input_file == NULL)
+	{
+		std::cout << "ECHEC open " << std::endl;
+		return (NULL);
+	}
+	stat(filename.c_str(), &sb);
+	res.resize(sb.st_size + 100);
+	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+	fclose(input_file);
+	file_contents = res;
+	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n");
+
+	return (file_contents);
+}
+
 /*
 **	Test on essaie d'ecrire
 */
@@ -395,37 +422,28 @@ int 		HttpServer::ft_test_writing( void )
 
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
-		int test;
-		std::string filename(this->_servers[0].index_server.c_str());				// a changer, car la ca affiche seuelemtn l'index.html
-		std::string file_contents;
-		struct stat sb;
-		std::string res;
-
-		FILE *input_file = fopen(filename.c_str(), "r");
-		if (input_file == NULL)
-		{
-			std::cout << "ECHEC open " << std::endl;
-			return (1);
-		}
-		stat(filename.c_str(), &sb);
-		res.resize(sb.st_size + 100);
-		fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
-		fclose(input_file);
-		file_contents = res;
-		file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n");
-
+		int ret_send;
+		
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
-			test = send(it_b_client->client_socket, file_contents.c_str(),  file_contents.size(), 0);
-			if (test < 0)
+			// on va utiliser _HTTP_RESPONSE
+			_HTTP_RESPONSE = ft_settup_http_response();
+			std::cout << "DISPLAY REPONSE = " << _HTTP_RESPONSE << std::endl;
+			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
+			if (ret_send < 0)
 			{
-				std::cout << "test < 0 = " << test << std::endl;
-				exit(1);
+				std::cout << "ret_send < 0 = " << ret_send << std::endl;
+				if (_HTTP_RESPONSE.empty())
+					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
+				return (1);
 			}
 			else
 			{
 				std::cout << "ca marche " << std::endl;
-				std::cout << "test de send = " << test << std::endl;
+				std::cout << "test de send = " << ret_send << std::endl;
+				if (_HTTP_RESPONSE.empty())
+					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
+				sleep(10);
 			}
 		}
 	}
