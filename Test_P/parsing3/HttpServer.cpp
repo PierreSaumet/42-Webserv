@@ -416,8 +416,6 @@ int 		HttpServer::ft_test_writing( void )
 
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
-			std::cout << "LAAA =)" << std::endl;
-			// exit(1);
 			test = send(it_b_client->client_socket, file_contents.c_str(),  file_contents.size(), 0);
 			if (test < 0)
 			{

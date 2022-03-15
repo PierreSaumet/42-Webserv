@@ -79,12 +79,16 @@ class HttpServer {
 		int					ft_test_writing( void );
 		int					ft_test_reading( void );
 
+		std::string				ft_settup_http_response( void );
+
+
 		/*
 		**	Functions used for the signal handler
 		*/
 		static int			int_signal;
 		static void			handler_signal( int num );
 
+		
 
 	private:
 		Parsing				*_data;
@@ -99,6 +103,7 @@ class HttpServer {
 		fd_set							_write_fs;
 		std::vector<t_client_socket>	_all_client_socket;	// va posseder toutes les conenctions. peut etre mettre en list
 		int								_return_select;
+		std::string						_HTTP_RESPONSE;
 
 	protected:
 };
