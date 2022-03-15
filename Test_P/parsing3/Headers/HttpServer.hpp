@@ -79,6 +79,7 @@ class HttpServer {
 		int					ft_test_writing( void );
 		int					ft_test_reading( void );
 
+		void				ft_parser_requete( int len_msg, const char *msg );
 		std::string				ft_settup_http_response( void );
 
 

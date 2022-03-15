@@ -320,7 +320,7 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 	// 3) on ajoute l'ensemble de lecture et ecriture aux clients? 
 	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
 	std::vector<t_client_socket>::iterator it_e_client = this->_all_client_socket.end();
-	std::cout << "taille des clients = " << this->_all_client_socket.size() << std::endl;
+	//std::cout << "taille des clients = " << this->_all_client_socket.size() << std::endl;
 	for (it_b_client = this->_all_client_socket.begin(); it_b_client != it_e_client; it_b_client++)
 	{
 		FD_SET(it_b_client->client_socket, &this->_read_fs);
@@ -335,7 +335,7 @@ void	HttpServer::ft_gerer_les_connections_avec_select( void )
 		// il faut fermer les socket ? tous les sockets < ==========================================
 		throw Error(5, "Error, 'main loop server', cannot select().", 2);
 	}
-	std::cout << "ICI return select = " << this->_return_select << std::endl;
+	//std::cout << "ICI return select = " << this->_return_select << std::endl;
 	return ;
 }
 
@@ -348,7 +348,7 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 	std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
 	std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
 
-	std::cout << "dans isset enselbe, size du server = " << this->_http_servers.size() << std::endl;
+	//std::cout << "dans isset enselbe, size du server = " << this->_http_servers.size() << std::endl;
 	for (; it_b != it_e; it_b++)
 	{
 		int		socket_new_client;
@@ -450,6 +450,24 @@ int 		HttpServer::ft_test_writing( void )
 	return (0);
 }
 
+
+/*
+**	DONC on parse la requete et on recupere les info
+*/
+void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
+{
+	std::cout << "Dans parser requete " << std::endl;
+
+	std::string test(msg);
+	// std::stringstream ss;
+	// ss << msg;
+	// ss >> test;
+	std::cout << "msg = " << test << std::endl;
+	std::cout << "len = " << test.length() << std::endl;
+	std::cout << "len = " << len_msg << std::endl;
+
+
+}
 /*
 *	**	Testing writing
 */
@@ -463,9 +481,11 @@ int		HttpServer::ft_test_reading( void )
 		char buffer[1024 + 1];
 		memset((char *)buffer, 0, 1024 + 1);
 
-		std::cout << "dans la boucle read" << std::endl;
+		//std::cout << "dans la boucle read" << std::endl;
 		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
 		{
+			std::cout << "dans fdisset de reading "<< std::endl;
+			
 			int longue_message;
 
 			longue_message = recv(it_b_client->client_socket, buffer, 1024, 0);
@@ -478,9 +498,15 @@ int		HttpServer::ft_test_reading( void )
 			}
 			else
 			{
-				std::cout << "mesasge good" << std::endl;
-				std::cout << "MESSAGE = " << longue_message << std::endl;
+				std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
+				this->ft_parser_requete(longue_message, buffer);
+				//return (1);
+				// std::cout << "mesasge good" << std::endl;
+				// std::cout << "MESSAGE = " << longue_message << std::endl;
+				// std::cout << "BUFFER = " << buffer << std::endl;
 			}
+			//return (1);
+			//exit(EXIT_FAILURE);
 		}
 	}
 
@@ -502,11 +528,11 @@ int		HttpServer::ft_test_main_loop_server( void )
 			if (this->_return_select != 0) // cas ou on obtient quelque chose, genre un mec se connecte et bah envoie des donnes ?
 			{
 				// du coup note socket server est pret a etre lu
-				std::cout << "dans if return select" << std::endl;
+				//std::cout << "dans if return select" << std::endl;
 				// on va verifier si un fd est dans un emselbe
 				this->ft_verifier_ensemble_isset();
-				if (this->ft_test_writing() == 1)
-					return (1);
+				// if (this->ft_test_writing() == 1)
+				// 	return (1);
 				if (this->ft_test_reading() == 1)
 					return (1);
 			}		
