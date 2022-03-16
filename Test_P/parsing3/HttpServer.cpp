@@ -430,7 +430,6 @@ int 		HttpServer::ft_test_writing( void )
 		{
 			// on va utiliser _HTTP_RESPONSE
 			_HTTP_RESPONSE = ft_settup_http_response();
-			std::cout << "DISPLAY REPONSE = " << _HTTP_RESPONSE << std::endl;
 			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
 			if (ret_send < 0)
 			{
@@ -452,39 +451,6 @@ int 		HttpServer::ft_test_writing( void )
 	return (0);
 }
 
-
-/*
-**	DONC on parse la requete et on recupere les info
-*/
-void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
-{
-	std::cout << "Dans parser requete " << std::endl;
-
-	std::string test(msg);
-	// std::stringstream ss;
-	// ss << msg;
-	// ss >> test;
-	std::cout << "msg = " << test << std::endl;
-	std::cout << "len = " << test.length() << std::endl;
-	std::cout << "len = " << len_msg << std::endl;
-
-	char	*data;
-
-	data = (char *)msg;
-	//data = std::strtok(&test[0], " \t\n\v\r\f");
-	std::cout << "\ndata = " << data << std::endl;
-	while (data)
-	{
-		_header_requete.push_back(data);
-
-	}
-	std::vector<std::string>::iterator it_b;
-	for (it_b = _header_requete.begin(); it_b != _header_requete.end(); it_b++)
-	{
-		std::cout << "it_b = " << *it_b << std::endl;
-	}
-
-}
 /*
 *	**	Testing writing
 */
@@ -501,31 +467,27 @@ int		HttpServer::ft_test_reading( void )
 		//std::cout << "dans la boucle read" << std::endl;
 		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
 		{
-			std::cout << "dans fdisset de reading "<< std::endl;
+			int request_length;
+			request_length = recv(it_b_client->client_socket, buffer, 1024, 0);
 			
-			int longue_message;
-
-			longue_message = recv(it_b_client->client_socket, buffer, 1024, 0);
-			if (longue_message <= 0)
+			if (request_length <= 0)
 			{
+				// faire une erreur prorpre
 				std::cout << "kek erreur recv" << std::endl;
-				std::cout << "message taille recu = " << longue_message << std::endl;
+				std::cout << "message taille recu = " << request_length << std::endl;
+				
+				close(it_b_client->client_socket);
 				// exit(1);
 				return (1);
 			}
 			else
 			{
 				std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
-				this->ft_parser_requete(longue_message, buffer);
-				//return (1);
-				// std::cout << "mesasge good" << std::endl;
-				// std::cout << "MESSAGE = " << longue_message << std::endl;
-				// std::cout << "BUFFER = " << buffer << std::endl;
+				this->ft_parser_requete(request_length, buffer);
+				// a supprimer le close
 				close(it_b_client->client_socket);
 				return (1);
 			}
-			//return (1);
-			//exit(EXIT_FAILURE);
 		}
 	}
 	return (0);
