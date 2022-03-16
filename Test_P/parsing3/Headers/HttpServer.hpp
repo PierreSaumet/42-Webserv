@@ -50,6 +50,14 @@ class HttpServer {
 
 		}						t_client_socket;
 
+		typedef struct 			s_header_request {
+
+			std::string			method;
+			std::string			direction;
+			std::string			protocol;
+			std::string			host;
+		}						t_header_request;
+		
 
 		/*
 		**	Canonical Form
@@ -81,7 +89,7 @@ class HttpServer {
 
 		void				ft_parser_requete( int len_msg, const char *msg );
 		std::string				ft_settup_http_response( void );
-
+		std::string		ft_check_methods( std::string header );
 
 		/*
 		**	Functions used for the signal handler
@@ -106,7 +114,7 @@ class HttpServer {
 		int								_return_select;
 		std::string						_HTTP_RESPONSE;
 
-		std::vector<std::string>		_header_requete;
+		std::vector<t_header_request>		_header_requete;
 
 	protected:
 };

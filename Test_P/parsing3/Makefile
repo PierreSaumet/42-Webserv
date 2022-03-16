@@ -23,6 +23,7 @@ SOURCES			+=	main.cpp		\
 					Parsing_get_location.cpp	\
 					Parsing_utils.cpp			\
 					HttpServer.cpp				\
+					HttpServerRequest.cpp		\
 					Error.cpp					\
 					to_delete.cpp
 					
