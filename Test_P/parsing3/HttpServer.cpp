@@ -135,8 +135,9 @@ int					HttpServer::ft_create_servers( void ) {
 				if (close(this->_http_servers[i].sock) < 0)
 				{
 					close(this->_http_servers[i].sock);
-					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);	throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
+					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);	
 				}
+				throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
 			}
 			if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
 			{
@@ -146,6 +147,7 @@ int					HttpServer::ft_create_servers( void ) {
 					close(this->_http_servers[i].sock);
 					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
 				}
+				std::cout << "cannot bind this->_http_servers[i].sock = " << this->_http_servers[i].sock << std::endl;
 				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 			}
 			if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
@@ -466,6 +468,21 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 	std::cout << "len = " << test.length() << std::endl;
 	std::cout << "len = " << len_msg << std::endl;
 
+	char	*data;
+
+	data = (char *)msg;
+	//data = std::strtok(&test[0], " \t\n\v\r\f");
+	std::cout << "\ndata = " << data << std::endl;
+	while (data)
+	{
+		_header_requete.push_back(data);
+
+	}
+	std::vector<std::string>::iterator it_b;
+	for (it_b = _header_requete.begin(); it_b != _header_requete.end(); it_b++)
+	{
+		std::cout << "it_b = " << *it_b << std::endl;
+	}
 
 }
 /*
@@ -504,12 +521,13 @@ int		HttpServer::ft_test_reading( void )
 				// std::cout << "mesasge good" << std::endl;
 				// std::cout << "MESSAGE = " << longue_message << std::endl;
 				// std::cout << "BUFFER = " << buffer << std::endl;
+				close(it_b_client->client_socket);
+				return (1);
 			}
 			//return (1);
 			//exit(EXIT_FAILURE);
 		}
 	}
-
 	return (0);
 }
 
@@ -534,7 +552,18 @@ int		HttpServer::ft_test_main_loop_server( void )
 				// if (this->ft_test_writing() == 1)
 				// 	return (1);
 				if (this->ft_test_reading() == 1)
+				{
+					std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
+					std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
+
+					//std::cout << "dans isset enselbe, size du server = " << this->_http_servers.size() << std::endl;
+					for (; it_b != it_e; it_b++)
+					{
+						close(it_b->sock);
+						std::cout << " on ferme une fois " << std::endl;
+					}
 					return (1);
+				}
 			}		
 		}
 		catch (std::exception &e)
@@ -544,7 +573,7 @@ int		HttpServer::ft_test_main_loop_server( void )
 			break ;
 		}
 	}
-
+	// close(this->_http_servers->sock);
 	std::cout << "FIN DU PROGRAMME " << std::endl;
 	return (0);
 }

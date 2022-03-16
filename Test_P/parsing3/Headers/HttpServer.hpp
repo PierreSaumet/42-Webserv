@@ -106,6 +106,8 @@ class HttpServer {
 		int								_return_select;
 		std::string						_HTTP_RESPONSE;
 
+		std::vector<std::string>		_header_requete;
+
 	protected:
 };
 
