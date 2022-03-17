@@ -356,6 +356,7 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 		int		socket_new_client;
 		struct sockaddr_in	addr_new_client;
 		socklen_t	size_addr_new_client = sizeof(addr_new_client);
+		memset((char*)&addr_new_client, 0, (int)size_addr_new_client);
 
 		if (FD_ISSET(it_b->sock, &this->_read_fs))
 		{
@@ -379,6 +380,7 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 					// sleep(10);
 					new_client.client_addr = addr_new_client;
 					this->_all_client_socket.push_back(new_client);
+					std::cout << "taille clien = " << this->_all_client_socket.size() << std::endl;
 				}		
 			}
 		}
@@ -395,7 +397,40 @@ std::string		HttpServer::ft_settup_http_response( void )
 	struct stat sb;
 	std::string res;
 
-	FILE *input_file = fopen(filename.c_str(), "r");
+	std::cout<< "kek " << std::endl;
+	FILE *input_file = NULL;
+
+	if (this->_header_requete[0].path == "/ ")
+	{
+		std::cout << "display index" << std::endl;
+		input_file = fopen(filename.c_str(), "r");
+		sleep(1);
+	}
+	else if (this->_header_requete[0].path == "/page2.html ")
+	{
+		std::cout << "display page2" << std::endl;
+		input_file = fopen("page2.html", "r");
+		sleep(1);
+	}
+	else
+	{
+		std::cout << "ne peut pas ouvirr le fichier lol" << std::endl;
+		std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << "-" << std::endl;
+		
+		
+		input_file = fopen("errors/404.html", "r");
+		stat(filename.c_str(), &sb);
+		res.resize(sb.st_size + 100);
+		fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+		fclose(input_file);
+		file_contents = res;
+		file_contents.insert(0, "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
+
+		return (file_contents);
+		sleep(1);
+	}
+
+	// FILE *input_file = fopen(filename.c_str(), "r");
 	if (input_file == NULL)
 	{
 		std::cout << "ECHEC open " << std::endl;
@@ -406,7 +441,8 @@ std::string		HttpServer::ft_settup_http_response( void )
 	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
 	fclose(input_file);
 	file_contents = res;
-	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n");
+	std::cout << "la taille putain = " << file_contents.size() << std::endl;
+	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
 
 	return (file_contents);
 }
@@ -425,18 +461,30 @@ int 		HttpServer::ft_test_writing( void )
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
 		int ret_send;
-		
+
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
+			std::cout << "ON EST DANS ECRITURE DONC server a client " << std::endl;
+			//exit(EXIT_FAILURE);
 			// on va utiliser _HTTP_RESPONSE
+			
+
+			if (this->_header_requete.empty() == true)
+			{
+				std::cout << "kek c'est vide " << std::endl;
+				break;
+			}
+
 			_HTTP_RESPONSE = ft_settup_http_response();
+
 			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
+			std::cout << "apres send " << std::endl;
 			if (ret_send < 0)
 			{
 				std::cout << "ret_send < 0 = " << ret_send << std::endl;
 				if (_HTTP_RESPONSE.empty())
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
-				return (1);
+				// return (1);
 			}
 			else
 			{
@@ -444,7 +492,13 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "test de send = " << ret_send << std::endl;
 				if (_HTTP_RESPONSE.empty())
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
-				sleep(10);
+				close(it_b_client->client_socket);
+				it_b_client = this->_all_client_socket.erase(it_b_client);
+				std::cout << "on a ferme le socket PUTAIN du clien " << std::endl;
+				
+				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
+				continue ;
+				//sleep(10);
 			}
 		}
 	}
@@ -464,10 +518,15 @@ int		HttpServer::ft_test_reading( void )
 		char buffer[1024 + 1];
 		memset((char *)buffer, 0, 1024 + 1);
 
-		//std::cout << "dans la boucle read" << std::endl;
+		// std::cout << "dans la boucle read" << std::endl;
+
+		// std::cout << "writeing taille clien = " << this->_all_client_socket.size() << std::endl;
+		// std::cout << "id clien = " << it_b_client->client_socket << std::endl;
 		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
 		{
+			std::cout << "dans isst de read" << std::endl;
 			int request_length;
+			memset((char *)buffer, 0, 1024 + 1);
 			request_length = recv(it_b_client->client_socket, buffer, 1024, 0);
 			
 			if (request_length <= 0)
@@ -476,17 +535,17 @@ int		HttpServer::ft_test_reading( void )
 				std::cout << "kek erreur recv" << std::endl;
 				std::cout << "message taille recu = " << request_length << std::endl;
 				
-				close(it_b_client->client_socket);
-				// exit(1);
-				return (1);
+				// close(it_b_client->client_socket);
+				// // exit(1);
+				// return (1);
 			}
 			else
 			{
 				std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
 				this->ft_parser_requete(request_length, buffer);
 				// a supprimer le close
-				close(it_b_client->client_socket);
-				return (1);
+				// close(it_b_client->client_socket);
+				// return (1);
 			}
 		}
 	}
@@ -511,8 +570,7 @@ int		HttpServer::ft_test_main_loop_server( void )
 				//std::cout << "dans if return select" << std::endl;
 				// on va verifier si un fd est dans un emselbe
 				this->ft_verifier_ensemble_isset();
-				// if (this->ft_test_writing() == 1)
-				// 	return (1);
+				
 				if (this->ft_test_reading() == 1)
 				{
 					std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
@@ -526,6 +584,8 @@ int		HttpServer::ft_test_main_loop_server( void )
 					}
 					return (1);
 				}
+				if (this->ft_test_writing() == 1)
+					return (1);
 			}		
 		}
 		catch (std::exception &e)

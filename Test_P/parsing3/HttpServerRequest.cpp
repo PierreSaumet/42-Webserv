@@ -76,7 +76,13 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 				exit(EXIT_FAILURE);
 			}
 			std::cout << "le path = " << this->_header_requete[0].path << std::endl;
-		
+
+			if (this->_header_requete[0].path == "/page2.html")
+			{
+				std::cout << "YES" << std::endl;
+				exit(EXIT_SUCCESS);
+			}
+
 			this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
 			if (this->_header_requete[0].protocol.empty() == true)
 			{
@@ -93,6 +99,8 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 			}
 			std::cout << "le host = " << this->_header_requete[0].host << std::endl;
 
+
+			std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 		}
 		else
 		{
@@ -163,6 +171,7 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 		else
 		{
 			std::string tmp(header, pos, pos_http - pos);
+			
 			return (tmp);
 		}
 	}
