@@ -586,12 +586,19 @@ int		HttpServer::ft_test_main_loop_server( void )
 				}
 				if (this->ft_test_writing() == 1)
 					return (1);
-			}		
+			}		    
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
 			std::cout << "dans catch error main loop " << std::endl;
+			/* A FAIRE LOL */
+			// doit tout close les sockets ici auqnd une erreur occurs
+			// doit aussi	adns parsing_get_server si localhost alors mettre 127.0.0.1
+			//	doit aussi nettoyer httpserverrequest et mettre des erreurs de partout et verifier les valeurs trouve
+			//	doit aussi nettoyer tout le code de partout
+			//	doit aussi faire une fonction create header.
+
 			break ;
 		}
 	}

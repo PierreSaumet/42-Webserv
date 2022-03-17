@@ -67,7 +67,7 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 				std::cout << "PLS DANS LE HEADER" << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			std::cout << "On a la requete : " << this->_header_requete[0].method << std::endl;
+			std::cout << "On a la requete :" << this->_header_requete[0].method << "-" <<  std::endl;
 		
 			this->_header_requete[0].path = this->ft_check_path_header(size_header);
 			if (this->_header_requete[0].path.empty() == true)
@@ -89,7 +89,7 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 				std::cout << "PLS dans le header protocol" << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			std::cout << "le protocol = " << this->_header_requete[0].protocol << std::endl;
+			std::cout << "le protocol = " << this->_header_requete[0].protocol << "-" << std::endl;
 
 			this->_header_requete[0].host = this->ft_check_host_header(size_header);
 			if (this->_header_requete[0].host.empty() == true)
@@ -97,7 +97,9 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 				std::cout << "PLS dans le header host " << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			std::cout << "le host = " << this->_header_requete[0].host << std::endl;
+			// on verifie que le host corresponde aux notres.
+			
+			std::cout << "le host = " << this->_header_requete[0].host << "-" << std::endl;
 
 
 			std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
@@ -130,6 +132,35 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 		}
 		else
 		{
+			std::string tmp(header, pos + 6, pos_user - (pos + 6));
+			for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
+			{
+				std::cout << "this->_servers[i].host_server =" << this->_servers[i].host_server <<std::endl;
+				std::cout << "tmp =" << tmp << std::endl;
+				std::cout << "i" << std::endl;
+				if (tmp.compare(0, 9, this->_servers[i].host_server) == 0)
+				{
+					std::cout << "ILS SONT EGAUX les host" << std::endl;
+
+					std::stringstream ss;
+					ss << this->_servers[i].port_server;
+					std::string port;
+					ss >> port;
+					if (tmp.compare(10, 2, port) == 0)
+					{
+						std::cout<< "Ils sont egaux les port " << std::endl;
+						return (tmp);
+					}
+					else
+						throw Error(5, "Erreur test lol, ", 5);
+				}
+				else
+					std::cout << "les host ne sont pas egaux" << std::endl;
+				// if (this->_servers[i].host_server == tmp)
+				// 	return (tmp);
+			}
+			std::cout << "ERREUR ICI " << std::endl;
+			exit(1);
 			return (std::string(header, pos + 6, pos_user - (pos + 6)));
 		}
 	}
