@@ -53,7 +53,7 @@ class HttpServer {
 		typedef struct 			s_header_request {
 
 			std::string			method;
-			std::string			direction;
+			std::string			path;
 			std::string			protocol;
 			std::string			host;
 		}						t_header_request;
@@ -89,8 +89,11 @@ class HttpServer {
 
 		void				ft_parser_requete( int len_msg, const char *msg );
 		std::string				ft_settup_http_response( void );
-		std::string		ft_check_methods( std::string header );
-
+		std::string		ft_check_methods_header( std::string header );
+		std::string		ft_check_path_header( std::string header) ;
+		std::string		ft_check_protocol_header( std::string header );
+		std::string		ft_check_host_header( std::string header );
+		
 		/*
 		**	Functions used for the signal handler
 		*/

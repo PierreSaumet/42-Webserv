@@ -61,12 +61,38 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 			this->_header_requete.push_back(t_header_request());
 
 
-			this->_header_requete[0].method = this->ft_check_methods(size_header);
+			this->_header_requete[0].method = this->ft_check_methods_header(size_header);
 			if (this->_header_requete[0].method.empty() == true)
 			{
 				std::cout << "PLS DANS LE HEADER" << std::endl;
+				exit(EXIT_FAILURE);
 			}
 			std::cout << "On a la requete : " << this->_header_requete[0].method << std::endl;
+		
+			this->_header_requete[0].path = this->ft_check_path_header(size_header);
+			if (this->_header_requete[0].path.empty() == true)
+			{
+				std::cout << "PLS dans le header path" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			std::cout << "le path = " << this->_header_requete[0].path << std::endl;
+		
+			this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
+			if (this->_header_requete[0].protocol.empty() == true)
+			{
+				std::cout << "PLS dans le header protocol" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			std::cout << "le protocol = " << this->_header_requete[0].protocol << std::endl;
+
+			this->_header_requete[0].host = this->ft_check_host_header(size_header);
+			if (this->_header_requete[0].host.empty() == true)
+			{
+				std::cout << "PLS dans le header host " << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			std::cout << "le host = " << this->_header_requete[0].host << std::endl;
+
 		}
 		else
 		{
@@ -77,7 +103,72 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 	std::cout << "i = " << i << std::endl;
 }
 
-std::string		HttpServer::ft_check_methods( std::string header )
+std::string		HttpServer::ft_check_host_header( std::string header )
+{
+	size_t pos;
+
+	if ((pos = header.find("Host: ", 0)) == std::string::npos)
+	{
+		std::cout << "ERREUR NE TROUBE PAS LE HOST DANS LE HEADER" << std::endl;
+		return (NULL);
+	}
+	else
+	{
+		size_t pos_user;
+		if ((pos_user = header.find("User-Agent:", pos)) == std::string::npos)
+		{
+			std::cout << "ERREUR NE TROUBE PAS LE HOST DANS LE HEADER" << std::endl;
+			return (NULL);
+		}
+		else
+		{
+			return (std::string(header, pos + 6, pos_user - (pos + 6)));
+		}
+	}
+
+}
+
+std::string		HttpServer::ft_check_protocol_header( std::string header )
+{
+	size_t pos;
+
+	if ((pos = header.find("HTTP/1.1")) == std::string::npos)
+	{
+		std::cout << "ERREUR NE TROUBE PAS LE PROTOCOL DANS LE HEADER" << std::endl;
+		return (NULL);
+
+	}
+	else
+	{
+		return (std::string(header, pos, 8));
+	}
+}
+
+std::string		HttpServer::ft_check_path_header( std::string header )
+{
+	size_t	pos;
+	if ((pos = header.find_first_of("/", 0)) == std::string::npos)
+	{
+		std::cout << "ERREUR NE TROUVE PAS LE PATH DANS LE HEADER DE LA REQUETE \n";
+		return (NULL);
+	}
+	else
+	{
+		size_t pos_http;
+		if ((pos_http = header.find("HTTP")) == std::string::npos)
+		{
+			std::cout << "ERREUR NE TROUVE PAS LE PATH DANS LE HEADER DE LA REQUETE \n";
+			return (NULL);
+		}
+		else
+		{
+			std::string tmp(header, pos, pos_http - pos);
+			return (tmp);
+		}
+	}
+}
+
+std::string		HttpServer::ft_check_methods_header( std::string header )
 {
 	// std::string::iterator	it_b = header.begin();
 	// std::string::iterator	it_end_method;
