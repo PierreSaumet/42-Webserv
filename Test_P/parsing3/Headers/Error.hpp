@@ -144,6 +144,12 @@ class Error: public std::exception
 							=	5	==>	cannot select.
 							=	6	==>	server cannot accept() a client.
 							=	7	==>	server cannot change FD client with fcntl().
+
+							=	10	==> header size is greater than 8000.
+							=	11	==> method used is not correct.
+							=	12	==> the path is not correct.
+							=	13	==>	the protocol is not correct.
+							=	14	==>	the host is not correct.
 throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 

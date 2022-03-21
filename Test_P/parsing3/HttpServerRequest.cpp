@@ -48,7 +48,8 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 	std::string size_header(request_http.begin(), it_end_request);
 	if (size_header.size() > 8000)		// server apache 8000 max
 	{
-		// throw error
+		// throw error ou affiche la page 413 ?
+		// throw Error(10, "Error, in recieved header, the header size is greater than 8000.", 2);
 		std::cout << "ERREUR size du header trop grand return une erreur 413 entity too large" << std::endl;
 	}
 	else
@@ -57,26 +58,20 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 		// test savoir quelle method
 		if (this->_header_requete.empty() == true)
 		{
-			std::cout << "ehader request epty " << std::endl;
+			std::cout << "Notre container header est vide, on en cree un et on recupere les informations" << std::endl;
 			this->_header_requete.push_back(t_header_request());
-
 
 			this->_header_requete[0].method = this->ft_check_methods_header(size_header);
 			if (this->_header_requete[0].method.empty() == true)
-			{
-				std::cout << "PLS DANS LE HEADER" << std::endl;
-				exit(EXIT_FAILURE);
-			}
+				throw Error(11, "Error, in recieved header, the method used is not correct.", 2);
 			std::cout << "On a la requete :" << this->_header_requete[0].method << "-" <<  std::endl;
 		
 			this->_header_requete[0].path = this->ft_check_path_header(size_header);
 			if (this->_header_requete[0].path.empty() == true)
-			{
-				std::cout << "PLS dans le header path" << std::endl;
-				exit(EXIT_FAILURE);
-			}
+				throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
 			std::cout << "le path = " << this->_header_requete[0].path << std::endl;
 
+			// EUH a quoi ca sert ca ?
 			if (this->_header_requete[0].path == "/page2.html")
 			{
 				std::cout << "YES" << std::endl;
@@ -85,20 +80,12 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 
 			this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
 			if (this->_header_requete[0].protocol.empty() == true)
-			{
-				std::cout << "PLS dans le header protocol" << std::endl;
-				exit(EXIT_FAILURE);
-			}
+				throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
 			std::cout << "le protocol = " << this->_header_requete[0].protocol << "-" << std::endl;
 
 			this->_header_requete[0].host = this->ft_check_host_header(size_header);
 			if (this->_header_requete[0].host.empty() == true)
-			{
-				std::cout << "PLS dans le header host " << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			// on verifie que le host corresponde aux notres.
-			
+				throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
 			std::cout << "le host = " << this->_header_requete[0].host << "-" << std::endl;
 
 
@@ -152,7 +139,7 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 						return (tmp);
 					}
 					else
-						throw Error(5, "Erreur test lol, ", 5);
+						throw Error(666, "Erreur test lol, ", 666);
 				}
 				else
 					std::cout << "les host ne sont pas egaux" << std::endl;
