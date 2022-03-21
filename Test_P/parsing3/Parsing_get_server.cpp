@@ -540,6 +540,8 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 			i++;
 		}
 	}
+	if (this->_servers[index_server].host_server == "localhost")
+		this->_servers[index_server].host_server = "127.0.0.1";
 	return false;
 }
 
