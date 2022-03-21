@@ -88,12 +88,12 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 				throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
 			std::cout << "le host = " << this->_header_requete[0].host << "-" << std::endl;
 
-
 			std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 		}
 		else
 		{
-			std::cout << " keke _header_requete est pas vide ? " << std::endl;
+			std::cout << "Probleme le container qui recupere la header de la requete n'est pas vide. " << std::endl;
+			std::cout << "Il faut le supprimer apres avoir fait traite une demande." << std::endl;
 		}
 
 	}
@@ -122,9 +122,9 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 			std::string tmp(header, pos + 6, pos_user - (pos + 6));
 			for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 			{
-				std::cout << "this->_servers[i].host_server =" << this->_servers[i].host_server <<std::endl;
-				std::cout << "tmp =" << tmp << std::endl;
-				std::cout << "i" << std::endl;
+				// std::cout << "this->_servers[i].host_server =" << this->_servers[i].host_server <<std::endl;
+				// std::cout << "tmp =" << tmp << std::endl;
+				// std::cout << "i" << std::endl;
 				if (tmp.compare(0, 9, this->_servers[i].host_server) == 0)
 				{
 					std::cout << "ILS SONT EGAUX les host" << std::endl;
@@ -133,16 +133,50 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 					ss << this->_servers[i].port_server;
 					std::string port;
 					ss >> port;
-					if (tmp.compare(10, 2, port) == 0)
+					if (tmp.compare(10, 4, port) == 0)
 					{
 						std::cout<< "Ils sont egaux les port " << std::endl;
 						return (tmp);
 					}
 					else
+					{
+						if (this->_data->ft_get_nbr_servers() > 1)
+						{
+							std::cout << "euh nbr serv = " << this->_data->ft_get_nbr_servers() << std::endl;
+							for (size_t y = 0; y < this->_data->ft_get_nbr_servers(); y++)
+							{
+								std::stringstream ss2;
+								std::string port2;
+								// ss.str("");
+								// ss.flush();
+								// port = "";
+								// ss >> port;
+								std::cout << "port lol = " << port2 << std::endl;
+								std::cout << RED << "y = " << y << " et port server = " << this->_servers[y].port_server << CLEAR << std::endl;
+								ss2 << this->_servers[y].port_server;
+								// std::string port;
+								ss2 >> port2;
+								std::cout << "MERDE = " << port2 << " et y = " << y << std::endl;
+								if (tmp.compare(10, 4, port2) == 0)
+								{
+									std::cout<< "Ils sont egaux les port " << std::endl;
+									return (tmp);
+								}
+								ss2.str("");
+								ss2.flush();
+								port2 = "";
+							}
+						}
+						std::cout << "port pas egaux ? " << std::endl;
+						std::cout << " tmp = -" << tmp << "- et nous = -" << port << "-" << std::endl;
 						throw Error(666, "Erreur test lol, ", 666);
+					}
 				}
 				else
+				{
 					std::cout << "les host ne sont pas egaux" << std::endl;
+					throw Error(666, "Erreur test lol 2, ", 666);
+				}
 				// if (this->_servers[i].host_server == tmp)
 				// 	return (tmp);
 			}
@@ -207,6 +241,7 @@ std::string		HttpServer::ft_check_methods_header( std::string header )
 		{
 			if ((pos = header.find("DELETE", 0)) == std::string::npos)
 			{
+				std::cout << "check methos header probleme return null rien a ete trouve" << std::endl;
 				return (NULL);
 			}
 			else

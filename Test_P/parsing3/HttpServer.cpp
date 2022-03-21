@@ -161,6 +161,7 @@ int					HttpServer::ft_create_servers( void ) {
 				throw Error(5, "Error, 'creation of server', cannot listen.", 2);
 			}
 			std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
+			std::cout << " et i = " << i << std::endl;
 			std::cout << std::endl;
 		}
 		// while (1)
@@ -452,7 +453,7 @@ std::string		HttpServer::ft_settup_http_response( void )
 */
 int 		HttpServer::ft_test_writing( void )
 {
-	std::cout << "Dans ft _test_writing" << std::endl;
+	// std::cout << "Dans ft _test_writing" << std::endl;
 
 	// on test les ip des clients
 	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
@@ -464,7 +465,7 @@ int 		HttpServer::ft_test_writing( void )
 
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
-			std::cout << "ON EST DANS ECRITURE DONC server a client " << std::endl;
+			// std::cout << "ON EST DANS ECRITURE DONC server a client " << std::endl;
 			//exit(EXIT_FAILURE);
 			// on va utiliser _HTTP_RESPONSE
 			
