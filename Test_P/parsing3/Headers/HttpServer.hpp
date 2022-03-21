@@ -95,6 +95,12 @@ class HttpServer {
 		std::string		ft_check_host_header( std::string header );
 		
 		/*
+		**	Function used to clean sockets from clients and servers.
+		*/
+		void				ft_clean_socket_clients( void );
+		void				ft_clean_socket_servers( void );
+
+		/*
 		**	Functions used for the signal handler
 		*/
 		static int			int_signal;

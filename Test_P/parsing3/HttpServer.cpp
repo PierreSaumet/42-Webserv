@@ -553,6 +553,35 @@ int		HttpServer::ft_test_reading( void )
 }
 
 /*
+**	Functions a deplacer dans un autre fichier
+*/
+void	HttpServer::ft_clean_socket_clients( void )
+{
+	std::cout << "Dans clean socket clients." << std::endl;
+	std::vector<t_client_socket>::iterator it_b;
+	std::vector<t_client_socket>::iterator it_e = this->_all_client_socket.end();
+
+	for (it_b = this->_all_client_socket.begin(); it_b != it_e; it_b++)
+	{
+		close(it_b->client_socket);
+	}
+	return ;
+}
+
+void	HttpServer::ft_clean_socket_servers( void )
+{
+	std::cout << "Dans clean socket servers." << std::endl;
+	std::vector<t_http_server>::iterator it_b;
+	std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
+
+	for (it_b = this->_http_servers.begin(); it_b != it_e; it_b++)
+	{
+		close(it_b->sock);
+	}
+	return ;
+}
+
+/*
 **	Test de la boucle principal qui va tout faire.
 */
 int		HttpServer::ft_test_main_loop_server( void )
@@ -573,25 +602,21 @@ int		HttpServer::ft_test_main_loop_server( void )
 				
 				if (this->ft_test_reading() == 1)
 				{
-					std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
-					std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
-
-					//std::cout << "dans isset enselbe, size du server = " << this->_http_servers.size() << std::endl;
-					for (; it_b != it_e; it_b++)
-					{
-						close(it_b->sock);
-						std::cout << " on ferme une fois " << std::endl;
-					}
+					std::cout << "test_reading return 1" << std::endl;
 					return (1);
 				}
 				if (this->ft_test_writing() == 1)
+				{
+					std::cout << "test_writing return 1" << std::endl;
 					return (1);
+				}
 			}		    
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
 			std::cout << "dans catch error main loop " << std::endl;
+
 			/* A FAIRE LOL */
 			// doit tout close les sockets ici auqnd une erreur occurs
 			// doit aussi	adns parsing_get_server si localhost alors mettre 127.0.0.1
@@ -602,6 +627,8 @@ int		HttpServer::ft_test_main_loop_server( void )
 			break ;
 		}
 	}
+	this->ft_clean_socket_clients();
+	this->ft_clean_socket_servers();
 	// close(this->_http_servers->sock);
 	std::cout << "FIN DU PROGRAMME " << std::endl;
 	return (0);
