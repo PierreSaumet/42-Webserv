@@ -93,7 +93,7 @@ class HttpServer {
 		std::string		ft_check_path_header( std::string header) ;
 		std::string		ft_check_protocol_header( std::string header );
 		std::string		ft_check_host_header( std::string header );
-		
+		std::string		ft_setup_header( void );
 		/*
 		**	Function used to clean sockets from clients and servers.
 		*/

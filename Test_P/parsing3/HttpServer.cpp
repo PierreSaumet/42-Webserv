@@ -388,6 +388,22 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 	}
 }
 
+std::string		HttpServer::ft_setup_header( void )
+{
+	// cette fonction doit voir si le path de la requete est valide et existe.
+	// ouvrir le fichier, verifier qu'il ne soit pas vide.
+	// setup up le header avec le numero de la reponse du server.
+	std::string filename(this->_servers[0].index_server.c_str());
+	FILE *input_file = NULL;
+
+	// on verifier si le path est l'index
+	if (this->_header_requete[0].path == "/ ")
+	{
+		std::cout << "display index" << std::endl;		
+		input_file = fopen(filename.c_str(), "r");
+		sleep(1);
+	}
+}
 std::string		HttpServer::ft_settup_http_response( void )
 {
 	// fonction to create the response to display
@@ -404,6 +420,7 @@ std::string		HttpServer::ft_settup_http_response( void )
 	if (this->_header_requete[0].path == "/ ")
 	{
 		std::cout << "display index" << std::endl;
+		
 		input_file = fopen(filename.c_str(), "r");
 		sleep(1);
 	}
@@ -472,7 +489,7 @@ int 		HttpServer::ft_test_writing( void )
 
 			if (this->_header_requete.empty() == true)
 			{
-				std::cout << "kek c'est vide " << std::endl;
+				//std::cout << "kek c'est vide " << std::endl;
 				break;
 			}
 
