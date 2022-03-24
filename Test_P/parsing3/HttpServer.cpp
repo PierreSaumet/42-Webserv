@@ -395,14 +395,46 @@ std::string		HttpServer::ft_setup_header( void )
 	// setup up le header avec le numero de la reponse du server.
 	std::string filename(this->_servers[0].index_server.c_str());
 	FILE *input_file = NULL;
+	std::string res;
+	std::string file_contents;
 
 	// on verifier si le path est l'index
 	if (this->_header_requete[0].path == "/ ")
 	{
-		std::cout << "display index" << std::endl;		
+		std::cout << "display index" << std::endl;	
+		struct stat buff;
+		if (stat(filename.c_str(), &buff) < 0)
+		{
+			std::cout << "Error, la page demande n'exite pas." << std::endl;
+			return (NULL);
+		}
+		if (buff.st_size == 0)
+		{
+			std::cout << "Error, la page demande est vide. " << std::endl;
+			return (NULL);
+		}
 		input_file = fopen(filename.c_str(), "r");
+		if (input_file == NULL)
+		{
+			std::cout << "Error, pour ouvrir la page demande avec fopen." << std::endl;
+			return (NULL);
+		}
+
+		// stat(filename.c_str(), &sb);
+		res.resize(buff.st_size + 100);
+		std::cout << "taille buffer = " << buff.st_size << std::endl;
+		
+		fread(const_cast<char*>(res.data()), buff.st_size, 1, input_file);
+
+		fclose(input_file);
+		file_contents = res;
+		std::cout << "la taille putain = " << file_contents.size() << std::endl;
+
+		file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 500\r\n\r\n");
+
 		sleep(1);
 	}
+	return (NULL);
 }
 std::string		HttpServer::ft_settup_http_response( void )
 {
@@ -421,7 +453,9 @@ std::string		HttpServer::ft_settup_http_response( void )
 	{
 		std::cout << "display index" << std::endl;
 		
+
 		input_file = fopen(filename.c_str(), "r");
+
 		sleep(1);
 	}
 	else if (this->_header_requete[0].path == "/page2.html ")
@@ -460,8 +494,10 @@ std::string		HttpServer::ft_settup_http_response( void )
 	fclose(input_file);
 	file_contents = res;
 	std::cout << "la taille putain = " << file_contents.size() << std::endl;
-	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
+	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 500\r\n\r\n");
+	// file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
 
+	std::cout << " TOTAL = -" << file_contents << std::endl;
 	return (file_contents);
 }
 
@@ -570,34 +606,7 @@ int		HttpServer::ft_test_reading( void )
 	return (0);
 }
 
-/*
-**	Functions a deplacer dans un autre fichier
-*/
-void	HttpServer::ft_clean_socket_clients( void )
-{
-	std::cout << "Dans clean socket clients." << std::endl;
-	std::vector<t_client_socket>::iterator it_b;
-	std::vector<t_client_socket>::iterator it_e = this->_all_client_socket.end();
 
-	for (it_b = this->_all_client_socket.begin(); it_b != it_e; it_b++)
-	{
-		close(it_b->client_socket);
-	}
-	return ;
-}
-
-void	HttpServer::ft_clean_socket_servers( void )
-{
-	std::cout << "Dans clean socket servers." << std::endl;
-	std::vector<t_http_server>::iterator it_b;
-	std::vector<t_http_server>::iterator it_e = this->_http_servers.end();
-
-	for (it_b = this->_http_servers.begin(); it_b != it_e; it_b++)
-	{
-		close(it_b->sock);
-	}
-	return ;
-}
 
 /*
 **	Test de la boucle principal qui va tout faire.
