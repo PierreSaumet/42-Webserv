@@ -387,55 +387,6 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 		}
 	}
 }
-
-std::string		HttpServer::ft_setup_header( void )
-{
-	// cette fonction doit voir si le path de la requete est valide et existe.
-	// ouvrir le fichier, verifier qu'il ne soit pas vide.
-	// setup up le header avec le numero de la reponse du server.
-	std::string filename(this->_servers[0].index_server.c_str());
-	FILE *input_file = NULL;
-	std::string res;
-	std::string file_contents;
-
-	// on verifier si le path est l'index
-	if (this->_header_requete[0].path == "/ ")
-	{
-		std::cout << "display index" << std::endl;	
-		struct stat buff;
-		if (stat(filename.c_str(), &buff) < 0)
-		{
-			std::cout << "Error, la page demande n'exite pas." << std::endl;
-			return (NULL);
-		}
-		if (buff.st_size == 0)
-		{
-			std::cout << "Error, la page demande est vide. " << std::endl;
-			return (NULL);
-		}
-		input_file = fopen(filename.c_str(), "r");
-		if (input_file == NULL)
-		{
-			std::cout << "Error, pour ouvrir la page demande avec fopen." << std::endl;
-			return (NULL);
-		}
-
-		// stat(filename.c_str(), &sb);
-		res.resize(buff.st_size + 100);
-		std::cout << "taille buffer = " << buff.st_size << std::endl;
-		
-		fread(const_cast<char*>(res.data()), buff.st_size, 1, input_file);
-
-		fclose(input_file);
-		file_contents = res;
-		std::cout << "la taille putain = " << file_contents.size() << std::endl;
-
-		file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 500\r\n\r\n");
-
-		sleep(1);
-	}
-	return (NULL);
-}
 std::string		HttpServer::ft_settup_http_response( void )
 {
 	// fonction to create the response to display
@@ -449,6 +400,8 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::cout<< "kek " << std::endl;
 	FILE *input_file = NULL;
 
+	std::string ENTETELOL = ft_setup_header();
+	return (NULL);
 	if (this->_header_requete[0].path == "/ ")
 	{
 		std::cout << "display index" << std::endl;
@@ -494,7 +447,7 @@ std::string		HttpServer::ft_settup_http_response( void )
 	fclose(input_file);
 	file_contents = res;
 	std::cout << "la taille putain = " << file_contents.size() << std::endl;
-	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 500\r\n\r\n");
+	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 950\r\n\r\n");
 	// file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
 
 	std::cout << " TOTAL = -" << file_contents << std::endl;
@@ -530,6 +483,11 @@ int 		HttpServer::ft_test_writing( void )
 			}
 
 			_HTTP_RESPONSE = ft_settup_http_response();
+			if (_HTTP_RESPONSE.empty())
+			{
+				std::cout << "EN TETE NULL TEST" << std::endl;
+				return (0);
+			}
 
 			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
 			std::cout << "apres send " << std::endl;

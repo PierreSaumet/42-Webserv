@@ -24,6 +24,7 @@ SOURCES			+=	main.cpp		\
 					Parsing_utils.cpp			\
 					HttpServer.cpp				\
 					HttpServerRequest.cpp		\
+					HttpServerResponse.cpp		\
 					HttpServerUtils.cpp			\
 					Error.cpp					\
 					to_delete.cpp
