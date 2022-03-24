@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Headers/HttpServer.hpp"
+#include "../Headers/HttpServer.hpp"
 
 /*
 **	HttpServer Empty Constructor.
@@ -645,10 +645,6 @@ int		HttpServer::ft_test_main_loop_server( void )
 			std::cout << "dans catch error main loop " << std::endl;
 
 			/* A FAIRE LOL */
-			// doit tout close les sockets ici auqnd une erreur occurs
-			//	doit aussi nettoyer httpserverrequest et mettre des erreurs de partout et verifier les valeurs trouve
-			//	doit aussi nettoyer tout le code de partout
-			//	doit aussi faire une fonction create header.
 
 			break ;
 		}

@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Headers/Parsing.hpp"
-#include "Headers/HttpServer.hpp"
-#include "Headers/Error.hpp"
+#include "../Headers/Parsing.hpp"
+#include "../Headers/HttpServer.hpp"
+#include "../Headers/Error.hpp"
 #include <iostream>
 
 /*

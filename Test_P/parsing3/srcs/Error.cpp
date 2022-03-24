@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Headers/Error.hpp"
+#include "../Headers/Error.hpp"
 
 /*
 **	Error constructor overload

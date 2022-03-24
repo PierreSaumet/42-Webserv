@@ -15,7 +15,7 @@
 NAME			= webserv
 
 # SRCS =========================================================================
-SRCS	= ./
+SRCS	= ./srcs
 
 SOURCES			+=	main.cpp		\
 					Parsing.cpp		\
@@ -48,7 +48,7 @@ OBJECTS		 	= $(addprefix $(OBJECTS_FOLDER), $(OBJECT));
 all: $(NAME)
 
 # TESTER webserv=================================================================
-$(OBJECTS_FOLDER)%.o :	$(SRCS)%.cpp	$(INCLUDE) 
+$(OBJECTS_FOLDER)%.o :	$(SRCS)/%.cpp	$(INCLUDE) 
 	@mkdir -p	$(OBJECTS_FOLDER)
 	@echo "Compiling: $<"
 	clang++ $(FLAGS) -c $< -o $@
