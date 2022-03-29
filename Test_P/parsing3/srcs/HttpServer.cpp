@@ -400,6 +400,14 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::cout<< "kek " << std::endl;
 	FILE *input_file = NULL;
 
+	// On doit verifier quel type de requete est demande genre get delete et post
+	// en fonction, on applique la function.
+	// genre Get /page2.html
+	// ==> on va dans get
+	// ==> on verifie la page2.html qu'e;lle existe
+	//	==> elle existe pas return 404
+	//	==> elle existe return 200 et le bazar... 
+
 	std::string ENTETELOL = ft_setup_header();
 	return (NULL);
 	if (this->_header_requete[0].path == "/ ")
