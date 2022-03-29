@@ -94,6 +94,19 @@ class HttpServer {
 		std::string		ft_check_protocol_header( std::string header );
 		std::string		ft_check_host_header( std::string header );
 		std::string		ft_setup_header( void );
+
+
+		/*
+		**	Functions used to set up the headers for the response
+		*/
+		std::string		ft_get_content_length( struct stat buff ) const;
+		std::string		ft_get_end_header( void ) const;
+		std::string		ft_get_content_type( void ) const;
+		std::string		ft_get_charset( void ) const;
+		std::string		ft_get_server_name( void ) const;
+		std::string		ft_get_status( void ) const;
+
+
 		/*
 		**	Function used to clean sockets from clients and servers.
 		*/

@@ -57,19 +57,65 @@ std::string		HttpServer::ft_setup_header( void )
 		std::cout << "la taille putain = " << file_contents.size() << std::endl;
 
 		// file_contents.insert(0, file_contents.c_str());
-		file_contents.insert(0, "\r\n\r\n");
-		file_contents.insert(0, "879");
-		file_contents.insert(0, "Content-Length: ");
-		file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\n");
-		// HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\n == 80
-		// file_contents.insert(81, "Content-Length: ");
-		// Content-Length: == 16
-		// file_contents.insert(98, file_contents.c_str());
-		// 3 lol
+		file_contents.insert(0, this->ft_get_end_header());
+		file_contents.insert(0, this->ft_get_content_length(buff));
+		file_contents.insert(0, this->ft_get_server_name());
+		file_contents.insert(0, this->ft_get_charset());
+		file_contents.insert(0, this->ft_get_content_type());
+		file_contents.insert(0, this->ft_get_status());
 		
-
-		std::cout << "file contents = " << file_contents << std::endl;
+		
+		// std::cout << "KEK = " << ft_get_server_name() << std::endl;
+		std::cout << "\nfile contents = " << file_contents << std::endl;
 		sleep(1);
 	}
 	return (NULL);
+}
+
+std::string		HttpServer::ft_get_end_header( void ) const
+{
+	return ("\r\n\r\n");
+}
+
+std::string		HttpServer::ft_get_status( void ) const 
+{
+	// a changer lol
+
+	return ("HTTP/1.1 200 OK\r\n");
+
+}
+std::string		HttpServer::ft_get_server_name( void ) const
+{
+	// a changer en fonctin du server qu'on utilise KEK...
+	std::string		tmp;
+
+	// std::cout << " je dois prendre ca = " << this->_servers[0].name_server << std::endl;
+	tmp.insert(0, "\r\n");
+	tmp.insert(0, this->_servers[0].name_server);
+	tmp.insert(0, "Server: ");
+	return (tmp);
+}
+
+
+std::string		HttpServer::ft_get_charset( void ) const
+{
+	return ("Charset=UTF-8\r\n");
+}
+
+std::string		HttpServer::ft_get_content_type( void ) const
+{
+	// peut etre a changer en fonction de ce qu'on affiche ? 
+	return ("Content-Type: text/html\r\n");
+}
+
+std::string		HttpServer::ft_get_content_length( struct stat buff ) const
+{
+	std::string tmp_size;
+	std::stringstream ss_tmp;
+
+	ss_tmp << buff.st_size + 100;
+	ss_tmp >> tmp_size;
+
+	tmp_size.insert(0, "Content-Length: ");
+	return (tmp_size);
 }
