@@ -411,7 +411,11 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::string ENTETELOL = ft_setup_header();
 	std::cout << " fin de la fonctio nheader = " << ENTETELOL << std::endl;
 	std::cout << "le ficheir demande = -" << this->_header_requete[0].path << "-" << std::endl;
+	if (this->_header_requete[0].error == true)
+		return (ENTETELOL);
 
+	
+	
 	// DEMANDE L'INDEX ...
 	if (this->_header_requete[0].path == "./root/")
 	{

@@ -26,6 +26,7 @@
 #include <err.h>
 #include "Parsing.hpp"
 #include <algorithm>
+#include <map>
 
 #include <fcntl.h>
 
@@ -118,7 +119,7 @@ class HttpServer {
 		**	Function used if an error occurs in the request
 		*/
 		size_t			ft_setup_error_header( std::string request_http, int len_msg );
-
+		std::string			ft_find_error_html( void );
 
 		/*
 		**	Function used to clean sockets from clients and servers.

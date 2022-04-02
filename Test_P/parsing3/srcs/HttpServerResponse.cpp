@@ -23,7 +23,7 @@ std::string		HttpServer::ft_setup_header( void )
 	FILE *input_file = NULL;
 	std::string res;
 	std::string file_contents;
-
+	std::string the_header;
 	//							 on verifie le path
 	std::cout << "on doit verifier le path ..." << std::endl;
 
@@ -31,8 +31,21 @@ std::string		HttpServer::ft_setup_header( void )
 	{
 		// une erreur a ete setup donc on doit deja avoir une reposne a display;
 		std::cout << "GO SETUP HEADER POUR ERROR " << std::endl;
+		std::cout << "le body c'est quoi deja = " << this->_header_requete[0].body_error << std::endl;
+		if (this->_header_requete[0].body_error.empty() == false)
+		{
+			// fonction qui va chercher l'erreur dans les differents dossiers
+			// si ne trouve pas alors renvoie juste le header
+			the_header = ft_find_error_html( );
+			return (the_header);
+		}
+		else
+		{
+			std::cout << "putain le header requet ebody erro n'est est pas vide " << std::endl;
+			return (NULL);
+		}
 		return (NULL);
-		std::string the_header;
+		// std::string the_header;
 		the_header.insert(0, this->ft_get_end_header());
 
 		// struct stat buff2;
@@ -87,7 +100,7 @@ std::string		HttpServer::ft_setup_header( void )
 
 	std::cout << "OK donc tout est bon ici la page demandee existe on va mettre rendre le header\n" << std::endl;
 
-	std::string the_header;
+	// std::string the_header;
 
 
 	the_header.insert(0, this->ft_get_end_header());
@@ -146,6 +159,70 @@ std::string		HttpServer::ft_setup_header( void )
 	// return (NULL);
 }
 
+std::string		HttpServer::ft_find_error_html( void )
+{
+	// (void)request_html;
+	// (void)len_msg;
+
+	std::stringstream 	ss;
+	std::string			path_error;
+	// path_error.insert(0, ".html");
+	ss << this->_header_requete[0].num_error;
+	ss >> path_error;
+	path_error.resize(4);
+	path_error.insert(4, ".html");
+	path_error.insert(0, this->_header_requete[0].body_error);
+	std::cout << "path_error = " << path_error << std::endl;
+
+	std::string the_header;
+
+	struct stat buff;
+	if (stat(path_error.c_str(), &buff) < 0)
+	{
+		// le fichier n'a pas ete trouve
+		// on setup le juste le header avec le bon numero d'erreur
+		std::cout << "size buff = " << buff.st_size << std::endl;
+		buff.st_size = 0;
+
+		the_header.insert(0, "<!DOCTYPE html><html><head><title>Hello World</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>TEST Webserv</h1></body></html>\r\n");
+
+		the_header.insert(0, this->ft_get_end_header());
+		the_header.insert(0, this->ft_get_content_length(buff));
+		the_header.insert(0, this->ft_get_server_name());
+		the_header.insert(0, this->ft_get_charset());
+		the_header.insert(0, this->ft_get_content_type());
+		the_header.insert(0, this->ft_get_status());
+		std::cout << "\n\nDU COUP LE HEADER DE L:ERREUR =" << the_header << std::endl;
+		return (the_header);
+	}
+	// struct stat buff2;
+	// if (stat(this->_header_requete[0].path.c_str(), &buff2) < 0)
+	// {
+	// 	std::cout << "Error, la page demande n'exite pas. ici" << std::endl;
+	// 	return (NULL);
+	// }
+	// if (buff2.st_size == 0)
+	// {
+	// 	std::cout << "Error, la page demande est vide. " << std::endl;
+	// 	return (NULL);
+	// }
+
+	// input_file = fopen(this->_header_requete[0].path.c_str(), "r");
+	// if (input_file == NULL)
+	// {
+	// 	std::cout << "Error, pour ouvrir la page demande avec fopen." << std::endl;
+	// 	return (NULL);
+	// }
+	// fclose(input_file);
+
+	std::cout << "kek pas cool problem find error_page" << std::endl;
+	return (NULL);
+
+
+
+}
+
+
 std::string		HttpServer::ft_get_end_header( void ) const
 {
 	return ("\r\n\r\n");
@@ -155,9 +232,80 @@ std::string		HttpServer::ft_get_status( void ) const
 {
 	// a changer lol
 
-	return ("HTTP/1.1 200 OK\r\n");
+	std::map<size_t, std::string> list_error;
+	list_error.insert(std::pair<size_t, std::string>(400, "Bad Request"));
+	list_error.insert(std::pair<size_t, std::string>(401, "Unauthorized (RFC 7235)"));
+	list_error.insert(std::pair<size_t, std::string>(402, "Payment Required"));
+	list_error.insert(std::pair<size_t, std::string>(403, "Forbidden"));
+	list_error.insert(std::pair<size_t, std::string>(404, "Not Found"));
+	list_error.insert(std::pair<size_t, std::string>(405, "Method Not Allowed"));
+	list_error.insert(std::pair<size_t, std::string>(406, "Not Acceptable"));
+	list_error.insert(std::pair<size_t, std::string>(407, "Proxy Authentication Required"));
+	list_error.insert(std::pair<size_t, std::string>(408, "Request Timeout"));
+	list_error.insert(std::pair<size_t, std::string>(409, "Conflict"));
+	list_error.insert(std::pair<size_t, std::string>(410, "Gone"));
+	list_error.insert(std::pair<size_t, std::string>(411, "Length Required"));
+	list_error.insert(std::pair<size_t, std::string>(412, "Precondition Failed"));
+	list_error.insert(std::pair<size_t, std::string>(413, "Payload Too Large"));
+	list_error.insert(std::pair<size_t, std::string>(414, "URI Too Long"));
+	list_error.insert(std::pair<size_t, std::string>(415, "Unsupported Media Type"));
+	list_error.insert(std::pair<size_t, std::string>(416, "Range Not Satisfiable"));
+	list_error.insert(std::pair<size_t, std::string>(417, "Expectation Failed"));
+	list_error.insert(std::pair<size_t, std::string>(421, "Misdirected Request"));
+	list_error.insert(std::pair<size_t, std::string>(422, "Unprocessable Entity"));
+	list_error.insert(std::pair<size_t, std::string>(423, "Locked"));
+	list_error.insert(std::pair<size_t, std::string>(424, "Failed Dependency"));
+	list_error.insert(std::pair<size_t, std::string>(425, "Too Early"));
+	list_error.insert(std::pair<size_t, std::string>(426, "Upgrade Required"));
+	list_error.insert(std::pair<size_t, std::string>(428, "Precondition Required"));
+	list_error.insert(std::pair<size_t, std::string>(429, "Too Many Requests"));
+	list_error.insert(std::pair<size_t, std::string>(431, "Request Header Fields Too Large"));
+	list_error.insert(std::pair<size_t, std::string>(451, "Unavailable For Legal Reasons"));
+	list_error.insert(std::pair<size_t, std::string>(500, "Internal Server Error"));
+	list_error.insert(std::pair<size_t, std::string>(501, "Not Implemented"));
+	list_error.insert(std::pair<size_t, std::string>(502, "Bad Gateway"));
+	list_error.insert(std::pair<size_t, std::string>(503, "Service Unavailable"));
+	list_error.insert(std::pair<size_t, std::string>(504, "Gateway Timeout"));
+	list_error.insert(std::pair<size_t, std::string>(505, "HTTP Version Not Supported"));
+	list_error.insert(std::pair<size_t, std::string>(506, "Variant Also Negotiates"));
+	list_error.insert(std::pair<size_t, std::string>(507, "Insufficient Storage"));
+	list_error.insert(std::pair<size_t, std::string>(508, "Loop Detected"));
+	list_error.insert(std::pair<size_t, std::string>(510, "Not Extended"));
+	list_error.insert(std::pair<size_t, std::string>(511, "Network Authentification Required"));
 
+	
+
+	if (this->_header_requete[0].error == true)
+	{
+		std::string status_str;
+		status_str = "\r\n";
+
+		std::map<size_t, std::string>::iterator it_b = list_error.begin();
+		for (; it_b != list_error.end(); it_b++)
+		{
+			if (it_b->first == this->_header_requete[0].num_error)
+			{
+				status_str.insert(0, it_b->second);
+				status_str.insert(0, " ");
+				std::stringstream ss;
+				std::string tmp;
+				ss << it_b->first;
+				ss >> tmp;
+				status_str.insert(0, tmp);
+				status_str.insert(0, "HTTP/1.1 ");
+				return (status_str);
+				break;
+			}
+		}
+		
+
+	}
+	else
+		return ("HTTP/1.1 200 OK\r\n");
+	return ("HTTP/1.1 200 OK\r\n");
 }
+
+
 std::string		HttpServer::ft_get_server_name( void ) const
 {
 	// a changer en fonctin du server qu'on utilise KEK...

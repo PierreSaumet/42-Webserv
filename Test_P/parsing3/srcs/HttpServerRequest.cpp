@@ -247,6 +247,14 @@ size_t			HttpServer::ft_setup_error_header( std::string request_http, int len_ms
 									std::cout << "euh non " << std::endl;
 								}
 							}
+							std::cout << RED << "l'erreur n'a pas ete trouve dans error_page " << CLEAR << std::endl;
+							this->_header_requete[0].body_error = "/";
+							this->_header_requete[0].body_error.insert(0, this->_servers[0].location[i].name_location);
+							// this->_header_requete[0].body_error = this->_servers[0].location[i].name_location;
+							this->_header_requete[0].body_error.insert(0, this->_servers[0].root_server);
+							std::cout << "euh le body error = " << this->_header_requete[0].body_error << std::endl;
+							// this->_header_requete[0].body_error = this->_servers[0].root_server;
+							// this->_header_requete[0].body_error = "NULL";
 						}
 						else
 						{
@@ -265,6 +273,8 @@ size_t			HttpServer::ft_setup_error_header( std::string request_http, int len_ms
 				else
 				{
 					std::cout << "euh non pas dans un location " << std::endl;
+					std::cout << " REKT FRAGILE " << std::endl;
+					exit(EXIT_FAILURE);
 				}
 			}
 			i++;
