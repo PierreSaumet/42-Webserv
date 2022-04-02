@@ -56,6 +56,7 @@ class HttpServer {
 			std::string			path;
 			std::string			protocol;
 			std::string			host;
+			bool				cgi;
 		}						t_header_request;
 		
 

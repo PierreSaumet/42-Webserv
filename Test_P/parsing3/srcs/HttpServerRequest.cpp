@@ -70,13 +70,13 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 			if (this->_header_requete[0].path.empty() == true)
 				throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
 			std::cout << "le path = " << this->_header_requete[0].path << std::endl;
-
+			std::cout << " Taille DU PATH = " << this->_header_requete[0].path.length() << std::endl;
 			// EUH a quoi ca sert ca ?
-			if (this->_header_requete[0].path == "/page2.html")
-			{
-				std::cout << "YES" << std::endl;
-				exit(EXIT_SUCCESS);
-			}
+			// if (this->_header_requete[0].path == "/page2.html")
+			// {
+			// 	std::cout << "YES" << std::endl;
+			// 	exit(EXIT_SUCCESS);
+			// }
 
 			this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
 			if (this->_header_requete[0].protocol.empty() == true)

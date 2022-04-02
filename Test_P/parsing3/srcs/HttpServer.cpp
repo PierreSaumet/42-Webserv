@@ -409,7 +409,41 @@ std::string		HttpServer::ft_settup_http_response( void )
 	//	==> elle existe return 200 et le bazar... 
 
 	std::string ENTETELOL = ft_setup_header();
-	return (NULL);
+	std::cout << " fin de la fonctio nheader = " << ENTETELOL << std::endl;
+	std::cout << "le ficheir demande = -" << this->_header_requete[0].path << "-" << std::endl;
+
+	// DEMANDE L'INDEX ...
+	if (this->_header_requete[0].path == "./root/")
+	{
+		//  this->_servers[0].root_server);
+		std::cout << "on prend l'index =-" << this->_servers[0].index_server << "-" << std::endl;
+		input_file = fopen(this->_servers[0].index_server.c_str(), "r");
+		if (input_file == NULL)
+		{
+			std::cout << " MERDE " << std::endl;
+			exit(1);
+		}
+	}
+	else if (this->_header_requete[0].path.find(".php") != std::string::npos)
+	{
+		std::cout << " ok on a donc le php . on affihce pour voir ... "<< std::endl;
+		input_file = fopen("./root/query_get_test.php", "r");
+	}
+	else
+		input_file = fopen(this->_header_requete[0].path.c_str(), "r");
+
+	stat(this->_header_requete[0].path.c_str(), &sb);
+
+	res.resize(sb.st_size + 100);
+	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+	fclose(input_file);
+	file_contents = res;
+
+	file_contents.insert(0, ENTETELOL.c_str());
+	std::cout << "file content dans la fonction =-" << file_contents << "-" << std::endl;
+
+	return (file_contents);
+
 	if (this->_header_requete[0].path == "/ ")
 	{
 		std::cout << "display index" << std::endl;
@@ -496,7 +530,7 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "EN TETE NULL TEST" << std::endl;
 				return (0);
 			}
-
+			std::cout << " HTTP_RESPONSE = -" << _HTTP_RESPONSE << "-" << std::endl;
 			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
 			std::cout << "apres send " << std::endl;
 			if (ret_send < 0)
