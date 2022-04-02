@@ -127,7 +127,7 @@ class Error: public std::exception
 
 							=	62	==>	 in 'location' directive, it needs 'location' + '/' + '{'.
 							=	63	==>	'root' directive should be setup before 'index' directive.
-
+							=	64	==>	'root' directive should be setup before 'error_page'.
 
 
 							=	99	==>	'wrong argument given'.

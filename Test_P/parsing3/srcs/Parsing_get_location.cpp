@@ -133,6 +133,18 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 		throw Error(45, "Error, in 'error_page' directive should end with a directory or file", 1);
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 	struct stat buffer;
+	// Adding the root address of the location or root address of server
+	if (this->_servers[index_server].location[index_location].root_location.empty() == false)
+	{
+		address.erase(0, 1);
+		address.insert(0, this->_servers[index_server].location[index_server].root_location);
+	}
+	else
+	{
+		address.erase(0, 1);
+		address.insert(0, this->_servers[index_server].location[index_location].name_location);
+		address.insert(0, this->_servers[index_server].root_server);
+	}
 	if (stat(address.c_str(), &buffer) != 0)
 		throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
 	if (this->_servers[index_server].location[index_location].error_location.size() > 1)		// several error pages.

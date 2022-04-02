@@ -275,7 +275,9 @@ bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, si
 */
 size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	// on incremente k on passe errr_page
+	// on incremente k on passe errr_page]
+	if (this->_servers[index_server].root_server.empty() == true)
+		throw Error(64, "Error: 'root' directive should be setup before 'error_page'.", 1);
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
@@ -300,6 +302,8 @@ size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, 
 	}
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 	struct stat buffer;
+	address.erase(0, 1);
+	address.insert(0, this->_servers[index_server].root_server);
 	if (stat(address.c_str(), &buffer) != 0)
 		throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
 	if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
