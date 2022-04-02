@@ -126,7 +126,7 @@ class Error: public std::exception
 							=	61	==>	a bloc server cannot have another bloc server inside.
 
 							=	62	==>	 in 'location' directive, it needs 'location' + '/' + '{'.
-
+							=	63	==>	'root' directive should be setup before 'index' directive.
 
 
 
@@ -159,4 +159,4 @@ throw Error(1, "Error, the configuration file doesn't exist.", 0);
 
 */		
 
-#endif	
+#endif		

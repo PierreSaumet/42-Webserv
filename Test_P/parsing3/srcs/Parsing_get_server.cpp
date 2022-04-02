@@ -558,6 +558,8 @@ bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t in
 	struct stat buffer;
 	size_t  	len;
 	
+	if (this->_servers[index_server].root_server.empty() == true)
+		throw Error(63, "Error, 'root' directive should be setup before 'index' directive.", 1);
 	k += 1;
 	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
@@ -569,6 +571,8 @@ bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t in
 	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
 		throw Error(29, "Error, in 'index' directive, it should end with '.html'.", 1);
 	this->_servers[index_server].index_server = tmp[k].substr(0, len - 1);
+	this->_servers[index_server].index_server.erase(0, 1);
+	this->_servers[index_server].index_server.insert(0, this->_servers[index_server].root_server);
 	if (stat(this->_servers[index_server].index_server.c_str(), &buffer) == -1)
 		throw Error(30, "Error, in 'index' directive, file doesn't exist.", 1);
 	if (buffer.st_size == 0)

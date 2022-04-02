@@ -35,7 +35,7 @@ std::string		HttpServer::ft_setup_header( void )
 		std::string the_header;
 		the_header.insert(0, this->ft_get_end_header());
 
-		struct stat buff2;
+		// struct stat buff2;
 		// if (stat()) 
 
 		// the_header.insert(0, this->ft_get_content_length(buff2));
