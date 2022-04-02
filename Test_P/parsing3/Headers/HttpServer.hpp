@@ -57,6 +57,9 @@ class HttpServer {
 			std::string			protocol;
 			std::string			host;
 			bool				cgi;
+			bool				error;
+			size_t				num_error;
+			std::string			body_error;
 		}						t_header_request;
 		
 
@@ -100,12 +103,21 @@ class HttpServer {
 		/*
 		**	Functions used to set up the headers for the response
 		*/
+		size_t			ft_get(std::string request_http, int len_msg);
+		void			ft_post(std::string request_http, int len_msg);
+		void			ft_delete(std::string request_http, int len_msg);
+
 		std::string		ft_get_content_length( struct stat buff ) const;
 		std::string		ft_get_end_header( void ) const;
 		std::string		ft_get_content_type( void ) const;
 		std::string		ft_get_charset( void ) const;
 		std::string		ft_get_server_name( void ) const;
 		std::string		ft_get_status( void ) const;
+
+		/*
+		**	Function used if an error occurs in the request
+		*/
+		size_t			ft_setup_error_header( std::string request_http, int len_msg );
 
 
 		/*

@@ -27,6 +27,27 @@ std::string		HttpServer::ft_setup_header( void )
 	//							 on verifie le path
 	std::cout << "on doit verifier le path ..." << std::endl;
 
+	if (this->_header_requete[0].error == true)
+	{
+		// une erreur a ete setup donc on doit deja avoir une reposne a display;
+		std::cout << "GO SETUP HEADER POUR ERROR " << std::endl;
+		return (NULL);
+		std::string the_header;
+		the_header.insert(0, this->ft_get_end_header());
+
+		struct stat buff2;
+		// if (stat()) 
+
+		// the_header.insert(0, this->ft_get_content_length(buff2));
+		the_header.insert(0, this->ft_get_server_name());
+		the_header.insert(0, this->ft_get_charset());
+		the_header.insert(0, this->ft_get_content_type());
+		the_header.insert(0, this->ft_get_status());
+		return (NULL);
+	}
+	// tout marche bien pour l'instant
+
+
 	//	checker si ? et si get car du coup on a des donnees a recuperer.
 	if (this->_header_requete[0].path.find(".php") != std::string::npos)
 	{
