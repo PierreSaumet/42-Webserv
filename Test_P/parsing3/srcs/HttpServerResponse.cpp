@@ -184,8 +184,13 @@ std::string		HttpServer::ft_find_error_html( void )
 		std::cout << "size buff = " << buff.st_size << std::endl;
 		buff.st_size = 0;
 
-		the_header.insert(0, "<!DOCTYPE html><html><head><title>Hello World</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>TEST Webserv</h1></body></html>\r\n");
-
+		
+		std::string tmp = ft_create_fake_error();
+		return (tmp); // test
+		buff.st_size = tmp.length();
+		std::cout << "buff st size = " << buff.st_size << std::endl;
+		sleep(1);
+		the_header = tmp;
 		the_header.insert(0, this->ft_get_end_header());
 		the_header.insert(0, this->ft_get_content_length(buff));
 		the_header.insert(0, this->ft_get_server_name());
@@ -222,10 +227,92 @@ std::string		HttpServer::ft_find_error_html( void )
 
 }
 
+std::string		HttpServer::ft_create_fake_error( void )
+{
+	std::string the_header = "</h1></body></html>\r\n";			// c'est la find
+																// faut mettre le message de l'erreur et le numero
+
+	the_header.insert(0, ft_return_error());
+	the_header.insert(0, "<!DOCTYPE html><html><head><title>WebServ Error</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>");
+	
+	std::string tmp;
+	// tmp.insert(0, "<!DOCTYPE html><html><head><title>Hello World</title></head><body><h1>TEST Webserv</h1></body></html>\r\n");
+
+	// tmp = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>Hello World</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>TEST Webserv</h1></body></html>\r\n";
+	
+	
+	tmp = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>GET Query String</title><style>body { background-color: rgb(105, 140, 238) }h1 { font-size:2cm; text-align: center; color: rgb(121, 219, 56);text-shadow: 0 0 2mm red}</style></head><body><h1> Im'gonne say hello to you using the query string in the URL ! </h1><h2><?php echo 'Hello ' . htmlspecialchars($_GET['name']) . '!';?></h2></body></html>\r\n";
+	
+	return (tmp);
+}
+
 
 std::string		HttpServer::ft_get_end_header( void ) const
 {
 	return ("\r\n\r\n");
+}
+
+std::string		HttpServer::ft_return_error( void )
+{
+	std::map<size_t, std::string> list_error;
+	list_error.insert(std::pair<size_t, std::string>(400, "Bad Request"));
+	list_error.insert(std::pair<size_t, std::string>(401, "Unauthorized (RFC 7235)"));
+	list_error.insert(std::pair<size_t, std::string>(402, "Payment Required"));
+	list_error.insert(std::pair<size_t, std::string>(403, "Forbidden"));
+	list_error.insert(std::pair<size_t, std::string>(404, "Not Found"));
+	list_error.insert(std::pair<size_t, std::string>(405, "Method Not Allowed"));
+	list_error.insert(std::pair<size_t, std::string>(406, "Not Acceptable"));
+	list_error.insert(std::pair<size_t, std::string>(407, "Proxy Authentication Required"));
+	list_error.insert(std::pair<size_t, std::string>(408, "Request Timeout"));
+	list_error.insert(std::pair<size_t, std::string>(409, "Conflict"));
+	list_error.insert(std::pair<size_t, std::string>(410, "Gone"));
+	list_error.insert(std::pair<size_t, std::string>(411, "Length Required"));
+	list_error.insert(std::pair<size_t, std::string>(412, "Precondition Failed"));
+	list_error.insert(std::pair<size_t, std::string>(413, "Payload Too Large"));
+	list_error.insert(std::pair<size_t, std::string>(414, "URI Too Long"));
+	list_error.insert(std::pair<size_t, std::string>(415, "Unsupported Media Type"));
+	list_error.insert(std::pair<size_t, std::string>(416, "Range Not Satisfiable"));
+	list_error.insert(std::pair<size_t, std::string>(417, "Expectation Failed"));
+	list_error.insert(std::pair<size_t, std::string>(421, "Misdirected Request"));
+	list_error.insert(std::pair<size_t, std::string>(422, "Unprocessable Entity"));
+	list_error.insert(std::pair<size_t, std::string>(423, "Locked"));
+	list_error.insert(std::pair<size_t, std::string>(424, "Failed Dependency"));
+	list_error.insert(std::pair<size_t, std::string>(425, "Too Early"));
+	list_error.insert(std::pair<size_t, std::string>(426, "Upgrade Required"));
+	list_error.insert(std::pair<size_t, std::string>(428, "Precondition Required"));
+	list_error.insert(std::pair<size_t, std::string>(429, "Too Many Requests"));
+	list_error.insert(std::pair<size_t, std::string>(431, "Request Header Fields Too Large"));
+	list_error.insert(std::pair<size_t, std::string>(451, "Unavailable For Legal Reasons"));
+	list_error.insert(std::pair<size_t, std::string>(500, "Internal Server Error"));
+	list_error.insert(std::pair<size_t, std::string>(501, "Not Implemented"));
+	list_error.insert(std::pair<size_t, std::string>(502, "Bad Gateway"));
+	list_error.insert(std::pair<size_t, std::string>(503, "Service Unavailable"));
+	list_error.insert(std::pair<size_t, std::string>(504, "Gateway Timeout"));
+	list_error.insert(std::pair<size_t, std::string>(505, "HTTP Version Not Supported"));
+	list_error.insert(std::pair<size_t, std::string>(506, "Variant Also Negotiates"));
+	list_error.insert(std::pair<size_t, std::string>(507, "Insufficient Storage"));
+	list_error.insert(std::pair<size_t, std::string>(508, "Loop Detected"));
+	list_error.insert(std::pair<size_t, std::string>(510, "Not Extended"));
+	list_error.insert(std::pair<size_t, std::string>(511, "Network Authentification Required"));
+
+	std::map<size_t, std::string>::iterator it_b = list_error.begin();
+	std::string tmp;
+	for (; it_b != list_error.end(); it_b++)
+	{
+		if (it_b->first == this->_header_requete[0].num_error)
+		{
+			tmp.insert(0, it_b->second);
+			tmp.insert(0, " ");
+			std::stringstream ss;
+			std::string tmp_num;
+			ss << it_b->first;
+			ss >> tmp_num;
+			tmp.insert(0, tmp_num);
+			return (tmp);
+		}
+	}
+	return (tmp);
+
 }
 
 std::string		HttpServer::ft_get_status( void ) const 
@@ -335,6 +422,8 @@ std::string		HttpServer::ft_get_content_length( struct stat buff ) const
 	std::string tmp_size;
 	std::stringstream ss_tmp;
 
+	std::cout << "dans get content lengtjh size = " << buff.st_size << std::endl;
+	sleep(1);
 	ss_tmp << buff.st_size + 100;
 	ss_tmp >> tmp_size;
 

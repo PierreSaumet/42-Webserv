@@ -120,6 +120,8 @@ class HttpServer {
 		*/
 		size_t			ft_setup_error_header( std::string request_http, int len_msg );
 		std::string			ft_find_error_html( void );
+		std::string			ft_create_fake_error( void );
+		std::string			ft_return_error( void );
 
 		/*
 		**	Function used to clean sockets from clients and servers.

@@ -104,6 +104,7 @@ char response[] = "HTTP/1.1 200 OK\r\n"
 " text-shadow: 0 0 2mm red}</style></head>"
 "<body><h1>TEST Webserv</h1></body></html>\r\n";
 
+
 #include <arpa/inet.h>
 int					HttpServer::ft_create_servers( void ) {
 
@@ -412,9 +413,12 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::cout << " fin de la fonctio nheader = " << ENTETELOL << std::endl;
 	std::cout << "le ficheir demande = -" << this->_header_requete[0].path << "-" << std::endl;
 	if (this->_header_requete[0].error == true)
+	{
+		std::cout << "\n\n on retourne header et body car error " << std::endl;
 		return (ENTETELOL);
+	}
 
-	
+
 	
 	// DEMANDE L'INDEX ...
 	if (this->_header_requete[0].path == "./root/")
@@ -537,6 +541,7 @@ int 		HttpServer::ft_test_writing( void )
 			std::cout << " HTTP_RESPONSE = -" << _HTTP_RESPONSE << "-" << std::endl;
 			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
 			std::cout << "apres send " << std::endl;
+			sleep(10);
 			if (ret_send < 0)
 			{
 				std::cout << "ret_send < 0 = " << ret_send << std::endl;
