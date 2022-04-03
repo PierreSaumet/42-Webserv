@@ -232,11 +232,14 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 	}
 }
 
-
+// a DERPLACER DANS HTTPSERVER RESPONSE
 std::string		HttpServer::ft_settup_http_response( void )				
 {
 	/* Donc cette fonction doit retourner la reponse entiere du server, cad HEADER + BODY
 
+		Il faut la changer, elle est pas bonne.
+		1 ) ft_setup_header ==> setup le header
+		2 ) on ajoute le body 
 	*/
 
 	std::string filename(this->_servers[0].index_server.c_str());				// a changer, car la ca affiche seuelemtn l'index.html
@@ -247,15 +250,10 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::cout<< "kek " << std::endl;
 	FILE *input_file = NULL;
 
-	// On doit verifier quel type de requete est demande genre get delete et post
-	// en fonction, on applique la function.
-	// genre Get /page2.html
-	// ==> on va dans get
-	// ==> on verifie la page2.html qu'e;lle existe
-	//	==> elle existe pas return 404
-	//	==> elle existe return 200 et le bazar... 
 
 	std::string ENTETELOL = ft_setup_header();
+
+
 	std::cout << " fin de la fonctio nheader = " << ENTETELOL << std::endl;
 	std::cout << "le ficheir demande = -" << this->_header_requete[0].path << "-" << std::endl;
 	if (this->_header_requete[0].error == true)
@@ -298,56 +296,58 @@ std::string		HttpServer::ft_settup_http_response( void )
 
 	return (file_contents);
 
-	if (this->_header_requete[0].path == "/ ")
-	{
-		std::cout << "display index" << std::endl;
+
+	// // useless en bas
+	// if (this->_header_requete[0].path == "/ ")
+	// {
+	// 	std::cout << "display index" << std::endl;
 		
 
-		input_file = fopen(filename.c_str(), "r");
+	// 	input_file = fopen(filename.c_str(), "r");
 
-		sleep(1);
-	}
-	else if (this->_header_requete[0].path == "/page2.html ")
-	{
-		std::cout << "display page2" << std::endl;
-		input_file = fopen("page2.html", "r");
-		sleep(1);
-	}
-	else
-	{
-		std::cout << "ne peut pas ouvirr le fichier lol" << std::endl;
-		std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << "-" << std::endl;
+	// 	sleep(1);
+	// }
+	// else if (this->_header_requete[0].path == "/page2.html ")
+	// {
+	// 	std::cout << "display page2" << std::endl;
+	// 	input_file = fopen("page2.html", "r");
+	// 	sleep(1);
+	// }
+	// else
+	// {
+	// 	std::cout << "ne peut pas ouvirr le fichier lol" << std::endl;
+	// 	std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << "-" << std::endl;
 		
 		
-		input_file = fopen("errors/404.html", "r");
-		stat(filename.c_str(), &sb);
-		res.resize(sb.st_size + 100);
-		fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
-		fclose(input_file);
-		file_contents = res;
-		file_contents.insert(0, "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
+	// 	input_file = fopen("errors/404.html", "r");
+	// 	stat(filename.c_str(), &sb);
+	// 	res.resize(sb.st_size + 100);
+	// 	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+	// 	fclose(input_file);
+	// 	file_contents = res;
+	// 	file_contents.insert(0, "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
 
-		return (file_contents);
-		sleep(1);
-	}
+	// 	return (file_contents);
+	// 	sleep(1);
+	// }
 
-	// FILE *input_file = fopen(filename.c_str(), "r");
-	if (input_file == NULL)
-	{
-		std::cout << "ECHEC open " << std::endl;
-		return (NULL);
-	}
-	stat(filename.c_str(), &sb);
-	res.resize(sb.st_size + 100);
-	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
-	fclose(input_file);
-	file_contents = res;
-	std::cout << "la taille putain = " << file_contents.size() << std::endl;
-	file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 950\r\n\r\n");
-	// file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
+	// // FILE *input_file = fopen(filename.c_str(), "r");
+	// if (input_file == NULL)
+	// {
+	// 	std::cout << "ECHEC open " << std::endl;
+	// 	return (NULL);
+	// }
+	// stat(filename.c_str(), &sb);
+	// res.resize(sb.st_size + 100);
+	// fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+	// fclose(input_file);
+	// file_contents = res;
+	// std::cout << "la taille putain = " << file_contents.size() << std::endl;
+	// file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 950\r\n\r\n");
+	// // file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
 
-	std::cout << " TOTAL = -" << file_contents << std::endl;
-	return (file_contents);
+	// std::cout << " TOTAL = -" << file_contents << std::endl;
+	// return (file_contents);
 }
 
 /*
