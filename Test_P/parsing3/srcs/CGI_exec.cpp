@@ -97,44 +97,115 @@ void	Cgi_exec::setServerName( std::string const name )
 	this->_env_cgi["SERVER_NAME"] = name;
 	return ;
 }
+
 void	Cgi_exec::setGatewayInterface( std::string const gateway )
 {
 	this->_env_cgi["GATEWAY_INTERFACE"] = gateway;
 	return ;
 }
+
 void	Cgi_exec::setServerProtocol( std::string const protocol )
 {
 	this->_env_cgi["SERVER_PROTOCOL"] = protocol;
 	return ;
 }
+
 void	Cgi_exec::setServerPort( std::string const port )
 {
 	this->_env_cgi["SERVER_PORT"] = port;
 	return ;
 }
+
 void	Cgi_exec::setRequestMethod( std::string const method )
 {
 	this->_env_cgi["REQUEST_METHOD"] = method;
 	return ;
 }
+
 void	Cgi_exec::setPathInfo( std::string const path_info )
 {
 	this->_env_cgi["PATH_INFO"] = path_info;
 	return ;
 }
+
 void	Cgi_exec::setPathTranslated( std::string const path_trans )
 {
 	this->_env_cgi["PATH_TRANSLATED"] = path_trans;
 	return ;
 }
+
 void	Cgi_exec::setScriptName( std::string const script_name )
 {
 	this->_env_cgi["SCRIPT_NAME"] = script_name;
 	return ;
 }
+
 void	Cgi_exec::setQueryString( std::string const query_string )
 {
 	this->_env_cgi["QUERY_STRING"] = query_string;
+	return ;
+}
+
+
+
+void	Cgi_exec::setRemoteHost( std::string const remote_host )
+{
+	this->_env_cgi["REMOTE_HOST"] = remote_host;
+	return ;
+}
+void	Cgi_exec::setRemoteADDR( std::string const remote_addr )
+{
+	this->_env_cgi["REMOTE_ADDR"] = remote_addr;
+	return ;
+}
+void	Cgi_exec::setAuthType( std::string const auth_type )
+{
+	this->_env_cgi["AUTH_TYPE"] = auth_type;
+	return ;
+}
+void	Cgi_exec::setRemoteUser( std::string const remote_user )
+{
+	this->_env_cgi["REMOTE_USER"] = remote_user;
+	return ;
+}
+void	Cgi_exec::setRemoteIdent( std::string const remote_ident )
+{
+	this->_env_cgi["REMOTE_IDENT"] = remote_ident;
+	return ;
+}
+void	Cgi_exec::setContentTypes( std::string const content_type )
+{
+	this->_env_cgi["CONTENT_TYPES"] = content_type;
+	return ;
+}
+void	Cgi_exec::setContentLength( std::string const content_length )
+{
+	this->_env_cgi["CONTENT_LENGTH"] = content_length;
+	return ;
+}
+void	Cgi_exec::setHttpAccept( std::string const http_accept )
+{
+	this->_env_cgi["HTTP_ACCEPT"] = http_accept;
+	return ;
+}
+void	Cgi_exec::setHttpAcceptLanguage( std::string const http_languange )
+{
+	this->_env_cgi["HTTP_ACCEPT_LANGUAGE"] = http_languange;
+	return ;
+}
+void	Cgi_exec::setHttpUserAgent( std::string const http_user )
+{
+	this->_env_cgi["HTTP_USER_AGENT"] = http_user;
+	return ;
+}
+void	Cgi_exec::setHttpCookie( std::string const http_cookie )
+{
+	this->_env_cgi["HTTP_COOKIE"] = http_cookie;
+	return ;
+}
+void	Cgi_exec::setHttpReferer( std::string const http_referer )
+{
+	this->_env_cgi["HTTP_REFERER"] = http_referer;
 	return ;
 }
 
