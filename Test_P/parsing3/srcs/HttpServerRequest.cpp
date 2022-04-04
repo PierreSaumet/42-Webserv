@@ -173,6 +173,15 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			std::cout << "Ok pas d'erreur 431 donc on continue" << std::endl;
 			std::cout << "request = " << request_http << std::endl;
 
+			// peut etre a changer l'ordre
+			//	On a une requete get, il faut verifier si on a du php et donc du cgi
+			if (ft_find_cgi_or_php(request_http, len_msg) == 1)
+			{
+				// on a du php ou du cgi ?
+				// donc faut utiliser cgi
+				ft_exec_cgi_test( request_http, len_msg);
+			}
+
 			// on trouve la fin du header de la requete HTTP.
 			std::string::iterator	it_b = request_http.begin();
 			std::string::iterator	it_end_request;
@@ -278,6 +287,40 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 
 	return (0);
 }
+
+void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
+{
+	std::cout << "DANS exec CGI ... " << std::endl;
+
+	return ;
+}
+
+
+size_t			HttpServer::ft_find_cgi_or_php( std::string request_http, int len_msg )
+{
+	std::cout << "dans la fonction find cgi or php " << std::endl;
+	// on trouve le premier /
+	size_t 		find_backslash = request_http.find("/");
+	// on cherche HTTP
+	size_t		find_http = request_http.find("HTTP");
+	//	on cherche .php?
+	size_t		find_php = request_http.find(".php?");
+
+	// si .php est entre / et HTTP c'est good, sinon erruer
+	if (find_php > find_backslash && find_php < find_http)
+	{
+		std::cout << " good on a bien du php" << std::endl;
+		// rajouter debut query_string avec ?
+		return (1);
+	}
+	else
+	{
+		std::cout << "non on a pas de phpg ou du moins pas entre le / et http" << std::endl;
+		return (0);
+	}
+	return (0);
+}
+
 
 
 size_t			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
