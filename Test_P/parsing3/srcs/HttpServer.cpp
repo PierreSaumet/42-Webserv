@@ -30,9 +30,9 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 
 	this->_cgi = new Cgi_exec();
 	this->_cgi->ft_setup_env_cgi();
-	std::cout << "test getsoft = " << this->_cgi->getSoftware() << std::endl;
-	this->_cgi->setSoftware("Bonjour");
-	std::cout << "test setsoft = " << this->_cgi->getSoftware() << std::endl;
+	std::cout << "test getsoft = " << this->_cgi->getServerSoftware() << std::endl;
+	this->_cgi->setServerSoftware("Bonjour");
+	std::cout << "test setsoft = " << this->_cgi->getServerSoftware() << std::endl;
 
 	std::cout << "\n\n\n display all = " << std::endl;
 	this->_cgi->ft_display_all_variable_env();

@@ -46,7 +46,7 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	//https://fr.wikipedia.org/wiki/Variables_d%27environnement_CGI
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_SOFTWARE", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_NAME", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("GATEWAY_INTERGACE", "NULL"));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("GATEWAY_INTERFACE", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_PROTOCOL", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_PORT", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REQUEST_METHOD", "NULL"));
@@ -56,6 +56,7 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	this->_env_cgi.insert(std::pair<std::string, std::string>("QUERY_STRING", "NULL"));
 	// PAS OBLIGE JE CROIS... DOIT METTRE VIDE CAD LE SUPPRIMER
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_HOST", "NULL"));
+	
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_ADDR", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("AUTH_TYPE", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_USER", "NULL"));
@@ -82,16 +83,65 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	return (0);
 }
 
-
-void	Cgi_exec::setSoftware( std::string const software )
+/*
+**	SETTERS
+*/
+void	Cgi_exec::setServerSoftware( std::string const software )
 {
-	std::string		server_software = "SERVER_SOFTWARE";
-
 	this->_env_cgi["SERVER_SOFTWARE"] = software;
 	return ;
 }
 
-std::string	Cgi_exec::getSoftware( void )
+void	Cgi_exec::setServerName( std::string const name )
+{
+	this->_env_cgi["SERVER_NAME"] = name;
+	return ;
+}
+void	Cgi_exec::setGatewayInterface( std::string const gateway )
+{
+	this->_env_cgi["GATEWAY_INTERFACE"] = gateway;
+	return ;
+}
+void	Cgi_exec::setServerProtocol( std::string const protocol )
+{
+	this->_env_cgi["SERVER_PROTOCOL"] = protocol;
+	return ;
+}
+void	Cgi_exec::setServerPort( std::string const port )
+{
+	this->_env_cgi["SERVER_PORT"] = port;
+	return ;
+}
+void	Cgi_exec::setRequestMethod( std::string const method )
+{
+	this->_env_cgi["REQUEST_METHOD"] = method;
+	return ;
+}
+void	Cgi_exec::setPathInfo( std::string const path_info )
+{
+	this->_env_cgi["PATH_INFO"] = path_info;
+	return ;
+}
+void	Cgi_exec::setPathTranslated( std::string const path_trans )
+{
+	this->_env_cgi["PATH_TRANSLATED"] = path_trans;
+	return ;
+}
+void	Cgi_exec::setScriptName( std::string const script_name )
+{
+	this->_env_cgi["SCRIPT_NAME"] = script_name;
+	return ;
+}
+void	Cgi_exec::setQueryString( std::string const query_string )
+{
+	this->_env_cgi["QUERY_STRING"] = query_string;
+	return ;
+}
+
+/*
+**	GETTERS
+*/
+std::string	Cgi_exec::getServerSoftware( void )
 {
 	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
 	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
