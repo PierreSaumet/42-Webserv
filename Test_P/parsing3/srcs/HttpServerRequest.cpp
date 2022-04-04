@@ -334,7 +334,8 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 {
 	std::cout << "DANS exec CGI ... " << std::endl;
-
+	(void)request_http;
+	(void)len_msg;
 	return ;
 }
 
@@ -348,6 +349,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 */
 bool			HttpServer::ft_find_cgi_or_php( std::string request_http, int len_msg )
 {
+	(void)len_msg;
 	std::cout << "dans la fonction find cgi or php " << std::endl;
 	// on trouve le premier /
 	size_t 		find_backslash = request_http.find("/");

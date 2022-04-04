@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../Headers/HttpServer.hpp"
+#include "../Headers/CGI_exec.hpp"
 
 /*
 **	HttpServer Empty Constructor.
@@ -26,6 +27,16 @@ HttpServer::HttpServer( void ) { // a terminer, initialiser toutes les variables
 **	HttpServer Constructor with argument.
 */
 HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a terminer, initialiser toutes les variables
+
+	this->_cgi = new Cgi_exec();
+	this->_cgi->ft_setup_env_cgi();
+	std::cout << "test getsoft = " << this->_cgi->getSoftware() << std::endl;
+	this->_cgi->setSoftware("Bonjour");
+	std::cout << "test setsoft = " << this->_cgi->getSoftware() << std::endl;
+
+	std::cout << "\n\n\n display all = " << std::endl;
+	this->_cgi->ft_display_all_variable_env();
+	exit(1);
 
 	std::cout << "Constructor avec argument "<< std::endl;
 	try {

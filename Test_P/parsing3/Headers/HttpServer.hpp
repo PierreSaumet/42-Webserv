@@ -30,6 +30,8 @@
 
 #include <fcntl.h>
 
+#include "../Headers/CGI_exec.hpp"
+
 
 class HttpServer {
 
@@ -156,6 +158,8 @@ class HttpServer {
 		std::string						_HTTP_RESPONSE;
 
 		std::vector<t_header_request>		_header_requete;
+
+		Cgi_exec			*_cgi;
 
 	protected:
 };

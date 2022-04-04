@@ -26,6 +26,7 @@ SOURCES			+=	main.cpp		\
 					HttpServerRequest.cpp		\
 					HttpServerResponse.cpp		\
 					HttpServerUtils.cpp			\
+					CGI_exec.cpp				\
 					Error.cpp					\
 					to_delete.cpp
 					
