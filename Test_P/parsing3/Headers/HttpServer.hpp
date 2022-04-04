@@ -108,7 +108,7 @@ class HttpServer {
 		void			ft_post(std::string request_http, int len_msg);
 		void			ft_delete(std::string request_http, int len_msg);
 
-		size_t			ft_find_cgi_or_php( std::string request_http, int len_msg );
+		bool			ft_find_cgi_or_php( std::string request_http, int len_msg );
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );
 
 		std::string		ft_get_content_length( struct stat buff ) const;

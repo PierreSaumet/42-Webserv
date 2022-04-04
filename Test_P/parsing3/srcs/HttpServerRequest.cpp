@@ -12,9 +12,36 @@
 
 #include "../Headers/HttpServer.hpp"
 
+/*
+**	INFORMATIONS SUR CE FICHIER !
+**
+**		Ce fichier contient toutes les fonctions utilisees lorsqu'un client
+**		fait une requete au server. Il peut demander a afficher un page avec
+**		la methode GET, ou il peut poster un formulaire avec GET ou POST et
+**		supprimer quelque chose avec DELETE.
+**
+**		Toutes les fonctions ici permettent de parser, le header et le body (
+**		seulement pour la fonction POST). Elles verifient que toutes les informations
+**		concordent et genere un vector (this->_header_requete) avec ces informations.
+
+**		std::vector<t_header_request> 	_header_requete contient:
+			std::string method  	= get ou post ou delete
+			std::string path		= qui est le path demande ex: /qtest.php?name=pierre
+			std::string protocol	= HTTP /1.1
+			std::string	host		= 127.0.0.1:8080 par exempe
+			bool		cgi			= true il y a cgi dans le path ou php
+			bool		error		= true s'il y a une erreur dans le header de la requete
+									ou s'il y a une erreur quelconque.
+			size_t		num_error	= le numero de l'erreur si bool error = true.
+			std::string body_error	= euh alors la c'est le foure tout. Dedans on peut mettre
+			ce qu'on veut pour l'instant
+*/
 
 /*
-**	DONC on parse la requete et on recupere les info
+**	void	ft_parser_requete( int len_msg, const char  *msg )
+**		This function checks that there is either a GET, a POST or DELETE request in
+**		the client request path.
+**		Then choose the corresponding function.
 */
 void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 {
@@ -41,6 +68,10 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 	{
 		std::cout << "ERROR dans la method error 405" << std::endl;
 	}
+
+	// TOUT CE QUI EST EN COMMENTAIRE DESSOUS DOIT ETRE SUPPRIME ET IMPLEMENTE 
+	//DANS LES AUTRES FONCTIONS.
+
 	// on regarder si c'est get et la taille sup a 1023 si oui erreur 431
 	// if (request_http.compare(0, 4, "GET ") == 0 && len_msg > 1023)
 	// {
@@ -143,8 +174,18 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 
 	// }
 	// std::cout << "i = " << i << std::endl;
+	return ;
 }
 
+/*
+**	size_t	ft_get( std::string request_http, int len_msg)
+**		Cette fonction gere toutes les demandes GET.
+**		1) elle verifie que notre variable _header_requete est vide.
+**		2)	si la longueur de la requete (len_msg) est sup a 1023 = error 431  ==> peut etre a supprimer
+**		3) sinon verifie si la requete a besoin de cgi ou php
+**		4) si oui, execute CGI
+**		4) si non, recupere les informations de la requete et les mets dans this->_header_request
+*/
 size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 {
 	std::cout << "Dans get : " << std::endl;
@@ -156,16 +197,18 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		if (len_msg > 1023)
 		{
 
-			std::cout << RED << "PUTAIN ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
+			std::cout << RED << "On a une  ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
 
-			// il faut regarder dans les error_page si cette erreur est specifie
-			//	regarder si on est dans root et errors ou location
 			if (this->ft_setup_error_header(request_http, len_msg) == 0)
 				return (0);
-			else 
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				sleep(2);
 				return (1);
+			}
 
 		}
 		else
@@ -296,7 +339,14 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 }
 
 
-size_t			HttpServer::ft_find_cgi_or_php( std::string request_http, int len_msg )
+/*
+**	size_t		ft_find_cgi_or_php( std::string request_http, int len_msg )
+**		This function will simply check the presence or absence in the request path
+**		of 'cgi' or 'php'.
+**
+**		If there is, it returns true, otherwise returns false.
+*/
+bool			HttpServer::ft_find_cgi_or_php( std::string request_http, int len_msg )
 {
 	std::cout << "dans la fonction find cgi or php " << std::endl;
 	// on trouve le premier /
@@ -309,20 +359,33 @@ size_t			HttpServer::ft_find_cgi_or_php( std::string request_http, int len_msg )
 	// si .php est entre / et HTTP c'est good, sinon erruer
 	if (find_php > find_backslash && find_php < find_http)
 	{
-		std::cout << " good on a bien du php" << std::endl;
+		std::cout << " good on a bien du php dans la requete qu'il faut utiliser avec cgi" << std::endl;
 		// rajouter debut query_string avec ?
-		return (1);
+		return (true);
 	}
 	else
 	{
-		std::cout << "non on a pas de phpg ou du moins pas entre le / et http" << std::endl;
-		return (0);
+		// on verifie si on a seulement du cgi
+		size_t	find_cgi = request_http.find(".cgi");
+		if (find_cgi > find_backslash && find_cgi < find_http)
+		{
+			std::cout << " good on a bien du cgi dans la requete qu'il faut utiliser avec cgi" << std::endl;
+			// rajouter debut query_string avec ?
+			return (true);
+		}
+		std::cout << "non on a pas de php ou de cgi" << std::endl;
+		return (false);
 	}
-	return (0);
+	return (false);
 }
 
 
-
+/*
+**	size_t		ft_setup_error_header( std::string request_http, int len_msg )
+**
+**	<!> This function is used if there is an error in the header or any error.
+**	IT IS NOT FINISHED.
+*/
 size_t			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 {
 	(void)request_http;
@@ -427,11 +490,18 @@ size_t			HttpServer::ft_setup_error_header( std::string request_http, int len_ms
 }
 
 
+/*
+**		A FAIRE CAS DES REQUETE POST
+*/
 void			HttpServer::ft_post(std::string request_http, int len_msg)
 {
 	(void)request_http;
 	(void)len_msg;
 }
+
+/*
+**	A FAIRE CAS DES REQUETES DELETE
+*/
 void			HttpServer::ft_delete(std::string request_http, int len_msg)
 {
 	(void)request_http;
@@ -440,14 +510,22 @@ void			HttpServer::ft_delete(std::string request_http, int len_msg)
 
 
 
-
+/*
+**	std::string		ft_check_host_header( std::string header )
+**		This function checks for the presence of 'Host' in the client request.
+**
+**		et retourne une string contenant le host et le port.
+**		exmeple: 127.0.0.1:8080
+**			==> ne marche pas si 8081 			A FAIRE
+*/
 std::string		HttpServer::ft_check_host_header( std::string header )
 {
 	size_t pos;
 
 	if ((pos = header.find("Host: ", 0)) == std::string::npos)
 	{
-		std::cout << "ERREUR NE TROUBE PAS LE HOST DANS LE HEADER" << std::endl;
+		// A FAIRE: creer une erreur propre.
+		std::cout << "ERREUR NE TROUVE PAS LE HOST DANS LE HEADER" << std::endl;
 		return (NULL);
 	}
 	else
@@ -455,52 +533,63 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 		size_t pos_user;
 		if ((pos_user = header.find("User-Agent:", pos)) == std::string::npos)
 		{
-			std::cout << "ERREUR NE TROUBE PAS LE HOST DANS LE HEADER" << std::endl;
+			// A FAIRE: creer une erreur propre.
+			std::cout << "ERREUR NE TROUVE PAS LE USER-AGENT DANS LE HEADER" << std::endl;
 			return (NULL);
 		}
 		else
 		{
+			// on verifie que la position de host est avant la position de user-agent.
+			if (pos > pos_user)
+			{
+				// A FAIRE: creer une erreur propre.
+				std::cout << "ERREUR HOST doit etre avant USER-AGENT" << std::endl;
+				return (NULL);
+			}
+			// on recupere les informations apres Host et avant User-agent
 			std::string tmp(header, pos + 6, pos_user - (pos + 6));
 			for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 			{
-				// std::cout << "this->_servers[i].host_server =" << this->_servers[i].host_server <<std::endl;
-				// std::cout << "tmp =" << tmp << std::endl;
-				// std::cout << "i" << std::endl;
+				// on parcourt nos servers pour verifier que le host de la requete est
+				//	bien pour un de nos servers.
 				if (tmp.compare(0, 9, this->_servers[i].host_server) == 0)
 				{
+					// les host de la requete et de notre server sont egaux
+					//	ex: 127.0.0.1
 					std::cout << "ILS SONT EGAUX les host" << std::endl;
 
+					// on convertit le port (std::size_t) en std::string.
 					std::stringstream ss;
 					ss << this->_servers[i].port_server;
 					std::string port;
 					ss >> port;
 					if (tmp.compare(10, 4, port) == 0)
 					{
-						std::cout<< "Ils sont egaux les port " << std::endl;
+						// les ports sont bon, on retourne la string au complete
+						//		ex : 127.0.0.1:8080
+						std::cout<< "Ils sont egaux les port cas 1" << std::endl;
 						return (tmp);
 					}
 					else
 					{
+						//	Les ports ne correspondent pas.
 						if (this->_data->ft_get_nbr_servers() > 1)
 						{
+							// Cas ou on a plusieurs servers
 							std::cout << "euh nbr serv = " << this->_data->ft_get_nbr_servers() << std::endl;
 							for (size_t y = 0; y < this->_data->ft_get_nbr_servers(); y++)
 							{
+								// on parcourt chaque servers pour voir si on a un port
+								//	qui correspond a la requete du client.
 								std::stringstream ss2;
 								std::string port2;
-								// ss.str("");
-								// ss.flush();
-								// port = "";
-								// ss >> port;
-								std::cout << "port lol = " << port2 << std::endl;
 								std::cout << RED << "y = " << y << " et port server = " << this->_servers[y].port_server << CLEAR << std::endl;
 								ss2 << this->_servers[y].port_server;
-								// std::string port;
 								ss2 >> port2;
-								std::cout << "MERDE = " << port2 << " et y = " << y << std::endl;
+								std::cout << "Punaise = " << port2 << " et y = " << y << std::endl;
 								if (tmp.compare(10, 4, port2) == 0)
 								{
-									std::cout<< "Ils sont egaux les port " << std::endl;
+									std::cout<< "Ils sont egaux les port cas 2" << std::endl;
 									return (tmp);
 								}
 								ss2.str("");
@@ -510,18 +599,18 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 						}
 						std::cout << "port pas egaux ? " << std::endl;
 						std::cout << " tmp = -" << tmp << "- et nous = -" << port << "-" << std::endl;
-						throw Error(666, "Erreur test lol, ", 666);
+						throw Error(666, "Erreur test lol, ", 666);			// A FAIRE au propre
 					}
 				}
 				else
 				{
 					std::cout << "les host ne sont pas egaux" << std::endl;
-					throw Error(666, "Erreur test lol 2, ", 666);
+					throw Error(666, "Erreur test lol 2, ", 666);		// A FAIRE au propre
 				}
 				// if (this->_servers[i].host_server == tmp)
 				// 	return (tmp);
 			}
-			std::cout << "ERREUR ICI " << std::endl;
+			std::cout << "ERREUR ICI " << std::endl;			// A FAIRE au propre
 			exit(1);
 			return (std::string(header, pos + 6, pos_user - (pos + 6)));
 		}
@@ -529,12 +618,20 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 
 }
 
+/*
+**	std::string		ft_check_protocol_header( std::string header )
+**		This function checks the version of the HTTP protocol used by the client's request.
+**	
+
+**		Attention ne epeut pas retour ner NULL
+*/
 std::string		HttpServer::ft_check_protocol_header( std::string header )
 {
 	size_t pos;
 
 	if ((pos = header.find("HTTP/1.1")) == std::string::npos)
 	{
+		// A FAIRE: creer une erreur propre.
 		std::cout << "ERREUR NE TROUBE PAS LE PROTOCOL DANS LE HEADER" << std::endl;
 		return (NULL);
 
@@ -545,12 +642,14 @@ std::string		HttpServer::ft_check_protocol_header( std::string header )
 	}
 }
 
+
 std::string		HttpServer::ft_check_path_header( std::string header )
 {
 	size_t	pos;
 	if ((pos = header.find_first_of("/", 0)) == std::string::npos)
 	{
-		std::cout << "ERREUR NE TROUVE PAS LE PATH DANS LE HEADER DE LA REQUETE \n";
+		// A FAIRE: creer une erreur propre.
+		std::cout << "ERREUR NE TROUVE PAS de / dans le path du HEADER DE LA REQUETE \n";
 		return (NULL);
 	}
 	else
@@ -558,23 +657,32 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 		size_t pos_http;
 		if ((pos_http = header.find("HTTP")) == std::string::npos)
 		{
-			std::cout << "ERREUR NE TROUVE PAS LE PATH DANS LE HEADER DE LA REQUETE \n";
+			std::cout << "ERREUR NE TROUVE PAS  HTTP protocol dans le PATH du HEADER DE LA REQUETE \n";
 			return (NULL);
 		}
 		else
 		{
+			if (pos > pos_http)
+			{
+				// A FAIRE: creer une erreur propre.
+				std::cout << "ERREUR le path doit etre avant le http version dans le header du client \n";
+				return (NULL);
+			}
+			// tout est bon, on retour le path en entier.
 			std::string tmp(header, pos, pos_http - pos);
-			
 			return (tmp);
 		}
 	}
 }
 
+/*
+** std::string		ft_check_methods_header( std::string header )
+**	fonction useless je pense
+**	checks la method utilisee dans la requete du client
+**	et setup retourne une string contennant la methode utilisee.
+*/
 std::string		HttpServer::ft_check_methods_header( std::string header )
 {
-	// std::string::iterator	it_b = header.begin();
-	// std::string::iterator	it_end_method;
-
 	size_t pos;
 	if ((pos = header.find("GET", 0)) == std::string::npos)
 	{
