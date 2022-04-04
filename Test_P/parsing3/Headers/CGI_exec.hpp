@@ -38,7 +38,6 @@ class Cgi_exec
 		void			setPathTranslated( std::string const path_trans );
 		void			setScriptName( std::string const script_name );
 		void			setQueryString( std::string const query_string );
-		
 		void			setRemoteHost( std::string const remote_host );
 		void			setRemoteADDR( std::string const remote_addr );
 		void			setAuthType( std::string const auth_type );

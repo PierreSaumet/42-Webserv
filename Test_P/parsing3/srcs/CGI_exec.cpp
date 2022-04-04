@@ -54,15 +54,17 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	this->_env_cgi.insert(std::pair<std::string, std::string>("PATH_TRANSLATED", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SCRIPT_NAME", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("QUERY_STRING", "NULL"));
-	// PAS OBLIGE JE CROIS... DOIT METTRE VIDE CAD LE SUPPRIMER
-	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_HOST", "NULL"));
-	
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_ADDR", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("AUTH_TYPE", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_USER", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_IDENT", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_TYPES", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_LENGTH", "NULL"));
+
+
+	// PAS OBLIGE JE CROIS... DOIT METTRE VIDE CAD LE SUPPRIMER
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_HOST", "NULL"));
+	
 
 	// PAS NECESSAIRE JE CROIS
 	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_ACCEPT", "NULL"));
@@ -146,8 +148,6 @@ void	Cgi_exec::setQueryString( std::string const query_string )
 	return ;
 }
 
-
-
 void	Cgi_exec::setRemoteHost( std::string const remote_host )
 {
 	this->_env_cgi["REMOTE_HOST"] = remote_host;
@@ -224,6 +224,282 @@ std::string	Cgi_exec::getServerSoftware( void )
 	}
 	return ("");
 }
+
+std::string	Cgi_exec::getServerName( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "SERVER_NAME")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getGatewayInterface( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "GATEWAY_INTERFACE")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getServerProtocol( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "SERVER_PROTOCOL")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getServerPort( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "SERVER_PORT")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getRequestMethod( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "REQUEST_METHOD")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getPathInfo( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "PATH_INFO")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getPathTranslated( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "PATH_TRANSLATED")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getScriptName( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "SCRIPT_NAME")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getQueryString( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "QUERY_STRING")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getRemoteHost( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "REMOTE_HOST")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getRemoteAddr( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "REMOTE_ADDR")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getAuthType( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "AUTH_TYPE")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getRemoteUser( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "REMOTE_USER")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getRemoteIdent( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "REMOTE_IDENT")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getContentTypes( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "CONTENT_TYPES")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getContentLength( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "CONTENT_LENGTH")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getHttpAccept( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "HTTP_ACCEPT")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getHttpAcceptLanguage( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "HTTP_ACCEPT_LANGUAGE")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getHttpUserAgent( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "HTTP_USER_AGENT")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getCookie( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "HTTP_COOKIE")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string	Cgi_exec::getReferer( void )
+{
+	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "HTTP_REFERER")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+
+
 
 
 void	Cgi_exec::ft_display_all_variable_env( void )
