@@ -76,8 +76,8 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 
 
 	std::cout << "this->_env_cgi contains : " << std::endl;
-	std::map<std::string, std::string>::iterator		it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator		it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator		it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator		it_e = this->_env_cgi.end();
 	for ( ; it_b != it_e; it_b++)
 	{
 		std::cout << "it_b->first = " << it_b->first << " and it_b->second = " << it_b->second << std::endl;
@@ -212,10 +212,10 @@ void	Cgi_exec::setHttpReferer( std::string const http_referer )
 /*
 **	GETTERS
 */
-std::string	Cgi_exec::getServerSoftware( void )
+std::string	Cgi_exec::getServerSoftware( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -225,10 +225,10 @@ std::string	Cgi_exec::getServerSoftware( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getServerName( void )
+std::string	Cgi_exec::getServerName( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -238,10 +238,10 @@ std::string	Cgi_exec::getServerName( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getGatewayInterface( void )
+std::string	Cgi_exec::getGatewayInterface( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -251,10 +251,10 @@ std::string	Cgi_exec::getGatewayInterface( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getServerProtocol( void )
+std::string	Cgi_exec::getServerProtocol( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -264,10 +264,10 @@ std::string	Cgi_exec::getServerProtocol( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getServerPort( void )
+std::string	Cgi_exec::getServerPort( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -277,10 +277,10 @@ std::string	Cgi_exec::getServerPort( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getRequestMethod( void )
+std::string	Cgi_exec::getRequestMethod( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -290,10 +290,10 @@ std::string	Cgi_exec::getRequestMethod( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getPathInfo( void )
+std::string	Cgi_exec::getPathInfo( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -303,10 +303,10 @@ std::string	Cgi_exec::getPathInfo( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getPathTranslated( void )
+std::string	Cgi_exec::getPathTranslated( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -316,10 +316,10 @@ std::string	Cgi_exec::getPathTranslated( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getScriptName( void )
+std::string	Cgi_exec::getScriptName( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -329,10 +329,10 @@ std::string	Cgi_exec::getScriptName( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getQueryString( void )
+std::string	Cgi_exec::getQueryString( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -342,10 +342,10 @@ std::string	Cgi_exec::getQueryString( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getRemoteHost( void )
+std::string	Cgi_exec::getRemoteHost( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -355,10 +355,10 @@ std::string	Cgi_exec::getRemoteHost( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getRemoteAddr( void )
+std::string	Cgi_exec::getRemoteAddr( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -368,10 +368,10 @@ std::string	Cgi_exec::getRemoteAddr( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getAuthType( void )
+std::string	Cgi_exec::getAuthType( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -381,10 +381,10 @@ std::string	Cgi_exec::getAuthType( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getRemoteUser( void )
+std::string	Cgi_exec::getRemoteUser( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -394,10 +394,10 @@ std::string	Cgi_exec::getRemoteUser( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getRemoteIdent( void )
+std::string	Cgi_exec::getRemoteIdent( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -407,10 +407,10 @@ std::string	Cgi_exec::getRemoteIdent( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getContentTypes( void )
+std::string	Cgi_exec::getContentTypes( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -420,10 +420,10 @@ std::string	Cgi_exec::getContentTypes( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getContentLength( void )
+std::string	Cgi_exec::getContentLength( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -433,10 +433,10 @@ std::string	Cgi_exec::getContentLength( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getHttpAccept( void )
+std::string	Cgi_exec::getHttpAccept( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -446,10 +446,10 @@ std::string	Cgi_exec::getHttpAccept( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getHttpAcceptLanguage( void )
+std::string	Cgi_exec::getHttpAcceptLanguage( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -459,10 +459,10 @@ std::string	Cgi_exec::getHttpAcceptLanguage( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getHttpUserAgent( void )
+std::string	Cgi_exec::getHttpUserAgent( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -472,10 +472,10 @@ std::string	Cgi_exec::getHttpUserAgent( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getCookie( void )
+std::string	Cgi_exec::getCookie( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -485,10 +485,10 @@ std::string	Cgi_exec::getCookie( void )
 	return ("");
 }
 
-std::string	Cgi_exec::getReferer( void )
+std::string	Cgi_exec::getReferer( void ) const
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
@@ -504,8 +504,8 @@ std::string	Cgi_exec::getReferer( void )
 
 void	Cgi_exec::ft_display_all_variable_env( void )
 {
-	std::map<std::string, std::string>::iterator it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::iterator it_e = this->_env_cgi.end();
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{

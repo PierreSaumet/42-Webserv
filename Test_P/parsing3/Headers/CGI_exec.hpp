@@ -20,14 +20,23 @@
 class Cgi_exec
 {
 	public:
+		/*
+		**	Canonical form
+		*/
 		Cgi_exec( void );
 		Cgi_exec( const Cgi_exec &copy );
 		~Cgi_exec( void );
 
 		Cgi_exec		&operator=( const Cgi_exec &element );
 
+		/*
+		**	This function setup all variables to "NULL" string
+		*/
 		size_t			ft_setup_env_cgi( void );
 
+		/*
+		**	Setters
+		*/
 		void			setServerSoftware( std::string const software );
 		void			setServerName( std::string const name );
 		void			setGatewayInterface( std::string const gateway );
@@ -51,28 +60,31 @@ class Cgi_exec
 		void			setHttpCookie( std::string const http_cookie );
 		void			setHttpReferer( std::string const http_referer );
 
-		std::string		getServerSoftware( void );
-		std::string		getServerName( void );
-		std::string		getGatewayInterface( void );
-		std::string		getServerProtocol( void );
-		std::string		getServerPort( void );
-		std::string		getRequestMethod( void );
-		std::string		getPathInfo( void );
-		std::string		getPathTranslated( void );
-		std::string		getScriptName( void );
-		std::string		getQueryString( void );
-		std::string		getRemoteHost( void );
-		std::string		getRemoteAddr( void );
-		std::string		getAuthType( void );
-		std::string		getRemoteUser( void );
-		std::string		getRemoteIdent( void );
-		std::string		getContentTypes( void );
-		std::string		getContentLength( void );
-		std::string		getHttpAccept( void );
-		std::string		getHttpAcceptLanguage( void );
-		std::string		getHttpUserAgent( void );
-		std::string		getCookie( void );
-		std::string		getReferer( void );
+		/*
+		**	Getters
+		*/
+		std::string		getServerSoftware( void ) const;
+		std::string		getServerName( void ) const;
+		std::string		getGatewayInterface( void ) const;
+		std::string		getServerProtocol( void ) const;
+		std::string		getServerPort( void ) const;
+		std::string		getRequestMethod( void ) const;
+		std::string		getPathInfo( void ) const;
+		std::string		getPathTranslated( void ) const;
+		std::string		getScriptName( void ) const;
+		std::string		getQueryString( void ) const;
+		std::string		getRemoteHost( void ) const;
+		std::string		getRemoteAddr( void ) const;
+		std::string		getAuthType( void ) const;
+		std::string		getRemoteUser( void ) const;
+		std::string		getRemoteIdent( void ) const;
+		std::string		getContentTypes( void ) const;
+		std::string		getContentLength( void ) const;
+		std::string		getHttpAccept( void ) const;
+		std::string		getHttpAcceptLanguage( void ) const;
+		std::string		getHttpUserAgent( void ) const;
+		std::string		getCookie( void ) const;
+		std::string		getReferer( void ) const;
 
 		void			ft_display_all_variable_env( void );
 
