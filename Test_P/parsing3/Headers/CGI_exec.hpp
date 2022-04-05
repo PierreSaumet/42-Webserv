@@ -35,6 +35,11 @@ class Cgi_exec
 		size_t			ft_setup_env_cgi( void );
 
 		/*
+		**	This function execute the cgi from the path
+		*/
+		std::string		ft_execute_cgi( void );
+
+		/*
 		**	Setters
 		*/
 		void			setServerSoftware( std::string const software );

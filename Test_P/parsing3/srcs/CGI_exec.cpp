@@ -42,7 +42,7 @@ Cgi_exec		&Cgi_exec::operator=( const Cgi_exec &element )
 
 size_t			Cgi_exec::ft_setup_env_cgi( void )
 {
-	// setup all data...
+	// setup all data to null ... 
 	//https://fr.wikipedia.org/wiki/Variables_d%27environnement_CGI
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_SOFTWARE", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_NAME", "NULL"));
@@ -62,6 +62,8 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_LENGTH", "NULL"));
 
 
+
+
 	// PAS OBLIGE JE CROIS... DOIT METTRE VIDE CAD LE SUPPRIMER
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_HOST", "NULL"));
 	
@@ -73,7 +75,8 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_COOKIE", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_REFERER", "NULL"));
 
-
+	//	A rajouter un status code ? je ne sais pas si ca existe mais Jerome m'a dit que oui
+	//this->_env_cgi.insert(std::pair<std::string, std::string>("REDIRECT_STATUS", "NULL"));
 
 	std::cout << "this->_env_cgi contains : " << std::endl;
 	std::map<std::string, std::string>::const_iterator		it_b = this->_env_cgi.begin();
@@ -84,6 +87,53 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	}
 	return (0);
 }
+
+std::string	Cgi_exec::ft_execute_cgi( void )
+{
+	std::cout << "Dans ft_execute_cgi " << std::endl;
+
+	/*
+			PSEUDO CODE A FAIRE	
+
+
+			1 ) mettre a jour les variables environnement de cgi
+				exemples :
+							==>	SERVER_SOFTWARE	=	"webser/1"
+							==>	SERVER_PROTOCOL	=	"HTTP/1.1"
+					c'est les infos qu'on a dans la requete.
+			2 ) init les variables locales a utiliser
+				pid_t pid;
+				int		stdin?
+				int		stdout?
+
+				stdin = dup(0)
+				stdout = dup(1);
+				pid = fork()
+			3 ) les conditions du fork()
+				if (pid < 0)
+					error
+				else if (pid == 0) child
+				{
+					dup2
+					dup2
+					execute ?
+						si execute < 0 
+							error
+				}
+				else	parent
+				{
+					waitpid()
+					recuperer la string du "retour de execute"
+
+				}
+			4 ) retourner la string contenant les infos du CGI
+				pour l'afficher apres dans le read.
+	*/
+
+
+	return ("");
+}
+
 
 /*
 **	SETTERS
