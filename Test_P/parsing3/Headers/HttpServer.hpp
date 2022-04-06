@@ -115,6 +115,7 @@ class HttpServer {
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );
 
 		size_t		ft_parsing_path_get_request( void );
+		std::string		ft_clean_path_get_request( std::string tmp );
 
 		std::string		ft_get_content_length( struct stat buff ) const;
 		std::string		ft_get_end_header( void ) const;

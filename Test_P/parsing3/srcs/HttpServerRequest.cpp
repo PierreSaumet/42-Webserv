@@ -264,7 +264,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 				}
 				else
 					std::cout << GREEN << "le parsing du path de get est OK =) " << CLEAR << std::endl;
-				return (0); //(1);
+				exit(1); //(1);
 				///////////////////////////////
 
 
@@ -348,7 +348,7 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 		size_t len = this->_header_requete[0].path.length();
 		while (this->_header_requete[0].path[pos_cursor])
 		{
-			std::cout << "lettre = this->_header_requete[0].path[pos_cursor] = " << this->_header_requete[0].path[pos_cursor] << std::endl;
+			// std::cout << "lettre = this->_header_requete[0].path[pos_cursor] = " << this->_header_requete[0].path[pos_cursor] << std::endl;
 			
 			if (this->_header_requete[0].path.compare(pos_cursor, 1, "=") == 0)
 			{
@@ -358,18 +358,22 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 			}
 			else if (this->_header_requete[0].path.compare(pos_cursor, 1, "&") == 0 || pos_cursor == len - 1)
 			{
-				pos_cursor++;
+				if (this->_header_requete[0].path.compare(pos_cursor, 1, "&") == 0 )
+					pos_cursor++;
 				std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
 				for (; it_b != this->_header_requete[0].data.end(); it_b++)
 				{
 					if (it_b->second == "NULL")
 					{
+						// need to change characters
+						tmp = ft_clean_path_get_request(tmp);
 						it_b->second = tmp;
 					}
 				}
 				tmp.clear();
 			}
-			tmp.append(this->_header_requete[0].path, pos_cursor, 1);
+			else
+				tmp.append(this->_header_requete[0].path, pos_cursor, 1);
 			// std::cout << "\ttmp = " << tmp << " et cursor = " << pos_cursor << std::endl;
 			pos_cursor++;
 
@@ -381,7 +385,7 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 	std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
 	for (; it_b != this->_header_requete[0].data.end(); it_b++)
 	{
-		std::cout << it_b->first << " et " << it_b->second << std::endl;
+		std::cout << it_b->first << " = " << it_b->second << std::endl;
 	}
 	// this->_header_requete[0].path
 
@@ -389,6 +393,59 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 	return (0);
 }
 
+std::string		find_replace( std::string to_search, std::string to_replace, std::string data )
+{
+	size_t pos = data.find(to_search);
+
+	while (pos != std::string::npos)
+	{
+		data.replace(pos, to_search.size(), to_replace);
+		pos = data.find(to_search, pos + to_replace.size());
+	}
+	// data.erase(0, 1); // delete = at the beginning.
+	return (data);
+}
+// URL ENCODING
+std::string		HttpServer::ft_clean_path_get_request( std::string tmp )
+{
+	// size_t len_tmp = tmp.length();
+	std::map<std::string, std::string> url_coding;
+
+	url_coding.insert(std::pair<std::string , std::string>("+", " ")); // space
+	url_coding.insert(std::pair<std::string , std::string>("%3D", "=")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%21", "!")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%22", "\"")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%23", "#")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%24", "$")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%25", "%")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%26", "&")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%27", "'")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%28", "(")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%29", ")")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("%2A", "*")); 	// =
+
+	std::map<std::string, std::string>::iterator it_find = url_coding.begin();
+	for (; it_find != url_coding.end(); it_find++)
+	{
+		tmp = find_replace(it_find->first, it_find->second, tmp);
+	}
+	return (tmp);
+	// std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
+	// for (; it_b != this->_header_requete[0].data.end(); it_b++)
+	// {
+	// 	std::cout << it_b->first << " = " << it_b->second << std::endl;
+	// 	fonction_coucou(it_b->second);
+	// 	std::map<std::string, std::string>::iterator it_find = url_coding.begin();
+	// 	for (; it_find != url_coding.end(); it_find++)
+	// 	{
+	// 		tmp
+	// 	}
+	// }
+
+	// // size_t  find = 
+	// (void)len_tmp;
+	return (tmp);
+}
 
 void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 {
