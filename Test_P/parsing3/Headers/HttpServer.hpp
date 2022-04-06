@@ -63,6 +63,7 @@ class HttpServer {
 			bool				error;
 			size_t				num_error;
 			std::string			body_error;
+			std::map<std::string, std::string>	data;
 		}						t_header_request;
 		
 
@@ -112,6 +113,8 @@ class HttpServer {
 
 		bool			ft_find_cgi_or_php( std::string request_http, int len_msg );
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );
+
+		size_t		ft_parsing_path_get_request( void );
 
 		std::string		ft_get_content_length( struct stat buff ) const;
 		std::string		ft_get_end_header( void ) const;

@@ -80,7 +80,7 @@ std::string		HttpServer::ft_setup_header( void )
 	if (stat(this->_header_requete[0].path.c_str(), &buff2) < 0)
 	{
 		std::cout << "Error, la page demande n'exite pas. ici" << std::endl;
-		return (NULL);
+		return ("");
 	}
 	if (buff2.st_size == 0)
 	{
@@ -238,10 +238,10 @@ std::string		HttpServer::ft_create_fake_error( void )
 	std::string tmp;
 	// tmp.insert(0, "<!DOCTYPE html><html><head><title>Hello World</title></head><body><h1>TEST Webserv</h1></body></html>\r\n");
 
-	// tmp = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>Hello World</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>TEST Webserv</h1></body></html>\r\n";
+	tmp = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>Hello World</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>TEST Webserv</h1></body></html>\r\n";
 	
 	
-	tmp = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>GET Query String</title><style>body { background-color: rgb(105, 140, 238) }h1 { font-size:2cm; text-align: center; color: rgb(121, 219, 56);text-shadow: 0 0 2mm red}</style></head><body><h1> Im'gonne say hello to you using the query string in the URL ! </h1><h2><?php echo 'Hello ' . htmlspecialchars($_GET['name']) . '!';?></h2></body></html>\r\n";
+	// tmp = "HTTP/1.1 404 KO\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>GET Query String</title><style>body { background-color: rgb(105, 140, 238) }h1 { font-size:2cm; text-align: center; color: rgb(121, 219, 56);text-shadow: 0 0 2mm red}</style></head><body><h1> Im'gonne say hello to you using the query string in the URL ! </h1><h2><?php echo 'Hello ' . htmlspecialchars($_GET['name']) . '!';?></h2></body></html>\r\n";
 	
 	return (tmp);
 }

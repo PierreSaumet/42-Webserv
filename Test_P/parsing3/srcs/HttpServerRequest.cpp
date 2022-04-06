@@ -218,12 +218,12 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 
 			// peut etre a changer l'ordre
 			//	On a une requete get, il faut verifier si on a du php et donc du cgi
-			if (ft_find_cgi_or_php(request_http, len_msg) == 1)
-			{
-				// on a du php ou du cgi ?
-				// donc faut utiliser cgi
-				ft_exec_cgi_test( request_http, len_msg);
-			}
+			// if (ft_find_cgi_or_php(request_http, len_msg) == 1)
+			// {
+			// 	// on a du php ou du cgi ?
+			// 	// donc faut utiliser cgi
+			// 	ft_exec_cgi_test( request_http, len_msg);
+			// }
 
 			// on trouve la fin du header de la requete HTTP.
 			std::string::iterator	it_b = request_http.begin();
@@ -237,85 +237,83 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 					it_end_request = it_b;
 					break ;
 				}
-				// std::cout << "*it = " << *it_b << std::endl;
 				i++;
 			}
 			std::string size_header(request_http.begin(), it_end_request);
-			if (size_header.size() >= 1024)		// server apache 8000 max
+			std::cout << RED << "ICI 3" << CLEAR << std::endl;
+			std::cout << "Taille du header bon = " << size_header.size() << std::endl;
+			// test savoir quelle method
+			if (this->_header_requete.empty() == false)
 			{
-				std::cout << RED << "ICI 2" << CLEAR << std::endl;
-				// throw error ou affiche la page 413 ?
-				// throw Error(10, "Error, in recieved header, the header size is greater than 8000.", 2);
-				std::cout << "ERREUR size du header trop grand return une erreur 413 entity too large" << std::endl;
+				std::cout << "Notre container header est vide, on en cree un et on recupere les informations" << std::endl;
+				this->_header_requete.push_back(t_header_request());
 
-				// alors si get return 431
-			}
-			else
-			{
-				std::cout << RED << "ICI 3" << CLEAR << std::endl;
-				std::cout << "Taille du header bon = " << size_header.size() << std::endl;
-				// test savoir quelle method
-				if (this->_header_requete.empty() == false)
-				{
-					std::cout << "Notre container header est vide, on en cree un et on recupere les informations" << std::endl;
-					this->_header_requete.push_back(t_header_request());
-
-					this->_header_requete[0].method = this->ft_check_methods_header(size_header);
-					if (this->_header_requete[0].method.empty() == true)
-						throw Error(11, "Error, in recieved header, the method used is not correct.", 2);
-					std::cout << "On a la requete :" << this->_header_requete[0].method << "-" <<  std::endl;
+				this->_header_requete[0].method = this->ft_check_methods_header(size_header);
+				if (this->_header_requete[0].method.empty() == true)
+					throw Error(11, "Error, in recieved header, the method used is not correct.", 2);
+				std::cout << "On a la requete :" << this->_header_requete[0].method << "-" <<  std::endl;
+			
+				this->_header_requete[0].path = this->ft_check_path_header(size_header);
+				if (this->_header_requete[0].path.empty() == true)
+					throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
+				std::cout << "le path = " << this->_header_requete[0].path << std::endl;
 				
-					this->_header_requete[0].path = this->ft_check_path_header(size_header);
-					if (this->_header_requete[0].path.empty() == true)
-						throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
-					std::cout << "le path = " << this->_header_requete[0].path << std::endl;
-					
-					// erruer avec le /flavicon.ico
-					if (this->_header_requete[0].path == "/flavicon.ico ")
-					{
-						std::cout << "merde flavicon " << std::endl;
-						this->_header_requete[0].path = "/ ";
-					}
+				if (ft_parsing_path_get_request() == 1)
+				{
+					std::cout << RED << "erreur dans le parsing d u path de get " << CLEAR << std::endl;
+				}
+				else
+					std::cout << GREEN << "le parsing du path de get est OK =) " << CLEAR << std::endl;
+				return (0); //(1);
+				///////////////////////////////
 
 
-					std::cout << " Taille DU PATH = " << this->_header_requete[0].path.length() << std::endl;
 
-					// donc si la taille du path est superieur a 1024 on  va dire
-					if (this->_header_requete[0].path.length() > 1024)
-					{
-						// doit setup error 414 si GET
-						std::cout << "path superierur a 1024" << std::endl;
-					}
-					else
-					{
-						std::cout << "taille path ok" << std::endl;
-					}
-					// EUH a quoi ca sert ca ?
-					// if (this->_header_requete[0].path == "/page2.html")
-					// {
-					// 	std::cout << "YES" << std::endl;
-					// 	exit(EXIT_SUCCESS);
-					// }
+				// erruer avec le /flavicon.ico
+				if (this->_header_requete[0].path == "/flavicon.ico ")
+				{
+					std::cout << "merde flavicon " << std::endl;
+					this->_header_requete[0].path = "/ ";
+				}
 
-					this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
-					if (this->_header_requete[0].protocol.empty() == true)
-						throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
-					std::cout << "le protocol = " << this->_header_requete[0].protocol << "-" << std::endl;
 
-					this->_header_requete[0].host = this->ft_check_host_header(size_header);
-					if (this->_header_requete[0].host.empty() == true)
-						throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
-					std::cout << "le host = " << this->_header_requete[0].host << "-" << std::endl;
+				std::cout << " Taille DU PATH = " << this->_header_requete[0].path.length() << std::endl;
 
-					std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+				// donc si la taille du path est superieur a 1024 on  va dire
+				if (this->_header_requete[0].path.length() > 1024)
+				{
+					// doit setup error 431
+					std::cout << "path superierur a 1024" << std::endl;
 				}
 				else
 				{
-					std::cout << "Probleme le container qui recupere la header de la requete est vide " << std::endl;
-					std::cout << "Il faut le supprimer apres avoir fait traite une demande." << std::endl;
+					std::cout << "taille path ok" << std::endl;
 				}
 
+				this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
+				if (this->_header_requete[0].protocol.empty() == true)
+					throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
+				std::cout << "le protocol = " << this->_header_requete[0].protocol << "-" << std::endl;
+
+				this->_header_requete[0].host = this->ft_check_host_header(size_header);
+				if (this->_header_requete[0].host.empty() == true)
+					throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
+				std::cout << "le host = " << this->_header_requete[0].host << "-" << std::endl;
+
+				std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 			}
+			else
+			{
+				std::cout << "Probleme le container qui recupere la header de la requete est vide " << std::endl;
+				std::cout << "Il faut le supprimer apres avoir fait traite une demande." << std::endl;
+			}
+			if (ft_find_cgi_or_php(request_http, len_msg) == 1)
+			{
+				// on a du php ou du cgi ?
+				// donc faut utiliser cgi
+				ft_exec_cgi_test( request_http, len_msg);
+			}
+			
 			std::cout << "i = " << i << std::endl;
 
 		}
@@ -330,6 +328,67 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 
 	return (0);
 }
+
+// / = %2F 
+// ? = %3F
+// & = %26
+size_t			HttpServer::ft_parsing_path_get_request( void )
+{
+	std::cout << "PATH = " << this->_header_requete[0].path << std::endl;
+	size_t		pos_cursor = this->_header_requete[0].path.find("?");
+	if (pos_cursor == std::string::npos)
+	{
+		std::cout << "pas de donnee a parser dans parsing path get request" << std::endl;
+		return (0);
+	}
+	else
+	{
+		std::string tmp;
+		pos_cursor++;
+		size_t len = this->_header_requete[0].path.length();
+		while (this->_header_requete[0].path[pos_cursor])
+		{
+			std::cout << "lettre = this->_header_requete[0].path[pos_cursor] = " << this->_header_requete[0].path[pos_cursor] << std::endl;
+			
+			if (this->_header_requete[0].path.compare(pos_cursor, 1, "=") == 0)
+			{
+				this->_header_requete[0].data.insert(std::pair<std::string, std::string>(tmp, "NULL"));
+				tmp.clear();
+
+			}
+			else if (this->_header_requete[0].path.compare(pos_cursor, 1, "&") == 0 || pos_cursor == len - 1)
+			{
+				pos_cursor++;
+				std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
+				for (; it_b != this->_header_requete[0].data.end(); it_b++)
+				{
+					if (it_b->second == "NULL")
+					{
+						it_b->second = tmp;
+					}
+				}
+				tmp.clear();
+			}
+			tmp.append(this->_header_requete[0].path, pos_cursor, 1);
+			// std::cout << "\ttmp = " << tmp << " et cursor = " << pos_cursor << std::endl;
+			pos_cursor++;
+
+		}
+
+		
+	}
+	std::cout << "\n\nDISPLAY ALL MAP DATA " << std::endl;
+	std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
+	for (; it_b != this->_header_requete[0].data.end(); it_b++)
+	{
+		std::cout << it_b->first << " et " << it_b->second << std::endl;
+	}
+	// this->_header_requete[0].path
+
+
+	return (0);
+}
+
 
 void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 {
@@ -657,7 +716,7 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 	else
 	{
 		size_t pos_http;
-		if ((pos_http = header.find("HTTP")) == std::string::npos)
+		if ((pos_http = header.find("HTTP/1.1\r\n")) == std::string::npos)
 		{
 			std::cout << "ERREUR NE TROUVE PAS  HTTP protocol dans le PATH du HEADER DE LA REQUETE \n";
 			return (NULL);

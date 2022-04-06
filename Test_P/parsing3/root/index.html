@@ -14,13 +14,38 @@
 
 		<p>Ok, donc maintenant on va essayer de cliquer sur le lien et aller sur la page : <a href="page2.html">TEST </a></p>
 	
+		<p>
+			<form action="test_form.html" method="GET">
+				<div>
+					<label for="test">Test: </label>
+					<input type="text" id="test" name="test"/>
+				</div>
+
+				<div>
+					<input type="submit"/>
+				</div>
+			</form>
+		</p>
 	
+		<p></p>
+
+
+
+
 		<p> TeST1 query string avec get</p>
 		<p>Marche pas ... need cgi je pense</p> 
 		<form action="./Hello/query_get_test.php" method="GET" accept-charset="utf-8">
 			<div>
 				<label for="name">Nom : </label>
-				<input type="text" id="name" name="name">
+				<input type="text" id="name" name="name"/>
+			</div>
+			<div>
+				<label for="prenom">Prenom : </label>
+				<input type="text" id="prenom" name="prenom"/>
+			</div>
+			<div>
+				<label for="msg">message : </label>
+				<input type="text" id="msg" name="message"/>
 			</div>
 
 			<div>
