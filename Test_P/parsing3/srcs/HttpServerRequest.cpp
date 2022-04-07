@@ -329,9 +329,6 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	return (0);
 }
 
-// / = %2F 
-// ? = %3F
-// & = %26
 size_t			HttpServer::ft_parsing_path_get_request( void )
 {
 	std::cout << "PATH = " << this->_header_requete[0].path << std::endl;
@@ -348,18 +345,13 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 		size_t len = this->_header_requete[0].path.length();
 		while (this->_header_requete[0].path[pos_cursor])
 		{
-			// std::cout << "lettre = this->_header_requete[0].path[pos_cursor] = " << this->_header_requete[0].path[pos_cursor] << std::endl;
-			
 			if (this->_header_requete[0].path.compare(pos_cursor, 1, "=") == 0)
 			{
 				this->_header_requete[0].data.insert(std::pair<std::string, std::string>(tmp, "NULL"));
 				tmp.clear();
-
 			}
 			else if (this->_header_requete[0].path.compare(pos_cursor, 1, "&") == 0 || pos_cursor == len - 1)
 			{
-				if (this->_header_requete[0].path.compare(pos_cursor, 1, "&") == 0 )
-					pos_cursor++;
 				std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
 				for (; it_b != this->_header_requete[0].data.end(); it_b++)
 				{
@@ -374,25 +366,23 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 			}
 			else
 				tmp.append(this->_header_requete[0].path, pos_cursor, 1);
-			// std::cout << "\ttmp = " << tmp << " et cursor = " << pos_cursor << std::endl;
 			pos_cursor++;
-
 		}
-
-		
 	}
-	std::cout << "\n\nDISPLAY ALL MAP DATA " << std::endl;
-	std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
-	for (; it_b != this->_header_requete[0].data.end(); it_b++)
-	{
-		std::cout << it_b->first << " = " << it_b->second << std::endl;
-	}
-	// this->_header_requete[0].path
-
-
+	// std::cout << "\n\nDISPLAY ALL MAP DATA " << std::endl;
+	// std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
+	// for (; it_b != this->_header_requete[0].data.end(); it_b++)
+	// {
+	// 	std::cout << it_b->first << " = " << it_b->second << std::endl;
+	// }
 	return (0);
 }
 
+/*
+**	find_replace and ft_clean_path get request
+**		on doit les deplacer ailleurs.
+**	clean path get request est a ameliorer. c'est du brut force LOL
+*/
 std::string		find_replace( std::string to_search, std::string to_replace, std::string data )
 {
 	size_t pos = data.find(to_search);
@@ -402,27 +392,43 @@ std::string		find_replace( std::string to_search, std::string to_replace, std::s
 		data.replace(pos, to_search.size(), to_replace);
 		pos = data.find(to_search, pos + to_replace.size());
 	}
-	// data.erase(0, 1); // delete = at the beginning.
 	return (data);
 }
 // URL ENCODING
 std::string		HttpServer::ft_clean_path_get_request( std::string tmp )
 {
-	// size_t len_tmp = tmp.length();
 	std::map<std::string, std::string> url_coding;
 
-	url_coding.insert(std::pair<std::string , std::string>("+", " ")); // space
-	url_coding.insert(std::pair<std::string , std::string>("%3D", "=")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%21", "!")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%22", "\"")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%23", "#")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%24", "$")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%25", "%")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%26", "&")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%27", "'")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%28", "(")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%29", ")")); 	// =
-	url_coding.insert(std::pair<std::string , std::string>("%2A", "*")); 	// =
+	url_coding.insert(std::pair<std::string , std::string>("+", " ")); // space	
+	url_coding.insert(std::pair<std::string , std::string>("%21", "!")); 	
+	url_coding.insert(std::pair<std::string , std::string>("%22", "\"")); 	
+	url_coding.insert(std::pair<std::string , std::string>("%23", "#")); 	
+	url_coding.insert(std::pair<std::string , std::string>("%24", "$")); 
+	url_coding.insert(std::pair<std::string , std::string>("%25", "%")); 	
+	url_coding.insert(std::pair<std::string , std::string>("%26", "&")); 
+	url_coding.insert(std::pair<std::string , std::string>("%27", "'")); 	
+	url_coding.insert(std::pair<std::string , std::string>("%28", "(")); 	
+	url_coding.insert(std::pair<std::string , std::string>("%29", ")")); 	
+	url_coding.insert(std::pair<std::string , std::string>("%2A", "*"));
+	url_coding.insert(std::pair<std::string , std::string>("%2B", "+"));
+	url_coding.insert(std::pair<std::string , std::string>("%2C", ","));
+	url_coding.insert(std::pair<std::string , std::string>("%2D", "-"));
+	url_coding.insert(std::pair<std::string , std::string>("%2E", "."));
+	url_coding.insert(std::pair<std::string , std::string>("%2F", "/"));
+	url_coding.insert(std::pair<std::string , std::string>("%3A", ":"));
+	url_coding.insert(std::pair<std::string , std::string>("%3B", ";"));
+	url_coding.insert(std::pair<std::string , std::string>("%3C", "<"));
+	url_coding.insert(std::pair<std::string , std::string>("%3D", "="));
+	url_coding.insert(std::pair<std::string , std::string>("%3E", ">"));
+	url_coding.insert(std::pair<std::string , std::string>("%3F", "?"));
+	url_coding.insert(std::pair<std::string , std::string>("%40", "@"));
+	url_coding.insert(std::pair<std::string , std::string>("%5B", "["));
+	url_coding.insert(std::pair<std::string , std::string>("%5C", "\\"));
+	url_coding.insert(std::pair<std::string , std::string>("%5D", "]"));
+	url_coding.insert(std::pair<std::string , std::string>("%5E", "^"));
+	url_coding.insert(std::pair<std::string , std::string>("%5F", "_"));
+	url_coding.insert(std::pair<std::string , std::string>("%E2", "€"));
+	url_coding.insert(std::pair<std::string , std::string>("%60", "`"));
 
 	std::map<std::string, std::string>::iterator it_find = url_coding.begin();
 	for (; it_find != url_coding.end(); it_find++)
@@ -430,20 +436,7 @@ std::string		HttpServer::ft_clean_path_get_request( std::string tmp )
 		tmp = find_replace(it_find->first, it_find->second, tmp);
 	}
 	return (tmp);
-	// std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
-	// for (; it_b != this->_header_requete[0].data.end(); it_b++)
-	// {
-	// 	std::cout << it_b->first << " = " << it_b->second << std::endl;
-	// 	fonction_coucou(it_b->second);
-	// 	std::map<std::string, std::string>::iterator it_find = url_coding.begin();
-	// 	for (; it_find != url_coding.end(); it_find++)
-	// 	{
-	// 		tmp
-	// 	}
-	// }
 
-	// // size_t  find = 
-	// (void)len_tmp;
 	return (tmp);
 }
 

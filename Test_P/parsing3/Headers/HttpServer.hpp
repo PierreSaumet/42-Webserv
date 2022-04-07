@@ -63,7 +63,7 @@ class HttpServer {
 			bool				error;
 			size_t				num_error;
 			std::string			body_error;
-			std::map<std::string, std::string>	data;
+			std::map<std::string, std::string>	data;					// contient les informations en get.
 		}						t_header_request;
 		
 
