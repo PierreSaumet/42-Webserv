@@ -446,35 +446,102 @@ int		HttpServer::ft_test_reading( void )
 	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
 	std::vector<t_client_socket>::iterator it_e_client = this->_all_client_socket.end();
 
+
+	// test avec un buffer plus petit
+	char buffer[1024];
+	std::string	tt_buffer;
+
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
-		char buffer[1000000 + 1];
-
 		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
 		{
-			std::cout << "dans isst de read" << std::endl;
-			std::cout << "euh _read_fs = " << &this->_read_fs << std::endl;
+			memset((char *)buffer, 0, 1024 + 1);
 			int request_length;
+			std::string	tt_buffer;
 
-			memset((char *)buffer, 0, 1000000 + 1);
-			request_length = recv(it_b_client->client_socket, buffer, 1000000, 0);
-			
-			if (request_length <= 0)
+			size_t error = 0;
+			while (1)
 			{
-				// Normalement il ne faut pas sortir une erreur ici, je crois.
-				std::cout << "Erreur recv" << std::endl;
-				std::cout << "message taille recu = " << request_length << std::endl;
-				close(it_b_client->client_socket);
-				it_b_client = this->_all_client_socket.erase(it_b_client);
-				continue ;
+				memset((char *)buffer, 0, 1024 + 1);
+				if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) < 0)
+				{
+					// error = 1;
+					break ;
+				}
+				else
+				{
+					tt_buffer.append(buffer, request_length);
+				}
+			}
+			if (error == 1)
+			{
+				std::cout << "Mince error " << std::endl;
+				exit(1);
 			}
 			else
 			{
-				std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
-				this->ft_parser_requete(request_length, buffer);
+				std::cout << "GOOD CA MARCHE " << std::endl;
+				std::cout << "tt de la string = " << tt_buffer << std::endl;
+				std::cout << "taille de la string = " << tt_buffer.size() << std::endl;
+				this->ft_parser_requete(tt_buffer.size() , tt_buffer);
 			}
+
+			// while ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) > 0)
+			// {
+			// 	tt_buffer.append(buffer, request_length);
+			// 	memset((char *)buffer, 0, 1024 + 1);
+			// 	std::cout << " ici + 1 " << std::endl;
+			// 	sleep(1);
+			// }
+			// if (request_length < 0)
+			// {
+			// 	//Normalement il ne faut pas sortir une erreur ici, je crois.
+			// 	std::cout << "Erreur recv" << std::endl;
+			// 	std::cout << "message taille recu = " << request_length << std::endl;
+			// 	std::cout << "tt de la string = " << tt_buffer << std::endl;
+			// 	close(it_b_client->client_socket);
+			// 	it_b_client = this->_all_client_socket.erase(it_b_client);
+			// 	continue ;
+			// }
+			// else
+			// {
+			// 	std::cout << "tt de la string = " << tt_buffer << std::endl;
+			// 	std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
+			// 	request_length = tt_buffer.size();
+			// 	this->ft_parser_requete(request_length, tt_buffer); 
+			// 	// exit(1);
+			// }
 		}
 	}
+	// for (; it_b_client != it_e_client; it_b_client++)
+	// {
+	// 	char buffer[1000000 + 1];
+
+	// 	if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
+	// 	{
+	// 		std::cout << "dans isst de read" << std::endl;
+	// 		std::cout << "euh _read_fs = " << &this->_read_fs << std::endl;
+	// 		int request_length;
+
+	// 		memset((char *)buffer, 0, 1000000 + 1);
+	// 		request_length = recv(it_b_client->client_socket, buffer, 1000000, 0);
+			
+	// 		if (request_length <= 0)
+	// 		{
+	// 			// Normalement il ne faut pas sortir une erreur ici, je crois.
+	// 			std::cout << "Erreur recv" << std::endl;
+	// 			std::cout << "message taille recu = " << request_length << std::endl;
+	// 			close(it_b_client->client_socket);
+	// 			it_b_client = this->_all_client_socket.erase(it_b_client);
+	// 			continue ;
+	// 		}
+	// 		else
+	// 		{
+	// 			std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
+	// 			this->ft_parser_requete(request_length, buffer);
+	// 		}
+	// 	}
+	// }
 	return (0);
 }
 

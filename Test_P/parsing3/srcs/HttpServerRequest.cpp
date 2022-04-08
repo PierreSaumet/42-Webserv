@@ -43,7 +43,7 @@
 **		the client request path.
 **		Then choose the corresponding function.
 */
-void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
+void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 {
 	std::cout << "Dans parser requete " << std::endl;
 
@@ -188,8 +188,11 @@ void	HttpServer::ft_parser_requete( int len_msg, const char  *msg )
 */
 size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 {
-	std::cout << "Dans get : " << std::endl;
-
+	std::cout << BLUE <<  "Dans get : " << CLEAR <<  std::endl;
+	std::cout << "taille request = " << request_http.length() << std::endl;
+	std::cout << "taille request = " << request_http.size() << std::endl;
+	std::cout << "len msg = " << len_msg << std::endl;
+	//sleep(5);
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
@@ -198,6 +201,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		{
 
 			std::cout << RED << "On a une  ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
+			//sleep(5);
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
 
