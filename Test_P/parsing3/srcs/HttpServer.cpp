@@ -226,6 +226,7 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 			else
 			{
 				std::cout << GREEN << "nouvelle connection client avec le server " << CLEAR << std::endl;
+				std::cout << "size addr new cloent = " << size_addr_new_client << std::endl;
 				// maintenant on modifi l'etat du fd avec fcntl pour le mettre en non bloquand
 				if (fcntl(socket_new_client, F_SETFL, O_NONBLOCK) < 0)
 					throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
@@ -447,23 +448,16 @@ int		HttpServer::ft_test_reading( void )
 
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
-		// test pour l'erreur 431, j'augmente le buffer.
-		// avant 1024 + 1 
-		// test 4096 +1 
-		char buffer[4096 + 1];
+		char buffer[1000000 + 1];
 
-		// memset((char *)buffer, 0, 4096 + 1);
 		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
 		{
 			std::cout << "dans isst de read" << std::endl;
+			std::cout << "euh _read_fs = " << &this->_read_fs << std::endl;
 			int request_length;
-			memset((char *)buffer, 0, 4096 + 1);
 
-			// if (getsockopt(it_b_client->client_socket, SOL_SOCKET, SO_SNDBUF, &buffer, sizeof(buffer)) == 0)
-			// 	std::cout << "getsockopt = 0" << std::endl;
-			// else
-			// 	std::cout << "getsockotp = -1 " << std::endl;
-			request_length = recv(it_b_client->client_socket, buffer, 4096, 0);
+			memset((char *)buffer, 0, 1000000 + 1);
+			request_length = recv(it_b_client->client_socket, buffer, 1000000, 0);
 			
 			if (request_length <= 0)
 			{

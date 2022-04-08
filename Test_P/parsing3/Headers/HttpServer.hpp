@@ -19,7 +19,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h> 
+#include <sys/stat.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -29,6 +31,7 @@
 #include <map>
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "../Headers/CGI_exec.hpp"
 
