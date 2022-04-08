@@ -27,7 +27,7 @@
 #include "Parsing.hpp"
 #include <algorithm>
 #include <map>
-
+#include <errno.h>
 #include <fcntl.h>
 
 #include "../Headers/CGI_exec.hpp"

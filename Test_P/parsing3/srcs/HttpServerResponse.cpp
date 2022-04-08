@@ -25,18 +25,18 @@ std::string		HttpServer::ft_setup_header( void )
 	std::string file_contents;
 	std::string the_header;
 	//							 on verifie le path
-	std::cout << "on doit verifier le path ..." << std::endl;
+	std::cout << GREEN <<  "\nFonction ft_setup_header" << CLEAR << std::endl;
 
 	if (this->_header_requete[0].error == true)
 	{
 		// une erreur a ete setup donc on doit deja avoir une reposne a display;
-		std::cout << "GO SETUP HEADER POUR ERROR " << std::endl;
-		std::cout << "le body c'est quoi deja = " << this->_header_requete[0].body_error << std::endl;
+		std::cout << "On a une erreur : " << this->_header_requete[0].num_error << std::endl;
 		if (this->_header_requete[0].body_error.empty() == false)
 		{
 			// fonction qui va chercher l'erreur dans les differents dossiers
 			// si ne trouve pas alors renvoie juste le header
 			the_header = ft_find_error_html( );
+			std::cout << "return de ft_setup_header : " << the_header << std::endl;
 			return (the_header);
 		}
 		else
@@ -76,6 +76,8 @@ std::string		HttpServer::ft_setup_header( void )
 	// std::cout << "le path avec le root = -" << this->_header_requete[0].path << "-" << std::endl;
 	}
 	
+	std::cout << "on doit avoir le fichier : " << this->_header_requete[0].path << std::endl;
+	sleep(1);
 	struct stat buff2;
 	if (stat(this->_header_requete[0].path.c_str(), &buff2) < 0)
 	{
@@ -161,9 +163,7 @@ std::string		HttpServer::ft_setup_header( void )
 
 std::string		HttpServer::ft_find_error_html( void )
 {
-	// (void)request_html;
-	// (void)len_msg;
-
+	std::cout << "\n On est dans ft_find_error_html " << std::endl;
 	std::stringstream 	ss;
 	std::string			path_error;
 	// path_error.insert(0, ".html");
@@ -172,7 +172,9 @@ std::string		HttpServer::ft_find_error_html( void )
 	path_error.resize(4);
 	path_error.insert(4, ".html");
 	path_error.insert(0, this->_header_requete[0].body_error);
-	std::cout << "path_error = " << path_error << std::endl;
+
+	std::cout << "On a setup le body_error de la requete avec le path correspondant a la requete et avec le numero de l'erreur" << std::endl;
+	std::cout << "le path_error = " << path_error << std::endl;
 
 	std::string the_header;
 
@@ -186,7 +188,10 @@ std::string		HttpServer::ft_find_error_html( void )
 
 		
 		std::string tmp = ft_create_fake_error();
+		std::cout << "retour de ft_create_fake_error = " << tmp << "\n\n " << std::endl;
 		return (tmp); // test
+
+
 		buff.st_size = tmp.length();
 		std::cout << "buff st size = " << buff.st_size << std::endl;
 		sleep(1);
@@ -229,19 +234,18 @@ std::string		HttpServer::ft_find_error_html( void )
 
 std::string		HttpServer::ft_create_fake_error( void )
 {
-	std::string the_header = "</h1></body></html>\r\n";			// c'est la find
-																// faut mettre le message de l'erreur et le numero
+	std::cout << "\n DAns ft_create_fake_error " << std::endl;
+	// Du coup fonction tmp, pour juste reussir a retourner un fichier a display.
 
-	the_header.insert(0, ft_return_error());
-	the_header.insert(0, "<!DOCTYPE html><html><head><title>WebServ Error</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>");
-	
+
 	std::string tmp;
-	// tmp.insert(0, "<!DOCTYPE html><html><head><title>Hello World</title></head><body><h1>TEST Webserv</h1></body></html>\r\n");
+	
 
-	tmp = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>Hello World</title><style>body { background-color: #111 }h1 { font-size:4cm; text-align: center; color: black; text-shadow: 0 0 2mm red}</style></head><body><h1>TEST Webserv</h1></body></html>\r\n";
+	tmp = "HTTP/1.1 431 Request Header Fields Too Large\r\nContent-Type: text/html;\r\nCharset=UTF-8\r\nServer: SERVER1\r\nContent-Length: 600\r\n\r\n";
+
 	
 	
-	// tmp = "HTTP/1.1 404 KO\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<!DOCTYPE html><html><head><title>GET Query String</title><style>body { background-color: rgb(105, 140, 238) }h1 { font-size:2cm; text-align: center; color: rgb(121, 219, 56);text-shadow: 0 0 2mm red}</style></head><body><h1> Im'gonne say hello to you using the query string in the URL ! </h1><h2><?php echo 'Hello ' . htmlspecialchars($_GET['name']) . '!';?></h2></body></html>\r\n";
+	
 	
 	return (tmp);
 }

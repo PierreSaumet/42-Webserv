@@ -264,7 +264,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 				}
 				else
 					std::cout << GREEN << "le parsing du path de get est OK =) " << CLEAR << std::endl;
-				exit(1); //(1);
+				// exit(1); //(1);
 				///////////////////////////////
 
 
@@ -510,7 +510,6 @@ size_t			HttpServer::ft_setup_error_header( std::string request_http, int len_ms
 	// 6) si non, on setup le bon header
 
 	// 1
-	std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
 	//	1: il y a des location si oui, on cherche si on est dedans...
 	if (this->_servers[0].nbr_location > 0)
 	{
@@ -544,14 +543,13 @@ size_t			HttpServer::ft_setup_error_header( std::string request_http, int len_ms
 							for (; it != this->_servers[0].location[i].error_location.end(); it++)
 							{
 								std::cout << "on display les erreur dans location... " << it->first << std::endl;
-								std::cout << "et nous = " << this->_header_requete[0].num_error << std::endl;
 								if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
 								{
-									std::cout << "OUI ILS OSNT EGAL" << std::endl;
+									std::cout << "OUI ils sont egaux, le num_error et l'erreur qui a ete setup dans le fichier de conf" << std::endl;
 									std::cout << "euh second = " << it->second << std::endl;
 									// on met dans le body le fichier a recuperer
 									this->_header_requete[0].body_error = it->second;
-									std::cout << " on a mit le fichiera recuperer pour l'error." << std::endl;
+									std::cout << " on a mis le fichier a recuperer pour l'error." << std::endl;
 									return (0);
 								}
 								else

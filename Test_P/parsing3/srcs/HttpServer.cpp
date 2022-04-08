@@ -107,6 +107,9 @@ int					HttpServer::ft_create_servers( void ) {
 			this->_http_servers[i].sock = socket(AF_INET, SOCK_STREAM, 0);
 			if (this->_http_servers[i].sock < 0)
 				throw Error(0, "Error, 'creation of server', cannot create a socket.", 2);
+			//test erreur 431
+			if (fcntl(this->_http_servers[i].sock, F_SETFL, O_NONBLOCK) < 0)
+				throw Error(666, "Error, 'creation of server', cannot fcntl a socker server.", 2);
 			if (setsockopt(this->_http_servers[i].sock, SOL_SOCKET, SO_REUSEADDR, &this->_http_servers[i].enable, sizeof(int)) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
@@ -252,7 +255,7 @@ std::string		HttpServer::ft_settup_http_response( void )
 		1 ) ft_setup_header ==> setup le header
 		2 ) on ajoute le body 
 	*/
-
+	std::cout << GREEN << "\n\n ft_settup_http_response " << CLEAR << std::endl;
 	std::string filename(this->_servers[0].index_server.c_str());				// a changer, car la ca affiche seuelemtn l'index.html
 	std::string file_contents;
 	struct stat sb;
@@ -265,12 +268,31 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::string ENTETELOL = ft_setup_header();
 
 
-	std::cout << " fin de la fonctio nheader = " << ENTETELOL << std::endl;
-	std::cout << "le ficheir demande = -" << this->_header_requete[0].path << "-" << std::endl;
+	std::cout << "ENTETELOL = " << ENTETELOL << std::endl;
+	std::cout << "le fichier demande = -" << this->_header_requete[0].path << "-" << std::endl;
 	if (this->_header_requete[0].error == true)
 	{
-		std::cout << "\n\n on retourne header et body car error " << std::endl;
-		return (ENTETELOL);
+		std::cout << "\n\n Donc on a setup la reponse a ecrire, qui est une erreur 431  " << std::endl;
+
+		input_file = fopen("./root/errors/431.html", "r");
+		if (input_file == NULL)
+		{
+			std::cout << " ne peut pas ouvrir le fichier 431 " << std::endl;
+			exit(1);
+		}
+		stat("./root/errors/431.html", &sb);
+
+		res.resize(sb.st_size + 100);
+		std::cout << "ici 1" << std::endl;
+		fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+		std::cout << "ici 2" << std::endl;
+		fclose(input_file);
+		std::cout << "ici 3" << std::endl;
+		file_contents = res;
+
+		file_contents.insert(0, ENTETELOL.c_str());
+		std::cout << "ici 4" << std::endl;
+		return (file_contents);
 	}
 
 
@@ -387,14 +409,21 @@ int 		HttpServer::ft_test_writing( void )
 				return (0);
 			}
 			std::cout << " HTTP_RESPONSE = -" << _HTTP_RESPONSE << "-" << std::endl;
+
+			// test  erreur 431
+		
+
 			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
+			// sleep(10);
 			if (ret_send < 0)
 			{
+				std::cout << "dans retour de send < 0 , cad send n'a pas marche " << std::endl;
 				if (_HTTP_RESPONSE.empty())
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
 			}
 			else
 			{
+				std::cout << "send a fonctionne ret_send = " << ret_send << std::endl;
 				if (_HTTP_RESPONSE.empty())
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
 				close(it_b_client->client_socket);
@@ -418,23 +447,32 @@ int		HttpServer::ft_test_reading( void )
 
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
-		char buffer[1024 + 1];
-		memset((char *)buffer, 0, 1024 + 1);
+		// test pour l'erreur 431, j'augmente le buffer.
+		// avant 1024 + 1 
+		// test 4096 +1 
+		char buffer[4096 + 1];
+
+		// memset((char *)buffer, 0, 4096 + 1);
 		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
 		{
 			std::cout << "dans isst de read" << std::endl;
 			int request_length;
-			memset((char *)buffer, 0, 1024 + 1);
-			request_length = recv(it_b_client->client_socket, buffer, 1024, 0);
+			memset((char *)buffer, 0, 4096 + 1);
+
+			// if (getsockopt(it_b_client->client_socket, SOL_SOCKET, SO_SNDBUF, &buffer, sizeof(buffer)) == 0)
+			// 	std::cout << "getsockopt = 0" << std::endl;
+			// else
+			// 	std::cout << "getsockotp = -1 " << std::endl;
+			request_length = recv(it_b_client->client_socket, buffer, 4096, 0);
 			
 			if (request_length <= 0)
 			{
-				// faire une erreur prorpre
-				std::cout << "kek erreur recv" << std::endl;
+				// Normalement il ne faut pas sortir une erreur ici, je crois.
+				std::cout << "Erreur recv" << std::endl;
 				std::cout << "message taille recu = " << request_length << std::endl;
-				// close(it_b_client->client_socket);
-				// // exit(1);
-				// return (1);
+				close(it_b_client->client_socket);
+				it_b_client = this->_all_client_socket.erase(it_b_client);
+				continue ;
 			}
 			else
 			{
