@@ -108,6 +108,7 @@ std::string		HttpServer::ft_setup_header( void )
 	the_header.insert(0, this->ft_get_end_header());
 	the_header.insert(0, this->ft_get_content_length(buff2));
 	the_header.insert(0, this->ft_get_server_name());
+	the_header.insert(0, this->ft_get_date());
 	the_header.insert(0, this->ft_get_charset());
 	the_header.insert(0, this->ft_get_content_type());
 	the_header.insert(0, this->ft_get_status());
@@ -412,13 +413,13 @@ std::string		HttpServer::ft_get_server_name( void ) const
 
 std::string		HttpServer::ft_get_charset( void ) const
 {
-	return ("Charset=UTF-8\r\n");
+	return ("charset=UTF-8\r\n");
 }
 
 std::string		HttpServer::ft_get_content_type( void ) const
 {
 	// peut etre a changer en fonction de ce qu'on affiche ? 
-	return ("Content-Type: text/html\r\n");
+	return ("Content-Type: text/html; ");
 }
 
 std::string		HttpServer::ft_get_content_length( struct stat buff ) const
@@ -433,4 +434,21 @@ std::string		HttpServer::ft_get_content_length( struct stat buff ) const
 
 	tmp_size.insert(0, "Content-Length: ");
 	return (tmp_size);
+}
+
+std::string		HttpServer::ft_get_date( void ) const
+{
+	struct timeval	tv;
+	time_t			t;
+	struct tm		*info;
+	char			buffer[64];
+
+	gettimeofday(&tv, NULL);
+	t = tv.tv_sec;
+	info = localtime(&t);
+	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %T GMT+02", info);
+	std::string		tmp(buffer);
+	tmp.insert(0, "Date: ");
+	tmp.append("\r\n");
+	return (tmp);
 }

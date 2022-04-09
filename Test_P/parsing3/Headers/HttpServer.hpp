@@ -21,6 +21,7 @@
 #include <sys/types.h> 
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -32,6 +33,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <time.h>
 
 #include "../Headers/CGI_exec.hpp"
 
@@ -126,6 +128,7 @@ class HttpServer {
 		std::string		ft_get_charset( void ) const;
 		std::string		ft_get_server_name( void ) const;
 		std::string		ft_get_status( void ) const;
+		std::string		ft_get_date( void ) const;
 
 		/*
 		**	Function used if an error occurs in the request

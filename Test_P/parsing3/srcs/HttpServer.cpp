@@ -28,6 +28,7 @@ HttpServer::HttpServer( void ) { // a terminer, initialiser toutes les variables
 */
 HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a terminer, initialiser toutes les variables
 
+	// debut CGI/////////////////////////////////////////////
 	// this->_cgi = new Cgi_exec();
 	// this->_cgi->ft_setup_env_cgi();
 	// std::cout << "test getsoft = " << this->_cgi->getServerSoftware() << std::endl;
@@ -37,6 +38,10 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 	// std::cout << "\n\n\n display all = " << std::endl;
 	// this->_cgi->ft_display_all_variable_env();
 	// exit(1);
+
+	/////// test time 
+	// ft_get_date();
+	// return ;
 
 	std::cout << "Constructor avec argument "<< std::endl;
 	try {
@@ -427,8 +432,8 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "send a fonctionne ret_send = " << ret_send << std::endl;
 				if (_HTTP_RESPONSE.empty())
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
-				// close(it_b_client->client_socket);
-				// it_b_client = this->_all_client_socket.erase(it_b_client);
+				close(it_b_client->client_socket);
+				it_b_client = this->_all_client_socket.erase(it_b_client);
 				// std::cout << "On a retournee une reponse, on ferme le socket du client." << std::endl;
 				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 				continue ;
