@@ -127,7 +127,7 @@ class HttpServer {
 		std::string		ft_get_content_type( void ) const;
 		std::string		ft_get_charset( void ) const;
 		std::string		ft_get_server_name( void ) const;
-		std::string		ft_get_status( void ) const;
+		std::string		ft_get_status( bool x ) const;
 		std::string		ft_get_date( void ) const;
 
 		/*

@@ -43,6 +43,11 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 	// ft_get_date();
 	// return ;
 
+	///// test fake error
+	// std::cout << ft_create_fake_error() << std::endl;
+	// std::cout << "ici 2" << std::endl;
+	// return ;
+
 	std::cout << "Constructor avec argument "<< std::endl;
 	try {
 		this->_data = new Parsing(configfile);
@@ -280,24 +285,25 @@ std::string		HttpServer::ft_settup_http_response( void )
 	{
 		std::cout << "\n\n Donc on a setup la reponse a ecrire, qui est une erreur 431  " << std::endl;
 
-		input_file = fopen("./root/errors/431.html", "r");
-		if (input_file == NULL)
-		{
-			std::cout << " ne peut pas ouvrir le fichier 431 " << std::endl;
-			exit(1);
-		}
-		stat("./root/errors/431.html", &sb);
+		// input_file = fopen("./root/errors/431.html", "r");
+		// if (input_file == NULL)
+		// {
+		// 	std::cout << " ne peut pas ouvrir le fichier 431 " << std::endl;
+		// 	exit(1);
+		// }
+		// stat("./root/errors/431.html", &sb);
 
-		res.resize(sb.st_size + 100);
-		std::cout << "ici 1" << std::endl;
-		fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
-		std::cout << "ici 2" << std::endl;
-		fclose(input_file);
-		std::cout << "ici 3" << std::endl;
-		file_contents = res;
+		// res.resize(sb.st_size + 100);
+		// std::cout << "ici 1" << std::endl;
+		// fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+		// std::cout << "ici 2" << std::endl;
+		// fclose(input_file);
+		// std::cout << "ici 3" << std::endl;
+		// file_contents = res;
 
-		file_contents.insert(0, ENTETELOL.c_str());
-		std::cout << "ici 4" << std::endl;
+		// file_contents.insert(0, ENTETELOL.c_str());
+		// std::cout << "ici 4" << std::endl;
+		return (ENTETELOL);
 		return (file_contents);
 	}
 
@@ -426,6 +432,10 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "dans retour de send < 0 , cad send n'a pas marche " << std::endl;
 				if (_HTTP_RESPONSE.empty())
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
+				close(it_b_client->client_socket);
+				it_b_client = this->_all_client_socket.erase(it_b_client);
+
+				// std::cout << "On a retournee une reponse, on ferme le socket du client." << std::endl;
 			}
 			else
 			{
@@ -434,7 +444,7 @@ int 		HttpServer::ft_test_writing( void )
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
-				// std::cout << "On a retournee une reponse, on ferme le socket du client." << std::endl;
+				std::cout << "On a retournee une reponse, on ferme le socket du client." << std::endl;
 				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 				continue ;
 			}
