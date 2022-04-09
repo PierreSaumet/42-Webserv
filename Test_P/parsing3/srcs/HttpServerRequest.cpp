@@ -635,6 +635,7 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 {
 	size_t pos;
 
+	pos = 0;
 	if ((pos = header.find("Host: ", 0)) == std::string::npos)
 	{
 		// A FAIRE: creer une erreur propre.
@@ -643,24 +644,24 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 	}
 	else
 	{
-		size_t pos_user;
-		if ((pos_user = header.find("User-Agent:", pos)) == std::string::npos)
+		size_t pos_end;
+		if ((pos_end = header.find("\r\n", pos)) == std::string::npos)
 		{
 			// A FAIRE: creer une erreur propre.
 			std::cout << "ERREUR NE TROUVE PAS LE USER-AGENT DANS LE HEADER" << std::endl;
-			return (NULL);
+			return ("");
 		}
 		else
 		{
 			// on verifie que la position de host est avant la position de user-agent.
-			if (pos > pos_user)
+			if (pos > pos_end)
 			{
 				// A FAIRE: creer une erreur propre.
 				std::cout << "ERREUR HOST doit etre avant USER-AGENT" << std::endl;
 				return (NULL);
 			}
 			// on recupere les informations apres Host et avant User-agent
-			std::string tmp(header, pos + 6, pos_user - (pos + 6));
+			std::string tmp(header, pos + 6, pos_end - (pos + 6));
 			for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 			{
 				// on parcourt nos servers pour verifier que le host de la requete est
@@ -725,7 +726,7 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 			}
 			std::cout << "ERREUR ICI " << std::endl;			// A FAIRE au propre
 			exit(1);
-			return (std::string(header, pos + 6, pos_user - (pos + 6)));
+			return (std::string(header, pos + 6, pos_end - (pos + 6)));
 		}
 	}
 
