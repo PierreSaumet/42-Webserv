@@ -44,7 +44,7 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 	// return ;
 
 	///// test fake error
-	// std::cout << ft_create_fake_error() << std::endl;
+	// std::cout << ft_create_error() << std::endl;
 	// std::cout << "ici 2" << std::endl;
 	// return ;
 
@@ -283,28 +283,9 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::cout << "le fichier demande = -" << this->_header_requete[0].path << "-" << std::endl;
 	if (this->_header_requete[0].error == true)
 	{
-		std::cout << "\n\n Donc on a setup la reponse a ecrire, qui est une erreur 431  " << std::endl;
-
-		// input_file = fopen("./root/errors/431.html", "r");
-		// if (input_file == NULL)
-		// {
-		// 	std::cout << " ne peut pas ouvrir le fichier 431 " << std::endl;
-		// 	exit(1);
-		// }
-		// stat("./root/errors/431.html", &sb);
-
-		// res.resize(sb.st_size + 100);
-		// std::cout << "ici 1" << std::endl;
-		// fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
-		// std::cout << "ici 2" << std::endl;
-		// fclose(input_file);
-		// std::cout << "ici 3" << std::endl;
-		// file_contents = res;
-
-		// file_contents.insert(0, ENTETELOL.c_str());
-		// std::cout << "ici 4" << std::endl;
+		std::cout << " on a eu une erreur on retourne tout" << std::endl;
 		return (ENTETELOL);
-		return (file_contents);
+
 	}
 
 
@@ -321,7 +302,7 @@ std::string		HttpServer::ft_settup_http_response( void )
 			exit(1);
 		}
 	}
-	else if (this->_header_requete[0].path.find(".php") != std::string::npos)
+	else if (this->_header_requete[0].path.find(".php") != std::string::npos)	// a changer
 	{
 		std::cout << " ok on a donc le php . on affihce pour voir ... "<< std::endl;
 		input_file = fopen("./root/query_get_test.php", "r");

@@ -147,6 +147,7 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 	}
 	if (stat(address.c_str(), &buffer) != 0)
 		throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
+	this->_servers[index_server].location[index_location].folder_error = address;
 	if (this->_servers[index_server].location[index_location].error_location.size() > 1)		// several error pages.
 	{
 		std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();

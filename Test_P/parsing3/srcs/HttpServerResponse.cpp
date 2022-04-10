@@ -34,7 +34,7 @@ std::string		HttpServer::ft_setup_header( void )
 		if (this->_header_requete[0].body_error.empty() == false)
 		{
 			// fonction qui va chercher l'erreur dans les differents dossiers
-			// si ne trouve pas alors renvoie juste le header
+			// et renvoie tout header + body
 			the_header = ft_find_error_html( );
 			std::cout << "return de ft_setup_header : " << the_header << std::endl;
 			return (the_header);
@@ -79,10 +79,65 @@ std::string		HttpServer::ft_setup_header( void )
 	std::cout << "on doit avoir le fichier : " << this->_header_requete[0].path << std::endl;
 	sleep(1);
 	struct stat buff2;
-	if (stat(this->_header_requete[0].path.c_str(), &buff2) < 0)
+	if (stat(this->_header_requete[0].path.c_str(), &buff2) < 0)	// le fichier existe pas on return 404
 	{
-		std::cout << "Error, la page demande n'exite pas. ici" << std::endl;
-		return ("");
+		// on setup une erreur 404
+		std::cout << RED << "on doit setup 404" << CLEAR << std::endl;
+		this->_header_requete[0].error = true;
+		this->_header_requete[0].num_error = 404;
+
+		// on verifie si l'erreur existe
+		int ret = ft_setup_error_header(this->_header_requete[0].path, this->_header_requete[0].path.size());
+		sleep(3);
+		std::cout << "\n\n fin du test " << std::endl;
+		size_t pos;
+		if (ret == 0)
+		{
+			std::cout << "alors erreur dans le root server " << std::endl;
+			pos = this->_header_requete[0].body_error.find(this->_servers[0].folder_error);
+		}
+		else if (ret > 0 || ret == -1)
+		{
+			std::cout << "alors erreur dans le location server " << std::endl;
+			// A TERMINER LA POSITION 2
+			if (ret == -1)
+				ret = 0;
+			std::cout << "kek " << this->_servers[0].location[ret].folder_error << std::endl;
+			std::cout << "bur " << this->_header_requete[0].body_error << std::endl;
+			pos = this->_header_requete[0].body_error.find(this->_servers[0].location[ret].folder_error);
+		}
+		else
+		{
+			std::cout << "tu fais de la merde pierre avril " << std::endl;
+			exit(1);
+		}
+		if (pos == std::string::npos)
+		{
+			// c'est que le dossier contentn les erreurs n'a pas ete trouve
+			// doncfaut creer une erreur
+			std::cout << "merde" << std::endl;
+			sleep(2);
+			return (ft_create_error());
+		}
+		else
+		{
+			// faut renvoyer l'erreur
+			std::cout << "merde 2 " << std::endl;
+			sleep(2);
+			struct stat buff;
+			if (stat(this->_header_requete[0].body_error.c_str(), &buff) < 0)
+				return (ft_create_error());
+			std::string tmp = ft_get_file(this->_header_requete[0].body_error);
+			tmp.insert(0, this->ft_get_end_header());
+			tmp.insert(0, this->ft_get_content_length(buff));
+			tmp.insert(0, this->ft_get_server_name());
+			tmp.insert(0, this->ft_get_date());
+			tmp.insert(0, this->ft_get_charset());
+			tmp.insert(0, this->ft_get_content_type());
+			tmp.insert(0, this->ft_get_status(true));
+			std::cout << " il a trouve " << std::endl;
+			return (tmp);
+		}
 	}
 	if (buff2.st_size == 0)
 	{
@@ -101,10 +156,6 @@ std::string		HttpServer::ft_setup_header( void )
 
 
 	std::cout << "OK donc tout est bon ici la page demandee existe on va mettre rendre le header\n" << std::endl;
-
-	// std::string the_header;
-
-
 	the_header.insert(0, this->ft_get_end_header());
 	the_header.insert(0, this->ft_get_content_length(buff2));
 	the_header.insert(0, this->ft_get_server_name());
@@ -114,52 +165,6 @@ std::string		HttpServer::ft_setup_header( void )
 	the_header.insert(0, this->ft_get_status(true));
 	return (the_header);
 
-	// // on verifier si le path est l'index
-	// if (this->_header_requete[0].path == "/ ")
-	// {
-	// 	std::cout << "display index" << std::endl;	
-	// 	struct stat buff;
-	// 	if (stat(filename.c_str(), &buff) < 0)
-	// 	{
-	// 		std::cout << "Error, la page demande n'exite pas." << std::endl;
-	// 		return (NULL);
-	// 	}
-	// 	if (buff.st_size == 0)
-	// 	{
-	// 		std::cout << "Error, la page demande est vide. " << std::endl;
-	// 		return (NULL);
-	// 	}
-	// 	input_file = fopen(filename.c_str(), "r");
-	// 	if (input_file == NULL)
-	// 	{
-	// 		std::cout << "Error, pour ouvrir la page demande avec fopen." << std::endl;
-	// 		return (NULL);
-	// 	}
-
-	// 	// stat(filename.c_str(), &sb);
-	// 	res.resize(buff.st_size + 100);
-	// 	std::cout << "taille buffer = " << buff.st_size << std::endl;
-		
-	// 	fread(const_cast<char*>(res.data()), buff.st_size, 1, input_file);
-
-	// 	fclose(input_file);
-	// 	file_contents = res;
-	// 	std::cout << "la taille putain = " << file_contents.size() << std::endl;
-
-	// 	// file_contents.insert(0, file_contents.c_str());
-	// 	file_contents.insert(0, this->ft_get_end_header());
-	// 	file_contents.insert(0, this->ft_get_content_length(buff));
-	// 	file_contents.insert(0, this->ft_get_server_name());
-	// 	file_contents.insert(0, this->ft_get_charset());
-	// 	file_contents.insert(0, this->ft_get_content_type());
-	// 	file_contents.insert(0, this->ft_get_status());
-		
-		
-	// 	// std::cout << "KEK = " << ft_get_server_name() << std::endl;
-	// 	std::cout << "\nfile contents = " << file_contents << std::endl;
-	// 	sleep(1);
-	// }
-	// return (NULL);
 }
 
 std::string		HttpServer::ft_find_error_html( void )
@@ -167,81 +172,94 @@ std::string		HttpServer::ft_find_error_html( void )
 	std::cout << "\n On est dans ft_find_error_html " << std::endl;
 	std::stringstream 	ss;
 	std::string			path_error;
-	// path_error.insert(0, ".html");
-	ss << this->_header_requete[0].num_error;
-	ss >> path_error;
-	path_error.resize(4);
-	path_error.insert(4, ".html");
-	path_error.insert(0, this->_header_requete[0].body_error);
 
-	std::cout << "On a setup le body_error de la requete avec le path correspondant a la requete et avec le numero de l'erreur" << std::endl;
-	std::cout << "le path_error = " << path_error << std::endl;
+	// path_error = ./root/Hello/errors/431.html431.html
+	// path_error = ./root/Hello/431.html
 
-	std::string the_header;
+	size_t pos = this->_header_requete[0].body_error.find("html");
 
+	if (pos == std::string::npos)
+	{
+			// il n'y a pas d'html
+		std::cout << "il y a pas  un html " << std::endl;
+		ss << this->_header_requete[0].num_error;
+		ss >> path_error;
+		path_error.resize(4);
+		path_error.insert(4, ".html");
+		path_error.insert(0, this->_header_requete[0].body_error);
+	}
+	else
+	{
+		std::cout << "il y a un html " << std::endl;
+		path_error = this->_header_requete[0].body_error;
+	}
+
+	std::cout << "path_error = -" << path_error << "-" << std::endl;
 	struct stat buff;
 	if (stat(path_error.c_str(), &buff) < 0)
 	{
-		// le fichier n'a pas ete trouve
-		// on setup le juste le header avec le bon numero d'erreur
-		std::cout << "size buff = " << buff.st_size << std::endl;
-		buff.st_size = 0;
-
-		
-		std::string tmp = ft_create_fake_error();
-		std::cout << "retour de ft_create_fake_error = " << tmp << "\n\n " << std::endl;
-		return (tmp); // test
-
-
-		buff.st_size = tmp.length();
-		std::cout << "buff st size = " << buff.st_size << std::endl;
-		sleep(1);
-		the_header = tmp;
-		the_header.insert(0, this->ft_get_end_header());
-		the_header.insert(0, this->ft_get_content_length(buff));
-		the_header.insert(0, this->ft_get_server_name());
-		the_header.insert(0, this->ft_get_charset());
-		the_header.insert(0, this->ft_get_content_type());
-		the_header.insert(0, this->ft_get_status(true));
-		std::cout << "\n\nDU COUP LE HEADER DE L:ERREUR =" << the_header << std::endl;
-		return (the_header);
+		// le fichier n'a pas ete trouve on renvoie une string avec toute l'erreur.
+		return (ft_create_error()); // test
 	}
-	// struct stat buff2;
-	// if (stat(this->_header_requete[0].path.c_str(), &buff2) < 0)
-	// {
-	// 	std::cout << "Error, la page demande n'exite pas. ici" << std::endl;
-	// 	return (NULL);
-	// }
-	// if (buff2.st_size == 0)
-	// {
-	// 	std::cout << "Error, la page demande est vide. " << std::endl;
-	// 	return (NULL);
-	// }
-
-	// input_file = fopen(this->_header_requete[0].path.c_str(), "r");
-	// if (input_file == NULL)
-	// {
-	// 	std::cout << "Error, pour ouvrir la page demande avec fopen." << std::endl;
-	// 	return (NULL);
-	// }
-	// fclose(input_file);
-
-	std::cout << "kek pas cool problem find error_page" << std::endl;
-	return (NULL);
-
-
-
+	else
+	{
+		if (buff.st_size == 0)	// fichier vide donc on ft_create_error()
+			return (ft_create_error());
+		else	// on renvoie le fichier de l'erreur
+		{
+			std::string tmp = ft_get_file(path_error);
+			tmp.insert(0, this->ft_get_end_header());
+			tmp.insert(0, this->ft_get_content_length(buff));
+			tmp.insert(0, this->ft_get_server_name());
+			tmp.insert(0, this->ft_get_date());
+			tmp.insert(0, this->ft_get_charset());
+			tmp.insert(0, this->ft_get_content_type());
+			tmp.insert(0, this->ft_get_status(true));
+			return (tmp);
+		}
+		// std::cerr << strerror(errno) << std::endl;
+		// exit(1);
+	}
+	std::cout << RED << "IMPOSSIBLE D'arriver la il y a un probleme dans la creation de l'erreur" << CLEAR << std::endl;
+	return ("");
 }
 
 /*
-**	std::string	ft_create_fake_error( void )
+**
+*/
+std::string	HttpServer::ft_get_file( std::string path ) const
+{
+	FILE *input_file = NULL;
+	struct stat sb;
+	std::string	file;
+
+	// path.erase(0, 1);
+	// std::cout << ""
+	input_file = fopen(path.c_str(), "r");
+	if (input_file == NULL)
+	{
+		std::cout << "Error, pour ouvrir la page demande avec fopen." << std::endl;
+		std::cerr << strerror(errno) << std::endl;
+		exit(1);
+		return (NULL);
+	}
+	stat(path.c_str(), &sb);
+	file.resize(sb.st_size + 100);
+	fread(const_cast<char*>(file.data()), sb.st_size, 1, input_file);
+	fclose(input_file);
+	// std::cout << "file = " << file << std::endl;
+	return (file);
+}
+
+/*
+**	std::string	ft_create_error( void )
 **		This function is used if there is an error and if there is no error page setup.
 **
 **	It will creates a body and a header into a std::string and return it.
 */
-std::string		HttpServer::ft_create_fake_error( void )
+std::string		HttpServer::ft_create_error( void )
 {
-	std::cout << "\n Dans ft_create_fake_error " << std::endl;
+	std::cout << "\n Dans ft_create_error " << std::endl;
 
 	std::string content_length;
 	std::string error_string;

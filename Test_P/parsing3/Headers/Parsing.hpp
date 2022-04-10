@@ -32,6 +32,7 @@ typedef struct					s_location {
 			std::string					index_location;
 			bool                        autoindex_location;
 			std::map<int, std::string>  error_location;
+			std::string					folder_error;
 			std::vector<std::string>    methods_location;
 			std::string					upload_store_location;
 			size_t						buffer_size_location;
@@ -50,6 +51,7 @@ typedef struct                  s_server {
 			std::string					upload_store_server;
 			std::vector<std::string>    methods_server;
 			std::map<int, std::string>  error_server;
+			std::string					folder_error;
 
 			std::vector<t_location>		location;
 			size_t						nbr_location;

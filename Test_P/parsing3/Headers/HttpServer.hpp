@@ -130,12 +130,15 @@ class HttpServer {
 		std::string		ft_get_status( bool x ) const;
 		std::string		ft_get_date( void ) const;
 
+
+		std::string		ft_get_file( std::string path ) const;
+
 		/*
 		**	Function used if an error occurs in the request
 		*/
-		size_t			ft_setup_error_header( std::string request_http, int len_msg );
+		int			ft_setup_error_header( std::string request_http, int len_msg );
 		std::string			ft_find_error_html( void );
-		std::string			ft_create_fake_error( void );
+		std::string			ft_create_error( void );
 		std::string			ft_return_error( void );
 
 		/*

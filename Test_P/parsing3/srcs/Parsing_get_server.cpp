@@ -306,6 +306,7 @@ size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, 
 	address.insert(0, this->_servers[index_server].root_server);
 	if (stat(address.c_str(), &buffer) != 0)
 		throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
+	this->_servers[index_server].folder_error = address;
 	if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
 	{
 		// on ajute l'addresse a toutes les erreurs
