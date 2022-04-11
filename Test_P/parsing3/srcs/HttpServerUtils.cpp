@@ -23,6 +23,7 @@ void	HttpServer::ft_clean_socket_clients( void )
 
 	for (it_b = this->_all_client_socket.begin(); it_b != it_e; it_b++)
 	{
+		std::cout << "\t dans la boucle client" << std::endl;
 		close(it_b->client_socket);
 	}
 	return ;
@@ -36,6 +37,7 @@ void	HttpServer::ft_clean_socket_servers( void )
 
 	for (it_b = this->_http_servers.begin(); it_b != it_e; it_b++)
 	{
+		std::cout << "\t dans la boucle serv" << std::endl;
 		close(it_b->sock);
 	}
 	return ;

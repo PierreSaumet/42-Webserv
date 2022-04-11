@@ -108,31 +108,42 @@ int					HttpServer::ft_create_servers( void ) {
 		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 		{
 			this->_http_servers.push_back(t_http_server());
-			this->_http_servers[i].enable = 0;
-			memset((char *)&this->_http_servers[i].svr_addr, 0, sizeof(this->_http_servers[i].svr_addr));
-			this->_http_servers[i].svr_addr.sin_family = AF_INET;
-			this->_http_servers[i].svr_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-			this->_http_servers[i].svr_addr.sin_port = htons(this->_servers[i].port_server);
+			this->_http_servers[i].enable = 1;
+			// memset((char *)&this->_http_servers[i].svr_addr, 0, sizeof(this->_http_servers[i].svr_addr));
+			
 			
 			this->_http_servers[i].sock = socket(AF_INET, SOCK_STREAM, 0);
 			if (this->_http_servers[i].sock < 0)
 				throw Error(0, "Error, 'creation of server', cannot create a socket.", 2);
-			//test erreur 431
+			std::cout << GREEN << "le serveur utilise le sock = " << this->_http_servers[i].sock << CLEAR << std::endl;
+
 			if (fcntl(this->_http_servers[i].sock, F_SETFL, O_NONBLOCK) < 0)
 				throw Error(666, "Error, 'creation of server', cannot fcntl a socker server.", 2);
-			if (setsockopt(this->_http_servers[i].sock, SOL_SOCKET, SO_REUSEADDR, &this->_http_servers[i].enable, sizeof(int)) < 0)
+
+			std::cout << "enable = " << this->_http_servers[i].enable << std::endl;
+			if (setsockopt(this->_http_servers[i].sock, SOL_SOCKET, SO_REUSEADDR, &this->_http_servers[i].enable, sizeof(this->_http_servers[i].enable)) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
 				if (close(this->_http_servers[i].sock) < 0)
 				{
 					close(this->_http_servers[i].sock);
-					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);	
+					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
 				}
 				throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
 			}
+			std::cerr << "avant bind = " << strerror(errno) << std::endl;
+
+			memset((char *)&this->_http_servers[i].svr_addr, 0, sizeof(this->_http_servers[i].svr_addr));
+			this->_http_servers[i].svr_addr.sin_family = AF_INET;
+			// this->_http_servers[i].svr_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+			this->_http_servers[i].svr_addr.sin_addr.s_addr = INADDR_ANY;
+			this->_http_servers[i].svr_addr.sin_port = htons(this->_servers[i].port_server);
+
+
 			if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
+				std::cerr << "apres bind = " << strerror(errno) << std::endl;
 				if (close(this->_http_servers[i].sock) < 0)
 				{
 					close(this->_http_servers[i].sock);
@@ -141,6 +152,9 @@ int					HttpServer::ft_create_servers( void ) {
 				std::cout << "cannot bind this->_http_servers[i].sock = " << this->_http_servers[i].sock << std::endl;
 				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 			}
+			std::cerr << "apres bind = " << strerror(errno) << std::endl;
+
+			std::cout << "MAX CONNECTION ? == " << this->_max_connections << std::endl;
 			if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
@@ -203,9 +217,10 @@ void	HttpServer::ft_handle_connections( void )
 		FD_SET(it_b_client->client_socket, &this->_write_fs);
 	}
 	// 4 ) select ? 
-	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0)
+	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0 && int_signal == 0)
 	{
 		// il faut fermer les socket ? tous les sockets < ==========================================
+		std::cout << "dans erreur de select" << std::endl;
 		this->ft_clean_socket_servers();
 		this->ft_clean_socket_clients();
 		exit(EXIT_FAILURE);
@@ -234,12 +249,13 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 		{
 			// on recoit une demande d'un cliebt
 			socket_new_client = accept(it_b->sock, (struct sockaddr *)&addr_new_client, &size_addr_new_client);		
-			if (socket_new_client < 0)
+			if (socket_new_client < 0 && int_signal == 0)
 				throw Error(6, "Error, 'main loop server', server cannot accept() a client.", 2);
 			else
 			{
 				std::cout << GREEN << "nouvelle connection client avec le server " << CLEAR << std::endl;
 				std::cout << "size addr new cloent = " << size_addr_new_client << std::endl;
+				std::cout << "int du client = " << socket_new_client << std::endl;
 				// maintenant on modifi l'etat du fd avec fcntl pour le mettre en non bloquand
 				if (fcntl(socket_new_client, F_SETFL, O_NONBLOCK) < 0)
 					throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
@@ -426,6 +442,7 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "send a fonctionne ret_send = " << ret_send << std::endl;
 				if (_HTTP_RESPONSE.empty())
 					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
+				std::cout << "\nle client = " << it_b_client->client_socket << std::endl;
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
 				std::cout << "On a retournee une reponse, on ferme le socket du client." << std::endl;
@@ -556,7 +573,7 @@ int		HttpServer::ft_test_main_loop_server( void )
 		try {
 			
 			this->ft_handle_connections();
-			if (this->_return_select != 0) // cas ou on obtient quelque chose, genre un mec se connecte et bah envoie des donnes ?
+			if (this->_return_select != 0 && int_signal == 0) // cas ou on obtient quelque chose, genre un mec se connecte et bah envoie des donnes ?
 			{
 				this->ft_verifier_ensemble_isset();
 				if (this->ft_test_reading() == 1)
