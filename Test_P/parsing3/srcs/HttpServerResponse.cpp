@@ -46,6 +46,8 @@ std::string		HttpServer::ft_setup_header( void )
 		}
 		return (NULL);
 		// std::string the_header;
+
+		std::cout << RED << " On arrive jamais la ???? " << std::endl;
 		the_header.insert(0, this->ft_get_end_header());
 
 		// struct stat buff2;
@@ -208,12 +210,18 @@ std::string		HttpServer::ft_find_error_html( void )
 		else	// on renvoie le fichier de l'erreur
 		{
 			std::string tmp = ft_get_file(path_error);
+			std::cout << "dans erreur on recupere le fichier" << std::endl;
+
+
 			tmp.insert(0, this->ft_get_end_header());
 			tmp.insert(0, this->ft_get_content_length(buff));
 			tmp.insert(0, this->ft_get_server_name());
 			tmp.insert(0, this->ft_get_date());
 			tmp.insert(0, this->ft_get_charset());
 			tmp.insert(0, this->ft_get_content_type());
+
+			if(this->_header_requete[0].num_error == 405)
+				tmp.insert(0, this->ft_get_allow());
 			tmp.insert(0, this->ft_get_status(true));
 			return (tmp);
 		}
@@ -286,11 +294,68 @@ std::string		HttpServer::ft_create_error( void )
 	error_string.insert(0, this->ft_get_date());
 	error_string.insert(0, this->ft_get_charset());
 	error_string.insert(0, this->ft_get_content_type());
+	if(this->_header_requete[0].num_error == 405)
+		tmp.insert(0, this->ft_get_allow());
 	error_string.insert(0, this->ft_get_status(true));
 
+	// std::cout << "dans create error" << std::endl;
+	// std::cout << "retour ft_get_allox() = " << this->ft_get_allow() << std::endl;
+
+	// exit(1);
 	return (error_string);
 }
 
+std::string		HttpServer::ft_get_allow( void ) const
+{
+	std::cout << "dans ft_get allow " << std::endl;
+	std::string tmp = "Allow: ";
+	
+	// std::cout << "le body = " <<  this->_header_requete[0].body_error << std::endl;
+	if (this->_servers[0].nbr_location > 0)
+	{
+		//std::cout << "il y a des locations : " << this->_servers[0].nbr_location << std::endl;
+		size_t i = 0;
+		while ( i < this->_servers[0].nbr_location)
+		{
+			size_t found = this->_header_requete[0].body_error.find("/");
+			if (found == std::string::npos)
+			{
+				std::cout << "ERREUR euh pas normal ne trouve pas / dans la requete a traiter "<< std::endl;
+				exit(EXIT_FAILURE);
+			}
+			else
+			{
+				std::string tmp_name = this->_servers[0].location[i].name_location;
+				if (tmp_name[tmp_name.size() - 1] != '/')
+					tmp_name.append("/");
+				if (this->_header_requete[0].body_error.find(tmp_name) != std::string::npos)
+				{
+					std::vector<std::string>::const_iterator	it_b = this->_servers[0].location[i].methods_location.begin();
+					for (; it_b != this->_servers[0].location[i].methods_location.end(); it_b++)
+					{
+						tmp.append(*it_b);
+						tmp.append(", ");
+					}
+					tmp.resize(tmp.size() - 2);
+					tmp.append("\r\n");
+					return (tmp);
+				}
+			}
+			i++;
+		}
+	}
+	std::cout << "on va chercher dans le root" << std::endl;
+	std::vector<std::string>::const_iterator  it_b = this->_servers[0].methods_server.begin();
+	for (; it_b != this->_servers[0].methods_server.end(); it_b++)
+	{
+		tmp.append(*it_b);
+		tmp.append(", ");
+	}
+	tmp.resize(tmp.size() - 2);
+	tmp.append("\r\n");
+	return (tmp);
+	
+}
 
 std::string		HttpServer::ft_get_end_header( void ) const
 {

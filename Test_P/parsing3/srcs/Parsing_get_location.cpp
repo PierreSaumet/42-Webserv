@@ -355,7 +355,11 @@ size_t          Parsing::ft_find_methods_location( size_t k, std::vector<std::st
 			else if (tmp[k].compare("GET;") == 0)
 				this->_servers[index_server].location[index_location].methods_location.push_back("GET");
 			else
+			{
+				if (tmp[k] == ";")
+					break ;			
 				throw Error(39, "Error, in 'dav_methods' directive, it can only have DELETE POST and GET methods!", 1);
+			}
 			break;
 		}
 		k++;

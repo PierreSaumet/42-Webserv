@@ -578,8 +578,9 @@ int		HttpServer::ft_test_main_loop_server( void )
 			break ;
 		}
 	}
-	this->ft_clean_socket_clients();
 	this->ft_clean_socket_servers();
+	this->ft_clean_socket_clients();
+
 	std::cout << "FIN DU PROGRAMME " << std::endl;
 	return (0);
 }

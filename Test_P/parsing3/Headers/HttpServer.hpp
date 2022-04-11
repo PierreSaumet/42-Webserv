@@ -129,10 +129,11 @@ class HttpServer {
 		std::string		ft_get_server_name( void ) const;
 		std::string		ft_get_status( bool x ) const;
 		std::string		ft_get_date( void ) const;
-
+		std::string		ft_get_allow( void ) const;
 
 		std::string		ft_get_file( std::string path ) const;
 
+		int				ft_check_method_allowed( std::string request_http, std::string method );
 		/*
 		**	Function used if an error occurs in the request
 		*/

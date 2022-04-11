@@ -186,6 +186,68 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 **		4) si oui, execute CGI
 **		4) si non, recupere les informations de la requete et les mets dans this->_header_request
 */
+
+int				HttpServer::ft_check_method_allowed( std::string request_http, std::string method )
+{
+	if (this->_servers[0].nbr_location > 0)
+	{
+		std::cout << "il y a des locations : " << this->_servers[0].nbr_location << std::endl;
+		size_t i = 0;
+		while ( i < this->_servers[0].nbr_location)
+		{
+			std::cout << "affiche le nom de la location : " << this->_servers[0].location[i].name_location << std::endl;
+			
+			size_t found = request_http.find("/");
+			// size_t size_name_location = this->_servers[0].location[i].name_location.length();
+			if (found == std::string::npos)
+			{
+				std::cout << "ERREUR euh pas normal ne trouve pas / dans la requete a traiter "<< std::endl;
+				exit(EXIT_FAILURE);
+			}
+			else
+			{
+				// std::cout << "request http = " << request_http << std::endl;
+				// std::cout << "nom lcoation = " << this->_servers[0].location[i].name_location << std::endl;
+				// std::cout << "found = " << found << std::endl;
+				std::string tmp = this->_servers[0].location[i].name_location;
+				if (tmp[tmp.size() - 1] != '/')
+					tmp.append("/");
+				// std::cout << "tmp = " << tmp << std::endl;
+				if (request_http.find(tmp) != std::string::npos)
+				{
+					std::cout << "OUI on se trouve dans un dossier location a continuer   11 " << std::endl;
+					
+					// 
+					std::vector<std::string>::iterator	it_b = this->_servers[0].location[i].methods_location.begin();
+					for (; it_b != this->_servers[0].location[i].methods_location.end(); it_b++)
+					{
+						if (*it_b == method)
+						{
+							std::cout << " la method est autorisee dans location " << std::endl;
+							return (0);		// oui method fonctionne
+						}
+					}
+					std::cout << " la method n'est PAS autorisee dans location " << std::endl;
+					return (1);		// la method n'est pas autorisee
+				}
+			}
+			i++;
+		}
+	}
+	std::cout << "on va chercher dans le root" << std::endl;
+	std::vector<std::string>::iterator  it_b = this->_servers[0].methods_server.begin();
+	for (; it_b != this->_servers[0].methods_server.end(); it_b++)
+	{
+		if (*it_b == method)
+		{
+			std::cout << " la method est autorisee dans root " << std::endl;
+			return (0);		// oui ca marche
+		}
+	}
+	std::cout << " la method n'est PAS autorisee dans root " << std::endl;
+	return (1);
+}
+
 size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 {
 	std::cout << BLUE <<  "Dans get : " << CLEAR <<  std::endl;
@@ -196,7 +258,43 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
+		// ici il faut verifier la methode si on a le droit.
 
+		if (ft_check_method_allowed(request_http, "GET") == 1)
+		{
+			std::cout << "method interdite donc 405 error " << std::endl;
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 405;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				sleep(2);
+				return (1);
+			}
+			// exit(1);
+		}
+		else
+		{
+			std::cout << "METHOD autorisee donc on continue" << std::endl;
+			// exit(0);
+		}
+		/*
+			1 ) on regarde si on est dans une location
+				si oui , on regarde si get est dans dav_method
+					oui get est dans dav donc on continue
+					non get n'est PAS dans dav method
+						on sort 405
+			2) on regarde si on est dans root
+				si oui, on regarde si get est dans dav methdo
+					oui get est dans dav method donc on contiue
+					non get n;est pas dans dav method
+						on sort 405.
+
+			! si 405 rajouter dans le Header Allow: et la liste des method autorisees.
+
+		*/
 		if (len_msg > 1023)
 		{
 
@@ -524,7 +622,7 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 			std::cout << "affiche le nom de la location : " << this->_servers[0].location[i].name_location << std::endl;
 			
 			size_t found = request_http.find("/");
-			size_t size_name_location = this->_servers[0].location[i].name_location.length();
+			// size_t size_name_location = this->_servers[0].location[i].name_location.length();
 			if (found == std::string::npos)
 			{
 				std::cout << "ERREUR euh pas normal ne trouve pas / dans la requete a traiter "<< std::endl;
@@ -532,11 +630,14 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 			}
 			else
 			{
-				std::cout << "request http = " << request_http << std::endl;
-				std::cout << "nom lcoation = " << this->_servers[0].location[i].name_location << std::endl;
-				std::cout << "found = " << found << std::endl;
-				sleep(3);
-				if (request_http.compare(found, size_name_location, this->_servers[0].location[i].name_location) == 0)
+				// std::cout << "request http = " << request_http << std::endl;
+				// std::cout << "nom lcoation = " << this->_servers[0].location[i].name_location << std::endl;
+				// std::cout << "found = " << found << std::endl;
+				std::string tmp = this->_servers[0].location[i].name_location;
+				if (tmp[tmp.size() - 1] != '/')
+					tmp.append("/");
+				// std::cout << "tmp = " << tmp << std::endl;
+				if (request_http.find(tmp) != std::string::npos)
 				{
 					std::cout << "OUI on se trouve dans un dossier location a continuer   11 " << std::endl;
 					
@@ -559,7 +660,10 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 									this->_header_requete[0].body_error = it->second;
 									std::cout << " on a mis le fichier a recuperer pour l'error." << std::endl;
 									std::cout << "\nbody error = " << this->_header_requete[0].body_error;
-									return (i);
+									if (i == 0)
+										return (-1);
+									else
+										return (i);
 								}
 								else
 								{
@@ -589,79 +693,6 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 
 					return (0);
 				}
-				else
-				{
-					found = request_http.find(this->_servers[0].location[i].name_location);
-					if (found == std::string::npos)
-					{
-						std::cout << "ERREUR 36363 euh pas normal ne trouve pas / dans la requete a traiter "<< std::endl;
-						exit(EXIT_FAILURE);
-					}
-					else
-					{
-						if (request_http.compare(found, size_name_location, this->_servers[0].location[i].name_location) == 0)
-						{
-							std::cout << "OUI on se trouve dans un dossier location a continuer  22" << std::endl;
-							
-							// go checker si l'erreur est setup
-							if (this->_header_requete[0].error == true)
-							{
-								if (this->_header_requete[0].num_error)
-								{
-
-									std::map<int, std::string>::iterator it = this->_servers[0].location[i].error_location.begin();
-									// on cherche si l'erreur a ete idique dans une directive error_page
-									for (; it != this->_servers[0].location[i].error_location.end(); it++)
-									{
-										std::cout << "on display les erreur dans location... " << it->first << std::endl;
-										if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
-										{
-											std::cout << "OUI ils sont egaux, le num_error et l'erreur qui a ete setup dans le fichier de conf" << std::endl;
-											std::cout << "euh second = " << it->second << std::endl;
-											// on met dans le body le fichier a recuperer
-											this->_header_requete[0].body_error = it->second;
-											std::cout << " on a mis le fichier a recuperer pour l'error." << std::endl;
-											std::cout << "\nbody error = " << this->_header_requete[0].body_error;
-											if (i == 0)
-												return (-1);	// retourne -1 si location est le premier == 0
-											else
-												return (i); // sinon retour l'endroit de location
-										}
-										else
-										{
-											std::cout << "euh non " << std::endl;
-										}
-									}
-									std::cout << RED << "l'erreur n'a pas ete trouve dans error_page " << CLEAR << std::endl;
-									this->_header_requete[0].body_error = "/";
-									this->_header_requete[0].body_error.insert(0, this->_servers[0].location[i].name_location);
-									// this->_header_requete[0].body_error = this->_servers[0].location[i].name_location;
-									this->_header_requete[0].body_error.insert(0, this->_servers[0].root_server);
-									std::cout << "euh le body error = " << this->_header_requete[0].body_error << std::endl;
-									// this->_header_requete[0].body_error = this->_servers[0].root_server;
-									// this->_header_requete[0].body_error = "NULL";
-								}
-								else
-								{
-									std::cout << "pas normal on ne doit pas etre la num error pas setup = false" << std::endl;
-									exit(EXIT_FAILURE);
-								}
-							}
-							else
-							{
-								std::cout << "pas normal on ne doit pas etre la error = false" << std::endl;
-								exit(EXIT_FAILURE);
-							}
-
-							return (0);
-						}
-					}
-					std::cout << "euh non pas dans un location " << std::endl;
-					std::cout << " REKT FRAGILE " << std::endl;
-					exit(EXIT_FAILURE);
-				}
-
-				exit(1);
 			}
 			i++;
 		}
