@@ -108,6 +108,7 @@ class HttpServer {
 		std::string		ft_check_host_header( std::string header );
 		std::string		ft_setup_header( void );
 
+		std::string::iterator ft_find_end_header( std::string request_http );
 
 		/*
 		**	Functions used to set up the headers for the response

@@ -137,7 +137,7 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 		{
 			if (this->ft_find_cgi_path(k, scope_server, i))
 				return (true);
-			k += 2;
+			k += 3;
 		}
 		else if (scope_server[k] == "upload_store")
 		{
@@ -227,6 +227,13 @@ bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t
 	
 	k += 1;
 	len = tmp[k].size();
+
+	std::cout << "tmp[k] == " << tmp[k] << " et len = " << tmp[k].size() << std::endl;
+	// if (tmp[k][0] != '*' || tmp[k])
+	if (len < 3 || tmp[k][0] != '*' || tmp[k][1] != '.')
+		throw Error(530, "Error, in 'cgi_path' directive, the first argument should start with '*.php' for example.", 1);
+	k += 1;
+	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 		throw Error(53, "Error, in 'cgi_path' directive, it should end with '\0'.", 1);
 	if (tmp[k][len - 1] != ';')
@@ -234,9 +241,16 @@ bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 		throw Error(55, "Error, in 'cgi_path' directive, it should start with './'.", 1);
 	this->_servers[index_server].cgi_path_server = tmp[k].substr(0, len - 1);
+
+	// on supprime le  . ?
+	if (	this->_servers[index_server].cgi_path_server[0] == '.')
+		this->_servers[index_server].cgi_path_server.erase(0, 1);
+	std::cout << "address du cgi = " << this->_servers[index_server].cgi_path_server << std::endl;
 	if (stat(this->_servers[index_server].cgi_path_server.c_str(), &buffer) == -1)
 		throw Error(56, "Error, in 'cgi_path' directive, the folder doesn't exist!", 1);
+	
 	return (false);
+	exit(0);
 }
 
 /*

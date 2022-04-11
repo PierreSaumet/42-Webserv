@@ -66,7 +66,14 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 		this->ft_delete(request_http, len_msg);
 	else
 	{
-		std::cout << "ERROR dans la method error 405" << std::endl;
+		if (this->_header_requete.empty() == true)
+		{
+			this->_header_requete.push_back(t_header_request());
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 405;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return ;
+		}
 	}
 
 	// TOUT CE QUI EST EN COMMENTAIRE DESSOUS DOIT ETRE SUPPRIME ET IMPLEMENTE 
@@ -248,6 +255,25 @@ int				HttpServer::ft_check_method_allowed( std::string request_http, std::strin
 	return (1);
 }
 
+std::string::iterator	HttpServer::ft_find_end_header( std::string request_http )
+{
+	std::string::iterator	it_b = request_http.begin();
+	std::string::iterator	it_end_request;
+	// int i =0;
+	for(; it_b != request_http.end(); it_b++)
+	{
+		std::string end_request(it_b, it_b + 4);
+		if (end_request == "\r\n\r\n")
+		{
+			it_end_request = it_b;
+			return (it_b);
+			std::cout << "on atrouve la fin du header" << std::endl;
+			break ;
+		}
+	}
+	return (it_b);
+}
+
 size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 {
 	std::cout << BLUE <<  "Dans get : " << CLEAR <<  std::endl;
@@ -316,33 +342,32 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		else
 		{
 			std::cout << "Ok pas d'erreur 431 donc on continue" << std::endl;
-			std::cout << "request = " << request_http << std::endl;
+			sleep(1);
+			std::cout << "request = " << request_http << "\n\n" << std::endl;
+			sleep(2);
 
-			// peut etre a changer l'ordre
-			//	On a une requete get, il faut verifier si on a du php et donc du cgi
-			// if (ft_find_cgi_or_php(request_http, len_msg) == 1)
-			// {
-			// 	// on a du php ou du cgi ?
-			// 	// donc faut utiliser cgi
-			// 	ft_exec_cgi_test( request_http, len_msg);
-			// }
 
 			// on trouve la fin du header de la requete HTTP.
-			std::string::iterator	it_b = request_http.begin();
-			std::string::iterator	it_end_request;
+			// std::string::iterator	it_b = request_http.begin();
+			std::string::iterator	it_end_request = ft_find_end_header( request_http );
 			int i =0;
-			for(; it_b != request_http.end(); it_b++)
-			{
-				std::string end_request(it_b, it_b + 4);
-				if (end_request == "\r\n\r\n")
-				{
-					it_end_request = it_b;
-					break ;
-				}
-				i++;
-			}
+			// for(; it_b != request_http.end(); it_b++)
+			// {
+			// 	std::string end_request(it_b, it_b + 4);
+			// 	if (end_request == "\r\n\r\n")
+			// 	{
+			// 		it_end_request = it_b;
+			// 		std::cout << "on atrouve la fin du header" << std::endl;
+			// 		break ;
+			// 	}
+				
+			// }
+			std::cout << "ICI 2 \n" << std::endl;
+			sleep(5);
 			std::string size_header(request_http.begin(), it_end_request);
+
 			std::cout << RED << "ICI 3" << CLEAR << std::endl;
+			sleep(3);
 			std::cout << "Taille du header bon = " << size_header.size() << std::endl;
 			// test savoir quelle method
 			if (this->_header_requete.empty() == false)
