@@ -39,13 +39,14 @@ int             main(int argc, char **argv)
 		std::cerr << RED << "Error, in the argument given." << CLEAR << std::endl;
 	}
 	//Testing signal
-	raise(SIGINT);
+	// raise(SIGINT);
 	std::cout << "int sig = " << HttpServer::int_signal << std::endl;
 
-	// if (&signal != 0)
-	// {
-	// 	std::cout << "ERREUR AHAHAH" << std::endl;
-	// }
+	if (&signal != 0)
+	{
+		std::cout << RED << "Our webserv wish you a goodbye..." << CLEAR << std::endl;
+		return (1);
+	}
 
     return (0);
 }

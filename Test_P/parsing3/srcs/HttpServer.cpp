@@ -206,7 +206,10 @@ void	HttpServer::ft_handle_connections( void )
 	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0)
 	{
 		// il faut fermer les socket ? tous les sockets < ==========================================
-		throw Error(5, "Error, 'main loop server', cannot select().", 2);
+		this->ft_clean_socket_servers();
+		this->ft_clean_socket_clients();
+		exit(EXIT_FAILURE);
+		//throw Error(5, "Error, 'main loop server', cannot select().", 2);
 	}
 	return ;
 }
@@ -570,6 +573,7 @@ int		HttpServer::ft_test_main_loop_server( void )
 		}
 		catch (std::exception &e)
 		{
+			std::cout << " on capte une erreur ici dans la boucle principale." << std::endl;
 			std::cerr << e.what() << std::endl;
 			std::cout << "dans catch error main loop " << std::endl;
 
