@@ -64,10 +64,12 @@ class Cgi_exec
 		void			setHttpUserAgent( std::string const http_user );
 		void			setHttpCookie( std::string const http_cookie );
 		void			setHttpReferer( std::string const http_referer );
+		void			setRequestUri( std::string const request_uri );
 
 		/*
 		**	Getters
 		*/
+		std::string		getRequestUri( void ) const;
 		std::string		getServerSoftware( void ) const;
 		std::string		getServerName( void ) const;
 		std::string		getGatewayInterface( void ) const;
@@ -91,6 +93,9 @@ class Cgi_exec
 		std::string		getCookie( void ) const;
 		std::string		getReferer( void ) const;
 
+
+		// a supprimer
+		void			ft_test( void );
 		void			ft_display_all_variable_env( void );
 
 	private:

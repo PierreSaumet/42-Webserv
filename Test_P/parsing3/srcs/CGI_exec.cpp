@@ -60,6 +60,7 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_IDENT", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_TYPES", "NULL"));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_LENGTH", "NULL"));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REQUEST_URI", "NULL"));
 
 
 
@@ -86,6 +87,22 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 		std::cout << "it_b->first = " << it_b->first << " and it_b->second = " << it_b->second << std::endl;
 	}
 	return (0);
+}
+
+
+//	test a supprimer
+void		Cgi_exec::ft_test( void )
+{
+	this->setServerPort("HTTP/1.1");
+	this->setServerName("127.0.0.1");
+	this->setServerPort("8080");
+	this->setServerSoftware("Webserv/1.0");
+	this->setGatewayInterface("CGI/1.1");
+	this->setRequestUri("/Hello/query_get_test.php?name=Pierre&prenom=Saumet&message=PARFAIT");
+	this->setHttpAccept("test/html");
+
+	// int return_execve = execve()
+	return ;
 }
 
 std::string	Cgi_exec::ft_execute_cgi( void )
@@ -138,6 +155,11 @@ std::string	Cgi_exec::ft_execute_cgi( void )
 /*
 **	SETTERS
 */
+void	Cgi_exec::setRequestUri( std::string const request_uri )
+{
+	this->_env_cgi["REQUEST_URI"] = request_uri;
+	return ;
+}
 void	Cgi_exec::setServerSoftware( std::string const software )
 {
 	this->_env_cgi["SERVER_SOFTWARE"] = software;
@@ -262,6 +284,19 @@ void	Cgi_exec::setHttpReferer( std::string const http_referer )
 /*
 **	GETTERS
 */
+std::string Cgi_exec::getRequestUri( void ) const
+{
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "REQUEST_URI")
+			return (it_b->second);
+	}
+	return ("");
+}
+
 std::string	Cgi_exec::getServerSoftware( void ) const
 {
 	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();

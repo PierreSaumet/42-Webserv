@@ -39,15 +39,6 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 	// this->_cgi->ft_display_all_variable_env();
 	// exit(1);
 
-	/////// test time 
-	// ft_get_date();
-	// return ;
-
-	///// test fake error
-	// std::cout << ft_create_error() << std::endl;
-	// std::cout << "ici 2" << std::endl;
-	// return ;
-
 	std::cout << "Constructor avec argument "<< std::endl;
 	try {
 		this->_data = new Parsing(configfile);
