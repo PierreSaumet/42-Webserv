@@ -176,7 +176,7 @@ bool                            Parsing::ft_check_semicolon( void )
 	directives.push_back("autoindex");
 	directives.push_back("root");
 	directives.push_back("client_body_buffer_size");
-	// directives.push_back("cgi_path");
+	directives.push_back("cgi_path");
 	directives.push_back("upload_store");
 	directives.push_back("index");
 
