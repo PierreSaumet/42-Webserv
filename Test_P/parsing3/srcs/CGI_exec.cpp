@@ -118,6 +118,9 @@ std::string	Cgi_exec::ft_execute_cgi( void )
 							==>	SERVER_SOFTWARE	=	"webser/1"
 							==>	SERVER_PROTOCOL	=	"HTTP/1.1"
 					c'est les infos qu'on a dans la requete.
+
+				il faut aussi pour execve mettre les variables dans un char** pour le troisieme argument
+
 			2 ) init les variables locales a utiliser
 				pid_t pid;
 				int		stdin?
