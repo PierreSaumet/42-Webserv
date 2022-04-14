@@ -16,6 +16,13 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 
 class Cgi_exec
 {

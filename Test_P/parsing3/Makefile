@@ -36,7 +36,7 @@ INCLUDE 		+= 	Headers/Parsing.hpp			\
 					Headers/Error.hpp
 
 # FLAGS ========================================================================
-FLAGS 			= -Wall -Wextra -Werror -g -std=c++98 
+FLAGS 			= -Wall -Wextra -Werror -g #-std=c++98 
 
 # OBJECTS ======================================================================
 OBJECTS_FOLDER 	= ./objects/
