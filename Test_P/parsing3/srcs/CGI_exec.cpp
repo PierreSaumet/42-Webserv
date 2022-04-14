@@ -89,6 +89,62 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	return (0);
 }
 
+/*
+**	pour une requete GET il nous faut
+	CONTENT_LENGTH = vide ?
+	CONTENT_TYPE = vide ?
+	GATEWAY_INTERFACE = CGI/1.1
+	HTTP_accept = valeur du header:
+		exemple = text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*//*;q=0.8
+	PATH_INFO = le chemin du fichier php:
+		exemple = /home/pierre/dossier/webser/test/parsing3/root/Hello/fichier.php
+	PATH_TRANSLATED = pareil que path_info
+		exemple = /home/pierre/dossier/webser/test/parsing3/root/Hello/fichier.php
+	QUERY_STRING = les valeurs qui proviennet de l'url car get
+		exemple = name=SAUMET&prenom=PIERRE
+	REDIRECT_STATUS = 200  ==> verifier avant que les fichiers sont bons et les donnees le sont egalement
+	REQUEST_METHOD = GET
+	REQUEST_URI = l'addresse du fichier + les info
+		exemple = /Hello/query_get_test.php?name=SAUMET
+	SCRIPT_FILENAME = nom du fichier
+		exemple = query_test_get.php
+	SCRIPT_NAME = pareil que script_filemane
+		exemple = query_test_get.php
+	SERVER_NAME = le nom du server
+	SERVER_PORT = le port du server ou on ecoute
+	SERVER_PROTOCOl = HTTP/1.1
+	SERVER_SOFTWARE = webserv/1.0 enfin notre server
+	STATUS_CODE = 200 comme redirect status
+
+	et le write on lui donne une string vide. je pense
+*/
+
+/*
+**	pour une requete POST il nous faut
+	CONTENT_LENGTH = la valeur du body recu enfin la taille 
+		exemple = 6 pour pierre
+	CONTENT_TYPE = valeur qu'on trovue dans le header de la requete
+		exemple = application/x-www-form-urlencoded
+	GATEWAY_INTERFACE = CGI/1.1
+	HTTP_ACCEPT = valeur qu'on trouve dans le header de la requete
+		exemple = text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*//*;q=0.8
+	PATH_INFO = pareil que pour GET
+	PATH_TRANSLATED = pareil que pour GEt
+	REDIRECT_STTUS = 200
+	REQUEST_METHOD = POST
+	REQUEST_URO = nom du fichier suelement
+		exemple = /fichier.php
+	SCRIPT_NAME = nom du fichier
+		exemple = /fichier.php
+	SERVER_NAME	= le nom du server
+	SERVEr_PORt = le ort du server
+	SERVER_PROTOCOL = HTTP/1.1
+	SERVER_SOFTWARE = bah server webserv
+	STATTUS _CODE = 200
+
+	et pour le write, il faut lui transmettre les donnees qu'on a recupere
+	genre = name=pierre?prenom=paindemie
+*/
 
 //	test a supprimer
 void		Cgi_exec::ft_test( void )
@@ -108,7 +164,7 @@ void		Cgi_exec::ft_test( void )
 
 	std::vector<std::string> aArgs;
 	aArgs.push_back("/usr/bin/php-cgi");
-	aArgs.push_back("./test1.php");
+	aArgs.push_back("./root/Hello/query_get_test.php");
 
 	sysCline = new char*[aArgs.size()+1];
 	for (unsigned long i = 0; i < aArgs.size(); i++)
@@ -120,16 +176,37 @@ void		Cgi_exec::ft_test( void )
 	sysCline[aArgs.size()] = NULL;
 
 
+	// DONC pour _GET dans le fichier query_get_test
+	// il faut que QUERY_STRING possede les valeurs
+	// ex = QUERY_STRING=name=pierre
+	//	et dans le write, bah on peut ecrier n'importe quoi... bizarre
+
+	//	DONC pour _POST dans le fichier query_get_test
+	//	il faut que QUERY_STRINg possede test=querystring
 	std::vector<std::string> aEnv; 
 	aEnv.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	aEnv.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	aEnv.push_back("QUERY_STRING=test=querystring");
+	// pour tester avec get
+	// aEnv.push_back("QUERY_STRING=name=pierre");
+	// aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php?name=pierre");
+	
+	
+	// pour tester avec post
+	// aEnv.push_back("QUERY_STRING=test=querystring");
+	 aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php");
+	
 	aEnv.push_back("REDIRECT_STATUS=200");
-	aEnv.push_back("REQUEST_METHOD=POST");
+	
+	
+	aEnv.push_back("REQUEST_METHOD=POST");	// avec post ca ne marche pas ... bizarre
+	
 	aEnv.push_back("CONTENT_TYPE=application/x-www-form-urlencoded;charset=utf-8");
-	aEnv.push_back("SCRIPT_FILENAME=./test1.php");
+
+	// aEnv.push_back("SCRIPT_FILENAME=./test1.php");
+	aEnv.push_back("SCRIPT_FILENAME=./root/Hello/query_get_test.php");
 	// aEnv.push_back("CONTENT_LENGTH=500");				//+ std::to_string(sData.length()) );
-	aEnv.push_back("CONTENT_LENGTH=32"); //+ std::to_string(sData.length()) );
+	
+	aEnv.push_back("CONTENT_LENGTH=11"); //+ std::to_string(sData.length()) );
 	sysENV = new char*[aEnv.size() + 1];
 	for (unsigned long i = 0; i < aEnv.size(); i++)
 	{
@@ -172,7 +249,8 @@ void		Cgi_exec::ft_test( void )
 
 	//	on ecrit dans fd_in car c'est dedans qu'on va passer les valeurs recuperer via le parsing
 	//	et les transmettre au CGI.
-	write(fd_in, "nom=WEBSERV&ca_marche=EVIDEMMENT", 32);
+	// euh quand c'est un post il faut mettre les donnes ici 
+	write(fd_in, "name=pierre", 11);
 	//	On replace le curseur de lecture de fd_in au debut
 	lseek(fd_in, 0, SEEK_SET);
 
