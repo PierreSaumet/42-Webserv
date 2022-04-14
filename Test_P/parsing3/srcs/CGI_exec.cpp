@@ -93,18 +93,18 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 //	test a supprimer
 void		Cgi_exec::ft_test( void )
 {
-	this->setServerPort("HTTP/1.1");
-	this->setServerName("127.0.0.1");
-	this->setServerPort("8080");
-	this->setServerSoftware("Webserv/1.0");
-	this->setGatewayInterface("CGI/1.1");
-	this->setRequestUri("/Hello/query_get_test.php?name=Pierre&prenom=Saumet&message=PARFAIT");
-	this->setHttpAccept("test/html");
+	// this->setServerPort("HTTP/1.1");
+	// this->setServerName("127.0.0.1");
+	// this->setServerPort("8080");
+	// this->setServerSoftware("Webserv/1.0");
+	// this->setGatewayInterface("CGI/1.1");
+	// this->setRequestUri("/Hello/query_get_test.php?name=Pierre&prenom=Saumet&message=PARFAIT");
+	// this->setHttpAccept("test/html");
 
 
 	char **sysCline = NULL;
 	char **sysENV = NULL;
-	std::string		sData ="var_1=val1&var_=val2";
+	// std::string		sData ="var_1=val1&var_=val2";
 
 	std::vector<std::string> aArgs;
 	aArgs.push_back("/usr/bin/php-cgi");
@@ -242,50 +242,20 @@ void		Cgi_exec::ft_test( void )
 	close(fd_out);
 	close(stdin_tmp);
 	close(stdout_tmp);
-	// pid_t pid;
-	// int pp[2];
-	// // int res;
 
-	// pipe(pp);
-	// // int	my_stdin;
-	// // int my_stdout;
+	// faut nettoyer pour les leaks
+	for (unsigned long i = 0; i < aEnv.size(); i++)
+	{
+		delete [] sysENV[i];
+	}
+	delete [] sysENV;
 
-	// // my_stdin = dup(0);
-	// // my_stdout = dup(1);
+	for (unsigned long i = 0; i < aArgs.size(); i++)
+	{
+		delete [] sysCline[i];
+	}
+	delete [] sysCline;
 
-	// pid = fork();
-	// int status = 0;
-
-	// std::cout << "\n\n" << std::endl;
-	// if (pid == -1)
-	// {
-	// 	std::cout << "Fork marche pas" << std::endl;
-	// 	exit(1);
-	// }
-	// else if (pid == 0)
-	// {
-	// 	std::cout << "child " << std::endl;
-	// 	dup2(pp[0], 0);
-	// 	// res = execve(sysCline[0], sysCline, sysENV);
-
-	// 	if (execve(sysCline[0], sysCline, sysENV) == -1)
-	// 	{
-	// 		std::cerr << "Error cgi" << std::endl;
-	// 	}
-	// 	// std::cout << "res = " << res << std::endl;
-	// }
-	// else
-	// {
-	// 	waitpid(pid, &status, WUNTRACED);
-	// 	if (WIFEXITED(status))
-	// 		std::cerr << strerror(WEXITSTATUS(status));
-	// 	std::cout << "parent" << std::endl;
-	// }
-	// close(pp[1]);
-
-
-	
-	 std::cout << "fin de execve" << std::endl;
 
 	return ;
 }

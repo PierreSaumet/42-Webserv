@@ -29,35 +29,40 @@ HttpServer::HttpServer( void ) { // a terminer, initialiser toutes les variables
 HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a terminer, initialiser toutes les variables
 
 	// debut CGI/////////////////////////////////////////////
+	(void)configfile;
 	this->_cgi = new Cgi_exec();
-	this->_cgi->ft_setup_env_cgi();
-	std::cout << "test getsoft = " << this->_cgi->getServerSoftware() << std::endl;
-	this->_cgi->setServerSoftware("Bonjour");
-	std::cout << "test setsoft = " << this->_cgi->getServerSoftware() << std::endl;
+	// this->_cgi->ft_setup_env_cgi();
+	// std::cout << "test getsoft = " << this->_cgi->getServerSoftware() << std::endl;
+	// this->_cgi->setServerSoftware("Bonjour");
+	// std::cout << "test setsoft = " << this->_cgi->getServerSoftware() << std::endl;
 
-	std::cout << "\n\n\n display all = " << std::endl;
-	this->_cgi->ft_display_all_variable_env();
+	// std::cout << "\n\n\n display all = " << std::endl;
+	// this->_cgi->ft_display_all_variable_env();
 	std::cout << "\n\n" << std::endl;
 
 	this->_cgi->ft_test();
-	exit(1);
-
-	std::cout << "Constructor avec argument "<< std::endl;
-	try {
-		this->_data = new Parsing(configfile);
-		if (this->_data->ft_get_error() == 1)
-			return ;
-		this->_servers = this->_data->ft_get_servers();											// on recupere les informations provenant de la class parsing
-		std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
-		if (this->ft_create_servers() == 1)
-			return ;
-		this->ft_test_main_loop_server();
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << e.what() << std::endl;
-	}
+	// delete this->_cgi;
+	
 	return ;
+
+
+
+	// std::cout << "Constructor avec argument "<< std::endl;
+	// try {
+	// 	this->_data = new Parsing(configfile);
+	// 	if (this->_data->ft_get_error() == 1)
+	// 		return ;
+	// 	this->_servers = this->_data->ft_get_servers();											// on recupere les informations provenant de la class parsing
+	// 	std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
+	// 	if (this->ft_create_servers() == 1)
+	// 		return ;
+	// 	this->ft_test_main_loop_server();
+	// }
+	// catch (std::exception &e)
+	// {
+	// 	std::cerr << e.what() << std::endl;
+	// }
+	// return ;
 }
 
 /*
@@ -74,7 +79,10 @@ HttpServer::HttpServer( const HttpServer &copy ) {			// a terminer, initialiser 
 */
 HttpServer::~HttpServer( void ) {
 
-	delete (this->_data);
+	delete this->_cgi;
+
+	// if (this->_data)
+	// 	delete (this->_data);
 	return ;
 }
 
