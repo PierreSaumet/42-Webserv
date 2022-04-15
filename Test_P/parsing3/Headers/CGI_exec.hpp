@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
+#include "HttpServer.hpp"
 
 class Cgi_exec
 {

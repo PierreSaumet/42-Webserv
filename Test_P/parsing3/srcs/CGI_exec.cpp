@@ -102,6 +102,7 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 		exemple = /home/pierre/dossier/webser/test/parsing3/root/Hello/fichier.php
 	QUERY_STRING = les valeurs qui proviennet de l'url car get
 		exemple = name=SAUMET&prenom=PIERRE
+	
 	REDIRECT_STATUS = 200  ==> verifier avant que les fichiers sont bons et les donnees le sont egalement
 	REQUEST_METHOD = GET
 	REQUEST_URI = l'addresse du fichier + les info

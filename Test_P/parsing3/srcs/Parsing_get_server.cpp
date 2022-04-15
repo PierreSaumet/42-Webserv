@@ -76,7 +76,7 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 		}
 	}
 	this->_servers.push_back(t_server());
-	std::cout << "On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
+	// std::cout << "On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
 	return (false);
 }
 
@@ -234,7 +234,6 @@ bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 		throw Error(55, "Error, in 'cgi_path' directive, it should start with './'.", 1);
 	this->_servers[index_server].cgi_path_server = tmp[k].substr(0, len - 1);
-	std::cout << "address du cgi = " << this->_servers[index_server].cgi_path_server << std::endl;
 	if (this->_servers[index_server].cgi_path_server == "./usr/bin/php-cgi")
 		this->_servers[index_server].cgi_path_server.erase(0, 1);
 	else

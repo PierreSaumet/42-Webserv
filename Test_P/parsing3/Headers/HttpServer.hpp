@@ -35,8 +35,9 @@
 #include <string.h>
 #include <time.h>
 
-#include "../Headers/CGI_exec.hpp"
+#include "CGI_exec.hpp"
 
+class Cgi_exec;
 
 class HttpServer {
 
@@ -60,15 +61,18 @@ class HttpServer {
 
 		typedef struct 			s_header_request {
 
-			std::string			method;
-			std::string			path;
+			std::string			method;				// Get Delete ou Post
+			std::string			path;				// Le path c'est a dire l'URL transmise avec les donnees pour Get
 			std::string			protocol;
 			std::string			host;
+			std::string			accept;				// le Accept: de la requete
+			std::string			path_http;			// le path total du fichier demande.
+			std::string			query_string;		// les valeur donnees dans l'url pour une requete get
 			bool				cgi;
 			bool				error;
 			size_t				num_error;
 			std::string			body_error;
-			std::map<std::string, std::string>	data;					// contient les informations en get.
+			std::map<std::string, std::string>	data;	// Contient les information transmise a Get via un formulaire					// contient les informations en get.
 		}						t_header_request;
 		
 
@@ -102,10 +106,16 @@ class HttpServer {
 
 		void				ft_parser_requete( int len_msg, std::string msg );
 		std::string				ft_settup_http_response( void );
-		std::string		ft_check_methods_header( std::string header );
+
+		/*	Functions used to get information from the header of a request.
+		*/
 		std::string		ft_check_path_header( std::string header) ;
 		std::string		ft_check_protocol_header( std::string header );
 		std::string		ft_check_host_header( std::string header );
+		std::string		ft_check_pathhttp_header( std::string header );
+		std::string		ft_check_accept_header( std::string header );
+		bool			ft_check_cgi_or_php( std::string request_http );
+		
 		std::string		ft_setup_header( void );
 
 		std::string::iterator ft_find_end_header( std::string request_http );
@@ -117,7 +127,7 @@ class HttpServer {
 		void			ft_post(std::string request_http, int len_msg);
 		void			ft_delete(std::string request_http, int len_msg);
 
-		bool			ft_find_cgi_or_php( std::string request_http, int len_msg );
+		
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );
 
 		size_t		ft_parsing_path_get_request( void );
@@ -134,7 +144,7 @@ class HttpServer {
 
 		std::string		ft_get_file( std::string path ) const;
 
-		int				ft_check_method_allowed( std::string request_http, std::string method );
+		int				ft_check_method_allowed_header( std::string request_http, std::string method );
 		/*
 		**	Function used if an error occurs in the request
 		*/

@@ -45,14 +45,12 @@
 */
 void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 {
-	std::cout << "Dans parser requete " << std::endl;
+	std::cout << "\nDans ft_parser_requete: " << std::endl;
 
 	std::string request_http(msg);
-	std::cout << "msg = " << request_http << std::endl;
-	std::cout << "len = " << request_http.length() << std::endl;
-	std::cout << "len = " << len_msg << std::endl;
-
-
+	std::cout << "Contenu de la requete = " << request_http << std::endl;
+	std::cout << "taille de la requete = " << request_http.length() << std::endl;
+	std::cout << "\n" << std::endl;
 
 	if (request_http.compare(0, 4, "GET ") == 0)
 	{
@@ -78,63 +76,6 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 	return ;
 }
 
-int				HttpServer::ft_check_method_allowed( std::string request_http, std::string method )
-{
-	if (this->_servers[0].nbr_location > 0)
-	{
-		std::cout << "il y a des locations : " << this->_servers[0].nbr_location << std::endl;
-		size_t i = 0;
-		while ( i < this->_servers[0].nbr_location)
-		{
-			std::cout << "affiche le nom de la location : " << this->_servers[0].location[i].name_location << std::endl;
-			
-			size_t found = request_http.find("/");
-			// size_t size_name_location = this->_servers[0].location[i].name_location.length();
-			if (found == std::string::npos)
-			{
-				std::cout << "ERREUR euh pas normal ne trouve pas / dans la requete a traiter "<< std::endl;
-				exit(EXIT_FAILURE);
-			}
-			else
-			{
-				std::string tmp = this->_servers[0].location[i].name_location;
-				if (tmp[tmp.size() - 1] != '/')
-					tmp.append("/");
-				// std::cout << "tmp = " << tmp << std::endl;
-				if (request_http.find(tmp) != std::string::npos)
-				{
-					std::cout << "OUI on se trouve dans un dossier location a continuer   11 " << std::endl;
-					
-					// 
-					std::vector<std::string>::iterator	it_b = this->_servers[0].location[i].methods_location.begin();
-					for (; it_b != this->_servers[0].location[i].methods_location.end(); it_b++)
-					{
-						if (*it_b == method)
-						{
-							std::cout << " la method est autorisee dans location " << std::endl;
-							return (0);		// oui method fonctionne
-						}
-					}
-					std::cout << " la method n'est PAS autorisee dans location " << std::endl;
-					return (1);		// la method n'est pas autorisee
-				}
-			}
-			i++;
-		}
-	}
-	std::cout << "on va chercher dans le root" << std::endl;
-	std::vector<std::string>::iterator  it_b = this->_servers[0].methods_server.begin();
-	for (; it_b != this->_servers[0].methods_server.end(); it_b++)
-	{
-		if (*it_b == method)
-		{
-			std::cout << " la method est autorisee dans root " << std::endl;
-			return (0);		// oui ca marche
-		}
-	}
-	std::cout << " la method n'est PAS autorisee dans root " << std::endl;
-	return (1);
-}
 
 std::string::iterator	HttpServer::ft_find_end_header( std::string request_http )
 {
@@ -157,19 +98,15 @@ std::string::iterator	HttpServer::ft_find_end_header( std::string request_http )
 
 size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 {
-	std::cout << BLUE <<  "Dans get : " << CLEAR <<  std::endl;
-	std::cout << "taille request = " << request_http.length() << std::endl;
-	std::cout << "taille request = " << request_http.size() << std::endl;
-	std::cout << "len msg = " << len_msg << std::endl;
-	//sleep(5);
+	std::cout << GREEN << "Dans get : " << CLEAR <<  std::endl;
+
+	// On verifie que this->_header_requete est vide, apres chaque requete il doit etre vide.
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
-		// ici il faut verifier la methode si on a le droit.
-
-		if (ft_check_method_allowed(request_http, "GET") == 1)
+		if (ft_check_method_allowed_header(request_http, "GET") == 1)				// On verifie que la methode est autorisee
 		{
-			std::cout << "method interdite donc 405 error " << std::endl;
+			std::cout << RED << "La methode GET est interdite donc on sort une erreur 405" << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 405;
 			if (this->ft_setup_error_header(request_http, len_msg) == 0)
@@ -177,148 +114,108 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			else
 			{
 				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
 				sleep(2);
 				return (1);
 			}
 		}
-		else
-		{
-			std::cout << "METHOD autorisee donc on continue" << std::endl;
-			// exit(0);
-		}
-		if (len_msg > 1023)
+		std::cout << BLUE << "La methode GET est autorisee, on continue." << CLEAR << std::endl;
+
+		if (len_msg > 1023)													// on verifie que le header ne soit pas trop long
 		{
 
 			std::cout << RED << "On a une  ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
-			//sleep(5);
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
-
 			if (this->ft_setup_error_header(request_http, len_msg) == 0)
 				return (0);
 			else
 			{
 				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
 				sleep(2);
 				return (1);
 			}
 
 		}
-		else
+		std::cout << BLUE << "Ok pas d'erreur 431 ou d'erreur 405 donc on continue." << CLEAR <<  std::endl;
+
+		// A partir d'ici, on va parser la requete et recuperer toutes les informations disponibles.
+		std::string::iterator	it_end_request = ft_find_end_header( request_http );
+		std::string 			size_header(request_http.begin(), it_end_request);
+
+		// On recupere la methode
+		this->_header_requete[0].method = "GET";
+		std::cout << "On a la requete : " << this->_header_requete[0].method << "-" <<  std::endl;
+	
+		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
+		this->_header_requete[0].path = this->ft_check_path_header(size_header);
+		if (this->_header_requete[0].path.empty() == true)
+			throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
+		std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
+		
+		this->ft_parsing_path_get_request();
+		std::cout << "On a la query_string : " << this->_header_requete[0].query_string << std::endl;
+
+		this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
+		if (this->_header_requete[0].protocol.empty() == true)
+			throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
+		std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
+
+		this->_header_requete[0].host = this->ft_check_host_header(size_header);
+		if (this->_header_requete[0].host.empty() == true)
+			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
+		std::cout << "On a le host : " << this->_header_requete[0].host << "-" << std::endl;
+		
+		
+
+		// RAJOUT VENDREDi
+		this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
+		if (this->_header_requete[0].accept.empty() == true)
+			throw Error(15, "Error, in recieved header, the accept is not correct.", 2);
+		std::cout << "On a le accept = "<< this->_header_requete[0].accept << std::endl;
+	
+		
+		this->_header_requete[0].path_http = this->ft_check_pathhttp_header(size_header);
+		if (this->_header_requete[0].path_http.empty() == true)
+			throw Error(16, "Error, in recieved header, the path of the file si not correct." , 2);
+		std::cout << "le path = " << this->_header_requete[0].path_http << std::endl;
+		
+
+
+		
+		
+		if (ft_check_cgi_or_php(request_http) == 1)
 		{
-			std::cout << "Ok pas d'erreur 431 donc on continue" << std::endl;
-			sleep(1);
-			std::cout << "request = " << request_http << "\n\n" << std::endl;
-			sleep(2);
-
-
-			// on trouve la fin du header de la requete HTTP.
-			// std::string::iterator	it_b = request_http.begin();
-			std::string::iterator	it_end_request = ft_find_end_header( request_http );
-			int i =0;
-			std::string size_header(request_http.begin(), it_end_request);
-
-			std::cout << RED << "ICI 3" << CLEAR << std::endl;
-
-			std::cout << "Taille du header bon = " << size_header.size() << std::endl;
-			// test savoir quelle method
-			if (this->_header_requete.empty() == false)
-			{
-				std::cout << "Notre container header est vide, on en cree un et on recupere les informations" << std::endl;
-				this->_header_requete.push_back(t_header_request());
-
-				this->_header_requete[0].method = this->ft_check_methods_header(size_header);
-				if (this->_header_requete[0].method.empty() == true)
-					throw Error(11, "Error, in recieved header, the method used is not correct.", 2);
-				std::cout << "On a la requete :" << this->_header_requete[0].method << "-" <<  std::endl;
-			
-				this->_header_requete[0].path = this->ft_check_path_header(size_header);
-				if (this->_header_requete[0].path.empty() == true)
-					throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
-				std::cout << "le path = " << this->_header_requete[0].path << std::endl;
-				
-				if (ft_parsing_path_get_request() == 1)
-				{
-					std::cout << RED << "erreur dans le parsing d u path de get " << CLEAR << std::endl;
-				}
-				else
-					std::cout << GREEN << "le parsing du path de get est OK =) " << CLEAR << std::endl;
-				// exit(1); //(1);
-				///////////////////////////////
-
-
-
-				// erruer avec le /flavicon.ico
-				if (this->_header_requete[0].path == "/flavicon.ico ")
-				{
-					std::cout << "merde flavicon " << std::endl;
-					this->_header_requete[0].path = "/ ";
-				}
-
-
-				std::cout << " Taille DU PATH = " << this->_header_requete[0].path.length() << std::endl;
-
-				// donc si la taille du path est superieur a 1024 on  va dire
-				if (this->_header_requete[0].path.length() > 1024)
-				{
-					// doit setup error 431
-					std::cout << "path superierur a 1024" << std::endl;
-				}
-				else
-				{
-					std::cout << "taille path ok" << std::endl;
-				}
-
-				this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
-				if (this->_header_requete[0].protocol.empty() == true)
-					throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
-				std::cout << "le protocol = " << this->_header_requete[0].protocol << "-" << std::endl;
-
-				this->_header_requete[0].host = this->ft_check_host_header(size_header);
-				if (this->_header_requete[0].host.empty() == true)
-					throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
-				std::cout << "le host = " << this->_header_requete[0].host << "-" << std::endl;
-
-				std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
-			}
-			else
-			{
-				std::cout << "Probleme le container qui recupere la header de la requete est vide " << std::endl;
-				std::cout << "Il faut le supprimer apres avoir fait traite une demande." << std::endl;
-			}
-			if (ft_find_cgi_or_php(request_http, len_msg) == 1)
-			{
-				// on a du php ou du cgi ?
-				// donc faut utiliser cgi
-				ft_exec_cgi_test( request_http, len_msg);
-			}
-			
-			std::cout << "i = " << i << std::endl;
-
+			// on a du php ou du cgi ?
+			// donc faut utiliser cgi
+			ft_exec_cgi_test( request_http, len_msg);
 		}
+		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+		exit(1);
 	}
 	else
 	{
 		std::cout << RED << "Probleme le container qui recupere la header de la requete n'est pas vide. " << std::endl;
 		std::cout << "Il faut le supprimer apres avoir fait traite une demande." << CLEAR << std::endl;
 	}
-
-
-
 	return (0);
 }
 
+
 size_t			HttpServer::ft_parsing_path_get_request( void )
 {
-	std::cout << "PATH = " << this->_header_requete[0].path << std::endl;
+	std::cout << GREEN << "Dans ft_parsing_path_get_request : " << CLEAR << std::endl;
 	size_t		pos_cursor = this->_header_requete[0].path.find("?");
 	if (pos_cursor == std::string::npos)
 	{
-		std::cout << "pas de donnee a parser dans parsing path get request" << std::endl;
+		std::cout << "\tIl n'y a pas de donnees a parser dans parsing ft_parsing_path_get_request." << std::endl;
+		this->_header_requete[0].query_string = "";
 		return (0);
 	}
 	else
 	{
+		std::cout << "\tIl y a des donnees a parser dans la requete GET." << std::endl;
 		std::string tmp;
 		pos_cursor++;
 		size_t len = this->_header_requete[0].path.length();
@@ -331,14 +228,22 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 			}
 			else if (this->_header_requete[0].path.compare(pos_cursor, 1, "&") == 0 || pos_cursor == len - 1)
 			{
+				if (pos_cursor == len - 1)
+					tmp.append(this->_header_requete[0].path, pos_cursor, 1);
 				std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
 				for (; it_b != this->_header_requete[0].data.end(); it_b++)
 				{
 					if (it_b->second == "NULL")
 					{
-						// need to change characters
+						// On change les characteres speciaux
 						tmp = ft_clean_path_get_request(tmp);
 						it_b->second = tmp;
+
+						// On ajoute les donnees a this->_header_requete[0].query_string
+						this->_header_requete[0].query_string.append(it_b->first);
+						this->_header_requete[0].query_string.append("=");
+						this->_header_requete[0].query_string.append(it_b->second);
+						this->_header_requete[0].query_string.append("&");
 					}
 				}
 				tmp.clear();
@@ -348,12 +253,12 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 			pos_cursor++;
 		}
 	}
-	// std::cout << "\n\nDISPLAY ALL MAP DATA " << std::endl;
 	// std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
 	// for (; it_b != this->_header_requete[0].data.end(); it_b++)
 	// {
 	// 	std::cout << it_b->first << " = " << it_b->second << std::endl;
 	// }
+	this->_header_requete[0].query_string.erase(this->_header_requete[0].query_string.end() - 1);
 	return (0);
 }
 
@@ -378,7 +283,7 @@ std::string		HttpServer::ft_clean_path_get_request( std::string tmp )
 {
 	std::map<std::string, std::string> url_coding;
 
-	url_coding.insert(std::pair<std::string , std::string>("+", " ")); // space	
+	// url_coding.insert(std::pair<std::string , std::string>("+", " ")); // space	
 	url_coding.insert(std::pair<std::string , std::string>("%21", "!")); 	
 	url_coding.insert(std::pair<std::string , std::string>("%22", "\"")); 	
 	url_coding.insert(std::pair<std::string , std::string>("%23", "#")); 	
@@ -429,15 +334,14 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 
 
 /*
-**	size_t		ft_find_cgi_or_php( std::string request_http, int len_msg )
+**	size_t		ft_check_cgi_or_php( std::string request_http, int len_msg )
 **		This function will simply check the presence or absence in the request path
 **		of 'cgi' or 'php'.
 **
 **		If there is, it returns true, otherwise returns false.
 */
-bool			HttpServer::ft_find_cgi_or_php( std::string request_http, int len_msg )
+bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 {
-	(void)len_msg;
 	std::cout << "dans la fonction find cgi or php " << std::endl;
 	// on trouve le premier /
 	size_t 		find_backslash = request_http.find("/");
@@ -629,200 +533,3 @@ void			HttpServer::ft_delete(std::string request_http, int len_msg)
 }
 
 
-
-/*
-**	std::string		ft_check_host_header( std::string header )
-**		This function checks for the presence of 'Host' in the client request.
-**
-**		et retourne une string contenant le host et le port.
-**		exmeple: 127.0.0.1:8080
-**			==> ne marche pas si 8081 			A FAIRE
-*/
-std::string		HttpServer::ft_check_host_header( std::string header )
-{
-	size_t pos;
-
-	pos = 0;
-	if ((pos = header.find("Host: ", 0)) == std::string::npos)
-	{
-		// A FAIRE: creer une erreur propre.
-		std::cout << "ERREUR NE TROUVE PAS LE HOST DANS LE HEADER" << std::endl;
-		return (NULL);
-	}
-	else
-	{
-		size_t pos_end;
-		if ((pos_end = header.find("\r\n", pos)) == std::string::npos)
-		{
-			// A FAIRE: creer une erreur propre.
-			std::cout << "ERREUR NE TROUVE PAS LE USER-AGENT DANS LE HEADER" << std::endl;
-			return ("");
-		}
-		else
-		{
-			// on verifie que la position de host est avant la position de user-agent.
-			if (pos > pos_end)
-			{
-				// A FAIRE: creer une erreur propre.
-				std::cout << "ERREUR HOST doit etre avant USER-AGENT" << std::endl;
-				return (NULL);
-			}
-			// on recupere les informations apres Host et avant User-agent
-			std::string tmp(header, pos + 6, pos_end - (pos + 6));
-			for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
-			{
-				// on parcourt nos servers pour verifier que le host de la requete est
-				//	bien pour un de nos servers.
-				if (tmp.compare(0, 9, this->_servers[i].host_server) == 0)
-				{
-					// les host de la requete et de notre server sont egaux
-					//	ex: 127.0.0.1
-					std::cout << "ILS SONT EGAUX les host" << std::endl;
-
-					// on convertit le port (std::size_t) en std::string.
-					std::stringstream ss;
-					ss << this->_servers[i].port_server;
-					std::string port;
-					ss >> port;
-					if (tmp.compare(10, 4, port) == 0)
-					{
-						// les ports sont bon, on retourne la string au complete
-						//		ex : 127.0.0.1:8080
-						std::cout<< "Ils sont egaux les port cas 1" << std::endl;
-						return (tmp);
-					}
-					else
-					{
-						//	Les ports ne correspondent pas.
-						if (this->_data->ft_get_nbr_servers() > 1)
-						{
-							// Cas ou on a plusieurs servers
-							std::cout << "euh nbr serv = " << this->_data->ft_get_nbr_servers() << std::endl;
-							for (size_t y = 0; y < this->_data->ft_get_nbr_servers(); y++)
-							{
-								// on parcourt chaque servers pour voir si on a un port
-								//	qui correspond a la requete du client.
-								std::stringstream ss2;
-								std::string port2;
-								std::cout << RED << "y = " << y << " et port server = " << this->_servers[y].port_server << CLEAR << std::endl;
-								ss2 << this->_servers[y].port_server;
-								ss2 >> port2;
-								std::cout << "Punaise = " << port2 << " et y = " << y << std::endl;
-								if (tmp.compare(10, 4, port2) == 0)
-								{
-									std::cout<< "Ils sont egaux les port cas 2" << std::endl;
-									return (tmp);
-								}
-								ss2.str("");
-								ss2.flush();
-								port2 = "";
-							}
-						}
-						std::cout << "port pas egaux ? " << std::endl;
-						std::cout << " tmp = -" << tmp << "- et nous = -" << port << "-" << std::endl;
-						throw Error(666, "Erreur test lol, ", 666);			// A FAIRE au propre
-					}
-				}
-				else
-				{
-					std::cout << "les host ne sont pas egaux" << std::endl;
-					throw Error(666, "Erreur test lol 2, ", 666);		// A FAIRE au propre
-				}
-				// if (this->_servers[i].host_server == tmp)
-				// 	return (tmp);
-			}
-			std::cout << "ERREUR ICI " << std::endl;			// A FAIRE au propre
-			exit(1);
-			return (std::string(header, pos + 6, pos_end - (pos + 6)));
-		}
-	}
-
-}
-
-/*
-**	std::string		ft_check_protocol_header( std::string header )
-**		This function checks the version of the HTTP protocol used by the client's request.
-**	
-
-**		Attention ne epeut pas retour ner NULL
-*/
-std::string		HttpServer::ft_check_protocol_header( std::string header )
-{
-	size_t pos;
-
-	if ((pos = header.find("HTTP/1.1")) == std::string::npos)
-	{
-		// A FAIRE: creer une erreur propre.
-		std::cout << "ERREUR NE TROUBE PAS LE PROTOCOL DANS LE HEADER" << std::endl;
-		return (NULL);
-
-	}
-	else
-	{
-		return (std::string(header, pos, 8));
-	}
-}
-
-
-std::string		HttpServer::ft_check_path_header( std::string header )
-{
-	size_t	pos;
-	if ((pos = header.find_first_of("/", 0)) == std::string::npos)
-	{
-		// A FAIRE: creer une erreur propre.
-		std::cout << "ERREUR NE TROUVE PAS de / dans le path du HEADER DE LA REQUETE \n";
-		return (NULL);
-	}
-	else
-	{
-		size_t pos_http;
-		if ((pos_http = header.find("HTTP/1.1\r\n")) == std::string::npos)
-		{
-			std::cout << "ERREUR NE TROUVE PAS  HTTP protocol dans le PATH du HEADER DE LA REQUETE \n";
-			return (NULL);
-		}
-		else
-		{
-			if (pos > pos_http)
-			{
-				// A FAIRE: creer une erreur propre.
-				std::cout << "ERREUR le path doit etre avant le http version dans le header du client \n";
-				return (NULL);
-			}
-			// tout est bon, on retour le path en entier.
-			std::string tmp(header, pos, pos_http - pos);
-			return (tmp);
-		}
-	}
-}
-
-/*
-** std::string		ft_check_methods_header( std::string header )
-**	fonction useless je pense
-**	checks la method utilisee dans la requete du client
-**	et setup retourne une string contennant la methode utilisee.
-*/
-std::string		HttpServer::ft_check_methods_header( std::string header )
-{
-	size_t pos;
-	if ((pos = header.find("GET", 0)) == std::string::npos)
-	{
-		if ((pos = header.find("POST", 0)) == std::string::npos)
-		{
-			if ((pos = header.find("DELETE", 0)) == std::string::npos)
-			{
-				std::cout << "check methos header probleme return null rien a ete trouve" << std::endl;
-				return (NULL);
-			}
-			else
-				return (std::string(header, pos, 6));;
-		}
-		else
-			return (std::string(header, pos, 4));
-
-	}
-	else
-		return (std::string(header, pos, 3));
-
-	return (NULL);
-}

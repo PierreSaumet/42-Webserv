@@ -29,40 +29,40 @@ HttpServer::HttpServer( void ) { // a terminer, initialiser toutes les variables
 HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a terminer, initialiser toutes les variables
 
 	// debut CGI/////////////////////////////////////////////
-	(void)configfile;
+	// (void)configfile;
 	this->_cgi = new Cgi_exec();
 	// this->_cgi->ft_setup_env_cgi();
-	// std::cout << "test getsoft = " << this->_cgi->getServerSoftware() << std::endl;
-	// this->_cgi->setServerSoftware("Bonjour");
-	// std::cout << "test setsoft = " << this->_cgi->getServerSoftware() << std::endl;
+	// // std::cout << "test getsoft = " << this->_cgi->getServerSoftware() << std::endl;
+	// // this->_cgi->setServerSoftware("Bonjour");
+	// // std::cout << "test setsoft = " << this->_cgi->getServerSoftware() << std::endl;
 
-	// std::cout << "\n\n\n display all = " << std::endl;
-	// this->_cgi->ft_display_all_variable_env();
-	std::cout << "\n\n" << std::endl;
+	// // std::cout << "\n\n\n display all = " << std::endl;
+	// // this->_cgi->ft_display_all_variable_env();
+	// std::cout << "\n\n" << std::endl;
 
-	this->_cgi->ft_test();
-	// delete this->_cgi;
+	// this->_cgi->ft_test();
+	// // delete this->_cgi;
 	
-	return ;
-
-
-
-	// std::cout << "Constructor avec argument "<< std::endl;
-	// try {
-	// 	this->_data = new Parsing(configfile);
-	// 	if (this->_data->ft_get_error() == 1)
-	// 		return ;
-	// 	this->_servers = this->_data->ft_get_servers();											// on recupere les informations provenant de la class parsing
-	// 	std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
-	// 	if (this->ft_create_servers() == 1)
-	// 		return ;
-	// 	this->ft_test_main_loop_server();
-	// }
-	// catch (std::exception &e)
-	// {
-	// 	std::cerr << e.what() << std::endl;
-	// }
 	// return ;
+
+
+
+	std::cout << "Constructor avec argument "<< std::endl;
+	try {
+		this->_data = new Parsing(configfile);
+		if (this->_data->ft_get_error() == 1)
+			return ;
+		this->_servers = this->_data->ft_get_servers();											// on recupere les informations provenant de la class parsing
+		// std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
+		if (this->ft_create_servers() == 1)
+			return ;
+		this->ft_test_main_loop_server();
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+	return ;
 }
 
 /*
@@ -81,8 +81,8 @@ HttpServer::~HttpServer( void ) {
 
 	delete this->_cgi;
 
-	// if (this->_data)
-	// 	delete (this->_data);
+	if (this->_data)
+		delete (this->_data);
 	return ;
 }
 
@@ -98,31 +98,25 @@ HttpServer			&HttpServer::operator=( const HttpServer &element ) { // a terminer
 	return (*this);
 }
 
-int					HttpServer::ft_create_servers( void ) {
-
-	//	Cette fonction va creer les servers.
+int					HttpServer::ft_create_servers( void )
+{
 	try
 	{
 		int			i;
 
 		i = 0;
-		// size_t nbr_server = this->_data->ft_get_nbr_servers();
 		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 		{
 			this->_http_servers.push_back(t_http_server());
 			this->_http_servers[i].enable = 1;
-			// memset((char *)&this->_http_servers[i].svr_addr, 0, sizeof(this->_http_servers[i].svr_addr));
-			
-			
+
 			this->_http_servers[i].sock = socket(AF_INET, SOCK_STREAM, 0);
 			if (this->_http_servers[i].sock < 0)
 				throw Error(0, "Error, 'creation of server', cannot create a socket.", 2);
-			std::cout << GREEN << "le serveur utilise le sock = " << this->_http_servers[i].sock << CLEAR << std::endl;
-
+			
 			if (fcntl(this->_http_servers[i].sock, F_SETFL, O_NONBLOCK) < 0)
 				throw Error(666, "Error, 'creation of server', cannot fcntl a socker server.", 2);
 
-			std::cout << "enable = " << this->_http_servers[i].enable << std::endl;
 			if (setsockopt(this->_http_servers[i].sock, SOL_SOCKET, SO_REUSEADDR, &this->_http_servers[i].enable, sizeof(this->_http_servers[i].enable)) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
@@ -133,7 +127,6 @@ int					HttpServer::ft_create_servers( void ) {
 				}
 				throw Error(2, "Error, 'creation of server', cannot set up the socket options.", 2);
 			}
-			std::cerr << "avant bind = " << strerror(errno) << std::endl;
 
 			memset((char *)&this->_http_servers[i].svr_addr, 0, sizeof(this->_http_servers[i].svr_addr));
 			this->_http_servers[i].svr_addr.sin_family = AF_INET;
@@ -141,11 +134,10 @@ int					HttpServer::ft_create_servers( void ) {
 			this->_http_servers[i].svr_addr.sin_addr.s_addr = INADDR_ANY;
 			this->_http_servers[i].svr_addr.sin_port = htons(this->_servers[i].port_server);
 
-
 			if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
-				std::cerr << "apres bind = " << strerror(errno) << std::endl;
+				std::cerr << "error bind = " << strerror(errno) << std::endl;
 				if (close(this->_http_servers[i].sock) < 0)
 				{
 					close(this->_http_servers[i].sock);
@@ -154,9 +146,7 @@ int					HttpServer::ft_create_servers( void ) {
 				std::cout << "cannot bind this->_http_servers[i].sock = " << this->_http_servers[i].sock << std::endl;
 				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 			}
-			std::cerr << "apres bind = " << strerror(errno) << std::endl;
 
-			std::cout << "MAX CONNECTION ? == " << this->_max_connections << std::endl;
 			if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
 			{
 				// il faut fermer les socket ? tous les sockets < ==========================================
@@ -168,7 +158,6 @@ int					HttpServer::ft_create_servers( void ) {
 				throw Error(5, "Error, 'creation of server', cannot listen.", 2);
 			}
 			std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
-			std::cout << " et i = " << i << std::endl;
 			std::cout << std::endl;
 		}
 	}
@@ -255,9 +244,7 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 				throw Error(6, "Error, 'main loop server', server cannot accept() a client.", 2);
 			else
 			{
-				std::cout << GREEN << "nouvelle connection client avec le server " << CLEAR << std::endl;
-				std::cout << "size addr new cloent = " << size_addr_new_client << std::endl;
-				std::cout << "int du client = " << socket_new_client << std::endl;
+				std::cout << GREEN << "nouvelle connection client numero: " << socket_new_client << " avec le server " << CLEAR << std::endl;
 				// maintenant on modifi l'etat du fd avec fcntl pour le mettre en non bloquand
 				if (fcntl(socket_new_client, F_SETFL, O_NONBLOCK) < 0)
 					throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
@@ -267,11 +254,10 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 					t_client_socket new_client;
 
 					new_client.client_socket = socket_new_client;
-					std::cout << "nouveau client = " << new_client.client_socket << std::endl;
-					// sleep(10);
+					// std::cout << "nouveau client = " << new_client.client_socket << std::endl;
 					new_client.client_addr = addr_new_client;
 					this->_all_client_socket.push_back(new_client);
-					std::cout << "taille clien = " << this->_all_client_socket.size() << std::endl;
+					// std::cout << "taille clien = " << this->_all_client_socket.size() << std::endl;
 				}		
 			}
 		}
@@ -342,59 +328,6 @@ std::string		HttpServer::ft_settup_http_response( void )
 	std::cout << "file content dans la fonction =-" << file_contents << "-" << std::endl;
 
 	return (file_contents);
-
-
-	// // useless en bas
-	// if (this->_header_requete[0].path == "/ ")
-	// {
-	// 	std::cout << "display index" << std::endl;
-		
-
-	// 	input_file = fopen(filename.c_str(), "r");
-
-	// 	sleep(1);
-	// }
-	// else if (this->_header_requete[0].path == "/page2.html ")
-	// {
-	// 	std::cout << "display page2" << std::endl;
-	// 	input_file = fopen("page2.html", "r");
-	// 	sleep(1);
-	// }
-	// else
-	// {
-	// 	std::cout << "ne peut pas ouvirr le fichier lol" << std::endl;
-	// 	std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << "-" << std::endl;
-		
-		
-	// 	input_file = fopen("errors/404.html", "r");
-	// 	stat(filename.c_str(), &sb);
-	// 	res.resize(sb.st_size + 100);
-	// 	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
-	// 	fclose(input_file);
-	// 	file_contents = res;
-	// 	file_contents.insert(0, "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
-
-	// 	return (file_contents);
-	// 	sleep(1);
-	// }
-
-	// // FILE *input_file = fopen(filename.c_str(), "r");
-	// if (input_file == NULL)
-	// {
-	// 	std::cout << "ECHEC open " << std::endl;
-	// 	return (NULL);
-	// }
-	// stat(filename.c_str(), &sb);
-	// res.resize(sb.st_size + 100);
-	// fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
-	// fclose(input_file);
-	// file_contents = res;
-	// std::cout << "la taille putain = " << file_contents.size() << std::endl;
-	// file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; Charset=UTF-8\r\nServer: Webserv\r\nContent-Length: 950\r\n\r\n");
-	// // file_contents.insert(0, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\ncontent-length: 476\r\n\r\n");
-
-	// std::cout << " TOTAL = -" << file_contents << std::endl;
-	// return (file_contents);
 }
 
 /*
@@ -498,68 +431,11 @@ int		HttpServer::ft_test_reading( void )
 			}
 			else
 			{
-				std::cout << "GOOD CA MARCHE " << std::endl;
-				std::cout << "tt de la string = " << tt_buffer << std::endl;
-				std::cout << "taille de la string = " << tt_buffer.size() << std::endl;
+				std::cout << "\t on a bien recu une demande on va parser la requete..." << std::endl;
 				this->ft_parser_requete(tt_buffer.size() , tt_buffer);
 			}
-
-			// while ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) > 0)
-			// {
-			// 	tt_buffer.append(buffer, request_length);
-			// 	memset((char *)buffer, 0, 1024 + 1);
-			// 	std::cout << " ici + 1 " << std::endl;
-			// 	sleep(1);
-			// }
-			// if (request_length < 0)
-			// {
-			// 	//Normalement il ne faut pas sortir une erreur ici, je crois.
-			// 	std::cout << "Erreur recv" << std::endl;
-			// 	std::cout << "message taille recu = " << request_length << std::endl;
-			// 	std::cout << "tt de la string = " << tt_buffer << std::endl;
-			// 	close(it_b_client->client_socket);
-			// 	it_b_client = this->_all_client_socket.erase(it_b_client);
-			// 	continue ;
-			// }
-			// else
-			// {
-			// 	std::cout << "tt de la string = " << tt_buffer << std::endl;
-			// 	std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
-			// 	request_length = tt_buffer.size();
-			// 	this->ft_parser_requete(request_length, tt_buffer); 
-			// 	// exit(1);
-			// }
 		}
 	}
-	// for (; it_b_client != it_e_client; it_b_client++)
-	// {
-	// 	char buffer[1000000 + 1];
-
-	// 	if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
-	// 	{
-	// 		std::cout << "dans isst de read" << std::endl;
-	// 		std::cout << "euh _read_fs = " << &this->_read_fs << std::endl;
-	// 		int request_length;
-
-	// 		memset((char *)buffer, 0, 1000000 + 1);
-	// 		request_length = recv(it_b_client->client_socket, buffer, 1000000, 0);
-			
-	// 		if (request_length <= 0)
-	// 		{
-	// 			// Normalement il ne faut pas sortir une erreur ici, je crois.
-	// 			std::cout << "Erreur recv" << std::endl;
-	// 			std::cout << "message taille recu = " << request_length << std::endl;
-	// 			close(it_b_client->client_socket);
-	// 			it_b_client = this->_all_client_socket.erase(it_b_client);
-	// 			continue ;
-	// 		}
-	// 		else
-	// 		{
-	// 			std::cout << "DONC on a recu une demande provenant du client il faut la traiter" << std::endl;
-	// 			this->ft_parser_requete(request_length, buffer);
-	// 		}
-	// 	}
-	// }
 	return (0);
 }
 
