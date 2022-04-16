@@ -44,37 +44,38 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 {
 	// setup all data to null ... 
 	//https://fr.wikipedia.org/wiki/Variables_d%27environnement_CGI
-	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_SOFTWARE", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_NAME", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("GATEWAY_INTERFACE", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_PROTOCOL", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_PORT", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("REQUEST_METHOD", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("PATH_INFO", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("PATH_TRANSLATED", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("SCRIPT_NAME", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("QUERY_STRING", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_ADDR", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("AUTH_TYPE", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_USER", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_IDENT", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_TYPES", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_LENGTH", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("REQUEST_URI", "NULL"));
-
-
+	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_SOFTWARE", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_NAME", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("GATEWAY_INTERFACE", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_PROTOCOL", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("SERVER_PORT", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REQUEST_METHOD", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("PATH_INFO", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("PATH_TRANSLATED", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("SCRIPT_NAME", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("QUERY_STRING", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_ADDR", ""));
+	// this->_env_cgi.insert(std::pair<std::string, std::string>("AUTH_TYPE", "")); // inutile ?
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_USER", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_IDENT", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_TYPE", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("CONTENT_LENGTH", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REQUEST_URI", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("STATUS_CODE", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REDIRECT_STATUS", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_ACCEPT", ""));
 
 
 	// PAS OBLIGE JE CROIS... DOIT METTRE VIDE CAD LE SUPPRIMER
-	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_HOST", "NULL"));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_HOST", ""));
 	
 
 	// PAS NECESSAIRE JE CROIS
-	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_ACCEPT", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_ACCEPT_LANGUAGE", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_USER_AGENT", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_COOKIE", "NULL"));
-	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_REFERER", "NULL"));
+	
+	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_ACCEPT_LANGUAGE", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_USER_AGENT", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_COOKIE", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("HTTP_REFERER", ""));
 
 	//	A rajouter un status code ? je ne sais pas si ca existe mais Jerome m'a dit que oui
 	//this->_env_cgi.insert(std::pair<std::string, std::string>("REDIRECT_STATUS", "NULL"));
@@ -91,16 +92,16 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 
 /*
 **	pour une requete GET il nous faut
-	CONTENT_LENGTH = vide ?
-	CONTENT_TYPE = vide ?
-	GATEWAY_INTERFACE = CGI/1.1
-	HTTP_accept = valeur du header:
+OK	CONTENT_LENGTH = vide ?
+OK	CONTENT_TYPE = vide ?
+OK	GATEWAY_INTERFACE = CGI/1.1
+OK	HTTP_accept = valeur du header:
 		exemple = text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*//*;q=0.8
-	PATH_INFO = le chemin du fichier php:
+OK	PATH_INFO = le chemin du fichier php:
 		exemple = /home/pierre/dossier/webser/test/parsing3/root/Hello/fichier.php
-	PATH_TRANSLATED = pareil que path_info
+OK	PATH_TRANSLATED = pareil que path_info
 		exemple = /home/pierre/dossier/webser/test/parsing3/root/Hello/fichier.php
-	QUERY_STRING = les valeurs qui proviennet de l'url car get
+OK	QUERY_STRING = les valeurs qui proviennet de l'url car get
 		exemple = name=SAUMET&prenom=PIERRE
 	
 	REDIRECT_STATUS = 200  ==> verifier avant que les fichiers sont bons et les donnees le sont egalement
@@ -392,6 +393,18 @@ std::string	Cgi_exec::ft_execute_cgi( void )
 /*
 **	SETTERS
 */
+void	Cgi_exec::setRedirectStatus( std::string const redirect_status )
+{
+	this->_env_cgi["REDIRECT_STATUS"] = redirect_status;
+	return ;
+}
+
+void	Cgi_exec::setStatusCode( std::string const status_code )
+{
+	this->_env_cgi["STATUS_CODE"] = status_code;
+	return ;
+}
+
 void	Cgi_exec::setRequestUri( std::string const request_uri )
 {
 	this->_env_cgi["REQUEST_URI"] = request_uri;
@@ -482,9 +495,9 @@ void	Cgi_exec::setRemoteIdent( std::string const remote_ident )
 	this->_env_cgi["REMOTE_IDENT"] = remote_ident;
 	return ;
 }
-void	Cgi_exec::setContentTypes( std::string const content_type )
+void	Cgi_exec::setContentType( std::string const content_type )
 {
-	this->_env_cgi["CONTENT_TYPES"] = content_type;
+	this->_env_cgi["CONTENT_TYPEF"] = content_type;
 	return ;
 }
 void	Cgi_exec::setContentLength( std::string const content_length )
@@ -521,6 +534,32 @@ void	Cgi_exec::setHttpReferer( std::string const http_referer )
 /*
 **	GETTERS
 */
+std::string		Cgi_exec::getRedirectStatus( void ) const
+{
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "REDIRECT_STATUS")
+			return (it_b->second);
+	}
+	return ("");
+}
+
+std::string		Cgi_exec::getStatusCode( void ) const
+{
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "STATUS_CODE")
+			return (it_b->second);
+	}
+	return ("");
+}
+
 std::string Cgi_exec::getRequestUri( void ) const
 {
 	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
@@ -729,14 +768,14 @@ std::string	Cgi_exec::getRemoteIdent( void ) const
 	return ("");
 }
 
-std::string	Cgi_exec::getContentTypes( void ) const
+std::string	Cgi_exec::getContentType( void ) const
 {
 	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
 	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
 	
 	for (; it_b != it_e; it_b++)
 	{
-		if (it_b->first == "CONTENT_TYPES")
+		if (it_b->first == "CONTENT_TYPE")
 			return (it_b->second);
 	}
 	return ("");

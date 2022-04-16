@@ -185,11 +185,13 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 
 		
 		
-		if (ft_check_cgi_or_php(request_http) == 1)
+		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
 			// on a du php ou du cgi ?
 			// donc faut utiliser cgi
-			ft_exec_cgi_test( request_http, len_msg);
+			this->ft_exec_cgi_test( request_http, len_msg);
+
+			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
 		}
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 		exit(1);
@@ -326,9 +328,53 @@ std::string		HttpServer::ft_clean_path_get_request( std::string tmp )
 
 void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 {
-	std::cout << "DANS exec CGI ... " << std::endl;
-	(void)request_http;
-	(void)len_msg;
+	std::cout << GREEN << "\n\nDANS exec CGI ... " << CLEAR << std::endl;
+	std::cout << "request_http = " << request_http << std::endl;
+	std::cout << "longueur msg = " << len_msg << std::endl;
+
+	std::cout << "method = " << this->_header_requete[0].method << std::endl;
+	std::cout << "path = " << this->_header_requete[0].path << std::endl;
+	std::cout << "protocol = " << this->_header_requete[0].protocol << std::endl;
+	std::cout << "host = " << this->_header_requete[0].host << std::endl;
+	std::cout << "accept = " << this->_header_requete[0].accept << std::endl;
+	std::cout << "path_http = " << this->_header_requete[0].path_http << std::endl;
+	std::cout << "query_string = " << this->_header_requete[0].query_string << std::endl;
+	std::cout << "cgi_return = " << this->_header_requete[0].cgi_return << std::endl;
+	std::cout << "cgi = " << this->_header_requete[0].cgi << std::endl;
+	std::cout << "error = " << this->_header_requete[0].error << std::endl;
+	std::cout << "num_error = " << this->_header_requete[0].num_error << std::endl;
+	std::cout << "body_error = " << this->_header_requete[0].body_error << std::endl;
+
+	std::map<std::string, std::string>::iterator it = this->_header_requete[0].data.begin();
+	std::cout << "data = " << std::endl;
+	for (; it != this->_header_requete[0].data.end(); it++)
+	{
+		std::cout << "first = " << it->first << " et = " << it->second << std::endl;
+
+	}
+	
+
+	// on setup les variables a NULL
+	std::cout << "\n ON SETUP les variables de _env_cgi " << std::endl;
+	this->_cgi->ft_setup_env_cgi();
+
+	// on rempli les valeurd de l'env en fonction de la method
+	if (this->_header_requete[0].method == "GET")
+	{
+		std::cout << "On est dans get " << std::endl;
+		this->_cgi->setContentLength("");
+		this->_cgi->setContentType("");
+		this->_cgi->setGatewayInterface("CGI/1.1");
+		this->_cgi->setHttpAccept(this->_header_requete[0].accept);
+		this->_cgi->setPathInfo(this->_header_requete[0].path_http);
+		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
+		this->_cgi->setQueryString(this->_header_requete[0].query_string);
+	}
+	else
+	{
+		std::cout << "on est ailleurs" << std::endl;
+	}
+
 	return ;
 }
 
@@ -354,7 +400,7 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 	if (find_php > find_backslash && find_php < find_http)
 	{
 		std::cout << " good on a bien du php dans la requete qu'il faut utiliser avec cgi" << std::endl;
-		// rajouter debut query_string avec ?
+		this->_header_requete[0].cgi = true;
 		return (true);
 	}
 	else
@@ -364,7 +410,7 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 		if (find_cgi > find_backslash && find_cgi < find_http)
 		{
 			std::cout << " good on a bien du cgi dans la requete qu'il faut utiliser avec cgi" << std::endl;
-			// rajouter debut query_string avec ?
+			this->_header_requete[0].cgi = true;
 			return (true);
 		}
 		std::cout << "non on a pas de php ou de cgi" << std::endl;

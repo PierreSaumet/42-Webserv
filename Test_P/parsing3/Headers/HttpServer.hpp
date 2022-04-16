@@ -68,6 +68,7 @@ class HttpServer {
 			std::string			accept;				// le Accept: de la requete
 			std::string			path_http;			// le path total du fichier demande.
 			std::string			query_string;		// les valeur donnees dans l'url pour une requete get
+			std::string			cgi_return;			// string contenant les donnees provenant du cgi
 			bool				cgi;
 			bool				error;
 			size_t				num_error;

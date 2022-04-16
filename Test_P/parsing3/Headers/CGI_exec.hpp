@@ -46,9 +46,13 @@ class Cgi_exec
 		*/
 		std::string		ft_execute_cgi( void );
 
+		std::string		ft_return_data_from_cgi( void );
+
 		/*
 		**	Setters
 		*/
+		void			setRedirectStatus( std::string const redirect_status );
+		void			setStatusCode( std::string const status_code );
 		void			setServerSoftware( std::string const software );
 		void			setServerName( std::string const name );
 		void			setGatewayInterface( std::string const gateway );
@@ -64,7 +68,7 @@ class Cgi_exec
 		void			setAuthType( std::string const auth_type );
 		void			setRemoteUser( std::string const remote_user );
 		void			setRemoteIdent( std::string const remote_ident );
-		void			setContentTypes( std::string const content_type );
+		void			setContentType( std::string const content_type );
 		void			setContentLength( std::string const content_length );
 		void			setHttpAccept( std::string const http_accept );
 		void			setHttpAcceptLanguage( std::string const http_languange );
@@ -76,6 +80,8 @@ class Cgi_exec
 		/*
 		**	Getters
 		*/
+		std::string		getRedirectStatus( void ) const;
+		std::string		getStatusCode( void ) const;
 		std::string		getRequestUri( void ) const;
 		std::string		getServerSoftware( void ) const;
 		std::string		getServerName( void ) const;
@@ -92,7 +98,7 @@ class Cgi_exec
 		std::string		getAuthType( void ) const;
 		std::string		getRemoteUser( void ) const;
 		std::string		getRemoteIdent( void ) const;
-		std::string		getContentTypes( void ) const;
+		std::string		getContentType( void ) const;
 		std::string		getContentLength( void ) const;
 		std::string		getHttpAccept( void ) const;
 		std::string		getHttpAcceptLanguage( void ) const;
