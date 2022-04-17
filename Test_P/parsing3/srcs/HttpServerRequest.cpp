@@ -336,6 +336,8 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 	std::cout << "path = " << this->_header_requete[0].path << std::endl;
 	std::cout << "protocol = " << this->_header_requete[0].protocol << std::endl;
 	std::cout << "host = " << this->_header_requete[0].host << std::endl;
+	std::cout << "request_uri = " << this->_header_requete[0].request_uri << std::endl;
+	std::cout << "script name = " << this->_header_requete[0].script_file_name << std::endl;
 	std::cout << "accept = " << this->_header_requete[0].accept << std::endl;
 	std::cout << "path_http = " << this->_header_requete[0].path_http << std::endl;
 	std::cout << "query_string = " << this->_header_requete[0].query_string << std::endl;
@@ -369,6 +371,44 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		this->_cgi->setPathInfo(this->_header_requete[0].path_http);
 		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
 		this->_cgi->setQueryString(this->_header_requete[0].query_string);
+		// techniquement pas d'erreur donc 200
+		this->_cgi->setRedirectStatus("200");
+		this->_cgi->setStatusCode("200");
+		this->_cgi->setRequestMethod(this->_header_requete[0].method);
+		this->_cgi->setServerSoftware("Webserv/1.0");
+		this->_cgi->setServerProtocol("HTTP/1.1");
+		
+		
+		// test en rajoutant root
+		std::string tmp_2 = this->_header_requete[0].script_file_name;
+		tmp_2.insert(0, this->_servers[0].root_server);
+		std::cout << "\n tmp_2 = " << tmp_2 << std::endl;
+		this->_cgi->setScriptName(tmp_2);
+		this->_cgi->setScriptFileName(tmp_2);
+
+		tmp_2 = this->_header_requete[0].request_uri;
+		tmp_2.insert(0, this->_servers[0].root_server);
+		this->_cgi->setRequestUri(tmp_2);
+
+
+		// probleme si plusieurs servers ...
+		this->_cgi->setServerName(this->_servers[0].name_server);
+		
+		
+
+		std::cout << GREEN << "\n\nOn a tout setup, on va afficher pour verifier " << CLEAR << std::endl;
+		this->_cgi->ft_display_all_variable_env();
+
+		// exit(1);
+		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
+		
+		std::cout << "address cgi = " << this->_servers[0].cgi_path_server << std::endl;
+		std::string tmp = this->_header_requete[0].script_file_name;
+		tmp.insert(0, this->_servers[0].root_server);
+		std::cout << "tmp = " << tmp << std::endl;
+
+		this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp);
+		
 	}
 	else
 	{

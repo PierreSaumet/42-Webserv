@@ -53,6 +53,7 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	this->_env_cgi.insert(std::pair<std::string, std::string>("PATH_INFO", ""));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("PATH_TRANSLATED", ""));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("SCRIPT_NAME", ""));
+	this->_env_cgi.insert(std::pair<std::string, std::string>("SCRIPT_FILENAME", ""));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("QUERY_STRING", ""));
 	this->_env_cgi.insert(std::pair<std::string, std::string>("REMOTE_ADDR", ""));
 	// this->_env_cgi.insert(std::pair<std::string, std::string>("AUTH_TYPE", "")); // inutile ?
@@ -103,20 +104,27 @@ OK	PATH_TRANSLATED = pareil que path_info
 		exemple = /home/pierre/dossier/webser/test/parsing3/root/Hello/fichier.php
 OK	QUERY_STRING = les valeurs qui proviennet de l'url car get
 		exemple = name=SAUMET&prenom=PIERRE
-	
-	REDIRECT_STATUS = 200  ==> verifier avant que les fichiers sont bons et les donnees le sont egalement
-	REQUEST_METHOD = GET
-	REQUEST_URI = l'addresse du fichier + les info
+OK	STATUS_CODE = 200 comme redirect status	
+OK	SERVER_PROTOCOl = HTTP/1.1
+OK	SERVER_SOFTWARE = webserv/1.0 enfin notre server
+
+
+OK	REDIRECT_STATUS = 200  ==> verifier avant que les fichiers sont bons et les donnees le sont egalement
+OK	REQUEST_METHOD = GET
+
+
+OK	REQUEST_URI = l'addresse du fichier + les info
 		exemple = /Hello/query_get_test.php?name=SAUMET
 	SCRIPT_FILENAME = nom du fichier
 		exemple = query_test_get.php
-	SCRIPT_NAME = pareil que script_filemane
+OK	SCRIPT_NAME = pareil que script_filemane
 		exemple = query_test_get.php
-	SERVER_NAME = le nom du server
+
+ pas obligatoire ?
+OK	SERVER_NAME = le nom du server
 	SERVER_PORT = le port du server ou on ecoute
-	SERVER_PROTOCOl = HTTP/1.1
-	SERVER_SOFTWARE = webserv/1.0 enfin notre server
-	STATUS_CODE = 200 comme redirect status
+
+
 
 	et le write on lui donne une string vide. je pense
 */
@@ -148,7 +156,212 @@ OK	QUERY_STRING = les valeurs qui proviennet de l'url car get
 	genre = name=pierre?prenom=paindemie
 */
 
-//	test a supprimer
+
+std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_file )
+{
+	std::cout << "Dans ft_execute_cgi " << std::endl;
+
+	/*
+			PSEUDO CODE A FAIRE	
+
+
+			1 ) mettre a jour les variables environnement de cgi
+				exemples :
+							==>	SERVER_SOFTWARE	=	"webser/1"
+							==>	SERVER_PROTOCOL	=	"HTTP/1.1"
+					c'est les infos qu'on a dans la requete.
+
+				il faut aussi pour execve mettre les variables dans un char** pour le troisieme argument
+
+			2 ) init les variables locales a utiliser
+				pid_t pid;
+				int		stdin?
+				int		stdout?
+
+				stdin = dup(0)
+				stdout = dup(1);
+				pid = fork()
+			3 ) les conditions du fork()
+				if (pid < 0)
+					error
+				else if (pid == 0) child
+				{
+					dup2
+					dup2
+					execute ?
+						si execute < 0 
+							error
+				}
+				else	parent
+				{
+					waitpid()
+					recuperer la string du "retour de execute"
+
+				}
+			4 ) retourner la string contenant les infos du CGI
+				pour l'afficher apres dans le read.
+	*/
+
+	std::cout << GREEN << "\n On est dans ft_execute_cgi : " << CLEAR << std::endl;
+	
+	char	**sysCline = NULL;
+	char	**sysEnv = NULL;
+	std::vector<std::string>		aArgs;
+	std::vector<std::string>		aEnv;
+
+	aArgs.push_back(path_cgi);
+	aArgs.push_back(path_file);
+
+	sysCline = new char*[aArgs.size() + 1];
+	for (unsigned long i = 0; i < aArgs.size(); i++)
+	{
+		sysCline[i] = new char[aArgs[i].size() + 1];
+		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
+		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+	}
+	sysCline[aArgs.size()] = NULL;
+
+	// exit(1);
+	aEnv = this->ft_convert_map_to_vector();
+	// std::cout << "\n\naEnv = " << std::endl;
+	// std::vector<std::string>::iterator it = aEnv.begin();
+	// for (; it != aEnv.end(); it++)
+	// {
+	// 	std::cout << "it = " << *it << std::endl;
+	// }
+
+	sysEnv = new char*[aEnv.size() + 1];
+	for (unsigned long i = 0; i < aEnv.size(); i++)
+	{
+		sysEnv[i] = new char[aEnv[i].size() + 1];
+		strncpy(sysEnv[i], aEnv[i].c_str(), aEnv[i].size() + 1);
+		std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
+
+	}
+	sysEnv[aEnv.size()] = NULL;
+
+	pid_t pid;
+	int stdin_tmp = dup(STDIN_FILENO);
+	int stdout_tmp = dup(STDOUT_FILENO);
+
+	FILE *file_in = tmpfile();		// cree un fichier temporaire dans le cas de grosse donnees je pense
+	if (file_in == NULL)
+	{
+		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
+		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+	}
+	FILE *file_out = tmpfile();
+	if (file_out == NULL)
+	{
+		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
+		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+	}
+	long fd_in = fileno(file_in);
+	if (fd_in == -1)
+	{
+		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
+		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+	}
+	long fd_out = fileno(file_out);
+	if (fd_out == -1)
+	{
+		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
+		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+	}
+
+	
+	// Je ne suis pas sur de ca ... a voir plus tard
+	write(fd_in, "name=truc", 11);
+
+	//	On replace le curseur de lecture de fd_in au debut
+	lseek(fd_in, 0, SEEK_SET);
+
+	pid = fork();
+	if (pid == -1)
+	{
+		std::cerr << "For kcrash" << std::endl;
+		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+		exit(1);
+	}
+	else if (pid == 0)		// enfant lol
+	{
+		// On duplique les files descriptors d'entree et de sortie.
+		if (dup2(fd_in, 0) == -1) // STDIN_FILENO
+		{
+			std::cout << "erreur dup2 fd_in " << std::endl;
+			std::cout << "doit retourner une erruer" << std::endl;
+			exit(1);
+		}
+		if (dup2(fd_out, 1) == -1) // STDOUT_FILENO
+		{
+			std::cout << "erreur dup2 fd_in " << std::endl;
+			std::cout << "doit retourner une erruer" << std::endl;
+			exit(1);
+		}
+		// on execute le cgi avec execve
+		if (execve(sysCline[0], sysCline, sysEnv) == -1)
+		{
+			std::cerr << strerror(errno) << std::endl;
+			std::cerr << "Error cgi EXECVE" << std::endl;
+			std::cout << "doit retourner une erruer genre 500" << std::endl;
+		}
+	}
+	else // parenmt
+	{
+		// on setup un buffer pour recuperer les donnees
+		//	a voir pour la taille, j'ai mis 2000 aleatoirement
+		unsigned char buffer[2000] = {0};
+
+		// on attend la fin du processus 
+		waitpid(-1, NULL, 0);
+		//	on place la tete de lecture de fd_out au debut
+		lseek(fd_out, 0, SEEK_SET);
+		std::cout << "dans parent apres waitpid" << std::endl;
+
+		int ret = 1;
+		while (ret > 0)
+		{
+			memset(buffer, 0, 2000);
+			// on lit fd_out et on le place dans le buffer
+			ret = read(fd_out, buffer, 2000 - 1);
+			std::cout << "dans parents et buffer = " << buffer << std::endl;
+			// on termine la chaine de charactere par 0
+			buffer[ret] = 0;
+			if (ret > 0)
+			{
+				std::cout << "\n\n bingo buffer = " << buffer << std::endl;
+				// du coup faudra rajouter la chaine de charactere a une string a chaque lecture
+			}
+		}
+
+	}
+	dup2(stdin_tmp, 0);
+	dup2(stdout_tmp, 1);
+	fclose(file_in);
+	fclose(file_out);
+	close(fd_in);
+	close(fd_out);
+	close(stdin_tmp);
+	close(stdout_tmp);
+
+	// faut nettoyer pour les leaks
+	for (unsigned long i = 0; i < aEnv.size(); i++)
+	{
+		delete [] sysEnv[i];
+	}
+	delete [] sysEnv;
+
+	for (unsigned long i = 0; i < aArgs.size(); i++)
+	{
+		delete [] sysCline[i];
+	}
+	delete [] sysCline;
+
+	return ("");
+}
+
+#include <string.h>
+
 void		Cgi_exec::ft_test( void )
 {
 	// this->setServerPort("HTTP/1.1");
@@ -188,27 +401,30 @@ void		Cgi_exec::ft_test( void )
 	std::vector<std::string> aEnv; 
 	aEnv.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	aEnv.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	
 	// pour tester avec get
-	// aEnv.push_back("QUERY_STRING=name=pierre");
-	// aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php?name=pierre");
+	aEnv.push_back("QUERY_STRING=name=PIERRE");
+	aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php?name=PIERRE");
 	
 	
 	// pour tester avec post
 	// aEnv.push_back("QUERY_STRING=test=querystring");
-	 aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php");
+	//  aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php");
 	
 	aEnv.push_back("REDIRECT_STATUS=200");
 	
 	
-	aEnv.push_back("REQUEST_METHOD=POST");	// avec post ca ne marche pas ... bizarre
+	aEnv.push_back("REQUEST_METHOD=GET");	// avec post ca ne marche pas ... bizarre
 	
 	aEnv.push_back("CONTENT_TYPE=application/x-www-form-urlencoded;charset=utf-8");
 
 	// aEnv.push_back("SCRIPT_FILENAME=./test1.php");
 	aEnv.push_back("SCRIPT_FILENAME=./root/Hello/query_get_test.php");
+	
+	
 	// aEnv.push_back("CONTENT_LENGTH=500");				//+ std::to_string(sData.length()) );
 	
-	aEnv.push_back("CONTENT_LENGTH=11"); //+ std::to_string(sData.length()) );
+	aEnv.push_back("CONTENT_LENGTH=6"); //+ std::to_string(sData.length()) );
 	sysENV = new char*[aEnv.size() + 1];
 	for (unsigned long i = 0; i < aEnv.size(); i++)
 	{
@@ -248,11 +464,12 @@ void		Cgi_exec::ft_test( void )
 		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
 	}
 
-
+	// unsigned char tmp_buffer[2000] = {0};
+	// memset(tmp_buffer, 0, 2000);
 	//	on ecrit dans fd_in car c'est dedans qu'on va passer les valeurs recuperer via le parsing
 	//	et les transmettre au CGI.
 	// euh quand c'est un post il faut mettre les donnes ici 
-	write(fd_in, "name=pierre", 11);
+	write(fd_in, "name=truc", 11);
 	//	On replace le curseur de lecture de fd_in au debut
 	lseek(fd_in, 0, SEEK_SET);
 
@@ -303,17 +520,22 @@ void		Cgi_exec::ft_test( void )
 			memset(buffer, 0, 2000);
 			// on lit fd_out et on le place dans le buffer
 			ret = read(fd_out, buffer, 2000 - 1);
-			std::cout << "dans parents et buffer = " << buffer << std::endl;
+			// std::cout << "dans parents et buffer = " << buffer << std::endl;
 			// on termine la chaine de charactere par 0
 			buffer[ret] = 0;
 			if (ret > 0)
 			{
-				std::cout << "\n\n bingo buffer = " << buffer << std::endl;
+				// std::cout << "\n\n bingo buffer = " << buffer << std::endl;
 				// du coup faudra rajouter la chaine de charactere a une string a chaque lecture
+				std::cout << "buffer = " << buffer << std::endl;
+				
 			}
 		}
 
 	}
+
+	// std::cout << "tmp _ buffer = " << tmp_buffer << std::endl;
+
 	dup2(stdin_tmp, 0);
 	dup2(stdout_tmp, 1);
 	fclose(file_in);
@@ -340,59 +562,36 @@ void		Cgi_exec::ft_test( void )
 	return ;
 }
 
-std::string	Cgi_exec::ft_execute_cgi( void )
+
+
+
+std::vector<std::string>		Cgi_exec::ft_convert_map_to_vector( void )
 {
-	std::cout << "Dans ft_execute_cgi " << std::endl;
+	std::vector<std::string>	tmp;
 
-	/*
-			PSEUDO CODE A FAIRE	
+	std::map<std::string, std::string>::iterator 	it = this->_env_cgi.begin();
+	for (; it != this->_env_cgi.end(); it++)
+	{
+		std::string string = "";
+		string = it->first;
+		string.append("=");
+		string.append(it->second);
+		// std::cout << "string = " << string << std::endl;
+		tmp.push_back(string);
 
-
-			1 ) mettre a jour les variables environnement de cgi
-				exemples :
-							==>	SERVER_SOFTWARE	=	"webser/1"
-							==>	SERVER_PROTOCOL	=	"HTTP/1.1"
-					c'est les infos qu'on a dans la requete.
-
-				il faut aussi pour execve mettre les variables dans un char** pour le troisieme argument
-
-			2 ) init les variables locales a utiliser
-				pid_t pid;
-				int		stdin?
-				int		stdout?
-
-				stdin = dup(0)
-				stdout = dup(1);
-				pid = fork()
-			3 ) les conditions du fork()
-				if (pid < 0)
-					error
-				else if (pid == 0) child
-				{
-					dup2
-					dup2
-					execute ?
-						si execute < 0 
-							error
-				}
-				else	parent
-				{
-					waitpid()
-					recuperer la string du "retour de execute"
-
-				}
-			4 ) retourner la string contenant les infos du CGI
-				pour l'afficher apres dans le read.
-	*/
-
-
-	return ("");
+	}
+	return (tmp);
 }
-
 
 /*
 **	SETTERS
 */
+void	Cgi_exec::setScriptFileName( std::string const script_filename )
+{
+	this->_env_cgi["SCRIPT_FILENAME"] = script_filename;
+	return ;
+}
+
 void	Cgi_exec::setRedirectStatus( std::string const redirect_status )
 {
 	this->_env_cgi["REDIRECT_STATUS"] = redirect_status;
@@ -534,6 +733,19 @@ void	Cgi_exec::setHttpReferer( std::string const http_referer )
 /*
 **	GETTERS
 */
+std::string		Cgi_exec::getScriptFilename( void ) const
+{
+	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();
+	std::map<std::string, std::string>::const_iterator it_e = this->_env_cgi.end();
+	
+	for (; it_b != it_e; it_b++)
+	{
+		if (it_b->first == "SCRIPT_FILENAME")
+			return (it_b->second);
+	}
+	return ("");
+}
+
 std::string		Cgi_exec::getRedirectStatus( void ) const
 {
 	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();

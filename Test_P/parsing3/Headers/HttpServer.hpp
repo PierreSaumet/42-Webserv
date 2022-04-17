@@ -26,7 +26,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <err.h>
+#include <errno.h>
 #include "Parsing.hpp"
 #include <algorithm>
 #include <map>
@@ -69,6 +69,8 @@ class HttpServer {
 			std::string			path_http;			// le path total du fichier demande.
 			std::string			query_string;		// les valeur donnees dans l'url pour une requete get
 			std::string			cgi_return;			// string contenant les donnees provenant du cgi
+			std::string			request_uri;		// path du file phph plus les donnes de get?
+			std::string			script_file_name;	// nom du fichier
 			bool				cgi;
 			bool				error;
 			size_t				num_error;

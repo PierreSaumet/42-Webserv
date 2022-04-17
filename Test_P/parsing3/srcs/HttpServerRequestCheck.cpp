@@ -192,6 +192,14 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 				return ("");
 			}
 			std::string tmp(header, pos, pos_http - pos - 1);
+			// on setup aussi le request_uri
+			this->_header_requete[0].request_uri = tmp;
+			// on setup aussi scriptfilename
+			size_t pos_tmp = tmp.find("?");
+			std::string tmp2(tmp, 0, pos_tmp);
+			this->_header_requete[0].script_file_name = tmp2;
+			
+
 			if (tmp.size() != 1)							// on rajoute le root au debut de la string
 				tmp.insert(0, this->_servers[0].root_server);
 			return (tmp);

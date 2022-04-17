@@ -19,6 +19,7 @@
 #include <vector>
 #include <stdio.h>
 #include <string.h>
+#include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -44,13 +45,16 @@ class Cgi_exec
 		/*
 		**	This function execute the cgi from the path
 		*/
-		std::string		ft_execute_cgi( void );
+		std::string		ft_execute_cgi( std::string path_cgi, std::string path_file );
 
 		std::string		ft_return_data_from_cgi( void );
+
+		std::vector<std::string>		ft_convert_map_to_vector( void );
 
 		/*
 		**	Setters
 		*/
+		void			setScriptFileName( std::string const script_filename );
 		void			setRedirectStatus( std::string const redirect_status );
 		void			setStatusCode( std::string const status_code );
 		void			setServerSoftware( std::string const software );
@@ -80,6 +84,7 @@ class Cgi_exec
 		/*
 		**	Getters
 		*/
+		std::string		getScriptFilename( void ) const;
 		std::string		getRedirectStatus( void ) const;
 		std::string		getStatusCode( void ) const;
 		std::string		getRequestUri( void ) const;
