@@ -127,7 +127,7 @@ class HttpServer {
 		**	Functions used to set up the headers for the response
 		*/
 		size_t			ft_get(std::string request_http, int len_msg);
-		void			ft_post(std::string request_http, int len_msg);
+		size_t			ft_post(std::string request_http, int len_msg);
 		void			ft_delete(std::string request_http, int len_msg);
 
 		

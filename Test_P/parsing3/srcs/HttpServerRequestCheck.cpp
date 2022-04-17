@@ -27,9 +27,16 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 	}
 	else
 	{
-		size_t pos_interrogation = header.find("?", pos_backslash);
+		size_t pos_end;
+		if (this->_header_requete[0].method == "GET")
+			pos_end = header.find("?", pos_backslash);
+		if (this->_header_requete[0].method == "POST")
+		{
+			pos_end = header.find("HTTP/1.1", pos_backslash);
+			pos_end -= 1; // on supprime l'espace de fin
+		}
 
-		if (pos_interrogation == std::string::npos)
+		if (pos_end == std::string::npos)
 		{
 			std::cout << RED << "dans ft_check_path_header, ne trouve pas -?-: dans le header de la requete" << CLEAR << std::endl;
 			
@@ -40,7 +47,7 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 		}
 		else
 		{
-			std::string file_name(header, pos_backslash, pos_interrogation - pos_backslash);
+			std::string file_name(header, pos_backslash, pos_end - pos_backslash);
 
 			char	cwd[256];
 			if (getcwd(cwd, sizeof(cwd)) == NULL)

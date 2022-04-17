@@ -59,7 +59,11 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 		return ;
 	}
 	else if (request_http.compare(0, 5, "POST ") == 0)
+	{
 		this->ft_post(request_http, len_msg);
+		std::cout << "fin de ft_post(), on return ;" << std::endl;
+		return ;
+	}
 	else if (request_http.compare(0, 7, "DELETE ") == 0)
 		this->ft_delete(request_http, len_msg);
 	else
@@ -452,7 +456,12 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 	// on cherche HTTP
 	size_t		find_http = request_http.find("HTTP");
 	//	on cherche .php?
-	size_t		find_php = request_http.find(".php?");
+	size_t		find_php;
+	if (this->_header_requete[0].method == "GET")
+		find_php = request_http.find(".php?");
+	if (this->_header_requete[0].method == "POST")
+		find_php = request_http.find(".php");
+
 
 	// si .php est entre / et HTTP c'est good, sinon erruer
 	if (find_php > find_backslash && find_php < find_http)
@@ -621,10 +630,116 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 /*
 **		A FAIRE CAS DES REQUETE POST
 */
-void			HttpServer::ft_post(std::string request_http, int len_msg)
+size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 {
-	(void)request_http;
-	(void)len_msg;
+	std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
+	std::cout << "request_http = " << request_http << std::endl;
+	std::cout << "len_msg = " << len_msg << std::endl;
+
+	if (this->_header_requete.empty() == true)
+	{
+		this->_header_requete.push_back(t_header_request());
+		if (ft_check_method_allowed_header(request_http, "POST") == 1)				// On verifie que la methode est autorisee
+		{
+			std::cout << RED << "La methode POST est interdite donc on sort une erreur 405" << CLEAR << std::endl;
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 405;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
+				sleep(2);
+				return (1);
+			}
+		}
+		std::cout << BLUE << "La methode POST est autorisee, on continue." << CLEAR << std::endl;
+
+		size_t pos_hea = request_http.find("\r\n\r\n");
+		std::string size_header(request_http, 0, pos_hea);
+		if (size_header.size() > 1023)	// on verifie que le header ne soit pas trop long
+		{
+			std::cout << RED << "On a une  ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 431; 
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
+				sleep(2);
+				return (1);
+			}
+
+		}
+		// On regarde la taille du body si trop grand == erreur 413
+		//	il faut comparer la capacity() de la string a la limite client_buffer_siuze()
+		//	si c'est trop grand retourner une erreur 
+		// a terminer
+		std::string size_body(request_http, size_header.size(), request_http.size());
+
+		// if (FT_FONCTION A FAIRE ())
+		// REGARDE LE LOCATION ET OU SERVER
+		//	SI CLIENT BUFFER SIZE < SIZE_BODY_CAPACITY()
+		//	RETOURNE 413
+
+		std::cout << "capadcoty en bite = " << size_body.capacity() << std::endl;
+		std::cout << "length = " << size_body.length() << std::endl;
+		std::cout << BLUE << "Ok pas d'erreur 431 ou d'erreur 405 donc on continue." << CLEAR <<  std::endl;
+	
+	
+		// On recupere la methode
+		this->_header_requete[0].method = "POST";
+		std::cout << "\nOn a la requete : " << this->_header_requete[0].method << "-" <<  std::endl;
+	
+		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
+		this->_header_requete[0].path = this->ft_check_path_header(size_header);
+		if (this->_header_requete[0].path.empty() == true)
+			throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
+		std::cout << "\nOn a le path : " << this->_header_requete[0].path << std::endl;
+		
+		this->ft_parsing_path_get_request();
+		std::cout << "\nOn a la query_string : " << this->_header_requete[0].query_string << std::endl;
+
+		this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
+		if (this->_header_requete[0].protocol.empty() == true)
+			throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
+		std::cout << "\nOn a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
+
+		this->_header_requete[0].host = this->ft_check_host_header(size_header);
+		if (this->_header_requete[0].host.empty() == true)
+			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
+		std::cout << "\nOn a le host : " << this->_header_requete[0].host << "-" << std::endl;
+		
+		
+
+		// RAJOUT VENDREDi
+		this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
+		if (this->_header_requete[0].accept.empty() == true)
+			throw Error(15, "Error, in recieved header, the accept is not correct.", 2);
+		std::cout << "\nOn a le accept = "<< this->_header_requete[0].accept << std::endl;
+	
+		
+		this->_header_requete[0].path_http = this->ft_check_pathhttp_header(size_header);
+		if (this->_header_requete[0].path_http.empty() == true)
+			throw Error(16, "Error, in recieved header, the path of the file si not correct." , 2);
+		std::cout << "\nOn a le path = -" << this->_header_requete[0].path_http << "-" <<  std::endl;
+		
+
+		if (this->ft_check_cgi_or_php(request_http) == 1)
+		{
+			// on a du php ou du cgi ?
+			// donc faut utiliser cgi
+			this->ft_exec_cgi_test( request_http, len_msg);
+
+			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
+		}
+		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+	}
+	std::cout << RED << "Tout est bon ? " << CLEAR << std::endl;
+	exit(1);
 }
 
 /*
