@@ -6,8 +6,7 @@
 			text-shadow: 0 0 2mm red}
 		</style>
 		<link rel="icon" type="image/x-con" href="/flavicon.ico"/><link rel="shortcut icon" type="image/x-con" href="/flavicon.ico" />
- </head>
-
+</head>
 
  <body>
     <h1> On a bien recu les donnees =): </h1>
