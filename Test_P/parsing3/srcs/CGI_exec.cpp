@@ -217,7 +217,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysCline[i] = new char[aArgs[i].size() + 1];
 		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
-		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+		// std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
 	}
 	sysCline[aArgs.size()] = NULL;
 
@@ -235,7 +235,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysEnv[i] = new char[aEnv[i].size() + 1];
 		strncpy(sysEnv[i], aEnv[i].c_str(), aEnv[i].size() + 1);
-		std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
+		// std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
 
 	}
 	sysEnv[aEnv.size()] = NULL;
@@ -316,7 +316,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		waitpid(-1, NULL, 0);
 		//	on place la tete de lecture de fd_out au debut
 		lseek(fd_out, 0, SEEK_SET);
-		std::cout << "dans parent apres waitpid" << std::endl;
+		// std::cout << "dans parent apres waitpid" << std::endl;
 
 		int ret = 1;
 		while (ret > 0)
@@ -324,12 +324,13 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 			memset(buffer, 0, 2000);
 			// on lit fd_out et on le place dans le buffer
 			ret = read(fd_out, buffer, 2000 - 1);
-			std::cout << "dans parents et buffer = " << buffer << std::endl;
+			// std::cout << "dans parents et buffer = " << buffer << std::endl;
 			// on termine la chaine de charactere par 0
 			buffer[ret] = 0;
 			if (ret > 0)
 			{
-				std::cout << "\n\n bingo buffer = " << buffer << std::endl;
+				// std::cout << "\n\n bingo buffer = " << buffer << std::endl;
+				this->ft_add_to_cgi_string(buffer, ret );
 				// du coup faudra rajouter la chaine de charactere a une string a chaque lecture
 			}
 		}
@@ -357,210 +358,239 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	}
 	delete [] sysCline;
 
-	return ("");
+	return (this->ft_return_string_cgi());
 }
 
-#include <string.h>
-
-void		Cgi_exec::ft_test( void )
+/*
+**	Return this->_cgi_string which contains the string of the cgi
+**	and clear it.
+*/
+std::string		Cgi_exec::ft_return_string_cgi( void )
 {
-	// this->setServerPort("HTTP/1.1");
-	// this->setServerName("127.0.0.1");
-	// this->setServerPort("8080");
-	// this->setServerSoftware("Webserv/1.0");
-	// this->setGatewayInterface("CGI/1.1");
-	// this->setRequestUri("/Hello/query_get_test.php?name=Pierre&prenom=Saumet&message=PARFAIT");
-	// this->setHttpAccept("test/html");
+	std::string tmp = this->_cgi_string;
+
+	this->_cgi_string.clear();
+	return (tmp);
+}
 
 
-	char **sysCline = NULL;
-	char **sysENV = NULL;
-	// std::string		sData ="var_1=val1&var_=val2";
+/*
+**	This function add he buffer from the CGI to this->_cgi_string
+*/
+void		Cgi_exec::ft_add_to_cgi_string( unsigned char *buffer, int ret )
+{
 
-	std::vector<std::string> aArgs;
-	aArgs.push_back("/usr/bin/php-cgi");
-	aArgs.push_back("./root/Hello/query_get_test.php");
+	int i = 0;
 
-	sysCline = new char*[aArgs.size()+1];
-	for (unsigned long i = 0; i < aArgs.size(); i++)
+	while (i < ret)
 	{
-		sysCline[i] = new char[aArgs[i].size() + 1];
-		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
-		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+		this->_cgi_string += buffer[i];
+		i++;
 	}
-	sysCline[aArgs.size()] = NULL;
-
-
-	// DONC pour _GET dans le fichier query_get_test
-	// il faut que QUERY_STRING possede les valeurs
-	// ex = QUERY_STRING=name=pierre
-	//	et dans le write, bah on peut ecrier n'importe quoi... bizarre
-
-	//	DONC pour _POST dans le fichier query_get_test
-	//	il faut que QUERY_STRINg possede test=querystring
-	std::vector<std::string> aEnv; 
-	aEnv.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	aEnv.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	
-	// pour tester avec get
-	aEnv.push_back("QUERY_STRING=name=PIERRE");
-	aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php?name=PIERRE");
-	
-	
-	// pour tester avec post
-	// aEnv.push_back("QUERY_STRING=test=querystring");
-	//  aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php");
-	
-	aEnv.push_back("REDIRECT_STATUS=200");
-	
-	
-	aEnv.push_back("REQUEST_METHOD=GET");	// avec post ca ne marche pas ... bizarre
-	
-	aEnv.push_back("CONTENT_TYPE=application/x-www-form-urlencoded;charset=utf-8");
-
-	// aEnv.push_back("SCRIPT_FILENAME=./test1.php");
-	aEnv.push_back("SCRIPT_FILENAME=./root/Hello/query_get_test.php");
-	
-	
-	// aEnv.push_back("CONTENT_LENGTH=500");				//+ std::to_string(sData.length()) );
-	
-	aEnv.push_back("CONTENT_LENGTH=6"); //+ std::to_string(sData.length()) );
-	sysENV = new char*[aEnv.size() + 1];
-	for (unsigned long i = 0; i < aEnv.size(); i++)
-	{
-		sysENV[i] = new char[aEnv[i].size() + 1];
-		strncpy(sysENV[i], aEnv[i].c_str(), aEnv[i].size() + 1);
-		std::cout << "sysENV[" << i << "] = " << sysENV[i] << std::endl;
-
-	}
-	sysENV[aEnv.size()] = NULL;
-
-	pid_t pid;
-	int stdin_tmp = dup(STDIN_FILENO);
-	int stdout_tmp = dup(STDOUT_FILENO);
-
-	FILE *file_in = tmpfile();		// cree un fichier temporaire dans le cas de grosse donnees je pense
-	if (file_in == NULL)
-	{
-		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
-	FILE *file_out = tmpfile();
-	if (file_out == NULL)
-	{
-		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
-	long fd_in = fileno(file_in);
-	if (fd_in == -1)
-	{
-		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
-	long fd_out = fileno(file_out);
-	if (fd_out == -1)
-	{
-		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
-
-	// unsigned char tmp_buffer[2000] = {0};
-	// memset(tmp_buffer, 0, 2000);
-	//	on ecrit dans fd_in car c'est dedans qu'on va passer les valeurs recuperer via le parsing
-	//	et les transmettre au CGI.
-	// euh quand c'est un post il faut mettre les donnes ici 
-	write(fd_in, "name=truc", 11);
-	//	On replace le curseur de lecture de fd_in au debut
-	lseek(fd_in, 0, SEEK_SET);
-
-	pid = fork();
-	if (pid == -1)
-	{
-		std::cerr << "For kcrash" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-		exit(1);
-	}
-	else if (pid == 0)		// enfant lol
-	{
-		// On duplique les files descriptors d'entree et de sortie.
-		if (dup2(fd_in, 0) == -1) // STDIN_FILENO
-		{
-			std::cout << "erreur dup2 fd_in " << std::endl;
-			std::cout << "doit retourner une erruer" << std::endl;
-			exit(1);
-		}
-		if (dup2(fd_out, 1) == -1) // STDOUT_FILENO
-		{
-			std::cout << "erreur dup2 fd_in " << std::endl;
-			std::cout << "doit retourner une erruer" << std::endl;
-			exit(1);
-		}
-		// on execute le cgi avec execve
-		if (execve(sysCline[0], sysCline, sysENV) == -1)
-		{
-			std::cerr << "Error cgi" << std::endl;
-			std::cout << "doit retourner une erruer genre 500" << std::endl;
-		}
-	}
-	else // parenmt
-	{
-		// on setup un buffer pour recuperer les donnees
-		//	a voir pour la taille, j'ai mis 2000 aleatoirement
-		unsigned char buffer[2000] = {0};
-
-		// on attend la fin du processus 
-		waitpid(-1, NULL, 0);
-		//	on place la tete de lecture de fd_out au debut
-		lseek(fd_out, 0, SEEK_SET);
-		std::cout << "dans parent apres waitpid" << std::endl;
-
-		int ret = 1;
-		while (ret > 0)
-		{
-			memset(buffer, 0, 2000);
-			// on lit fd_out et on le place dans le buffer
-			ret = read(fd_out, buffer, 2000 - 1);
-			// std::cout << "dans parents et buffer = " << buffer << std::endl;
-			// on termine la chaine de charactere par 0
-			buffer[ret] = 0;
-			if (ret > 0)
-			{
-				// std::cout << "\n\n bingo buffer = " << buffer << std::endl;
-				// du coup faudra rajouter la chaine de charactere a une string a chaque lecture
-				std::cout << "buffer = " << buffer << std::endl;
-				
-			}
-		}
-
-	}
-
-	// std::cout << "tmp _ buffer = " << tmp_buffer << std::endl;
-
-	dup2(stdin_tmp, 0);
-	dup2(stdout_tmp, 1);
-	fclose(file_in);
-	fclose(file_out);
-	close(fd_in);
-	close(fd_out);
-	close(stdin_tmp);
-	close(stdout_tmp);
-
-	// faut nettoyer pour les leaks
-	for (unsigned long i = 0; i < aEnv.size(); i++)
-	{
-		delete [] sysENV[i];
-	}
-	delete [] sysENV;
-
-	for (unsigned long i = 0; i < aArgs.size(); i++)
-	{
-		delete [] sysCline[i];
-	}
-	delete [] sysCline;
-
-
 	return ;
 }
+
+
+
+// void		Cgi_exec::ft_test( void )
+// {
+// 	// this->setServerPort("HTTP/1.1");
+// 	// this->setServerName("127.0.0.1");
+// 	// this->setServerPort("8080");
+// 	// this->setServerSoftware("Webserv/1.0");
+// 	// this->setGatewayInterface("CGI/1.1");
+// 	// this->setRequestUri("/Hello/query_get_test.php?name=Pierre&prenom=Saumet&message=PARFAIT");
+// 	// this->setHttpAccept("test/html");
+
+
+// 	char **sysCline = NULL;
+// 	char **sysENV = NULL;
+// 	// std::string		sData ="var_1=val1&var_=val2";
+
+// 	std::vector<std::string> aArgs;
+// 	aArgs.push_back("/usr/bin/php-cgi");
+// 	aArgs.push_back("./root/Hello/query_get_test.php");
+
+// 	sysCline = new char*[aArgs.size()+1];
+// 	for (unsigned long i = 0; i < aArgs.size(); i++)
+// 	{
+// 		sysCline[i] = new char[aArgs[i].size() + 1];
+// 		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
+// 		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+// 	}
+// 	sysCline[aArgs.size()] = NULL;
+
+
+// 	// DONC pour _GET dans le fichier query_get_test
+// 	// il faut que QUERY_STRING possede les valeurs
+// 	// ex = QUERY_STRING=name=pierre
+// 	//	et dans le write, bah on peut ecrier n'importe quoi... bizarre
+
+// 	//	DONC pour _POST dans le fichier query_get_test
+// 	//	il faut que QUERY_STRINg possede test=querystring
+// 	std::vector<std::string> aEnv; 
+// 	aEnv.push_back("GATEWAY_INTERFACE=CGI/1.1");
+// 	aEnv.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	
+// 	// pour tester avec get
+// 	aEnv.push_back("QUERY_STRING=name=PIERRE");
+// 	aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php?name=PIERRE");
+	
+	
+// 	// pour tester avec post
+// 	// aEnv.push_back("QUERY_STRING=test=querystring");
+// 	//  aEnv.push_back("REQUEST_URI=./root/Hello/query_get_test.php");
+	
+// 	aEnv.push_back("REDIRECT_STATUS=200");
+	
+	
+// 	aEnv.push_back("REQUEST_METHOD=GET");	// avec post ca ne marche pas ... bizarre
+	
+// 	aEnv.push_back("CONTENT_TYPE=application/x-www-form-urlencoded;charset=utf-8");
+
+// 	// aEnv.push_back("SCRIPT_FILENAME=./test1.php");
+// 	aEnv.push_back("SCRIPT_FILENAME=./root/Hello/query_get_test.php");
+	
+	
+// 	// aEnv.push_back("CONTENT_LENGTH=500");				//+ std::to_string(sData.length()) );
+	
+// 	aEnv.push_back("CONTENT_LENGTH=6"); //+ std::to_string(sData.length()) );
+// 	sysENV = new char*[aEnv.size() + 1];
+// 	for (unsigned long i = 0; i < aEnv.size(); i++)
+// 	{
+// 		sysENV[i] = new char[aEnv[i].size() + 1];
+// 		strncpy(sysENV[i], aEnv[i].c_str(), aEnv[i].size() + 1);
+// 		std::cout << "sysENV[" << i << "] = " << sysENV[i] << std::endl;
+
+// 	}
+// 	sysENV[aEnv.size()] = NULL;
+
+// 	pid_t pid;
+// 	int stdin_tmp = dup(STDIN_FILENO);
+// 	int stdout_tmp = dup(STDOUT_FILENO);
+
+// 	FILE *file_in = tmpfile();		// cree un fichier temporaire dans le cas de grosse donnees je pense
+// 	if (file_in == NULL)
+// 	{
+// 		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
+// 		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+// 	}
+// 	FILE *file_out = tmpfile();
+// 	if (file_out == NULL)
+// 	{
+// 		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
+// 		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+// 	}
+// 	long fd_in = fileno(file_in);
+// 	if (fd_in == -1)
+// 	{
+// 		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
+// 		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+// 	}
+// 	long fd_out = fileno(file_out);
+// 	if (fd_out == -1)
+// 	{
+// 		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
+// 		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+// 	}
+
+// 	// unsigned char tmp_buffer[2000] = {0};
+// 	// memset(tmp_buffer, 0, 2000);
+// 	//	on ecrit dans fd_in car c'est dedans qu'on va passer les valeurs recuperer via le parsing
+// 	//	et les transmettre au CGI.
+// 	// euh quand c'est un post il faut mettre les donnes ici 
+// 	write(fd_in, "name=truc", 11);
+// 	//	On replace le curseur de lecture de fd_in au debut
+// 	lseek(fd_in, 0, SEEK_SET);
+
+// 	pid = fork();
+// 	if (pid == -1)
+// 	{
+// 		std::cerr << "For kcrash" << std::endl;
+// 		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+// 		exit(1);
+// 	}
+// 	else if (pid == 0)		// enfant lol
+// 	{
+// 		// On duplique les files descriptors d'entree et de sortie.
+// 		if (dup2(fd_in, 0) == -1) // STDIN_FILENO
+// 		{
+// 			std::cout << "erreur dup2 fd_in " << std::endl;
+// 			std::cout << "doit retourner une erruer" << std::endl;
+// 			exit(1);
+// 		}
+// 		if (dup2(fd_out, 1) == -1) // STDOUT_FILENO
+// 		{
+// 			std::cout << "erreur dup2 fd_in " << std::endl;
+// 			std::cout << "doit retourner une erruer" << std::endl;
+// 			exit(1);
+// 		}
+// 		// on execute le cgi avec execve
+// 		if (execve(sysCline[0], sysCline, sysENV) == -1)
+// 		{
+// 			std::cerr << "Error cgi" << std::endl;
+// 			std::cout << "doit retourner une erruer genre 500" << std::endl;
+// 		}
+// 	}
+// 	else // parenmt
+// 	{
+// 		// on setup un buffer pour recuperer les donnees
+// 		//	a voir pour la taille, j'ai mis 2000 aleatoirement
+// 		unsigned char buffer[2000] = {0};
+
+// 		// on attend la fin du processus 
+// 		waitpid(-1, NULL, 0);
+// 		//	on place la tete de lecture de fd_out au debut
+// 		lseek(fd_out, 0, SEEK_SET);
+// 		std::cout << "dans parent apres waitpid" << std::endl;
+
+// 		int ret = 1;
+// 		while (ret > 0)
+// 		{
+// 			memset(buffer, 0, 2000);
+// 			// on lit fd_out et on le place dans le buffer
+// 			ret = read(fd_out, buffer, 2000 - 1);
+// 			// std::cout << "dans parents et buffer = " << buffer << std::endl;
+// 			// on termine la chaine de charactere par 0
+// 			buffer[ret] = 0;
+// 			if (ret > 0)
+// 			{
+// 				// std::cout << "\n\n bingo buffer = " << buffer << std::endl;
+// 				// du coup faudra rajouter la chaine de charactere a une string a chaque lecture
+// 				std::cout << "buffer = " << buffer << std::endl;
+				
+// 			}
+// 		}
+
+// 	}
+
+// 	// std::cout << "tmp _ buffer = " << tmp_buffer << std::endl;
+
+// 	dup2(stdin_tmp, 0);
+// 	dup2(stdout_tmp, 1);
+// 	fclose(file_in);
+// 	fclose(file_out);
+// 	close(fd_in);
+// 	close(fd_out);
+// 	close(stdin_tmp);
+// 	close(stdout_tmp);
+
+// 	// faut nettoyer pour les leaks
+// 	for (unsigned long i = 0; i < aEnv.size(); i++)
+// 	{
+// 		delete [] sysENV[i];
+// 	}
+// 	delete [] sysENV;
+
+// 	for (unsigned long i = 0; i < aArgs.size(); i++)
+// 	{
+// 		delete [] sysCline[i];
+// 	}
+// 	delete [] sysCline;
+
+
+// 	return ;
+// }
 
 
 

@@ -264,69 +264,39 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 	}
 }
 
-// a DERPLACER DANS HTTPSERVER RESPONSE
+/*
+**	Cette fonction recupere le header dans une string via ft_setup_header().
+**	Si on doit afficher une erreur ou si on doit utiliser le CGi
+**	alors on peut retourner directement la string car elle contient le header et le body
+**	Sinon on ouvre le fichier et on le rajoute a header qu'on termine par retourner.
+*/
 std::string		HttpServer::ft_settup_http_response( void )				
 {
-	/* Donc cette fonction doit retourner la reponse entiere du server, cad HEADER + BODY
-
-		Il faut la changer, elle est pas bonne.
-		1 ) ft_setup_header ==> setup le header
-		2 ) on ajoute le body 
-	*/
 	std::cout << GREEN << "\n\n ft_settup_http_response " << CLEAR << std::endl;
 	std::string filename(this->_servers[0].index_server.c_str());				// a changer, car la ca affiche seuelemtn l'index.html
 	std::string file_contents;
 	struct stat sb;
 	std::string res;
-
-	std::cout<< "kek " << std::endl;
 	FILE *input_file = NULL;
 
 
-	std::string ENTETELOL = ft_setup_header();
-
-
-	std::cout << "ENTETELOL = " << ENTETELOL << std::endl;
+	std::string header = ft_setup_header();
+	std::cout << "header = " << header << std::endl;
 	std::cout << "le fichier demande = -" << this->_header_requete[0].path << "-" << std::endl;
-	if (this->_header_requete[0].error == true)
-	{
-		std::cout << " on a eu une erreur on retourne tout" << std::endl;
-		return (ENTETELOL);
-
-	}
-
-
 	
-	// DEMANDE L'INDEX ...
-	if (this->_header_requete[0].path == "./root/")
-	{
-		//  this->_servers[0].root_server);
-		std::cout << "on prend l'index =-" << this->_servers[0].index_server << "-" << std::endl;
-		input_file = fopen(this->_servers[0].index_server.c_str(), "r");
-		if (input_file == NULL)
-		{
-			std::cout << " MERDE " << std::endl;
-			exit(1);
-		}
-	}
-	else if (this->_header_requete[0].path.find(".php") != std::string::npos)	// a changer
-	{
-		std::cout << " ok on a donc le php . on affihce pour voir ... "<< std::endl;
-		input_file = fopen("./root/query_get_test.php", "r");
-	}
-	else
-		input_file = fopen(this->_header_requete[0].path.c_str(), "r");
-
+	// Si on a une erreur ou si on a un fichier qui utilise le cgi, alors on peut retourner directement car on a setup le header et le body
+	if (this->_header_requete[0].error == true)	
+		return (header);
+	if (this->_header_requete[0].cgi == true)
+		return (header);
+	// Sinon, on recupere le fichier demande et on ajoute header qui correspond au header.
+	input_file = fopen(this->_header_requete[0].path.c_str(), "r");
 	stat(this->_header_requete[0].path.c_str(), &sb);
-
-	res.resize(sb.st_size + 100);
+	res.resize(sb.st_size + 100);											// a changer
 	fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
 	fclose(input_file);
 	file_contents = res;
-
-	file_contents.insert(0, ENTETELOL.c_str());
-	std::cout << "file content dans la fonction =-" << file_contents << "-" << std::endl;
-
+	file_contents.insert(0, header.c_str());
 	return (file_contents);
 }
 

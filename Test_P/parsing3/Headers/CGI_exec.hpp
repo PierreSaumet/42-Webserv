@@ -51,6 +51,9 @@ class Cgi_exec
 
 		std::vector<std::string>		ft_convert_map_to_vector( void );
 
+		void					ft_add_to_cgi_string( unsigned char *buffer, int ret );
+
+		std::string				ft_return_string_cgi( void );
 		/*
 		**	Setters
 		*/
@@ -118,6 +121,8 @@ class Cgi_exec
 
 	private:
 		std::map<std::string, std::string>		_env_cgi;
+
+		std::string								_cgi_string;
 
 };
 

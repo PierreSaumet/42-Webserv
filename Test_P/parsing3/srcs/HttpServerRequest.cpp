@@ -88,11 +88,14 @@ std::string::iterator	HttpServer::ft_find_end_header( std::string request_http )
 		if (end_request == "\r\n\r\n")
 		{
 			it_end_request = it_b;
-			return (it_b);
+			
 			std::cout << "on atrouve la fin du header" << std::endl;
+			return (it_b);
 			break ;
 		}
 	}
+	std::cout << "ERROR on a pas la fin du header ??? " << std::endl;
+	// exit(1);
 	return (it_b);
 }
 
@@ -138,11 +141,22 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			}
 
 		}
+		
 		std::cout << BLUE << "Ok pas d'erreur 431 ou d'erreur 405 donc on continue." << CLEAR <<  std::endl;
 
 		// A partir d'ici, on va parser la requete et recuperer toutes les informations disponibles.
-		std::string::iterator	it_end_request = ft_find_end_header( request_http );
-		std::string 			size_header(request_http.begin(), it_end_request);
+		
+		// si pas de fin de header faire une erreur
+		size_t pos_hea = request_http.find("\r\n\r\n");
+		std::string size_header(request_http, 0, pos_hea);
+		// std::string::iterator	it_end_request = ft_find_end_header( request_http );
+		
+
+
+
+
+
+
 
 		// On recupere la methode
 		this->_header_requete[0].method = "GET";
@@ -194,7 +208,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
 		}
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
-		exit(1);
+		// exit(1);
 	}
 	else
 	{
@@ -396,19 +410,23 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		
 		
 
-		std::cout << GREEN << "\n\nOn a tout setup, on va afficher pour verifier " << CLEAR << std::endl;
-		this->_cgi->ft_display_all_variable_env();
+		// std::cout << GREEN << "\n\nOn a tout setup, on va afficher pour verifier " << CLEAR << std::endl;
+		// this->_cgi->ft_display_all_variable_env();
 
 		// exit(1);
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
 		
-		std::cout << "address cgi = " << this->_servers[0].cgi_path_server << std::endl;
+		// std::cout << "address cgi = " << this->_servers[0].cgi_path_server << std::endl;
 		std::string tmp = this->_header_requete[0].script_file_name;
 		tmp.insert(0, this->_servers[0].root_server);
-		std::cout << "tmp = " << tmp << std::endl;
+		// std::cout << "tmp = " << tmp << std::endl;
 
-		this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp);
+		// std::string BINGO = "";
+		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp);
 		
+		// sleep(1);
+		// std::cout << "\n\n\n BINGO = \n" << this->_header_requete[0].body_error << std::endl;
+		// exit(1);
 	}
 	else
 	{

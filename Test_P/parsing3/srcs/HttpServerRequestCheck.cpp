@@ -32,6 +32,10 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 		if (pos_interrogation == std::string::npos)
 		{
 			std::cout << RED << "dans ft_check_path_header, ne trouve pas -?-: dans le header de la requete" << CLEAR << std::endl;
+			
+			// erreur pour trouver img/chien donc on retourne simplement le path
+			std::cout << "on va retourner le path ? ..." << std::endl;
+			return (this->_header_requete[0].path);
 			return ("");
 		}
 		else

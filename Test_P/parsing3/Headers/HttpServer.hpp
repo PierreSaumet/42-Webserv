@@ -74,7 +74,7 @@ class HttpServer {
 			bool				cgi;
 			bool				error;
 			size_t				num_error;
-			std::string			body_error;
+			std::string			body_error;			// si cgi body_error contient la response du cgi sans le header
 			std::map<std::string, std::string>	data;	// Contient les information transmise a Get via un formulaire					// contient les informations en get.
 		}						t_header_request;
 		
@@ -136,7 +136,7 @@ class HttpServer {
 		size_t		ft_parsing_path_get_request( void );
 		std::string		ft_clean_path_get_request( std::string tmp );
 
-		std::string		ft_get_content_length( struct stat buff ) const;
+		std::string		ft_get_content_length( struct stat buff, size_t len ) const;
 		std::string		ft_get_end_header( void ) const;
 		std::string		ft_get_content_type( void ) const;
 		std::string		ft_get_charset( void ) const;
