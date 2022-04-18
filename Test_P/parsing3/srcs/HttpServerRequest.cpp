@@ -453,6 +453,15 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		std::cout << "\n tmp = " << tmp << std::endl;
 		this->_cgi->setScriptName(tmp);
 		this->_cgi->setScriptFileName(tmp);
+		this->_cgi->setRequestUri("");
+		if (this->_header_requete[0].upload == true)
+		{
+			this->ft_upload_file();
+			exit(1);
+			// this->_cgi->setScriptName("");
+			// this->_cgi->setScriptFileName("");
+			// this->_cgi->setRequestUri("/");			// a changer
+		}
 // name=Pierre&message=COUCOU1
 		// a setup
 
@@ -474,10 +483,16 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		tmp_2.insert(0, this->_servers[0].root_server);
 		// std::cout << "tmp = " << tmp << std::endl;
 
-		// std::string BINGO = "";
+		std::cout << " AVANT EXECUTE CGI : " << std::endl;
+		std::cout << "first arg = -" << this->_servers[0].cgi_path_server << "-" << std::endl;
+		
+
+		std::cout << "test tmp_2 = / " << std::endl;
+		tmp_2 = "/";
+		std::cout << "second arg = -" << tmp_2 << "-" << std::endl;
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
 		std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
-		// exit(1);
+		exit(1);
 	}
 	else
 	{
@@ -488,6 +503,55 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 	return ;
 }
 
+size_t			HttpServer::ft_upload_file( void )
+{
+	/*
+	**	1 ) regarder si on a recu un fichier
+				si non, pas de fichier
+					erreur afficher une page, il faut mettre un fichier
+		2) verifier les droits
+		2) regarder si le fichier existe
+				si oui, retourner une erreur, file deja uplooad
+		3) 	on upload le fichier
+			1) open
+			2) write
+			3) close
+			4) code sortie html 201 created file
+			afficher une page avec le bon code
+				
+	*/
+	// TMP tout a changer
+	std::string filename = "./root/test.txt";
+	if (filename.empty() == true)
+	{
+		// erreur pas de fichier
+	}
+	struct stat buff;
+	if (lstat(filename.c_str(), &buff) == 0)
+	{
+		// erruer deja upload
+	}
+	else
+	{
+		FILE *fp;
+		fp = fopen(filename.c_str(), "a");
+		if (fp == NULL)
+		{
+			// erreur 500
+		}
+		
+
+
+		fclose(fp);
+		// int fd = open(filename.c_str(), O_WRONLY | O_CREAT, 00755);
+		// if (fd < 0)
+		// {
+		// 	// erreur 500 on ne peut pas creer le fichier
+		// }
+		// close(fd);
+	}
+	return (0);
+}
 
 /*
 **	size_t		ft_check_cgi_or_php( std::string request_http, int len_msg )
@@ -526,6 +590,12 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 		{
 			std::cout << " good on a bien du cgi dans la requete qu'il faut utiliser avec cgi" << std::endl;
 			this->_header_requete[0].cgi = true;
+			return (true);
+		}
+		if (this->_header_requete[0].content_type.compare(0, 30, "multipart/form-data; boundary=") == 0)
+		{
+			std::cout << "IL Y A DU PHP ET IL FAUT UPLOADER" << std::endl;
+			this->_header_requete[0].upload = true;
 			return (true);
 		}
 		std::cout << "non on a pas de php ou de cgi" << std::endl;
@@ -684,6 +754,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 	std::cout << "request_http = " << request_http << std::endl;
 	std::cout << "len_msg = " << len_msg << std::endl;
 
+
+
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
@@ -728,13 +800,15 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		// a terminer
 		std::string size_body(request_http, size_header.size(), request_http.size());
 		std::cout << "euh size_body = -" << size_body << "-"<< std::endl;
+		std::cout << "et taille body = " << size_body.size() << std::endl;
+		
 		// exit(1);
 		// if (FT_FONCTION A FAIRE ())
 		// REGARDE LE LOCATION ET OU SERVER
 		//	SI CLIENT BUFFER SIZE < SIZE_BODY_CAPACITY()
 		//	RETOURNE 413
 
-		std::cout << "capadcoty en bite = " << size_body.capacity() << std::endl;
+		std::cout << "capacity en bite = " << size_body.capacity() << std::endl;
 		std::cout << "length = " << size_body.length() << std::endl;
 		std::cout << BLUE << "Ok pas d'erreur 431 ou d'erreur 405 donc on continue." << CLEAR <<  std::endl;
 	
@@ -795,19 +869,25 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		
 
 
-		// exit(1);
+		
 
 		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
 			// on a du php ou du cgi ?
 			// donc faut utiliser cgi
+			std::cout << "OUI " << std::endl;
+			
 			this->ft_exec_cgi_test( request_http, len_msg);
 
+			exit(1);
 			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
 		}
+		std::cout << "NON " << std::endl;
+		exit(1);
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 	}
 	std::cout << RED << "Tout est bon ? " << CLEAR << std::endl;
+	exit(1);
 	return (0);
 	// exit(1);
 }

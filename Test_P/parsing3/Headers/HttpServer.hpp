@@ -74,6 +74,7 @@ class HttpServer {
 			std::string			content_length;		// seulement post
 			std::string			body_post;				//seulement post
 			std::string			script_file_name;	// nom du fichier
+			bool				upload;
 			bool				cgi;
 			bool				error;
 			size_t				num_error;
@@ -135,6 +136,7 @@ class HttpServer {
 		size_t			ft_post(std::string request_http, int len_msg);
 		void			ft_delete(std::string request_http, int len_msg);
 
+		size_t			ft_upload_file( void );
 		
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );
 
