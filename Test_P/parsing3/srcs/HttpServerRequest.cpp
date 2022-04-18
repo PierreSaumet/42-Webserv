@@ -348,7 +348,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 {
 	std::cout << GREEN << "\n\nDANS exec CGI ... " << CLEAR << std::endl;
 	std::cout << "request_http = " << request_http << std::endl;
-	std::cout << "longueur msg = " << len_msg << std::endl;
+	std::cout << "longueur msg = " << len_msg << "\n\n" << std::endl;
 
 	std::cout << "method = " << this->_header_requete[0].method << std::endl;
 	std::cout << "path = " << this->_header_requete[0].path << std::endl;
@@ -373,7 +373,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 
 	}
 	
-
+	sleep(2);
 	// on setup les variables a NULL
 	std::cout << "\n ON SETUP les variables de _env_cgi " << std::endl;
 	this->_cgi->ft_setup_env_cgi();
@@ -432,9 +432,57 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		// std::cout << "\n\n\n BINGO = \n" << this->_header_requete[0].body_error << std::endl;
 		// exit(1);
 	}
+	else if (this->_header_requete[0].method == "POST")
+	{
+		std::cout << "On est dans Post " << std::endl;
+		this->_cgi->setGatewayInterface("CGI/1.1");
+		this->_cgi->setHttpAccept(this->_header_requete[0].accept);
+		this->_cgi->setPathInfo(this->_header_requete[0].path_http);
+		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
+		this->_cgi->setRedirectStatus("200");
+		this->_cgi->setStatusCode("200");
+		this->_cgi->setRequestMethod(this->_header_requete[0].method);
+		this->_cgi->setServerSoftware("Webserv/1.0");
+		this->_cgi->setServerProtocol("HTTP/1.1");
+
+		// probleme si plusieurs servers ...
+		this->_cgi->setServerName(this->_servers[0].name_server);
+
+		std::string tmp = this->_header_requete[0].script_file_name;
+		tmp.insert(0, this->_servers[0].root_server);
+		std::cout << "\n tmp = " << tmp << std::endl;
+		this->_cgi->setScriptName(tmp);
+		this->_cgi->setScriptFileName(tmp);
+// name=Pierre&message=COUCOU1
+		// a setup
+
+		this->_cgi->setContentLength(this->_header_requete[0].content_length);
+		this->_cgi->setContentType(this->_header_requete[0].content_type);
+		this->_cgi->setRequestUri("");
+
+		// il faut mettre le body dans la string privee body
+		this->_cgi->set_body_string_post(this->_header_requete[0].body_post);
+
+		this->_cgi->ft_display_all_variable_env();
+
+
+
+		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
+		
+		// std::cout << "address cgi = " << this->_servers[0].cgi_path_server << std::endl;
+		std::string tmp_2 = this->_header_requete[0].script_file_name;
+		tmp_2.insert(0, this->_servers[0].root_server);
+		// std::cout << "tmp = " << tmp << std::endl;
+
+		// std::string BINGO = "";
+		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
+		std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
+		// exit(1);
+	}
 	else
 	{
 		std::cout << "on est ailleurs" << std::endl;
+		exit(1);
 	}
 
 	return ;
@@ -679,7 +727,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		//	si c'est trop grand retourner une erreur 
 		// a terminer
 		std::string size_body(request_http, size_header.size(), request_http.size());
-
+		std::cout << "euh size_body = -" << size_body << "-"<< std::endl;
+		// exit(1);
 		// if (FT_FONCTION A FAIRE ())
 		// REGARDE LE LOCATION ET OU SERVER
 		//	SI CLIENT BUFFER SIZE < SIZE_BODY_CAPACITY()
@@ -724,9 +773,29 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		
 		this->_header_requete[0].path_http = this->ft_check_pathhttp_header(size_header);
 		if (this->_header_requete[0].path_http.empty() == true)
-			throw Error(16, "Error, in recieved header, the path of the file si not correct." , 2);
+			throw Error(16, "Error, in recieved header, the path of the file is not correct." , 2);
 		std::cout << "\nOn a le path = -" << this->_header_requete[0].path_http << "-" <<  std::endl;
 		
+
+		this->_header_requete[0].content_length = this->ft_check_content_length(size_header);
+		if (this->_header_requete[0].content_length.empty() == true)
+			throw Error(16, "Error, in recieved header, the content_length is  not correct." , 2);
+		std::cout << "\nOn a le content_length = -" << this->_header_requete[0].content_length << "-" <<  std::endl;
+		
+		this->_header_requete[0].content_type = this->ft_check_content_type(size_header);
+		if (this->_header_requete[0].content_type.empty() == true)
+			throw Error(16, "Error, in recieved header, the content_type is  not correct." , 2);
+		std::cout << "\nOn a le content_type = -" << this->_header_requete[0].content_type << "-" <<  std::endl;
+		
+
+		this->_header_requete[0].body_post = this->ft_check_body_post(size_body);
+		if (this->_header_requete[0].body_post.empty() == true)
+			throw Error(16, "Error, in recieved header, the body_post is  not correct." , 2);
+		std::cout << "\nOn a le body_post = -" << this->_header_requete[0].body_post << "-" <<  std::endl;
+		
+
+
+		// exit(1);
 
 		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
@@ -739,7 +808,68 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 	}
 	std::cout << RED << "Tout est bon ? " << CLEAR << std::endl;
-	exit(1);
+	return (0);
+	// exit(1);
+}
+
+std::string		HttpServer::ft_check_body_post( std::string request_http )
+{
+	size_t pos = request_http.find("\r\n\r\n"); // on cherche la fin
+	if (pos == std::string::npos)
+	{
+		std::cout << "Erreur dans POST le header n'a pas /r/n/r/n" << std::endl;
+		exit(1);
+	}
+	else
+	{
+		size_t pos_end = request_http.find("\r\n", pos);
+		std::string tmp(request_http, pos + 4, pos_end - (pos + 4));
+		std::cout << "tmp = -" << tmp << "-" << std::endl;
+		// on compare avec contentlengt
+		
+		if ((long)tmp.size() == std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10))
+			return (tmp);
+		else
+		{
+			std::cout << "ERROR size body differe de content length" << std::endl;
+			exit(1);
+		}
+		exit(1);
+		return (tmp); 
+	}
+}
+
+std::string		HttpServer::ft_check_content_type( std::string request_http )
+{
+	size_t pos = request_http.find("Content-Type: ");
+	if (pos == std::string::npos)
+	{
+		std::cout << "Erreur dans POST le header n'a pas Content-TYPE" << std::endl;
+		exit(1);
+	}
+	else
+	{
+		size_t pos_end = request_http.find("\r\n", pos);
+		std::string tmp(request_http, pos + 14, pos_end - (pos + 14));
+		return (tmp);
+	}
+}
+
+std::string		HttpServer::ft_check_content_length( std::string request_http )
+{
+	size_t pos = request_http.find("Content-Length: ");
+	if (pos == std::string::npos)
+	{
+		std::cout << "Erreur dans POST le header n'a pas Content-Length" << std::endl;
+		exit(1);
+	}
+	else
+	{
+		size_t pos_end = request_http.find("\r\n", pos);
+		std::string tmp(request_http, pos + 16, pos_end - (pos + 16));
+		// std::cout << "tmp = -" << tmp << "-" << std::endl;
+		return (tmp);
+	}
 }
 
 /*

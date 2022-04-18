@@ -203,7 +203,8 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	*/
 
 	std::cout << GREEN << "\n On est dans ft_execute_cgi : " << CLEAR << std::endl;
-	
+	std::cout << "body = " << this->_body_string_post << std::endl;
+	// exit(1);
 	char	**sysCline = NULL;
 	char	**sysEnv = NULL;
 	std::vector<std::string>		aArgs;
@@ -271,7 +272,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 
 	
 	// Je ne suis pas sur de ca ... a voir plus tard
-	write(fd_in, "name=truc", 11);
+	write(fd_in, this->_body_string_post.c_str(), this->_body_string_post.size());
 
 	//	On replace le curseur de lecture de fd_in au debut
 	lseek(fd_in, 0, SEEK_SET);
@@ -616,6 +617,12 @@ std::vector<std::string>		Cgi_exec::ft_convert_map_to_vector( void )
 /*
 **	SETTERS
 */
+void	Cgi_exec::set_body_string_post( std::string const body_post )
+{
+	this->_body_string_post = body_post;
+}
+
+
 void	Cgi_exec::setScriptFileName( std::string const script_filename )
 {
 	this->_env_cgi["SCRIPT_FILENAME"] = script_filename;
@@ -726,7 +733,7 @@ void	Cgi_exec::setRemoteIdent( std::string const remote_ident )
 }
 void	Cgi_exec::setContentType( std::string const content_type )
 {
-	this->_env_cgi["CONTENT_TYPEF"] = content_type;
+	this->_env_cgi["CONTENT_TYPE"] = content_type;
 	return ;
 }
 void	Cgi_exec::setContentLength( std::string const content_length )
@@ -763,6 +770,12 @@ void	Cgi_exec::setHttpReferer( std::string const http_referer )
 /*
 **	GETTERS
 */
+std::string		Cgi_exec::get_body_string_post( void ) const 
+{
+	return (this->_body_string_post);
+}
+
+
 std::string		Cgi_exec::getScriptFilename( void ) const
 {
 	std::map<std::string, std::string>::const_iterator it_b = this->_env_cgi.begin();

@@ -57,6 +57,8 @@ class Cgi_exec
 		/*
 		**	Setters
 		*/
+		void			set_body_string_post( std::string const body_post );
+
 		void			setScriptFileName( std::string const script_filename );
 		void			setRedirectStatus( std::string const redirect_status );
 		void			setStatusCode( std::string const status_code );
@@ -87,6 +89,8 @@ class Cgi_exec
 		/*
 		**	Getters
 		*/
+		std::string		get_body_string_post( void ) const ;
+
 		std::string		getScriptFilename( void ) const;
 		std::string		getRedirectStatus( void ) const;
 		std::string		getStatusCode( void ) const;
@@ -122,7 +126,8 @@ class Cgi_exec
 	private:
 		std::map<std::string, std::string>		_env_cgi;
 
-		std::string								_cgi_string;
+		std::string								_cgi_string; // c'est le retour, la string contenant toutes les donnees
+		std::string								_body_string_post;
 
 };
 

@@ -69,7 +69,10 @@ class HttpServer {
 			std::string			path_http;			// le path total du fichier demande.
 			std::string			query_string;		// les valeur donnees dans l'url pour une requete get
 			std::string			cgi_return;			// string contenant les donnees provenant du cgi
-			std::string			request_uri;		// path du file phph plus les donnes de get?
+			std::string			request_uri;		// path du file php plus les donnes de get  ( GET SEUELENT);
+			std::string			content_type;		// suelement post
+			std::string			content_length;		// seulement post
+			std::string			body_post;				//seulement post
 			std::string			script_file_name;	// nom du fichier
 			bool				cgi;
 			bool				error;
@@ -118,7 +121,9 @@ class HttpServer {
 		std::string		ft_check_pathhttp_header( std::string header );
 		std::string		ft_check_accept_header( std::string header );
 		bool			ft_check_cgi_or_php( std::string request_http );
-		
+		std::string		ft_check_content_length( std::string request_http );
+		std::string		ft_check_content_type( std::string request_http );
+		std::string		ft_check_body_post( std::string request_http );
 		std::string		ft_setup_header( void );
 
 		std::string::iterator ft_find_end_header( std::string request_http );
