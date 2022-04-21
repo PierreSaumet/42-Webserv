@@ -257,17 +257,40 @@ bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, si
 	struct stat buffer;
 	size_t  	len;
 	
+
+	if (this->_servers[index_server].root_server.empty() == true)
+		throw Error(63, "Error, 'root' directive should be setup before 'upload_store' directive.", 1);
 	k += 1;
 	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
 		throw Error(49, "Error, in 'upload_store' directive, it should end with '\0'.", 1);
 	if (tmp[k][len - 1] != ';')
 		throw Error(50, "Error, in 'upload_store' directive, it should end with ';'.",1);
-	if (tmp[k][0] != '.' || tmp[k][1] != '/')
-		throw Error(51, "Error, in 'upload_store' directive, it should start with './'.", 1);
+	if (tmp[k][0] !=  '/')
+		throw Error(51, "Error, in 'upload_store' directive, it should start with '/'.", 1);
 	this->_servers[index_server].upload_store_server = tmp[k].substr(0, len - 1);
+
+	// on ajoute le root
+	this->_servers[index_server].upload_store_server.insert(0, this->_servers[index_server].root_server);
+	std::cout << "upload store = " << this->_servers[index_server].upload_store_server << std::endl;
+
 	if (stat(this->_servers[index_server].upload_store_server.c_str(), &buffer) == -1)
 		throw Error(52, "Error, in 'upload_store' directive , the folder doesn't exist!", 1);
+	
+	// Checks if it is a folder and if it has the good rights
+	if (S_ISDIR(buffer.st_mode))
+	{
+		if ((buffer.st_mode & S_IRWXU) != 448)
+			throw Error(520, "Error, in 'upload_store' directive , the folder doesn't have the good rights", 1);
+	}
+	else
+		throw Error(521, "Error, in 'upload_store' directive , you need to use a fodler", 1);
+
+	// std::cout << "upload store = " << this->_servers[index_server].upload_store_server << std::endl;
+
+	// exit(1);
+
+	
 	return (false);
 }
 
