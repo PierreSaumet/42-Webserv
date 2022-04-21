@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Hello Webserv</title>
+		<style>body { background-color: rgb(105, 140, 238) }
+			h1 { font-size:2cm; text-align: center; color: rgb(121, 219, 56);
+			text-shadow: 0 0 2mm red}
+		</style>
+		<link rel="icon" type="image/x-con" href="/flavicon.ico"/><link rel="shortcut icon" type="image/x-con" href="/flavicon.ico" />
+	</head>
+
+	<body>
+		<h1>Cette page va vous permettre d'uploader des fichiers</h1>
+
+		<p>On va uploader un fichier dans le bloc http,
+			car la directive est 'upload_store' est setup.
+			Et la method POST aussi. kek </p>
+		
+		<form enctype="multipart/form-data" action="" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>	
+
+		<p>On va uploader un fichier dans le dossier 'Hello' ,
+			car la directive est 'upload_store' est setup.
+			Et la method POST aussi. kek </p>
+		
+		<form action="/Hello" enctype="multipart/form-data" action="" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>	
+
+
+		<p>On va uploader un fichier dans le  'Hello2' ,
+			mais il y aura une erreur car la directive n'est pas setup. </p>
+		
+		<form action="/Hello2" enctype="multipart/form-data" action="" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>	
+
+		
+	
+	</body>
+</html>

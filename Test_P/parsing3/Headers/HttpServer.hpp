@@ -129,6 +129,8 @@ class HttpServer {
 
 		std::string::iterator ft_find_end_header( std::string request_http );
 
+
+		
 		/*
 		**	Functions used to set up the headers for the response
 		*/
@@ -136,7 +138,8 @@ class HttpServer {
 		size_t			ft_post(std::string request_http, int len_msg);
 		void			ft_delete(std::string request_http, int len_msg);
 
-		size_t			ft_upload_file( void );
+		std::string		ft_where_to_upload( std::string path);
+		size_t			ft_upload_file( std::string request_http );
 		
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );
 
