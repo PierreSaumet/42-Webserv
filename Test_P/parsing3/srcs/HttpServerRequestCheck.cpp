@@ -117,7 +117,7 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 				std::string tmp = this->_servers[0].location[i].name_location;
 				if (tmp[tmp.size() - 1] != '/')
 					tmp.append("/");
-				// std::cout << "tmp = " << tmp << std::endl;
+				std::cout << "tmp = " << tmp << std::endl;
 				if (request_http.find(tmp) != std::string::npos)
 				{
 					std::cout << "OUI on se trouve dans un dossier location a continuer   11 " << std::endl;
@@ -139,6 +139,7 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 			i++;
 		}
 	}
+	// exit(1);
 	std::cout << "on va chercher dans le root" << std::endl;
 	std::vector<std::string>::iterator  it_b = this->_servers[0].methods_server.begin();
 	for (; it_b != this->_servers[0].methods_server.end(); it_b++)

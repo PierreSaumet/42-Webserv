@@ -456,14 +456,31 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		this->_cgi->setRequestUri("");
 		if (this->_header_requete[0].upload == true)
 		{
-			this->ft_upload_file();
-			exit(1);
-			// this->_cgi->setScriptName("");
-			// this->_cgi->setScriptFileName("");
-			// this->_cgi->setRequestUri("/");			// a changer
+			size_t  ret = this->ft_upload_file(request_http);
+			if (ret == 201)
+			{
+				this->_header_requete[0].cgi = true;
+				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>201</title><style type=text/css>body {color: green;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>201 Created, check it!</h1><p>by Pierre.</p></body></html>";
+				this->_header_requete[0].num_error = 201; // j'utilise error lol...
+				std::cout << "OUI 201 " << std::endl;
+				// sleep(2);
+			}
+			else if (ret == 200)
+			{
+				this->_header_requete[0].cgi = true;
+				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>200</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File Already uploaded =)</h1><p>by Pierre.</p></body></html>";				
+				this->_header_requete[0].num_error = 200;
+			}
+			else if (ret == 500)
+			{
+				this->_header_requete[0].cgi = true;
+				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>500</title><style type=text/css>body {color: red;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>500 Internal Server Error</h1><p>by Pierre.</p></body></html>";				
+				this->_header_requete[0].num_error = 500;
+			}
+			return ;
+			
 		}
-// name=Pierre&message=COUCOU1
-		// a setup
+
 
 		this->_cgi->setContentLength(this->_header_requete[0].content_length);
 		this->_cgi->setContentType(this->_header_requete[0].content_type);
@@ -492,7 +509,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		std::cout << "second arg = -" << tmp_2 << "-" << std::endl;
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
 		std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
-		exit(1);
+		// exit(1);
 	}
 	else
 	{
@@ -503,55 +520,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 	return ;
 }
 
-size_t			HttpServer::ft_upload_file( void )
-{
-	/*
-	**	1 ) regarder si on a recu un fichier
-				si non, pas de fichier
-					erreur afficher une page, il faut mettre un fichier
-		2) verifier les droits
-		2) regarder si le fichier existe
-				si oui, retourner une erreur, file deja uplooad
-		3) 	on upload le fichier
-			1) open
-			2) write
-			3) close
-			4) code sortie html 201 created file
-			afficher une page avec le bon code
-				
-	*/
-	// TMP tout a changer
-	std::string filename = "./root/test.txt";
-	if (filename.empty() == true)
-	{
-		// erreur pas de fichier
-	}
-	struct stat buff;
-	if (lstat(filename.c_str(), &buff) == 0)
-	{
-		// erruer deja upload
-	}
-	else
-	{
-		FILE *fp;
-		fp = fopen(filename.c_str(), "a");
-		if (fp == NULL)
-		{
-			// erreur 500
-		}
-		
 
-
-		fclose(fp);
-		// int fd = open(filename.c_str(), O_WRONLY | O_CREAT, 00755);
-		// if (fd < 0)
-		// {
-		// 	// erreur 500 on ne peut pas creer le fichier
-		// }
-		// close(fd);
-	}
-	return (0);
-}
 
 /*
 **	size_t		ft_check_cgi_or_php( std::string request_http, int len_msg )
@@ -754,8 +723,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 	std::cout << "request_http = " << request_http << std::endl;
 	std::cout << "len_msg = " << len_msg << std::endl;
 
-
-
+	// exit(1);
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
@@ -780,7 +748,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		std::string size_header(request_http, 0, pos_hea);
 		if (size_header.size() > 1023)	// on verifie que le header ne soit pas trop long
 		{
-			std::cout << RED << "On a une  ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
+			std::cout << "euh size_header = " << size_header << std::endl;
+			std::cout << RED << "On a une  ERREUR 431 car POSTR method et donnees trop grandes " << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
 			if (this->ft_setup_error_header(request_http, len_msg) == 0)
@@ -798,7 +767,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		//	il faut comparer la capacity() de la string a la limite client_buffer_siuze()
 		//	si c'est trop grand retourner une erreur 
 		// a terminer
-		std::string size_body(request_http, size_header.size(), request_http.size());
+		std::string size_body(request_http, size_header.size(), request_http.size());		// on prend aussi le \r\n\r\n donc +4
 		std::cout << "euh size_body = -" << size_body << "-"<< std::endl;
 		std::cout << "et taille body = " << size_body.size() << std::endl;
 		
@@ -853,9 +822,38 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 
 		this->_header_requete[0].content_length = this->ft_check_content_length(size_header);
 		if (this->_header_requete[0].content_length.empty() == true)
+		{
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 411; 
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
 			throw Error(16, "Error, in recieved header, the content_length is  not correct." , 2);
+		}
+
 		std::cout << "\nOn a le content_length = -" << this->_header_requete[0].content_length << "-" <<  std::endl;
-		
+		// si body 0 genre un fichier avec 0 droit ex chmod 000
+		if (this->_header_requete[0].content_length == "0")
+		{
+			std::cout << "OUI ERROR 400" << std::endl;
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 400; 
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
+				sleep(2);
+				return (1);
+			}
+
+		}
+		else
+		{
+			std::cout << "GOOD " << std::endl;
+		}
+		// sleep(10);
+
 		this->_header_requete[0].content_type = this->ft_check_content_type(size_header);
 		if (this->_header_requete[0].content_type.empty() == true)
 			throw Error(16, "Error, in recieved header, the content_type is  not correct." , 2);
@@ -878,7 +876,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			std::cout << "OUI " << std::endl;
 			
 			this->ft_exec_cgi_test( request_http, len_msg);
-
+			return (0);
 			exit(1);
 			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
 		}
@@ -905,14 +903,22 @@ std::string		HttpServer::ft_check_body_post( std::string request_http )
 		size_t pos_end = request_http.find("\r\n", pos);
 		std::string tmp(request_http, pos + 4, pos_end - (pos + 4));
 		std::cout << "tmp = -" << tmp << "-" << std::endl;
-		// on compare avec contentlengt
-		
+
+		// on compare avec content_lenght
+		//	 on a une erreur si j'envoie un fichier genre mp3		
 		if ((long)tmp.size() == std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10))
 			return (tmp);
-		else
+		else if (std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10) < (long)tmp.size())	// pour le cas de mp3
 		{
+			std::cout << "tmp.size() = " << tmp.size() << std::endl;
+			std::cout << "content_length = " << this->_header_requete[0].content_length << std::endl;
 			std::cout << "ERROR size body differe de content length" << std::endl;
 			exit(1);
+		}
+		else
+		{
+			std::cout << "yolo" << std::endl;
+			return (tmp);
 		}
 		exit(1);
 		return (tmp); 
@@ -941,6 +947,7 @@ std::string		HttpServer::ft_check_content_length( std::string request_http )
 	if (pos == std::string::npos)
 	{
 		std::cout << "Erreur dans POST le header n'a pas Content-Length" << std::endl;
+		return ("");
 		exit(1);
 	}
 	else

@@ -46,13 +46,15 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 	// return ;
 
 
-
 	std::cout << "Constructor avec argument "<< std::endl;
 	try {
 		this->_data = new Parsing(configfile);
+		
+
 		if (this->_data->ft_get_error() == 1)
 			return ;
 		this->_servers = this->_data->ft_get_servers();											// on recupere les informations provenant de la class parsing
+		// exit(1);
 		// std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
 		if (this->ft_create_servers() == 1)
 			return ;
@@ -257,6 +259,7 @@ void		HttpServer::ft_verifier_ensemble_isset( void )
 					// std::cout << "nouveau client = " << new_client.client_socket << std::endl;
 					new_client.client_addr = addr_new_client;
 					this->_all_client_socket.push_back(new_client);
+					std::cout << "Un nouveau client a ete ajoute, total de client = " << this->_all_client_socket.size() << std::endl;
 					// std::cout << "taille clien = " << this->_all_client_socket.size() << std::endl;
 				}		
 			}
