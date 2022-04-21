@@ -25,6 +25,7 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 	// Adding a block server
 	//this->_servers.push_back(t_server());
 	//std::cout << "dans finddirective location On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
+	struct stat buff;
 
 	if (this->_servers[index_server].location.size() == 0)
 		this->_servers[index_server].nbr_location = 1;
@@ -39,7 +40,24 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 	// Getting name of the location
 	size_t index_location = this->_servers[index_server].location.size() - 1;	
 	this->_servers[index_server].location[index_location].name_location = tmp[k + 1].substr(0, tmp[k + 1].size());
+	// Checking if the name of the location is a folder and if the rights are good
+	std::cout << "location nom = " << this->_servers[index_server].location[index_location].name_location << std::endl;
+	std::string tmp_name; // = "";
+	tmp_name.insert(0, this->_servers[index_server].root_server);
+	tmp_name.append(this->_servers[index_server].location[index_location].name_location);
+	std::cout << "tmp_name = " << tmp_name << std::endl;
+	if (stat(tmp_name.c_str(), &buff) == -1)
+		throw Error(620, "Error,  in 'location' directive, location doesn't exist.", 1);
+	if (S_ISDIR(buff.st_mode))
+	{
+		if ((buff.st_mode & S_IRWXU) != 448)
+			throw Error(620, "Error,  in 'location' directive, the folder location doesn't have the good right.", 1);
+	}
+	else
+		throw Error(620, "Error,  in 'location' directive, location is not a folder.", 1);
 	
+	std::cout << "good" << std::endl;
+	exit(1);
 	// Getting the scope of the location block
 	k += 2;
 	std::vector<std::string>    scope_location = this->ft_get_scope(k);
@@ -268,6 +286,12 @@ bool			Parsing::ft_find_upload_store_location( size_t k, std::vector<std::string
 	this->_servers[index_server].location[index_location].upload_store_location = tmp[k].substr(0, len - 1);
 	if (stat(this->_servers[index_server].location[index_location].upload_store_location.c_str(), &buffer) == -1)
 		throw Error(52, "Error, in  'upload_store' directive , the folder doesn't exist!", 1);
+	
+	
+	std::cout << "this->_server uplaod = " << this->_servers[index_server].location[index_location].upload_store_location << std::endl;
+	std::cout << "nom de location = " << this->_servers[index_server].location[index_location].name_location << std::endl;
+	
+	exit(1);
 	return (false);
 }
 
