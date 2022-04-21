@@ -272,7 +272,7 @@ bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, si
 
 	// on ajoute le root
 	this->_servers[index_server].upload_store_server.insert(0, this->_servers[index_server].root_server);
-	std::cout << "upload store = " << this->_servers[index_server].upload_store_server << std::endl;
+	// std::cout << "upload store = " << this->_servers[index_server].upload_store_server << std::endl;
 
 	if (stat(this->_servers[index_server].upload_store_server.c_str(), &buffer) == -1)
 		throw Error(52, "Error, in 'upload_store' directive , the folder doesn't exist!", 1);
