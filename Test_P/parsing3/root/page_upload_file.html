@@ -4,24 +4,95 @@
 	<head>
 		<title>Hello Webserv</title>
 		<style>body { background-color: rgb(105, 140, 238) }
-			h1 { font-size:2cm; text-align: center; color: rgb(121, 219, 56);
+			h1 { font-size:1cm; text-align: center; color: rgb(121, 219, 56);
 			text-shadow: 0 0 2mm red}
 		</style>
 		<link rel="icon" type="image/x-con" href="/flavicon.ico"/><link rel="shortcut icon" type="image/x-con" href="/flavicon.ico" />
 	</head>
 
 	<body>
-		<h1>Cette page va vous permettre d'uploader des fichiers</h1>
+		<h1>Cette page va vous permettre d'uploader des fichiers<br /></h1>
 
+
+		<h2>Test 1 : </h2>
 		<p>On va uploader un fichier dans le bloc http,
 			car la directive 'upload_store' est setup, POST aussi
-			et action="" donc on enregistre dans le upload_store du root.
+			donc on enregistre dans le upload_store du root.
+		
+		<form enctype="multipart/form-data" action="" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>
+
+		Vous pouvez verifier, le fichier est present. D'ailleurs, reessayez une deuxieme fois, vous allez
+		avoir une erreur =) <br />
+		</p>
+
+		<h2>Test 2 : </h2>
+		<p>On va uploader un fichier dans le bloc location 'Hello'.
+			Dans ce bloc, la directive 'upload_store' est setup, POST aussi
+			donc on enregistre dans le upload_store du bloc location.
 		
 		<form enctype="multipart/form-data" action="Hello" method="POST">
 			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
 			<input type="submit" value="upload_file" />
 			</p>
-		</form>	
+		</form>
+
+		Vous pouvez verifier, le fichier est present. <br />
+		</p>
+
+		<h2>Test 3 : </h2>
+		<p>On va uploader un fichier dans le bloc location 'Hello2.
+			Dans ce bloc, la directive 'upload_store' n'est pas setup, 
+			donc on ne peut pas enregistrer alors on va avoir une erreur.
+		
+		<form enctype="multipart/form-data" action="Hello2" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>
+		</p>
+
+		<h2>Test 4 : </h2>
+		<p>On va uploader un fichier dans un bloc qui n'existe pas, genre 'trucrelou'.
+			Donc on va avoir une erreur.
+
+		<form enctype="multipart/form-data" action="trucrelou" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>
+		</p>
+
+
+		<h3><br>Courage encore deux derniers tests...</h3>
+		<h2>Test 5: </h2>
+		<p>Ok, maintenant on va uploader un fichier dans le bloc 'Hello' mais 
+			dans un dossier different de 'upload_store', par example 'errors'.
+			Donc on va quand meme avoir une erreur.
+		</p>
+		<form enctype="multipart/form-data" action="Hello/errors" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>
+
+		<h2>Test 6: </h2>
+		<p>C'est cool tout fonctionne, mais on veut de la musique donc choisissez
+			le fichier mp3, c'est moi qui joue de la guitare.
+			On va le uploader dans le root mais la taille de 'client_max_body_size'
+			n'est pas assez grande. On va donc avoir une erreur.
+		</p>
+		<form enctype="multipart/form-data" action="" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>
+
+		<p>Dernier petit test, augmentez la taille de 'client_max_body_size' et ca marchera.
+			N'oubliez pas de relancer le server ^^ ahahah.
 		</p>
 
 		
