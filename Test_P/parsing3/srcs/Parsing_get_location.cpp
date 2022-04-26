@@ -86,7 +86,7 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 				return (0);
 			i += 2;
 		}
-		else if (scope_location[i] == "client_body_buffer_size")
+		else if (scope_location[i] == "client_max_body_size")
 		{
 			if (this->ft_find_buffer_size_location(i, scope_location, index_server, index_location))
 				return (0);
@@ -219,7 +219,7 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 
 /*
 **	ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
-**		This function will check the information given in the 'client_body_buffer_size' directive from a location block.
+**		This function will check the information given in the 'client_max_body_size' directive from a location block.
 **		The information given is between 8000 (8k) and 16000 (16k) maximum.
 **		The information will be used for the 'POST' command.
 **
@@ -236,12 +236,12 @@ bool			Parsing::ft_find_buffer_size_location( size_t k, std::vector<std::string>
 	while (isdigit(tmp[k][i]))
 		i++;
 	if (i == 0)
-		throw Error(57, "Error, in 'client_body_buffer_size' directive, it should only be digits.", 1);
+		throw Error(57, "Error, in 'client_max_body_size' directive, it should only be digits.", 1);
 	if (tmp[k][i] == 'k' && tmp[k][i + 1] == ';' && i + 1 == tmp[k].size() - 1 && tmp[k][i + 2] == '\0')
 	{
 		buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
 		if (buffer_size < 8 || buffer_size > 16)
-			throw Error(58, "Error, in 'client_body_buffer_size' directive, buffer size must be between 8k and 16k.", 1);
+			throw Error(58, "Error, in 'client_max_body_size' directive, buffer size must be between 8k and 16k.", 1);
 		this->_servers[index_server].location[index_location].buffer_size_location = buffer_size * 1000;
 	}
 	else
@@ -250,11 +250,11 @@ bool			Parsing::ft_find_buffer_size_location( size_t k, std::vector<std::string>
 		{
 			buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
 			if (buffer_size < 8000 || buffer_size > 16000)
-				throw Error(59, "Error, in 'client_body_buffer_size' directive, buffer size must be between 8000 and 16000.", 1);
+				throw Error(59, "Error, in 'client_max_body_size' directive, buffer size must be between 8000 and 16000.", 1);
 			this->_servers[index_server].location[index_location].buffer_size_location = buffer_size;
 		}
 		else
-			throw Error(60, "Error, in 'client_body_buffer_size' directive, informations are corrupted.", 1);
+			throw Error(60, "Error, in 'client_max_body_size' directive, informations are corrupted.", 1);
 	}
 	return (false);
 }

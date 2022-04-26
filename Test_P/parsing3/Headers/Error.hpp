@@ -118,10 +118,10 @@ class Error: public std::exception
 							=	55	==> in 'cgi_path' directive, it should start with './'.
 							=	56	==>	in 'cgi_path' directive, the folder doesn't exist!
 
-							=	57	==>	in 'client_body_buffer_size' directive, it should only be digits.
-							=	58	==>	in 'client_body_buffer_size' directive, buffer size must be between 8k and 16k.
-							=	59	==>	in 'client_body_buffer_size' directive, buffer size must be between 8000 and 16000.
-							=	60	==>	in 'client_body_buffer_size' directive, informations are corrupted.
+							=	57	==>	in 'client_max_body_size' directive, it should only be digits.
+							=	58	==>	in 'client_max_body_size' directive, buffer size must be between 8k and 16k.
+							=	59	==>	in 'client_max_body_size' directive, buffer size must be between 8000 and 16000.
+							=	60	==>	in 'client_max_body_size' directive, informations are corrupted.
 
 							=	61	==>	a bloc server cannot have another bloc server inside.
 

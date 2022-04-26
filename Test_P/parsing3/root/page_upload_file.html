@@ -14,34 +14,15 @@
 		<h1>Cette page va vous permettre d'uploader des fichiers</h1>
 
 		<p>On va uploader un fichier dans le bloc http,
-			car la directive est 'upload_store' est setup.
-			Et la method POST aussi. kek </p>
+			car la directive 'upload_store' est setup, POST aussi
+			et action="" donc on enregistre dans le upload_store du root.
 		
-		<form enctype="multipart/form-data" action="" method="POST">
+		<form enctype="multipart/form-data" action="Hello" method="POST">
 			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
 			<input type="submit" value="upload_file" />
 			</p>
 		</form>	
-
-		<p>On va uploader un fichier dans le dossier 'Hello' ,
-			car la directive est 'upload_store' est setup.
-			Et la method POST aussi. kek </p>
-		
-		<form action="/Hello" enctype="multipart/form-data" action="" method="POST">
-			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
-			<input type="submit" value="upload_file" />
-			</p>
-		</form>	
-
-
-		<p>On va uploader un fichier dans le  'Hello2' ,
-			mais il y aura une erreur car la directive n'est pas setup. </p>
-		
-		<form action="/Hello2" enctype="multipart/form-data" action="" method="POST">
-			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
-			<input type="submit" value="upload_file" />
-			</p>
-		</form>	
+		</p>
 
 		
 	

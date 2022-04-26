@@ -161,7 +161,7 @@ bool                            Parsing::ft_check_server( void )
 **  ft_check_semicolon():
 **      This function will check if after a directive, there is a semi colon at the end.
 **      It will only checks the following directives:
-**          listen / server_name / index / autoindex / root / client_body_buffer_size / cgi_path / upload_store
+**          listen / server_name / index / autoindex / root / client_max_body_size / cgi_path / upload_store
 **
 **  ==> Returns 0 if there is no error, otherwise returns 1.
 */
@@ -175,7 +175,7 @@ bool                            Parsing::ft_check_semicolon( void )
 	directives.push_back("index");
 	directives.push_back("autoindex");
 	directives.push_back("root");
-	directives.push_back("client_body_buffer_size");
+	directives.push_back("client_max_body_size");
 	directives.push_back("cgi_path");
 	directives.push_back("upload_store");
 	directives.push_back("index");

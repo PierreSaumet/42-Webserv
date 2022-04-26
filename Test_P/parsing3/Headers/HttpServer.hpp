@@ -59,6 +59,18 @@ class HttpServer {
 
 		}						t_client_socket;
 
+		typedef struct			s_recv_data {
+
+			std::string			method;			// post ou get
+			size_t				pos_end_header;	// post ou get
+			std::string			content_length;
+			std::string			content_type;
+			std::string			boundary;
+			std::string			size_body;
+			std::string			size_header;
+		}						t_recv_data;
+
+
 		typedef struct 			s_header_request {
 
 			std::string			method;				// Get Delete ou Post
@@ -69,6 +81,7 @@ class HttpServer {
 			std::string			path_http;			// le path total du fichier demande.
 			std::string			query_string;		// les valeur donnees dans l'url pour une requete get
 			std::string			cgi_return;			// string contenant les donnees provenant du cgi
+			std::string			referer;
 			std::string			request_uri;		// path du file php plus les donnes de get  ( GET SEUELENT);
 			std::string			content_type;		// suelement post
 			std::string			content_length;		// seulement post
@@ -116,6 +129,7 @@ class HttpServer {
 
 		/*	Functions used to get information from the header of a request.
 		*/
+		std::string		ft_check_referer( std::string request_http );
 		std::string		ft_check_path_header( std::string header) ;
 		std::string		ft_check_protocol_header( std::string header );
 		std::string		ft_check_host_header( std::string header );
@@ -126,6 +140,8 @@ class HttpServer {
 		std::string		ft_check_content_type( std::string request_http );
 		std::string		ft_check_body_post( std::string request_http );
 		std::string		ft_setup_header( void );
+
+		size_t			ft_check_access_location( std::string path );
 
 		std::string::iterator ft_find_end_header( std::string request_http );
 
@@ -178,7 +194,10 @@ class HttpServer {
 		static int			int_signal;
 		static void			handler_signal( int num );
 
-		
+		// ICI nouveau lyundi 24 
+		size_t				ft_check_recv_complete(std::string tt_buffer);
+		void				ft_test_display_recv( void );
+
 
 	private:
 		Parsing				*_data;
@@ -194,6 +213,9 @@ class HttpServer {
 		std::vector<t_client_socket>	_all_client_socket;	// va posseder toutes les conenctions. peut etre mettre en list
 		int								_return_select;
 		std::string						_HTTP_RESPONSE;
+
+		t_recv_data						_recv_complete;
+		std::string						_TOTAL_BUFFER;
 
 		std::vector<t_header_request>		_header_requete;
 

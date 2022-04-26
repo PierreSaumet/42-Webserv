@@ -39,10 +39,10 @@ DIRECTIVES:
 				Specifies a directory to which output files will be saved to.
 		ex:		upload_store	./upload
 	
-	- client_body_buffer_size:	On trouve cette directive dans server et location
+	- client_max_body_size:	On trouve cette directive dans server et location
 				Sets buffer size for reading client request body.
-		ex:		client_body_buffer_size		8000;
-				client_body_buffer_size		16k;
+		ex:		client_max_body_size		8000;
+				client_max_body_size		16k;
 	
 	- cgi_path:	N'est pas une vraie directive, on trouve cette 'directive' dans 'server'
 				Specifies a directory to find the cgi.
@@ -58,7 +58,7 @@ DIRECTIVES:
 	index 
 	
 	upload_store
-	client_body_buffer_size
+	client_max_body_size
 	cgi_path
 	autoindex
 	rajouter index ? 

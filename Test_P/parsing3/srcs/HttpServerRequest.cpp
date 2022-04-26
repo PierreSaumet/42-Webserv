@@ -48,10 +48,11 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 	std::cout << "\nDans ft_parser_requete: " << std::endl;
 
 	std::string request_http(msg);
-	std::cout << "Contenu de la requete = " << request_http << std::endl;
+	// std::cout << "Contenu de la requete = " << request_http << std::endl;
 	std::cout << "taille de la requete = " << request_http.length() << std::endl;
 	std::cout << "\n" << std::endl;
-
+	// sleep(5);
+	// sleep(10);
 	if (request_http.compare(0, 4, "GET ") == 0)
 	{
 		this->ft_get(request_http, len_msg);
@@ -140,6 +141,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			{
 				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
 				std::cout << "on doit sortir une erreur 500" << std::endl;
+				
 				sleep(2);
 				return (1);
 			}
@@ -471,6 +473,76 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>200</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File Already uploaded =)</h1><p>by Pierre.</p></body></html>";				
 				this->_header_requete[0].num_error = 200;
 			}
+			else if (ret == 400)
+			{
+				this->_header_requete[0].error = true;
+				this->_header_requete[0].num_error = 400;
+				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+					return ;
+				else
+				{
+					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+					std::cout << "on doit sortir une erreur 400" << std::endl;
+					sleep(2);
+					return ;
+				}
+			}
+			else if (ret == 403)
+			{
+				this->_header_requete[0].error = true;
+				this->_header_requete[0].num_error = 403;
+				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+					return ;
+				else
+				{
+					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+					std::cout << "on doit sortir une erreur 403" << std::endl;
+					sleep(2);
+					return ;
+				}
+			}
+			else if (ret == 413)
+			{
+				this->_header_requete[0].error = true;
+				this->_header_requete[0].num_error = 413;
+				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+					return ;
+				else
+				{
+					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+					std::cout << "on doit sortir une erreur 413" << std::endl;
+					sleep(2);
+					return ;
+				}
+			}
+			else if (ret == 431)
+			{
+				this->_header_requete[0].error = true;
+				this->_header_requete[0].num_error = 431;
+				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+					return ;
+				else
+				{
+					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+					std::cout << "on doit sortir une erreur 431" << std::endl;
+					sleep(2);
+					return ;
+				}
+			}
+			else if (ret == 404)
+			{
+				this->_header_requete[0].error = true;
+				this->_header_requete[0].num_error = 404;
+				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+					return ;
+				else
+				{
+					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+					std::cout << "on doit sortir une erreur 404" << std::endl;
+					sleep(2);
+					return ;
+				}
+			}
 			else if (ret == 500)
 			{
 				this->_header_requete[0].cgi = true;
@@ -720,30 +792,13 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 {
 	std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
-	std::cout << "request_http = " << request_http << std::endl;
+	// std::cout << "request_http = " << request_http << std::endl;
 	std::cout << "len_msg = " << len_msg << std::endl;
-
+	// sleep(5);
 	// exit(1);
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
-		if (ft_check_method_allowed_header(request_http, "POST") == 1)				// On verifie que la methode est autorisee
-		{
-			std::cout << RED << "La methode POST est interdite donc on sort une erreur 405" << CLEAR << std::endl;
-			this->_header_requete[0].error = true;
-			this->_header_requete[0].num_error = 405;
-			if (this->ft_setup_error_header(request_http, len_msg) == 0)
-				return (0);
-			else
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				sleep(2);
-				return (1);
-			}
-		}
-		std::cout << BLUE << "La methode POST est autorisee, on continue." << CLEAR << std::endl;
-
 		size_t pos_hea = request_http.find("\r\n\r\n");
 		std::string size_header(request_http, 0, pos_hea);
 		if (size_header.size() > 1023)	// on verifie que le header ne soit pas trop long
@@ -768,9 +823,9 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		//	si c'est trop grand retourner une erreur 
 		// a terminer
 		std::string size_body(request_http, size_header.size(), request_http.size());		// on prend aussi le \r\n\r\n donc +4
-		std::cout << "euh size_body = -" << size_body << "-"<< std::endl;
+		// std::cout << "euh size_body = -" << size_body << "-"<< std::endl;
 		std::cout << "et taille body = " << size_body.size() << std::endl;
-		
+		sleep(3);
 		// exit(1);
 		// if (FT_FONCTION A FAIRE ())
 		// REGARDE LE LOCATION ET OU SERVER
@@ -790,8 +845,37 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		this->_header_requete[0].path = this->ft_check_path_header(size_header);
 		if (this->_header_requete[0].path.empty() == true)
 			throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
-		std::cout << "\nOn a le path : " << this->_header_requete[0].path << std::endl;
+		std::cout << "\nOn a le path : " << this->_header_requete[0].path << "\n" <<  std::endl;
 		
+		this->_header_requete[0].referer = this->ft_check_referer(size_header);
+		if (this->_header_requete[0].referer.empty() == true)
+		{
+			std::cout << "ERREUR " << std::endl;
+			exit(1);
+		}
+		std::cout << "\nOn a le referer : " << this->_header_requete[0].referer << "\n" <<  std::endl;
+
+
+		// des qu'on a le path on verifie la method
+		if (ft_check_method_allowed_header(this->_header_requete[0].path, "POST") == 1)				// On verifie que la methode est autorisee
+		{
+			std::cout << RED << "La methode POST est interdite donc on sort une erreur 405" << CLEAR << std::endl;
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 405;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
+				sleep(2);
+				return (1);
+			}
+		}
+		std::cout << BLUE << "La methode POST est autorisee, on continue." << CLEAR << std::endl;
+
+
+
 		this->ft_parsing_path_get_request();
 		std::cout << "\nOn a la query_string : " << this->_header_requete[0].query_string << std::endl;
 
@@ -819,6 +903,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			throw Error(16, "Error, in recieved header, the path of the file is not correct." , 2);
 		std::cout << "\nOn a le path = -" << this->_header_requete[0].path_http << "-" <<  std::endl;
 		
+		// exit(1);
 
 		this->_header_requete[0].content_length = this->ft_check_content_length(size_header);
 		if (this->_header_requete[0].content_length.empty() == true)
@@ -831,6 +916,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		}
 
 		std::cout << "\nOn a le content_length = -" << this->_header_requete[0].content_length << "-" <<  std::endl;
+		sleep(5);
 		// si body 0 genre un fichier avec 0 droit ex chmod 000
 		if (this->_header_requete[0].content_length == "0")
 		{
@@ -954,7 +1040,7 @@ std::string		HttpServer::ft_check_content_length( std::string request_http )
 	{
 		size_t pos_end = request_http.find("\r\n", pos);
 		std::string tmp(request_http, pos + 16, pos_end - (pos + 16));
-		// std::cout << "tmp = -" << tmp << "-" << std::endl;
+		
 		return (tmp);
 	}
 }

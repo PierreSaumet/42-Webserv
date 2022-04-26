@@ -210,6 +210,7 @@ void	HttpServer::ft_handle_connections( void )
 		FD_SET(it_b_client->client_socket, &this->_write_fs);
 	}
 	// 4 ) select ? 
+	// std::cout << "FD_SETSIZE = " << FD_SETSIZE << std::endl;
 	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0 && int_signal == 0)
 	{
 		// il faut fermer les socket ? tous les sockets < ==========================================
@@ -362,6 +363,120 @@ int 		HttpServer::ft_test_writing( void )
 	return (0);
 }
 
+
+size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
+{
+	// std::cout << GREEN << "Dans ft_check_recv_complete : " << CLEAR << std::endl;
+
+	// std::cout << "BUFFER = " << tt_buffer << std::endl;
+	// std::cout << "test recv complete " << this->_recv_complete.method << std::endl;
+	// sleep(5);
+	size_t pos = tt_buffer.find("POST");
+	if (pos != std::string::npos)
+	{
+		// std::cout << "YES POST " << std::endl;
+		this->_recv_complete.method = "POST";
+
+		// On cherche Content-type
+		pos = tt_buffer.find("Content-Type: ");
+		if (pos == std::string::npos)
+		{
+			std::cout << "Erreur ne trouve pas Content-TYPE dans post" << std::endl;
+			exit(1);
+		}
+		size_t pos_2 = tt_buffer.find(";", pos);
+		if (pos_2 == std::string::npos)
+		{
+			std::cout << "Erreur ne trouve pas ';' apres le content type;" << std::endl;
+			exit(1);
+		}
+
+		std::string tmp(tt_buffer, pos + 14, pos_2 - (pos + 14));
+		// std::cout << "TMP = " << tmp << std::endl;
+		this->_recv_complete.content_type = tmp;
+		
+		tmp = "";
+		pos = pos_2;
+		pos_2 = tt_buffer.find("\r\n", pos);
+		if (pos_2 == std::string::npos)
+		{
+			std::cout << "Erreur ne trouve pas la fin de la ligne de content-type" << std::endl;
+			exit(1);
+		}
+		this->_recv_complete.boundary.insert(0, tt_buffer, pos + 2, pos_2 - pos - 2);
+		if (this->_recv_complete.boundary.find("boundary") == std::string::npos)
+		{
+			std::cout << "ne trouve pas boundary donc erruer " << std::endl;
+			exit(1);
+		}
+		this->_recv_complete.boundary.erase(0, 9);
+		// std::cout << "this->_recv_complete.boundary = " << this->_recv_complete.boundary << std::endl;
+
+		// on va compter le nombre de voir boundary
+		pos = tt_buffer.find(this->_recv_complete.boundary);
+		size_t count = 0;
+		while (pos != std::string::npos)
+		{
+			pos += 1;
+			count++;
+			pos = tt_buffer.find(this->_recv_complete.boundary, pos);
+		}
+		// std::cout << "COUNT = " << count << std::endl;
+
+		if (count < 3)
+			return (0);
+		else
+		{
+			std::cout << "PUTAIN BINGO" << std::endl;
+			// exit(1);
+			return (1);
+		}
+
+		// exit(1);
+	}
+	pos = tt_buffer.find("GET");
+	if (pos != std::string::npos)
+	{
+		std::cout << "YES GET " << std::endl;
+		this->_recv_complete.method = "GET";
+		// 
+		pos = tt_buffer.find("\r\n\r\n");
+		if (pos == std::string::npos)
+		{
+			std::cout << "ERREUR GET NE TROUVE PAS de header" << std::endl;
+			exit(1);
+		}
+		this->_recv_complete.pos_end_header = pos;
+		std::cout << "TAILLE DU HEADER = " << this->_recv_complete.pos_end_header << std::endl;
+
+		pos += 1;
+		pos = tt_buffer.find("\r\n\r\n");
+		if (pos == std::string::npos)
+		{
+			std::cout << "ERREUR GET BODY" << std::endl;
+			exit(1);
+		}
+
+		std::cout << "REQUETE GET BON ? " << std::endl;
+		return (1);
+
+	}
+	std::cout << "NI GET NI POST" << std::endl;
+	return (0);
+}
+
+void		HttpServer::ft_test_display_recv( void )
+{
+	std::cout << "\n\nDISPLAY DATA \n" << std::endl;
+	std::cout << this->_recv_complete.method << std::endl;
+	std::cout << this->_recv_complete.pos_end_header  << std::endl;
+	std::cout << this->_recv_complete.content_length  << std::endl;
+	std::cout << this->_recv_complete.size_body  << std::endl;
+	std::cout << this->_recv_complete.size_header  << std::endl;
+	std::cout << "\n\n";
+}
+
+
 /*
 *	**	Testing writing
 */
@@ -372,41 +487,124 @@ int		HttpServer::ft_test_reading( void )
 
 
 	// test avec un buffer plus petit
-	char buffer[1024];
+	char buffer[10240 + 1];
 	std::string	tt_buffer;
 
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
 		if (FD_ISSET(it_b_client->client_socket, &this->_read_fs))
 		{
-			memset((char *)buffer, 0, 1024 + 1);
+			memset((char *)buffer, 0, 10240 + 1);
 			int request_length;
-			std::string	tt_buffer;
+			// std::string	tt_buffer;
 
-			size_t error = 0;
-			while (1)
+
+			if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) <= 0)
 			{
-				memset((char *)buffer, 0, 1024 + 1);
-				if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) < 0)
+				if (request_length == -1)
 				{
-					// error = 1;
-					break ;
+					std::cout << "ERREUR RECV = -1 \t: " << request_length << std::endl;
+					std::cout << " on close le client et on continue" << std::endl;
+					FD_CLR(it_b_client->client_socket, &this->_read_fs);
+					close(it_b_client->client_socket);
+					it_b_client = this->_all_client_socket.erase(it_b_client);
+					std::cerr << strerror(errno) << std::endl;
+					exit(1);
 				}
 				else
 				{
-					tt_buffer.append(buffer, request_length);
+					std::cout << "La connection est fermee avc le client dans recv" << std::endl;
+					FD_CLR(it_b_client->client_socket, &this->_read_fs);
+					close(it_b_client->client_socket);
+					it_b_client = this->_all_client_socket.erase(it_b_client);
+					std::cerr << strerror(errno) << std::endl;
+					continue ;
 				}
 			}
-			if (error == 1)
+			_TOTAL_BUFFER.append(buffer, request_length);
+			// std::cout << "request_elgnth = " << request_length << std::endl;
+
+
+			// std::cout << "MAX size de tt_buffer " << std::endl;
+			// std::cout << _TOTAL_BUFFER.max_size() << std::endl;
+			// std::cout << "\n\n" << std::endl;
+
+			// donc maintenant il faut regarder si on a tout recu...
+			// pour sela il faut parser le header et compter la taille... 
+			//	si on est post, si on est content-length et trouver les boundaray
+			//	si on est post et chunk
+			//	si tout est bon alors on this->ft_parser_requete
+
+			// std::cout << "\t on a bien recu une demande on va parser la requete..." << std::endl;
+			// std::cout << "sorti de la boucle et this->_return_select = " << this->_return_select << std::endl;
+			// std::cout << "tt_bufffer size = " << tt_buffer.size() << std::endl;
+			// sleep(2);
+			// exit(1);
+
+			if (ft_check_recv_complete(_TOTAL_BUFFER) == 1)
 			{
-				std::cout << "Mince error " << std::endl;
-				exit(1);
+
+				this->ft_parser_requete(_TOTAL_BUFFER.size() , _TOTAL_BUFFER);
+				// on clear la structure
+				// go en faire une fonction
+				this->_recv_complete.method = "";
+				this->_recv_complete.pos_end_header = 0;
+				this->_recv_complete.content_length = "";
+				this->_recv_complete.size_body = "";
+				this->_recv_complete.size_header = "";
+				_TOTAL_BUFFER.clear();
 			}
 			else
-			{
-				std::cout << "\t on a bien recu une demande on va parser la requete..." << std::endl;
-				this->ft_parser_requete(tt_buffer.size() , tt_buffer);
-			}
+				std::cout << "ft_check_recv == 0" << std::endl;
+
+			this->_recv_complete.method = "";
+			this->_recv_complete.pos_end_header = 0;
+			this->_recv_complete.content_length = "";
+			this->_recv_complete.size_body = "";
+			this->_recv_complete.boundary = "";
+			this->_recv_complete.content_type = "";
+			this->_recv_complete.size_header = "";
+
+
+
+			// ft_test_display_recv();
+			// std::cout << "ICI POUR VOIR " << std::endl;
+			// std::cout << "test recv complete apres fomctipmn " << this->_recv_complete.method << std::endl;
+			// sleep(5);
+
+			// while (1)
+			// {
+			// 	memset((char *)buffer, 0, 4096 + 1);
+			// 	std::cout << "dans boucle while(1) et this->_return_select = " << this->_return_select << "\n" <<  std::endl;
+			// 	if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) < 0)
+			// 	{
+			// 		std::cout << "request_length = -1 ? " << request_length << std::endl;
+			// 		FD_CLR(it_b_client->client_socket, &this->_read_fs);
+			// 		close(it_b_client->client_socket);
+			// 		it_b_client = this->_all_client_socket.erase(it_b_client);
+			// 		std::cerr << strerror(errno) << std::endl;
+			// 		exit(1);
+			// 		break ;
+			// 	}
+			// 	else
+			// 	{
+			// 		std::cout << "request_length = " << request_length << std::endl;
+			// 		tt_buffer.append(buffer, request_length);
+			// 		if (request_length == 0)
+			// 		{
+			// 			std::cout << "request_lenght = 0 :" << request_length << std::endl;
+			// 			sleep(5);
+			// 			break ;
+			// 		}
+			// 	}
+			// }
+			// std::cout << "\t on a bien recu une demande on va parser la requete..." << std::endl;
+			// std::cout << "sorti de la boucle et this->_return_select = " << this->_return_select << std::endl;
+			// std::cout << "tt_bufffer size = " << tt_buffer.size() << std::endl;
+			// sleep(3);
+			// // exit(1);
+			// this->ft_parser_requete(tt_buffer.size() , tt_buffer);
+		
 		}
 	}
 	return (0);
@@ -429,12 +627,12 @@ int		HttpServer::ft_test_main_loop_server( void )
 				this->ft_verifier_ensemble_isset();
 				if (this->ft_test_reading() == 1)
 				{
-					std::cout << "test_reading return 1" << std::endl;			// Erreur a changer 
+					std::cout << "test_reading return -1" << std::endl;			// Erreur a changer 
 					return (1);
 				}
 				if (this->ft_test_writing() == 1)								// Erreur a changer
 				{
-					std::cout << "test_writing return 1" << std::endl;
+					std::cout << "test_writing return -1" << std::endl;
 					return (1);
 				}
 			}		    

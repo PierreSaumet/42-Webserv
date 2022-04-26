@@ -1,21 +1,10 @@
-Constructor avec argument 
-[1;32mParsing is terminated[0m
-[1;32m Le server: SERVER1 tourne sur le port : 8080[0m
-
-Dans la boucle principale
-signal = 0
-[1;32mnouvelle connection client numero: 4 avec le server [0m
-Un nouveau client a ete ajoute, total de client = 1
-	 on a bien recu une demande on va parser la requete...
-
-Dans ft_parser_requete: 
-Contenu de la requete = POST / HTTP/1.1
+POST /page_upload_file.html HTTP/1.1
 Host: 127.0.0.1:8080
 User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:99.0) Gecko/20100101 Firefox/99.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
 Accept-Language: en-US,en;q=0.5
 Accept-Encoding: gzip, deflate, br
-Referer: http://127.0.0.1:8080/
+Referer: http://127.0.0.1:8080/page_upload_file.html
 Origin: http://127.0.0.1:8080
 Connection: keep-alive
 Upgrade-Insecure-Requests: 1
@@ -24,51 +13,26 @@ Sec-Fetch-Mode: navigate
 Sec-Fetch-Site: same-origin
 Sec-Fetch-User: ?1
 
-taille de la requete = 512
 
-
-[1;32mDans ft_POST: [0m
-request_http = POST / HTTP/1.1
+POST /page_upload_file.html HTTP/1.1
 Host: 127.0.0.1:8080
 User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:99.0) Gecko/20100101 Firefox/99.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
 Accept-Language: en-US,en;q=0.5
 Accept-Encoding: gzip, deflate, br
-Referer: http://127.0.0.1:8080/
+Content-Type: multipart/form-data; 
+---------------------------
+---------------------------366411429239792344411524946370
+Content-Length: 3971001
 Origin: http://127.0.0.1:8080
 Connection: keep-alive
+Referer: http://127.0.0.1:8080/page_upload_file.html
 Upgrade-Insecure-Requests: 1
 Sec-Fetch-Dest: document
 Sec-Fetch-Mode: navigate
 Sec-Fetch-Site: same-origin
 Sec-Fetch-User: ?1
 
-len_msg = 512
-il y a des locations : 2
-affiche le nom de la location : /Hello
-affiche le nom de la location : /Hello2
-on va chercher dans le root
- la method est autorisee dans root 
-[1;34mLa methode POST est autorisee, on continue.[0m
-euh size_body = --
-et taille body = 0
-capacity en bite = 15
-length = 0
-[1;34mOk pas d'erreur 431 ou d'erreur 405 donc on continue.[0m
-
-On a la requete : POST-
-
-On a le path : /
-[1;32mDans ft_parsing_path_get_request : [0m
-	Il n'y a pas de donnees a parser dans parsing ft_parsing_path_get_request.
-
-On a la query_string : 
-
-On a le protocol : HTTP/1.1-
-
-On a le host : 127.0.0.1:8080-
-
-On a le accept = text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
-
-On a le path = -/home/user42/Documents/My_Github/webserv2/Test_P/parsing3/root/-
-Erreur dans POST le header n'a pas Content-Length
+-----------------------------366411429239792344411524946370
+Content-Disposition: form-data; name="uploadfile"; filename="jain_makeba.mp3"
+Content-Type: audio/mpeg

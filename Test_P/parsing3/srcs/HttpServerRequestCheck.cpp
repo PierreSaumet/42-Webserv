@@ -12,6 +12,14 @@
 
 #include "../Headers/HttpServer.hpp"
 
+size_t			HttpServer::ft_check_access_location( std::string path )
+{
+	std::cout << GREEN << "Dans ft_check_access location " << CLEAR << std::endl;
+	std::cout << "path = " << path << std::endl;
+
+	return (0);
+}
+
 
 std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 {
@@ -78,6 +86,7 @@ std::string		HttpServer::ft_check_accept_header( std::string header )
 		std::cout << RED << "dans ft_check_accpet, ne trouve pas ACCEPT: dans le header de la requete" << CLEAR << std::endl;
 		return ("");
 	}
+	else
 	{
 		size_t	pos_end = header.find("\r\n", pos);
 		if (pos_end == std::string::npos)
@@ -93,7 +102,21 @@ std::string		HttpServer::ft_check_accept_header( std::string header )
 	}
 }
 
-
+std::string		HttpServer::ft_check_referer( std::string request_http )
+{
+	size_t pos = request_http.find("Referer: ");
+	if (pos == std::string::npos)
+		return ("");
+	size_t pos_end = request_http.find("\r\n", pos);
+	if (pos_end == std::string::npos)
+		return ("");
+	std::string tmp(request_http, pos + 9, pos_end - (pos + 9));
+	
+	pos_end = tmp.find_last_of("/");
+	tmp.erase(0, pos_end);
+	
+	return (tmp);
+}
 
 int				HttpServer::ft_check_method_allowed_header( std::string request_http, std::string method )
 {
@@ -118,7 +141,18 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 				if (tmp[tmp.size() - 1] != '/')
 					tmp.append("/");
 				std::cout << "tmp = " << tmp << std::endl;
-				if (request_http.find(tmp) != std::string::npos)
+				std::cout << "request_http = " << request_http << std::endl;
+				std::string tmp_2 = request_http;
+				tmp_2.erase(0, this->_servers[0].root_server.size());	// on enleve le root de tmp_2
+				std::cout << "tmp_2 = " << tmp_2 << std::endl;
+				// on regarde si il y a un / a la find
+				if(tmp_2[tmp_2.size() - 1] != '/')
+					tmp_2.append("/");
+				
+
+				
+				// si tmp_2.size() est egal a tmp.size() - 1 c'est bon
+				if (tmp_2.compare(0, tmp.size(), tmp) == 0)
 				{
 					std::cout << "OUI on se trouve dans un dossier location a continuer   11 " << std::endl;
 					
@@ -210,11 +244,14 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 			size_t pos_tmp = tmp.find("?");
 			std::string tmp2(tmp, 0, pos_tmp);
 			this->_header_requete[0].script_file_name = tmp2;
+			std::cout << "tmp = " << tmp << std::endl;
+			std::cout << "tmp2 = " << tmp2 << std::endl;
+			std::cout << "script file name = " << this->_header_requete[0].script_file_name << std::endl;
 			
-
 			if (tmp.size() != 1)							// on rajoute le root au debut de la string
 				tmp.insert(0, this->_servers[0].root_server);
 			return (tmp);
+			
 		}
 	}
 }
