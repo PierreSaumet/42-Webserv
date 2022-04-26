@@ -1,38 +1,20 @@
-POST /page_upload_file.html HTTP/1.1
+DANS FT_DELETE 
+REQUEST = DELETE /to_delete.txt HTTP/1.1
 Host: 127.0.0.1:8080
-User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:99.0) Gecko/20100101 Firefox/99.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate, br
-Referer: http://127.0.0.1:8080/page_upload_file.html
-Origin: http://127.0.0.1:8080
-Connection: keep-alive
-Upgrade-Insecure-Requests: 1
-Sec-Fetch-Dest: document
-Sec-Fetch-Mode: navigate
-Sec-Fetch-Site: same-origin
-Sec-Fetch-User: ?1
+User-Agent: curl/7.58.0
+Accept: */*
 
 
-POST /page_upload_file.html HTTP/1.1
+len_msg = 94
+
+
+
+
+DANS FT_DELETE 
+REQUEST = DELETE /to_delete.txt HTTP/1.1
+User-Agent: PostmanRuntime/7.29.0
+Accept: */*
+Postman-Token: c9488352-e9b4-48de-bd85-01348b6dc014
 Host: 127.0.0.1:8080
-User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:99.0) Gecko/20100101 Firefox/99.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
 Accept-Encoding: gzip, deflate, br
-Content-Type: multipart/form-data; 
----------------------------
----------------------------366411429239792344411524946370
-Content-Length: 3971001
-Origin: http://127.0.0.1:8080
 Connection: keep-alive
-Referer: http://127.0.0.1:8080/page_upload_file.html
-Upgrade-Insecure-Requests: 1
-Sec-Fetch-Dest: document
-Sec-Fetch-Mode: navigate
-Sec-Fetch-Site: same-origin
-Sec-Fetch-User: ?1
-
------------------------------366411429239792344411524946370
-Content-Disposition: form-data; name="uploadfile"; filename="jain_makeba.mp3"
-Content-Type: audio/mpeg

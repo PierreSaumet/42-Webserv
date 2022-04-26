@@ -417,6 +417,8 @@ std::string		HttpServer::ft_get_status( bool x ) const
 	{
 		if (this->_header_requete[0].num_error == 201)
 			return ("HTTP/1.1 201 Created\r\n");
+		if (this->_header_requete[0].num_error == 204)
+			return ("HTTP/1.1 204 No Content\r\n");
 		if (this->_header_requete[0].num_error == 500)
 			return ("HTTP/1.1 500 Internal Server Error\r\n");
 	}

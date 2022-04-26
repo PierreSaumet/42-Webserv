@@ -366,9 +366,9 @@ int 		HttpServer::ft_test_writing( void )
 
 size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 {
-	// std::cout << GREEN << "Dans ft_check_recv_complete : " << CLEAR << std::endl;
+	std::cout << GREEN << "Dans ft_check_recv_complete : " << CLEAR << std::endl;
 
-	// std::cout << "BUFFER = " << tt_buffer << std::endl;
+	std::cout << "BUFFER = " << tt_buffer << std::endl;
 	// std::cout << "test recv complete " << this->_recv_complete.method << std::endl;
 	// sleep(5);
 	size_t pos = tt_buffer.find("POST");
@@ -387,6 +387,9 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		size_t pos_2 = tt_buffer.find(";", pos);
 		if (pos_2 == std::string::npos)
 		{
+			// cas formulaire donc ok
+			pos_2 = tt_buffer.find("\r\n", pos);
+			return (1);
 			std::cout << "Erreur ne trouve pas ';' apres le content type;" << std::endl;
 			exit(1);
 		}
@@ -460,6 +463,12 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		std::cout << "REQUETE GET BON ? " << std::endl;
 		return (1);
 
+	}
+	pos = tt_buffer.find("DELETE");
+	if (pos != std::string::npos )
+	{
+		std::cout << "DELTE donc go" << std::endl;
+		return (1);
 	}
 	std::cout << "NI GET NI POST" << std::endl;
 	return (0);

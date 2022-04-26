@@ -141,7 +141,7 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 				if (tmp[tmp.size() - 1] != '/')
 					tmp.append("/");
 				std::cout << "tmp = " << tmp << std::endl;
-				std::cout << "request_http = " << request_http << std::endl;
+				// std::cout << "request_http = " << request_http << std::endl;
 				std::string tmp_2 = request_http;
 				tmp_2.erase(0, this->_servers[0].root_server.size());	// on enleve le root de tmp_2
 				std::cout << "tmp_2 = " << tmp_2 << std::endl;

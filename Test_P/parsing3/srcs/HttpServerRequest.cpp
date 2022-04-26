@@ -153,8 +153,8 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		// A partir d'ici, on va parser la requete et recuperer toutes les informations disponibles.
 		
 		// si pas de fin de header faire une erreur
-		size_t pos_hea = request_http.find("\r\n\r\n");
-		std::string size_header(request_http, 0, pos_hea);
+		size_t pos_header = request_http.find("\r\n\r\n");
+		std::string size_header(request_http, 0, pos_header);
 		// std::string::iterator	it_end_request = ft_find_end_header( request_http );
 		
 
@@ -1048,10 +1048,121 @@ std::string		HttpServer::ft_check_content_length( std::string request_http )
 /*
 **	A FAIRE CAS DES REQUETES DELETE
 */
-void			HttpServer::ft_delete(std::string request_http, int len_msg)
+
+#include "sys/stat.h"
+size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 {
-	(void)request_http;
-	(void)len_msg;
+	std::cout << GREEN << "DANS FT_DELETE " << CLEAR << std::endl;
+	std::cout << "REQUEST = " << request_http << std::endl;
+	std::cout << "len_msg = " << len_msg << std::endl;
+
+
+
+	if (this->_header_requete.empty() == true)
+	{
+		this->_header_requete.push_back(t_header_request());
+
+
+		// si pas de fin de header faire une erreur
+		size_t pos_header = request_http.find("\r\n\r\n");
+		std::string size_header(request_http, 0, pos_header);
+
+		// On recupere la methode
+		this->_header_requete[0].method = "DELETE";
+		std::cout << "On a la requete : " << this->_header_requete[0].method << "-" <<  std::endl;
+	
+		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
+		this->_header_requete[0].path = this->ft_check_path_header(size_header);
+		if (this->_header_requete[0].path.empty() == true)
+			throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
+		std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
+		
+		this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
+		if (this->_header_requete[0].protocol.empty() == true)
+			throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
+		std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
+
+		this->_header_requete[0].host = this->ft_check_host_header(size_header);
+		if (this->_header_requete[0].host.empty() == true)
+			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
+		std::cout << "On a le host : " << this->_header_requete[0].host << "-" << std::endl;
+
+		// exit(1);
+
+		if (ft_check_method_allowed_header(this->_header_requete[0].path, "DELETE") == 1)				// On verifie que la methode est autorisee
+		{
+			std::cout << RED << "La methode DELETE est interdite donc on sort une erreur 405" << CLEAR << std::endl;
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 405;
+			exit(1);
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
+				exit(1);
+				sleep(2);
+				return (1);
+			}
+		}
+		std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
+
+
+
+		// Donc on peut delete
+		struct stat buff;
+
+		if (stat(this->_header_requete[0].path.c_str(), &buff) != 0)		// chmod 000 677
+		{
+			// on a pas acces au fichier donc on sort une erreur 403
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 403;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				return (0);
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
+				sleep(2);
+				return (1);
+			}
+		}
+		else
+		{
+			if (remove(this->_header_requete[0].path.c_str()) != 0)
+			{
+				std::cout << "ON NE PEUT PAS SUPPRIMER" << std::endl;
+				this->_header_requete[0].error = true;
+				this->_header_requete[0].num_error = 403;
+				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+					return (0);
+				else
+				{
+					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+					std::cout << "on doit sortir une erreur 500" << std::endl;
+					sleep(2);
+					return (1);
+				}
+			}
+			else
+			{
+				std::cout << "SI ON PEUT SUPPRIMER " << std::endl;
+				this->_header_requete[0].cgi = true;
+				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>204</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File delete so No Content =)</h1><p>by Pierre.</p></body></html>";				
+				this->_header_requete[0].num_error = 204;
+				return (0);
+			}
+		}
+
+	}
+	else
+	{
+		std::cout << RED << "DELETE Probleme le container qui recupere la header de la requete n'est pas vide. " << std::endl;
+		std::cout << "Il faut le supprimer apres avoir fait traite une demande." << CLEAR << std::endl;
+	}
+	return (0);
+	exit(1);
 }
 
 

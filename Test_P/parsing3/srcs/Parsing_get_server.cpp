@@ -281,7 +281,7 @@ bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, si
 	
 	// Checks if it is a folder and if it has the good rights
 	if (S_ISDIR(buffer.st_mode))
-	{
+	{									// pareil dans locatio nje crois
 		if ((buffer.st_mode & S_IRWXU) != 448)
 			throw Error(520, "Error, in 'upload_store' directive , the folder doesn't have the good rights", 1);
 	}
