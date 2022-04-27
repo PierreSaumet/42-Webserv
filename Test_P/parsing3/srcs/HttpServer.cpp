@@ -368,117 +368,99 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 {
 	std::cout << GREEN << "Dans ft_check_recv_complete : " << CLEAR << std::endl;
 
-	std::cout << "BUFFER = " << tt_buffer << std::endl;
-	// std::cout << "test recv complete " << this->_recv_complete.method << std::endl;
-	// sleep(5);
+	// std::cout << "BUFFER = " << tt_buffer << "\n\n\n\n" << std::endl;
+
 	size_t pos = tt_buffer.find("POST");
 	if (pos != std::string::npos)
 	{
-		std::cout << "YES POST " << std::endl;
-		this->_recv_complete.method = "POST";
-
-		// return (0);
-
-
-		// On cherche Content-type
-		pos = tt_buffer.find("Content-Type: ");
-		if (pos == std::string::npos)
+		this->_recv_complete.method = "POST";	// useless
+		if (this->_recv_complete.chunked == false)	//n'a pas ete setup ou pas de chunked
 		{
-			std::cout << "Erreur ne trouve pas Content-TYPE dans post" << std::endl;
-			exit(1);
-		}
-		size_t pos_2 = tt_buffer.find(";", pos);
-		if (pos_2 == std::string::npos)		// cas ou c'est un formulaire avec POST ou transfer-encoding chunk
-		{
-			// cas formulaire donc ok  ou chunk...
-			pos_2 = tt_buffer.find("Transfer-Encoding: chunked");
-			if (pos_2 == std::string::npos)
+			pos = tt_buffer.find("Transfer-Encoding: chunked");
+			if (pos == std::string::npos)	// Les data ne sont pas Chunked
 			{
-				std::cout << "On est dans un formulaire classique avec POST" << std::endl;
-				// donc on cherche la fin de la ligne
-				pos_2 = tt_buffer.find("\r\n", pos);
-				if (pos_2 == std::string::npos )
+				pos = tt_buffer.find("Content-Type: application/x-www-form-urlencoded\r\n");	
+				if (pos == std::string::npos)		// envoie formulaire via multipart
 				{
-					std::cout << "ERREUR dans le formualrie "<< std::endl;
-					exit(1);
+					if (this->_recv_complete.boundary.empty() == true)
+					{
+						pos = tt_buffer.find("Content-Type: multipart/form-data;");
+						if (pos == std::string::npos)
+						{
+							std::cout << "Erreur requete post content-type " << std::endl;
+							exit(1);
+						}
+						else
+						{
+							size_t pos_end = tt_buffer.find("\r\n", pos);
+							std::string tmp(tt_buffer, pos + 34, pos_end - pos - 34);
+							pos = tmp.find("boundary=");
+							if (pos == std::string::npos)
+							{
+								std::cout << "Erreur requete post pas de boundary dans le formulaire multipart" << std::endl;
+								exit(1);
+							}
+							else
+							{
+								if (tmp[0] == ' ')
+									tmp.erase(0, 1);
+								tmp.erase(0, 9);
+								this->_recv_complete.boundary = tmp;
+								this->_recv_complete.boundary.append("--");
+								if (tt_buffer.find(this->_recv_complete.boundary) != std::string::npos)
+									return (1);
+								return (0);
+							}
+						}
+					}
+					else
+					{
+						if (tt_buffer.find(this->_recv_complete.boundary) != std::string::npos)
+							return (1);
+						return (0);
+					}		
 				}
-				return (1);
+				else				// envoie de formulaire par default
+				{
+					pos = tt_buffer.find("Content-Length: ");
+					if (pos == std::string::npos)
+					{
+						std::cout << "Erreur requete post content-lenght" << std::endl;
+						exit(1);
+					}
+					else
+					{
+						std::cout << "Ok good envoie de data via un formulaire" << std::endl;
+						return (1);
+					}
+				}
 			}
 			else
 			{
-				std::cout << " On est dans un transfer chunked..." << std::endl;
-				pos = tt_buffer.find("0\r\n\r\n", pos_2);
-				if (pos == std::string::npos)
+				std::cout << " On a du data chunked" << std::endl;
+				this->_recv_complete.chunked = true;
+				pos = tt_buffer.find("0\r\n\r\n");				// On cherche la fin du transfer encoding
+				if (pos == std::string::npos)					// On n'a pas la fin, on continue de recuperer de la data
 				{
-					std::cout << "pas de fin on continue" << std::endl;
+					std::cout << "On n'a pas la fin du chunked" << std::endl;
 					return (0);
 				}
 				else
-				{
-					std::cout << "fin donc bon" << std::endl;
-					this->_recv_complete.chunked = true;
-					sleep(5);
-					return (1);
-				}
-				exit(1);
+					return (1);								// On a toute la requete
 			}
-
-			pos_2 = tt_buffer.find("\r\n", pos);
-			return (1);
-			std::cout << "Erreur ne trouve pas ';' apres le content type;" << std::endl;
-			exit(1);
-		}
-
-		std::string tmp(tt_buffer, pos + 14, pos_2 - (pos + 14));
-		// std::cout << "TMP = " << tmp << std::endl;
-		this->_recv_complete.content_type = tmp;
-		
-		tmp = "";
-		pos = pos_2;
-		pos_2 = tt_buffer.find("\r\n", pos);
-		if (pos_2 == std::string::npos)
-		{
-			std::cout << "Erreur ne trouve pas la fin de la ligne de content-type" << std::endl;
-			exit(1);
-		}
-		this->_recv_complete.boundary.insert(0, tt_buffer, pos + 2, pos_2 - pos - 2);
-		if (this->_recv_complete.boundary.find("boundary") == std::string::npos)
-		{
-			std::cout << "ne trouve pas boundary donc erruer " << std::endl;
-			exit(1);
-		}
-		this->_recv_complete.boundary.erase(0, 9);
-		// std::cout << "this->_recv_complete.boundary = " << this->_recv_complete.boundary << std::endl;
-
-		// on va compter le nombre de voir boundary
-		pos = tt_buffer.find(this->_recv_complete.boundary);
-		size_t count = 0;
-		while (pos != std::string::npos)
-		{
-			pos += 1;
-			count++;
-			pos = tt_buffer.find(this->_recv_complete.boundary, pos);
-		}
-		// std::cout << "COUNT = " << count << std::endl;
-
-		if (count < 3)
-		{
-			std::cout << "count  < 3" << std::endl;
-			return (0);
-		}
-		else if (count == 3)
-		{
-			std::cout << "PUTAIN BINGO" << std::endl;
-			// exit(1);
-			return (1);
 		}
 		else
 		{
-			std::cout << "On trouve la boundary a plusieurs reprises donc erreur " << std::endl;
-			exit(1);
+			std::string tmp(tt_buffer.end() - 5, tt_buffer.end());
+			if (tmp == "0\r\n\r\n")
+			{
+				std::cout << "Les toutes les donnees chunked sont transmises." << std::endl;
+				return (1);
+			}
+			return (0);	
 		}
-		std::cout << " FIN DE POST \n\n" << std::endl;
-		// exit(1);
+		// impossible d'etre la
+		exit(1);
 	}
 	pos = tt_buffer.find("GET");
 	if (pos != std::string::npos)
@@ -611,12 +593,12 @@ int		HttpServer::ft_test_reading( void )
 			else
 				std::cout << "ft_check_recv == 0" << std::endl;
 			// Faire une fonction pour ca
-			this->_recv_complete.chunked = false;
+			// this->_recv_complete.chunked = false;
 			this->_recv_complete.method = "";
 			this->_recv_complete.pos_end_header = 0;
 			this->_recv_complete.content_length = "";
 			this->_recv_complete.size_body = "";
-			this->_recv_complete.boundary = "";
+			// this->_recv_complete.boundary = "";
 			this->_recv_complete.content_type = "";
 			this->_recv_complete.size_header = "";
 		}
