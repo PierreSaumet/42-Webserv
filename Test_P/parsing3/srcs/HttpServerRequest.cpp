@@ -635,7 +635,13 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 		}
 		if (this->_header_requete[0].content_type.compare(0, 30, "multipart/form-data; boundary=") == 0)
 		{
-			std::cout << "IL Y A DU PHP ET IL FAUT UPLOADER" << std::endl;
+			std::cout << "IL Y A DU boundary ET IL FAUT UPLOADER" << std::endl;
+			this->_header_requete[0].upload = true;
+			return (true);
+		}
+		if (this->_recv_complete.chunked == true)
+		{
+			std::cout << "Transfer chunked" << std::endl;
 			this->_header_requete[0].upload = true;
 			return (true);
 		}
@@ -848,7 +854,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		std::cout << "\nOn a le path : " << this->_header_requete[0].path << "\n" <<  std::endl;
 		
 		this->_header_requete[0].referer = this->ft_check_referer(size_header);
-		if (this->_header_requete[0].referer.empty() == true)
+		if (this->_header_requete[0].referer.empty() == true && this->_recv_complete.chunked == false)
 		{
 			std::cout << "ERREUR " << std::endl;
 			exit(1);
@@ -906,7 +912,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		// exit(1);
 
 		this->_header_requete[0].content_length = this->ft_check_content_length(size_header);
-		if (this->_header_requete[0].content_length.empty() == true)
+		if (this->_header_requete[0].content_length.empty() == true && this->_recv_complete.chunked == false)
 		{
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 411; 
@@ -999,6 +1005,8 @@ std::string		HttpServer::ft_check_body_post( std::string request_http )
 			std::cout << "tmp.size() = " << tmp.size() << std::endl;
 			std::cout << "content_length = " << this->_header_requete[0].content_length << std::endl;
 			std::cout << "ERROR size body differe de content length" << std::endl;
+			if (this->_recv_complete.chunked == true)		// chunked
+				return (tmp);
 			exit(1);
 		}
 		else

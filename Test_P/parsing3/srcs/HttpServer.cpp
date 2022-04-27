@@ -374,8 +374,11 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 	size_t pos = tt_buffer.find("POST");
 	if (pos != std::string::npos)
 	{
-		// std::cout << "YES POST " << std::endl;
+		std::cout << "YES POST " << std::endl;
 		this->_recv_complete.method = "POST";
+
+		// return (0);
+
 
 		// On cherche Content-type
 		pos = tt_buffer.find("Content-Type: ");
@@ -385,9 +388,41 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 			exit(1);
 		}
 		size_t pos_2 = tt_buffer.find(";", pos);
-		if (pos_2 == std::string::npos)
+		if (pos_2 == std::string::npos)		// cas ou c'est un formulaire avec POST ou transfer-encoding chunk
 		{
-			// cas formulaire donc ok
+			// cas formulaire donc ok  ou chunk...
+			pos_2 = tt_buffer.find("Transfer-Encoding: chunked");
+			if (pos_2 == std::string::npos)
+			{
+				std::cout << "On est dans un formulaire classique avec POST" << std::endl;
+				// donc on cherche la fin de la ligne
+				pos_2 = tt_buffer.find("\r\n", pos);
+				if (pos_2 == std::string::npos )
+				{
+					std::cout << "ERREUR dans le formualrie "<< std::endl;
+					exit(1);
+				}
+				return (1);
+			}
+			else
+			{
+				std::cout << " On est dans un transfer chunked..." << std::endl;
+				pos = tt_buffer.find("0\r\n\r\n", pos_2);
+				if (pos == std::string::npos)
+				{
+					std::cout << "pas de fin on continue" << std::endl;
+					return (0);
+				}
+				else
+				{
+					std::cout << "fin donc bon" << std::endl;
+					this->_recv_complete.chunked = true;
+					sleep(5);
+					return (1);
+				}
+				exit(1);
+			}
+
 			pos_2 = tt_buffer.find("\r\n", pos);
 			return (1);
 			std::cout << "Erreur ne trouve pas ';' apres le content type;" << std::endl;
@@ -427,14 +462,22 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		// std::cout << "COUNT = " << count << std::endl;
 
 		if (count < 3)
+		{
+			std::cout << "count  < 3" << std::endl;
 			return (0);
-		else
+		}
+		else if (count == 3)
 		{
 			std::cout << "PUTAIN BINGO" << std::endl;
 			// exit(1);
 			return (1);
 		}
-
+		else
+		{
+			std::cout << "On trouve la boundary a plusieurs reprises donc erreur " << std::endl;
+			exit(1);
+		}
+		std::cout << " FIN DE POST \n\n" << std::endl;
 		// exit(1);
 	}
 	pos = tt_buffer.find("GET");
@@ -552,10 +595,12 @@ int		HttpServer::ft_test_reading( void )
 
 			if (ft_check_recv_complete(_TOTAL_BUFFER) == 1)
 			{
-
+				std::cout << RED << "check recv return 1" << std::endl;
+				// exit(1);
 				this->ft_parser_requete(_TOTAL_BUFFER.size() , _TOTAL_BUFFER);
 				// on clear la structure
 				// go en faire une fonction
+				this->_recv_complete.chunked = false;
 				this->_recv_complete.method = "";
 				this->_recv_complete.pos_end_header = 0;
 				this->_recv_complete.content_length = "";
@@ -565,7 +610,8 @@ int		HttpServer::ft_test_reading( void )
 			}
 			else
 				std::cout << "ft_check_recv == 0" << std::endl;
-
+			// Faire une fonction pour ca
+			this->_recv_complete.chunked = false;
 			this->_recv_complete.method = "";
 			this->_recv_complete.pos_end_header = 0;
 			this->_recv_complete.content_length = "";
@@ -573,47 +619,6 @@ int		HttpServer::ft_test_reading( void )
 			this->_recv_complete.boundary = "";
 			this->_recv_complete.content_type = "";
 			this->_recv_complete.size_header = "";
-
-
-
-			// ft_test_display_recv();
-			// std::cout << "ICI POUR VOIR " << std::endl;
-			// std::cout << "test recv complete apres fomctipmn " << this->_recv_complete.method << std::endl;
-			// sleep(5);
-
-			// while (1)
-			// {
-			// 	memset((char *)buffer, 0, 4096 + 1);
-			// 	std::cout << "dans boucle while(1) et this->_return_select = " << this->_return_select << "\n" <<  std::endl;
-			// 	if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) < 0)
-			// 	{
-			// 		std::cout << "request_length = -1 ? " << request_length << std::endl;
-			// 		FD_CLR(it_b_client->client_socket, &this->_read_fs);
-			// 		close(it_b_client->client_socket);
-			// 		it_b_client = this->_all_client_socket.erase(it_b_client);
-			// 		std::cerr << strerror(errno) << std::endl;
-			// 		exit(1);
-			// 		break ;
-			// 	}
-			// 	else
-			// 	{
-			// 		std::cout << "request_length = " << request_length << std::endl;
-			// 		tt_buffer.append(buffer, request_length);
-			// 		if (request_length == 0)
-			// 		{
-			// 			std::cout << "request_lenght = 0 :" << request_length << std::endl;
-			// 			sleep(5);
-			// 			break ;
-			// 		}
-			// 	}
-			// }
-			// std::cout << "\t on a bien recu une demande on va parser la requete..." << std::endl;
-			// std::cout << "sorti de la boucle et this->_return_select = " << this->_return_select << std::endl;
-			// std::cout << "tt_bufffer size = " << tt_buffer.size() << std::endl;
-			// sleep(3);
-			// // exit(1);
-			// this->ft_parser_requete(tt_buffer.size() , tt_buffer);
-		
 		}
 	}
 	return (0);

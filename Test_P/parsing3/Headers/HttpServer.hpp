@@ -65,6 +65,7 @@ class HttpServer {
 			size_t				pos_end_header;	// post ou get
 			std::string			content_length;
 			std::string			content_type;
+			bool				chunked;
 			std::string			boundary;
 			std::string			size_body;
 			std::string			size_header;

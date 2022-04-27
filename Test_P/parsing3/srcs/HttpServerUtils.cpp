@@ -244,6 +244,12 @@ std::string				HttpServer::ft_where_to_upload( std::string path)
 size_t			HttpServer::ft_upload_file( std::string request_http )
 {
 	std::cout << GREEN << "Dans ft_upload_file : \n" << CLEAR <<  std::endl;
+	sleep(2);
+
+	std::cout << "REQUEST = " << request_http << std::endl;
+
+	sleep(5);
+	
 	size_t pos = request_http.find("filename=");				// on cherche le nom du fichier
 	if (pos == std::string::npos)
 		return (400);
