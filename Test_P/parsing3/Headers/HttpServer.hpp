@@ -61,14 +61,9 @@ class HttpServer {
 
 		typedef struct			s_recv_data {
 
-			std::string			method;			// post ou get
-			size_t				pos_end_header;	// post ou get
-			std::string			content_length;
-			std::string			content_type;
-			bool				chunked;
-			std::string			boundary;
-			std::string			size_body;
-			std::string			size_header;
+			std::string			method;				// useless
+			bool				chunked;			// oui
+			std::string			boundary;			// oui
 		}						t_recv_data;
 
 
@@ -197,7 +192,6 @@ class HttpServer {
 
 		// ICI nouveau lyundi 24 
 		size_t				ft_check_recv_complete(std::string tt_buffer);
-		void				ft_test_display_recv( void );
 
 
 	private:

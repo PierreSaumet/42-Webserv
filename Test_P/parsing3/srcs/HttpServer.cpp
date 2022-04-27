@@ -368,10 +368,10 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 {
 	std::cout << GREEN << "Dans ft_check_recv_complete : " << CLEAR << std::endl;
 
-	// std::cout << "BUFFER = " << tt_buffer << "\n\n\n\n" << std::endl;
+	std::cout << "BUFFER = " << tt_buffer << "\n\n\n\n" << std::endl;
 
-	size_t pos = tt_buffer.find("POST");
-	if (pos != std::string::npos)
+	size_t pos = 0;
+	if (tt_buffer.compare(0, 5, "POST ") == 0)
 	{
 		this->_recv_complete.method = "POST";	// useless
 		if (this->_recv_complete.chunked == false)	//n'a pas ete setup ou pas de chunked
@@ -462,54 +462,29 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		// impossible d'etre la
 		exit(1);
 	}
-	pos = tt_buffer.find("GET");
-	if (pos != std::string::npos)
+	else if (tt_buffer.compare(0, 4, "GET ") == 0)
 	{
 		std::cout << "YES GET " << std::endl;
-		this->_recv_complete.method = "GET";
-		// 
 		pos = tt_buffer.find("\r\n\r\n");
 		if (pos == std::string::npos)
 		{
 			std::cout << "ERREUR GET NE TROUVE PAS de header" << std::endl;
 			exit(1);
 		}
-		this->_recv_complete.pos_end_header = pos;
-		std::cout << "TAILLE DU HEADER = " << this->_recv_complete.pos_end_header << std::endl;
-
-		pos += 1;
-		pos = tt_buffer.find("\r\n\r\n");
-		if (pos == std::string::npos)
-		{
-			std::cout << "ERREUR GET BODY" << std::endl;
-			exit(1);
-		}
-
-		std::cout << "REQUETE GET BON ? " << std::endl;
 		return (1);
-
 	}
-	pos = tt_buffer.find("DELETE");
-	if (pos != std::string::npos )
+	else if (tt_buffer.compare(0, 7, "DELETE ") == 0)
 	{
-		std::cout << "DELTE donc go" << std::endl;
+		std::cout << "YES DELETE" << std::endl;
 		return (1);
 	}
-	std::cout << "NI GET NI POST" << std::endl;
+	else
+	{
+		std::cout << "NI GET NI POST NI DELETE doit sortir une erreur" << std::endl;
+		return (1);
+	}
 	return (0);
 }
-
-void		HttpServer::ft_test_display_recv( void )
-{
-	std::cout << "\n\nDISPLAY DATA \n" << std::endl;
-	std::cout << this->_recv_complete.method << std::endl;
-	std::cout << this->_recv_complete.pos_end_header  << std::endl;
-	std::cout << this->_recv_complete.content_length  << std::endl;
-	std::cout << this->_recv_complete.size_body  << std::endl;
-	std::cout << this->_recv_complete.size_header  << std::endl;
-	std::cout << "\n\n";
-}
-
 
 /*
 *	**	Testing writing
@@ -519,8 +494,6 @@ int		HttpServer::ft_test_reading( void )
 	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
 	std::vector<t_client_socket>::iterator it_e_client = this->_all_client_socket.end();
 
-
-	// test avec un buffer plus petit
 	char buffer[10240 + 1];
 	std::string	tt_buffer;
 
@@ -530,8 +503,6 @@ int		HttpServer::ft_test_reading( void )
 		{
 			memset((char *)buffer, 0, 10240 + 1);
 			int request_length;
-			// std::string	tt_buffer;
-
 
 			if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) <= 0)
 			{
@@ -556,51 +527,19 @@ int		HttpServer::ft_test_reading( void )
 				}
 			}
 			_TOTAL_BUFFER.append(buffer, request_length);
-			// std::cout << "request_elgnth = " << request_length << std::endl;
-
-
-			// std::cout << "MAX size de tt_buffer " << std::endl;
-			// std::cout << _TOTAL_BUFFER.max_size() << std::endl;
-			// std::cout << "\n\n" << std::endl;
-
-			// donc maintenant il faut regarder si on a tout recu...
-			// pour sela il faut parser le header et compter la taille... 
-			//	si on est post, si on est content-length et trouver les boundaray
-			//	si on est post et chunk
-			//	si tout est bon alors on this->ft_parser_requete
-
-			// std::cout << "\t on a bien recu une demande on va parser la requete..." << std::endl;
-			// std::cout << "sorti de la boucle et this->_return_select = " << this->_return_select << std::endl;
-			// std::cout << "tt_bufffer size = " << tt_buffer.size() << std::endl;
-			// sleep(2);
-			// exit(1);
 
 			if (ft_check_recv_complete(_TOTAL_BUFFER) == 1)
 			{
-				std::cout << RED << "check recv return 1" << std::endl;
 				// exit(1);
 				this->ft_parser_requete(_TOTAL_BUFFER.size() , _TOTAL_BUFFER);
-				// on clear la structure
-				// go en faire une fonction
 				this->_recv_complete.chunked = false;
+				this->_recv_complete.boundary.clear();
 				this->_recv_complete.method = "";
-				this->_recv_complete.pos_end_header = 0;
-				this->_recv_complete.content_length = "";
-				this->_recv_complete.size_body = "";
-				this->_recv_complete.size_header = "";
 				_TOTAL_BUFFER.clear();
 			}
 			else
 				std::cout << "ft_check_recv == 0" << std::endl;
-			// Faire une fonction pour ca
-			// this->_recv_complete.chunked = false;
-			this->_recv_complete.method = "";
-			this->_recv_complete.pos_end_header = 0;
-			this->_recv_complete.content_length = "";
-			this->_recv_complete.size_body = "";
-			// this->_recv_complete.boundary = "";
-			this->_recv_complete.content_type = "";
-			this->_recv_complete.size_header = "";
+			this->_recv_complete.method = "";	// useless
 		}
 	}
 	return (0);

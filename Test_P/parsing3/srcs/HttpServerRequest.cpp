@@ -48,11 +48,6 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 	std::cout << "\nDans ft_parser_requete: " << std::endl;
 
 	std::string request_http(msg);
-	// std::cout << "Contenu de la requete = " << request_http << std::endl;
-	std::cout << "taille de la requete = " << request_http.length() << std::endl;
-	std::cout << "\n" << std::endl;
-	// sleep(5);
-	// sleep(10);
 	if (request_http.compare(0, 4, "GET ") == 0)
 	{
 		this->ft_get(request_http, len_msg);
