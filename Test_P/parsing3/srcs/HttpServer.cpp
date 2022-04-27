@@ -293,6 +293,9 @@ std::string		HttpServer::ft_settup_http_response( void )
 		return (header);
 	if (this->_header_requete[0].cgi == true)
 		return (header);
+	// TEST REDIRECTIOn
+	if (this->_header_requete[0].return_used == true)
+		return (header);
 	// Sinon, on recupere le fichier demande et on ajoute header qui correspond au header.
 	input_file = fopen(this->_header_requete[0].path.c_str(), "r");
 	stat(this->_header_requete[0].path.c_str(), &sb);

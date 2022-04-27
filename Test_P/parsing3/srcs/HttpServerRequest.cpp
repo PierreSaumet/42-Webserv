@@ -13,31 +13,6 @@
 #include "../Headers/HttpServer.hpp"
 
 /*
-**	INFORMATIONS SUR CE FICHIER !
-**
-**		Ce fichier contient toutes les fonctions utilisees lorsqu'un client
-**		fait une requete au server. Il peut demander a afficher un page avec
-**		la methode GET, ou il peut poster un formulaire avec GET ou POST et
-**		supprimer quelque chose avec DELETE.
-**
-**		Toutes les fonctions ici permettent de parser, le header et le body (
-**		seulement pour la fonction POST). Elles verifient que toutes les informations
-**		concordent et genere un vector (this->_header_requete) avec ces informations.
-
-**		std::vector<t_header_request> 	_header_requete contient:
-			std::string method  	= get ou post ou delete
-			std::string path		= qui est le path demande ex: /qtest.php?name=pierre
-			std::string protocol	= HTTP /1.1
-			std::string	host		= 127.0.0.1:8080 par exempe
-			bool		cgi			= true il y a cgi dans le path ou php
-			bool		error		= true s'il y a une erreur dans le header de la requete
-									ou s'il y a une erreur quelconque.
-			size_t		num_error	= le numero de l'erreur si bool error = true.
-			std::string body_error	= euh alors la c'est le foure tout. Dedans on peut mettre
-			ce qu'on veut pour l'instant
-*/
-
-/*
 **	void	ft_parser_requete( int len_msg, const char  *msg )
 **		This function checks that there is either a GET, a POST or DELETE request in
 **		the client request path.
@@ -75,34 +50,10 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 	}
 	return ;
 }
-
-
-std::string::iterator	HttpServer::ft_find_end_header( std::string request_http )
-{
-	std::string::iterator	it_b = request_http.begin();
-	std::string::iterator	it_end_request;
-	// int i =0;
-	for(; it_b != request_http.end(); it_b++)
-	{
-		std::string end_request(it_b, it_b + 4);
-		if (end_request == "\r\n\r\n")
-		{
-			it_end_request = it_b;
-			
-			std::cout << "on atrouve la fin du header" << std::endl;
-			return (it_b);
-			break ;
-		}
-	}
-	std::cout << "ERROR on a pas la fin du header ??? " << std::endl;
-	// exit(1);
-	return (it_b);
-}
-
 size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 {
 	std::cout << GREEN << "Dans get : " << CLEAR <<  std::endl;
-
+	
 	// On verifie que this->_header_requete est vide, apres chaque requete il doit etre vide.
 	if (this->_header_requete.empty() == true)
 	{
@@ -110,6 +61,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		if (ft_check_method_allowed_header(request_http, "GET") == 1)				// On verifie que la methode est autorisee
 		{
 			std::cout << RED << "La methode GET est interdite donc on sort une erreur 405" << CLEAR << std::endl;
+			// exit(1);
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 405;
 			if (this->ft_setup_error_header(request_http, len_msg) == 0)
@@ -123,7 +75,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			}
 		}
 		std::cout << BLUE << "La methode GET est autorisee, on continue." << CLEAR << std::endl;
-
+		// exit(1);
 		if (len_msg > 1023)													// on verifie que le header ne soit pas trop long
 		{
 
@@ -144,24 +96,13 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		}
 		
 		std::cout << BLUE << "Ok pas d'erreur 431 ou d'erreur 405 donc on continue." << CLEAR <<  std::endl;
-
-		// A partir d'ici, on va parser la requete et recuperer toutes les informations disponibles.
-		
-		// si pas de fin de header faire une erreur
 		size_t pos_header = request_http.find("\r\n\r\n");
 		std::string size_header(request_http, 0, pos_header);
-		// std::string::iterator	it_end_request = ft_find_end_header( request_http );
-		
 
+		// std::cout << "SIZE HEADER = -" << size_header << "-" << std::endl;
 
-
-
-
-
-
-		// On recupere la methode
 		this->_header_requete[0].method = "GET";
-		std::cout << "On a la requete : " << this->_header_requete[0].method << "-" <<  std::endl;
+		std::cout << "On a la method : " << this->_header_requete[0].method << "-" <<  std::endl;
 	
 		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
 		this->_header_requete[0].path = this->ft_check_path_header(size_header);
@@ -208,6 +149,15 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 
 			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
 		}
+		// TEST REDIRECTION
+		std::cout << "path request -" << this->_header_requete[0].path << "-" << std::endl;
+
+		if (this->_header_requete[0].path == "/" && this->_servers[0].return_server.empty() == false)
+		{
+			std::cout << "oui" << std::endl;
+			this->_header_requete[0].return_used = true;
+		}
+		// exit(1);
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 		// exit(1);
 	}
@@ -655,7 +605,6 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 */
 int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 {
-	(void)request_http;
 	(void)len_msg;
 	// donc on a une erreur.
 	// 1) il faut regarder ou on se trouve dans la requete si on est dans du root ou dans du location

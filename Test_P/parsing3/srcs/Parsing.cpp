@@ -106,6 +106,7 @@ bool                            Parsing::ft_check_data( void )
 	if (this->ft_check_server())
 	{
 		std::cout << "ERROR, problem bloc server" << std::endl;
+		throw Error(0, "Error a faire 1", 1);
 		return (true);
 	}
 	// std::cout << "lol ok " << std::endl;
@@ -146,9 +147,15 @@ bool                            Parsing::ft_check_server( void )
 		std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
 		server_size = scope_server.size();
 		if (ft_check_directive_server(scope_server, server_size))
+		{
+			std::cout << "ft_check_directive_server return true " << std::endl;
 			return (true);
+		}
 		if (ft_find_directive_server(1, scope_server, i))
+		{
+			std::cout << "ft_find_directive_server return true" << std::endl;
 			return (true);
+		}
 		// else
 		// 	std::cout << "cool ca marche " << std::endl;
 		// std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;

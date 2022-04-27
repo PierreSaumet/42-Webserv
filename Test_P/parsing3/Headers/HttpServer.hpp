@@ -83,6 +83,9 @@ class HttpServer {
 			std::string			content_length;		// seulement post
 			std::string			body_post;				//seulement post
 			std::string			script_file_name;	// nom du fichier
+			
+			bool				return_used;
+			
 			bool				upload;
 			bool				cgi;
 			bool				error;
@@ -139,7 +142,7 @@ class HttpServer {
 
 		size_t			ft_check_access_location( std::string path );
 
-		std::string::iterator ft_find_end_header( std::string request_http );
+		// std::string::iterator ft_find_end_header( std::string request_http );
 
 
 		
@@ -158,7 +161,7 @@ class HttpServer {
 		size_t		ft_parsing_path_get_request( void );
 		std::string		ft_clean_path_get_request( std::string tmp );
 
-		std::string		ft_get_content_length( struct stat buff, size_t len ) const;
+		std::string		ft_get_content_length( struct stat buff, size_t len, size_t len_header ) const;
 		std::string		ft_get_end_header( void ) const;
 		std::string		ft_get_content_type( void ) const;
 		std::string		ft_get_charset( void ) const;

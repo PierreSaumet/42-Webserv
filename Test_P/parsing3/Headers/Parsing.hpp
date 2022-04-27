@@ -45,6 +45,7 @@ typedef struct                  s_server {
 			std::string                 name_server;
 			std::string                 root_server;
 			std::string					index_server;
+			std::string					return_server;
 			bool                        autoindex_server;
 			size_t						buffer_size_server;
 			std::string					cgi_path_server;
@@ -108,6 +109,7 @@ class Parsing {
 		bool							ft_find_index( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_find_methods( size_t k, std::vector<std::string> tmp, size_t index_server );
 		size_t                      	ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server );
+		bool							ft_find_return( size_t k, std::vector<std::string> tmp, size_t index_server );
 
 		bool							ft_check_directive_server( std::vector<std::string> scope_server, size_t server_size );
 		bool 							ft_find_directive_server( size_t k, std::vector<std::string> scope_server, size_t i );

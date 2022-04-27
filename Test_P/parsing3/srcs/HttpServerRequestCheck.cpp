@@ -281,86 +281,96 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 		size_t pos_end;
 		if ((pos_end = header.find("\r\n", pos)) == std::string::npos)
 		{
+			// condition redirection avec postman
+			if ((pos_end = header.find("\0", pos)) == std::string::npos)
+			{
+				std::cout << "OHOH" << std::endl;
+				std::cout << "header = " << header << std::endl;
+				std::cout << "ERREUR NE TROUVE PAS LE USER-AGENT DANS LE HEADER" << std::endl;
+				sleep(5);
+				return ("");
+			}	
+		}
+		// on verifie que la position de host est avant la position de user-agent.
+		if (pos > pos_end)
+		{
 			// A FAIRE: creer une erreur propre.
-			std::cout << "ERREUR NE TROUVE PAS LE USER-AGENT DANS LE HEADER" << std::endl;
+			std::cout << "ERREUR HOST doit etre avant USER-AGENT" << std::endl;
 			return ("");
 		}
-		else
+		// on recupere les informations apres Host et avant User-agent
+		std::string tmp(header, pos + 6, pos_end - (pos + 6));
+		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 		{
-			// on verifie que la position de host est avant la position de user-agent.
-			if (pos > pos_end)
+			// on parcourt nos servers pour verifier que le host de la requete est
+			//	bien pour un de nos servers.
+			if (tmp.compare(0, 9, this->_servers[i].host_server) == 0 || tmp.compare(0, 9, "localhost") == 0 || tmp.compare(0, 9, "127.0.0.1") == 0)
 			{
-				// A FAIRE: creer une erreur propre.
-				std::cout << "ERREUR HOST doit etre avant USER-AGENT" << std::endl;
-				return ("");
-			}
-			// on recupere les informations apres Host et avant User-agent
-			std::string tmp(header, pos + 6, pos_end - (pos + 6));
-			for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
-			{
-				// on parcourt nos servers pour verifier que le host de la requete est
-				//	bien pour un de nos servers.
-				if (tmp.compare(0, 9, this->_servers[i].host_server) == 0)
-				{
-					// les host de la requete et de notre server sont egaux
-					//	ex: 127.0.0.1
-					// std::cout << "ILS SONT EGAUX les host" << std::endl;
+				// les host de la requete et de notre server sont egaux
+				//	ex: 127.0.0.1
+				// std::cout << "ILS SONT EGAUX les host" << std::endl;
 
-					// on convertit le port (std::size_t) en std::string.
-					std::stringstream ss;
-					ss << this->_servers[i].port_server;
-					std::string port;
-					ss >> port;
-					if (tmp.compare(10, 4, port) == 0)
-					{
-						// les ports sont bon, on retourne la string au complete
-						//		ex : 127.0.0.1:8080
-						// std::cout<< "Ils sont egaux les port cas 1" << std::endl;
-						return (tmp);
-					}
-					else
-					{
-						//	Les ports ne correspondent pas.
-						if (this->_data->ft_get_nbr_servers() > 1)
-						{
-							// Cas ou on a plusieurs servers
-							std::cout << "euh nbr serv = " << this->_data->ft_get_nbr_servers() << std::endl;
-							for (size_t y = 0; y < this->_data->ft_get_nbr_servers(); y++)
-							{
-								// on parcourt chaque servers pour voir si on a un port
-								//	qui correspond a la requete du client.
-								std::stringstream ss2;
-								std::string port2;
-								std::cout << RED << "y = " << y << " et port server = " << this->_servers[y].port_server << CLEAR << std::endl;
-								ss2 << this->_servers[y].port_server;
-								ss2 >> port2;
-								std::cout << "Punaise = " << port2 << " et y = " << y << std::endl;
-								if (tmp.compare(10, 4, port2) == 0)
-								{
-									std::cout<< "Ils sont egaux les port cas 2" << std::endl;
-									return (tmp);
-								}
-								ss2.str("");
-								ss2.flush();
-								port2 = "";
-							}
-						}
-						std::cout << "port pas egaux ? " << std::endl;
-						std::cout << " tmp = -" << tmp << "- et nous = -" << port << "-" << std::endl;
-						throw Error(666, "Erreur test lol, ", 666);			// A FAIRE au propre
-					}
+				// on convertit le port (std::size_t) en std::string.
+				std::stringstream ss;
+				ss << this->_servers[i].port_server;
+				std::string port;
+				ss >> port;
+				if (tmp.compare(10, 4, port) == 0)
+				{
+					// les ports sont bon, on retourne la string au complete
+					//		ex : 127.0.0.1:8080
+					// std::cout<< "Ils sont egaux les port cas 1" << std::endl;
+					return (tmp);
 				}
 				else
 				{
-					std::cout << "les host ne sont pas egaux" << std::endl;
-					throw Error(666, "Erreur test lol 2, ", 666);		// A FAIRE au propre
+					//	Les ports ne correspondent pas.
+					if (this->_data->ft_get_nbr_servers() > 1)
+					{
+						// Cas ou on a plusieurs servers
+						std::cout << "euh nbr serv = " << this->_data->ft_get_nbr_servers() << std::endl;
+						for (size_t y = 0; y < this->_data->ft_get_nbr_servers(); y++)
+						{
+							// on parcourt chaque servers pour voir si on a un port
+							//	qui correspond a la requete du client.
+							std::stringstream ss2;
+							std::string port2;
+							std::cout << RED << "y = " << y << " et port server = " << this->_servers[y].port_server << CLEAR << std::endl;
+							ss2 << this->_servers[y].port_server;
+							ss2 >> port2;
+							std::cout << "Punaise = " << port2 << " et y = " << y << std::endl;
+							if (tmp.compare(10, 4, port2) == 0)
+							{
+								std::cout<< "Ils sont egaux les port cas 2" << std::endl;
+								return (tmp);
+							}
+							ss2.str("");
+							ss2.flush();
+							port2 = "";
+						}
+					}
+					std::cout << "port pas egaux ? " << std::endl;
+					std::cout << " tmp = -" << tmp << "- et nous = -" << port << "-" << std::endl;
+					throw Error(666, "Erreur test lol, ", 666);			// A FAIRE au propre
 				}
-				// if (this->_servers[i].host_server == tmp)
-				// 	return (tmp);
 			}
-			std::cout << "ERREUR ICI " << std::endl;			// A FAIRE au propre
-			exit(1);
-			return (std::string(header, pos + 6, pos_end - (pos + 6)));
+			else
+			{
+
+				std::cout << "les host ne sont pas egaux" << std::endl;
+				std::cout << "tmp " << tmp << std::endl;
+				std::cout << "host = " << this->_servers[i].host_server << std::endl;
+
+
+
+				throw Error(666, "Erreur test lol 2, ", 666);		// A FAIRE au propre
+			}
+			// if (this->_servers[i].host_server == tmp)
+			// 	return (tmp);
 		}
+		std::cout << "ERREUR ICI " << std::endl;			// A FAIRE au propre
+		exit(1);
+		return (std::string(header, pos + 6, pos_end - (pos + 6)));
+		
 	}
 }

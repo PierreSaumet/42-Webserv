@@ -50,19 +50,42 @@ std::string		HttpServer::ft_setup_header( void )
 		std::cout << "\n\n display = " << this->_header_requete[0].body_error << std::endl;
 		
 		std::string tmp = this->_header_requete[0].body_error;
-		tmp.insert(0, this->ft_get_content_length(buff, tmp.size()));
+		tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
 		tmp.insert(0, this->ft_get_server_name());
 		tmp.insert(0, this->ft_get_date());
 		tmp.insert(0, this->ft_get_status(true));
-		std::cout <<"\n\n tmp = \n" << tmp << std::endl;
+
+		// size_t len_header = tmp.size();
+		// size_t find_end = tmp.find("\r\n\r\n");
+		// tmp.insert(find_end, this->ft_get_content_length(buff, tmp.size(), len_header));
+		// // std::cout <<"\n\n tmp = \n" << tmp << std::endl;
 		return (tmp);
 	}
 	// si -/- alors index du root
 	if (this->_header_requete[0].path == "/")
 	{
-		this->_header_requete[0].path.append(this->_servers[0].index_server);
-		this->_header_requete[0].path.erase(0, 1);
+		std::cout << "path = " << this->_header_requete[0].path << std::endl;
+		if (this->_header_requete[0].return_used == false)
+		{
+			this->_header_requete[0].path.append(this->_servers[0].index_server);
+			this->_header_requete[0].path.erase(0, 1);
+		}
+		else
+		{	// Redirection 301 dans un bloc server
+			std::cout << GREEN << "redirection 301" << CLEAR << std::endl;
+			the_header.insert(0, this->ft_get_end_header());
+			the_header.insert(0, "Content-Length: 0\r\n");
+			the_header.insert(0, this->ft_get_server_name());
+			the_header.insert(0, this->ft_get_date());
+			the_header.insert(0, "Location: http://localhost:8082/folder1/yolo.html\r\n");
+			the_header.insert(0, "HTTP/1.1 301 Moved Permanently\r\n");
+			sleep(2);
+			return (the_header);
+
+		}
+		std::cout << "path = " << this->_header_requete[0].path << std::endl;
 	}
+	// exit(1);
 
 	std::cout << "on doit avoir le fichier : " << this->_header_requete[0].path << std::endl;
 
@@ -117,13 +140,17 @@ std::string		HttpServer::ft_setup_header( void )
 				return (ft_create_error());
 			std::string tmp = ft_get_file(this->_header_requete[0].body_error);
 			tmp.insert(0, this->ft_get_end_header());
-			tmp.insert(0, this->ft_get_content_length(buff2, 0));
+			tmp.insert(0, this->ft_get_content_length(buff2, 0, 0));
 			tmp.insert(0, this->ft_get_server_name());
 			tmp.insert(0, this->ft_get_date());
 			tmp.insert(0, this->ft_get_charset());
 			tmp.insert(0, this->ft_get_content_type());
 			tmp.insert(0, this->ft_get_status(true));
-			std::cout << " il a trouve " << std::endl;
+
+
+			// size_t len_header = tmp.size();
+			// size_t find_end = tmp.find("\r\n\r\n");
+			// tmp.insert(find_end, this->ft_get_content_length(buff2, 0, len_header));
 			return (tmp);
 		}
 	}
@@ -141,12 +168,13 @@ std::string		HttpServer::ft_setup_header( void )
 	fclose(input_file);
 	std::cout << "OK donc tout est bon ici la page demandee existe on va mettre rendre le header\n" << std::endl;
 	the_header.insert(0, this->ft_get_end_header());
-	the_header.insert(0, this->ft_get_content_length(buff, 0));
+	the_header.insert(0, this->ft_get_content_length(buff, 0, 0));
 	the_header.insert(0, this->ft_get_server_name());
 	the_header.insert(0, this->ft_get_date());
 	the_header.insert(0, this->ft_get_charset());
 	the_header.insert(0, this->ft_get_content_type());
 	the_header.insert(0, this->ft_get_status(true));
+
 	return (the_header);
 
 }
@@ -196,7 +224,7 @@ std::string		HttpServer::ft_find_error_html( void )
 
 
 			tmp.insert(0, this->ft_get_end_header());
-			tmp.insert(0, this->ft_get_content_length(buff, 0));
+			tmp.insert(0, this->ft_get_content_length(buff, 0, 0));
 			tmp.insert(0, this->ft_get_server_name());
 			tmp.insert(0, this->ft_get_date());
 			tmp.insert(0, this->ft_get_charset());
@@ -205,6 +233,10 @@ std::string		HttpServer::ft_find_error_html( void )
 			if(this->_header_requete[0].num_error == 405)
 				tmp.insert(0, this->ft_get_allow());
 			tmp.insert(0, this->ft_get_status(true));
+
+
+
+
 			return (tmp);
 		}
 		// std::cerr << strerror(errno) << std::endl;
@@ -422,6 +454,8 @@ std::string		HttpServer::ft_get_status( bool x ) const
 		if (this->_header_requete[0].num_error == 500)
 			return ("HTTP/1.1 500 Internal Server Error\r\n");
 	}
+	// if (this->_servers[0].return_server.empty() == false)
+	// 	return ("HTTP/1.1 301 Moved Permanently\r\n");
 	return ("HTTP/1.1 200 OK\r\n");
 }
 
@@ -449,15 +483,16 @@ std::string		HttpServer::ft_get_content_type( void ) const		// peut etre a chang
 	return ("Content-Type: text/html; ");
 }
 
-std::string		HttpServer::ft_get_content_length( struct stat buff, size_t len ) const		// peut etre a changer
+std::string		HttpServer::ft_get_content_length( struct stat buff, size_t len, size_t len_header ) const		// peut etre a changer
 {
 	std::string tmp_size;
 	std::stringstream ss_tmp;
 
+	(void)len_header;
 	if (len == 0)
 	{
 		sleep(1);
-		ss_tmp << buff.st_size + 100;
+		ss_tmp << buff.st_size + 100; // attention j;ai enlee le +100
 		ss_tmp >> tmp_size;
 
 		tmp_size.insert(0, "Content-Length: ");
