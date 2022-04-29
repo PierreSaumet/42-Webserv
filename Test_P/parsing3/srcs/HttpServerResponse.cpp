@@ -68,7 +68,10 @@ std::string		HttpServer::ft_setup_header( void )
 		if (this->_header_requete[0].return_used == false)
 		{
 			this->_header_requete[0].path.append(this->_servers[0].index_server);
-			this->_header_requete[0].path.erase(0, 1);
+			this->_header_requete[0].path.erase(0, 1);								// on supprime le /
+			this->_header_requete[0].path.insert(0, this->_servers[0].root_server);
+			// std::cout << "du coup path = " << this->_header_requete[0].path << std::endl;
+			// exit(1);
 		}
 		else
 		{	// Redirection 301 dans un bloc server
@@ -83,7 +86,7 @@ std::string		HttpServer::ft_setup_header( void )
 			return (the_header);
 
 		}
-		std::cout << "path = " << this->_header_requete[0].path << std::endl;
+		std::cout << "ICI path = " << this->_header_requete[0].path << std::endl;
 	}
 	// exit(1);
 
@@ -154,11 +157,11 @@ std::string		HttpServer::ft_setup_header( void )
 			return (tmp);
 		}
 	}
-	if (buff.st_size == 0)
-	{
-		std::cout << "Error, la page demande est vide. " << std::endl;
-		return (NULL);
-	}
+	// if (buff.st_size == 0)
+	// {
+	// 	std::cout << "Error, la page demande est vide. " << std::endl;
+	// 	return (NULL);
+	// }
 	input_file = fopen(this->_header_requete[0].path.c_str(), "r");
 	if (input_file == NULL)
 	{

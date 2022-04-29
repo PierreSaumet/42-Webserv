@@ -55,6 +55,8 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	std::cout << GREEN << "Dans get : " << CLEAR <<  std::endl;
 	
 	// On verifie que this->_header_requete est vide, apres chaque requete il doit etre vide.
+	
+	
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
@@ -64,8 +66,13 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			// exit(1);
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 405;
+			
 			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+			{
+				std::cout << "ft_setup_error_header return 0 donc bon " << std::endl;
+				sleep(5); 
 				return (0);
+			}
 			else
 			{
 				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
@@ -75,6 +82,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			}
 		}
 		std::cout << BLUE << "La methode GET est autorisee, on continue." << CLEAR << std::endl;
+		// exit(1);
 		// exit(1);
 		if (len_msg > 1023)													// on verifie que le header ne soit pas trop long
 		{
@@ -157,9 +165,33 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			std::cout << "oui" << std::endl;
 			this->_header_requete[0].return_used = true;
 		}
-		// exit(1);
+
+		// VENDREDI 29, il faut verifier si on a le droit
+		/*
+			si il y a pas de locations de setup alors une requete /www/coucou.html c'est pas possible
+			sauf si c'est un index setup dans le bloc server
+			*/
+		size_t res = 0;
+		if ((res = this->ft_verifie_ledroit_du_chemin()) > 0)
+		{
+			this->_header_requete[0].error = true;
+			if (res == 2)
+				this->_header_requete[0].num_error = 403;
+			if (res == 1)
+				this->_header_requete[0].num_error = 404;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+			{
+				std::cout << "ft_setup_error_header return 0, on continue " << std::endl;
+				sleep(2); 
+				return (0);
+			}
+			else
+			{
+				std::cout << "ft_setup_error_header return 1, ERREUR" << std::endl;
+				exit(1);
+			}
+		}
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
-		// exit(1);
 	}
 	else
 	{
@@ -168,7 +200,32 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	}
 	return (0);
 }
-
+size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
+{
+	std::cout << GREEN <<  "Dans verifie le droit duchemin" << CLEAR << std::endl;
+	if (this->_servers[0].nbr_location == 0)
+	{
+		std::cout << "pas de location donc on compare la demande avec l'acces de l'index" << std::endl;
+		if (this->_header_requete[0].path == "/")			// on retourne 0
+			return (0);
+		std::string tmp_index = this->_servers[0].index_server;			// notre index du server
+		tmp_index.insert(0, this->_servers[0].root_server);			
+		struct stat buff_tmp;
+		stat(tmp_index.c_str(), &buff_tmp);
+		struct stat buff_path;
+		stat(this->_header_requete[0].path.c_str(), &buff_path);
+		if (stat(this->_header_requete[0].path.c_str(), &buff_path) < 0)
+			return (1);
+		// on compare les deux buffs si egaux alors la requete est l'index du server donc OK sinon on ressort 403
+		if (buff_tmp.st_dev == buff_path.st_dev && buff_tmp.st_ino == buff_path.st_ino)
+			return (0);
+		else
+			return (2);
+	}
+	std::cout << "plusieurs locations " << std::endl;
+	exit(1);
+	return (0);
+}
 
 size_t			HttpServer::ft_parsing_path_get_request( void )
 {
@@ -606,16 +663,8 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 {
 	(void)len_msg;
-	// donc on a une erreur.
-	// 1) il faut regarder ou on se trouve dans la requete si on est dans du root ou dans du location
-	// 2) regarder si l'erreur donne est deja configurer dans la directive error_page
-	// 3) si oui, on setup le header avec le fichier
-	// 4) si non, on regarde si on a le fichier de l'erreur en question.
-	// 5) si le fichier existe on setup le header et on revoit
-	// 6) si non, on setup le bon header
-
-	// 1
-	//	1: il y a des location si oui, on cherche si on est dedans...
+	std::cout << GREEN << "Dans ft_setup_error_header" << CLEAR << std::endl;
+	// exit(1);
 	if (this->_servers[0].nbr_location > 0)
 	{
 		std::cout << "il y a des loctions : " << this->_servers[0].nbr_location << std::endl;
@@ -730,7 +779,35 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 	}
 	else
 	{
-		std::cout << "il y a pas de location" << std::endl;
+		std::cout << "il y a pas de location, on cherche les erreurs dans root" << std::endl;
+		std:: cout << RED << " la pierre ca ne correspond pas des location  " << CLEAR << std::endl;
+
+		std::map<int, std::string>::iterator it = this->_servers[0].error_server.begin();
+		// on cherche si l'erreur a ete idique dans une directive error_page
+		for (; it != this->_servers[0].error_server.end(); it++)
+		{
+			std::cout << "on display les erreur setup du server... " << it->first << std::endl;
+			if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
+			{
+				std::cout << "OUI ils sont egaux, le num_error et l'erreur qui a ete setup dans le fichier de conf" << std::endl;
+				std::cout << "euh second = " << it->second << std::endl;
+				// on met dans le body le fichier a recuperer
+				this->_header_requete[0].body_error = it->second;
+				std::cout << " on a mis le fichier a recuperer pour l'error." << std::endl;
+				std::cout << "\nbody error = " << this->_header_requete[0].body_error;
+				return (0);
+			}
+			else
+			{
+				std::cout << "euh non " << std::endl;
+			}
+		}
+		std:: cout << RED << " la pierre que faire ?  " << CLEAR << std::endl;
+		this->_header_requete[0].body_error = "/";
+		
+		// this->_header_requete[0].body_error = this->_servers[0].location[i].name_location;
+		this->_header_requete[0].body_error.insert(0, this->_servers[0].root_server);
+		
 	}
 	return (0);
 }

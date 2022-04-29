@@ -154,10 +154,10 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 		if (this->_data->ft_get_error() == 1)
 			return ;
 		this->_servers = this->_data->ft_get_servers();											// on recupere les informations provenant de la class parsing
-		ft_put_root();
-		this->DISPLAY_ALL_DATA_PARSING();
+		// ft_put_root();
+		// this->DISPLAY_ALL_DATA_PARSING();
 
-		exit(1);
+		// exit(1);
 		// std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
 		if (this->ft_create_servers() == 1)
 			return ;

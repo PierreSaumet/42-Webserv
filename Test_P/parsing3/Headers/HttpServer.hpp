@@ -198,6 +198,7 @@ class HttpServer {
 
 		void DISPLAY_ALL_DATA_PARSING( void );
 		void							ft_put_root( void );
+		size_t ft_verifie_ledroit_du_chemin( void );
 
 	private:
 		Parsing				*_data;
