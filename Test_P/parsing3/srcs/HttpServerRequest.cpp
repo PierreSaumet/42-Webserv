@@ -60,28 +60,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
-		if (ft_check_method_allowed_header(request_http, "GET") == 1)				// On verifie que la methode est autorisee
-		{
-			std::cout << RED << "La methode GET est interdite donc on sort une erreur 405" << CLEAR << std::endl;
-			// exit(1);
-			this->_header_requete[0].error = true;
-			this->_header_requete[0].num_error = 405;
-			
-			if (this->ft_setup_error_header(request_http, len_msg) == 0)
-			{
-				std::cout << "ft_setup_error_header return 0 donc bon " << std::endl;
-				sleep(5); 
-				return (0);
-			}
-			else
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				sleep(2);
-				return (1);
-			}
-		}
-		std::cout << BLUE << "La methode GET est autorisee, on continue." << CLEAR << std::endl;
+		
 		// exit(1);
 		// exit(1);
 		if (len_msg > 1023)													// on verifie que le header ne soit pas trop long
@@ -103,7 +82,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 
 		}
 		
-		std::cout << BLUE << "Ok pas d'erreur 431 ou d'erreur 405 donc on continue." << CLEAR <<  std::endl;
+		std::cout << BLUE << "Ok pas d'erreur 431 donc on continue." << CLEAR <<  std::endl;
 		size_t pos_header = request_http.find("\r\n\r\n");
 		std::string size_header(request_http, 0, pos_header);
 
@@ -146,7 +125,31 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		std::cout << "le path = " << this->_header_requete[0].path_http << std::endl;
 		
 
-
+		size_t ret_method = 0;
+		if ((ret_method = ft_check_method_allowed_header(request_http, "GET")) > 0)				// On verifie que la methode est autorisee
+		{
+			std::cout << RED << "La methode GET est interdite donc on sort une erreur 405" << CLEAR << std::endl;
+			// exit(1);
+			this->_header_requete[0].error = true;
+			if (ret_method == 1)
+				this->_header_requete[0].num_error = 405;
+			if (ret_method == 2)
+				this->_header_requete[0].num_error = 404;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+			{
+				std::cout << "ft_setup_error_header return 0 donc bon " << std::endl;
+				sleep(5); 
+				return (0);
+			}
+			else
+			{
+				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
+				std::cout << "on doit sortir une erreur 500" << std::endl;
+				sleep(2);
+				return (1);
+			}
+		}
+		std::cout << BLUE << "La methode GET est autorisee, on continue." << CLEAR << std::endl;
 		
 		
 		if (this->ft_check_cgi_or_php(request_http) == 1)
@@ -210,17 +213,62 @@ size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
 			return (0);
 		std::string tmp_index = this->_servers[0].index_server;			// notre index du server
 		tmp_index.insert(0, this->_servers[0].root_server);			
-		struct stat buff_tmp;
-		stat(tmp_index.c_str(), &buff_tmp);
+		struct stat buff_index;
+		stat(tmp_index.c_str(), &buff_index);
 		struct stat buff_path;
+		std::cout << "path = " << this->_header_requete[0].path << std::endl;
+		// exit(1);
 		stat(this->_header_requete[0].path.c_str(), &buff_path);
 		if (stat(this->_header_requete[0].path.c_str(), &buff_path) < 0)
-			return (1);
+			return (1);	// erreur 404
+		std::cout << " la page demande existe ... " << std::endl;
 		// on compare les deux buffs si egaux alors la requete est l'index du server donc OK sinon on ressort 403
-		if (buff_tmp.st_dev == buff_path.st_dev && buff_tmp.st_ino == buff_path.st_ino)
+		if (buff_index.st_dev == buff_path.st_dev && buff_index.st_ino == buff_path.st_ino)
+		{
+			std::cout << "c'est egal a lindex doncok " << std::endl;
 			return (0);
+		}
 		else
+		{
+			std::cout << "ICI ce n'est pas egal a un index donc on verifie que c'est bien dans le root" << std::endl;
+			// std::cout << "le st_dev de la requete = " << buff_path.st_dev << std::endl;
+			// std::cout << " le st_dev de l'index = " << buff_tmp.st_dev << std::endl;
+
+			// std::cout << "\nle st_ino de la requete = " << buff_path.st_ino << std::endl;
+			// std::cout << " le st_ino de l'index = " << buff_tmp.st_ino << std::endl;
+			// on supprime le root de path
+			std::string tmp_path = this->_header_requete[0].path;
+			tmp_path.erase(0, this->_servers[0].root_server.size() + 1); // pour supprimer le / de la requete
+			// tmp_index.erase(0, this->_servers[0].root_server.size());
+			std::cout << "maintenant path  = -" << tmp_path << "-" << std::endl;
+
+			DIR *dp;
+			struct dirent *dirp;
+			if ((dp = opendir(this->_servers[0].root_server.c_str())) == NULL)
+			{
+				std::cout << "ERREUR OPEN WWW" << std::endl;
+				exit(1);
+			}
+			while ((dirp = readdir(dp)) != NULL)
+			{
+				std::cout << "nom = " << dirp->d_name << " et type = " << dirp->d_type << std::endl;
+				// if (dirp->d_name == tmp_path.c_str())
+				if (tmp_path.compare(dirp->d_name) == 0)
+				{
+					
+					if (dirp->d_type == DT_REG)
+					{
+						std::cout << "YES BINGO" << std::endl;
+						sleep(5);
+						return (0);
+					}
+				}
+			}
 			return (2);
+
+			exit(1);
+			return (2); // erreur 403?
+		}
 	}
 	std::cout << "plusieurs locations " << std::endl;
 	exit(1);

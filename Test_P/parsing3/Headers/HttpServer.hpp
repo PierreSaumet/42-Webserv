@@ -34,6 +34,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <time.h>
+#include <dirent.h>
 
 #include "CGI_exec.hpp"
 
@@ -199,6 +200,8 @@ class HttpServer {
 		void DISPLAY_ALL_DATA_PARSING( void );
 		void							ft_put_root( void );
 		size_t ft_verifie_ledroit_du_chemin( void );
+		bool compareNameLocation( std::vector<t_location> a, std::vector<t_location> b);
+
 
 	private:
 		Parsing				*_data;

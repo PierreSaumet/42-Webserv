@@ -118,62 +118,64 @@ std::string		HttpServer::ft_check_referer( std::string request_http )
 	return (tmp);
 }
 
+// bool HttpServer::compareNameLocation( std::vector<t_location> a, std::vector<t_location> b)
+// {
+// 	std::vector<t_location>::iterator it_a = a.begin
+// 	std::cout << "a = " << a.name_location << " b = " << b.name_location);
+// 	return (1);
+// }
+
 int				HttpServer::ft_check_method_allowed_header( std::string request_http, std::string method )
 {
+	(void)request_http;
+	std::cout << GREEN << "Dans ft_check_method_allowed_header " << CLEAR << std::endl;
 	if (this->_servers[0].nbr_location > 0)
 	{
 		std::cout << "il y a des locations : " << this->_servers[0].nbr_location << std::endl;
 		size_t i = 0;
 		while ( i < this->_servers[0].nbr_location)
 		{
-			std::cout << "affiche le nom de la location : " << this->_servers[0].location[i].name_location << std::endl;
-			
-			size_t found = request_http.find("/");
-			// size_t size_name_location = this->_servers[0].location[i].name_location.length();
-			if (found == std::string::npos)
-			{
-				std::cout << "ERREUR euh pas normal ne trouve pas / dans la requete a traiter "<< std::endl;
-				exit(EXIT_FAILURE);
-			}
-			else
-			{
-				std::string tmp = this->_servers[0].location[i].name_location;
-				if (tmp[tmp.size() - 1] != '/')
-					tmp.append("/");
-				std::cout << "tmp = " << tmp << std::endl;
-				// std::cout << "request_http = " << request_http << std::endl;
-				std::string tmp_2 = request_http;
-				tmp_2.erase(0, this->_servers[0].root_server.size());	// on enleve le root de tmp_2
-				std::cout << "tmp_2 = " << tmp_2 << std::endl;
-				// on regarde si il y a un / a la find
-				if(tmp_2[tmp_2.size() - 1] != '/')
-					tmp_2.append("/");
-				
+			// on recupere la requete, le path
+			std::string test = this->_header_requete[0].path;
+			if (this->_header_requete[0].path != "/")	// si requete est differente de juste / on supprime le root
+				test.erase(0, this->_servers[0].root_server.size());
+			std::cout << "test = " << test << std::endl;
 
-				
-				// si tmp_2.size() est egal a tmp.size() - 1 c'est bon
-				if (tmp_2.compare(0, tmp.size(), tmp) == 0)
+			std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
+			for (std::vector<t_location>::iterator it = this->_servers[0].location.begin(); it != this->_servers[0].location.end(); it++)
+				all_location.push_back(it->name_location);
+			std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
+			for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); it++)
+			{
+				size_t pos_slash = test.find("/", 1); // on cherche le deuxieme / pour avoir le premier dossier de la requete
+				if (test.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
 				{
-					std::cout << "OUI on se trouve dans un dossier location a continuer   11 " << std::endl;
-					
-					// 
-					std::vector<std::string>::iterator	it_b = this->_servers[0].location[i].methods_location.begin();
-					for (; it_b != this->_servers[0].location[i].methods_location.end(); it_b++)
+					for (std::vector<t_location>::iterator it_loc = this->_servers[0].location.begin(); it_loc != this->_servers[0].location.end(); it_loc++)
 					{
-						if (*it_b == method)
+						if (it_loc->name_location == *it)
 						{
-							std::cout << " la method est autorisee dans location " << std::endl;
-							return (0);		// oui method fonctionne
+							for (std::vector<std::string>::iterator it_method = it_loc->methods_location.begin(); it_method != it_loc->methods_location.end(); it_method++)
+							{
+								if (*it_method == method) // la method est autorisee
+									return (0);
+							}
+							return (1); // pas de method on return 1
 						}
 					}
-					std::cout << " la method n'est PAS autorisee dans location " << std::endl;
-					return (1);		// la method n'est pas autorisee
 				}
 			}
+			std::cout << " ca correspond a qucun location erreur ? " << std::endl;
+			std::cout << "SAUF SI REDIRECTION ATTENTION PIERRE" << std::endl;
+			sleep(5);
+			return (2);
+			exit(1);
+			std::cout << "requete = " << test<< std::endl;
+			exit(1);
 			i++;
+			
 		}
+		exit(1);
 	}
-	// exit(1);
 	std::cout << "on va chercher dans le root" << std::endl;
 	std::vector<std::string>::iterator  it_b = this->_servers[0].methods_server.begin();
 	for (; it_b != this->_servers[0].methods_server.end(); it_b++)
