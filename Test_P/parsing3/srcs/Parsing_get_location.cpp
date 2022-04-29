@@ -25,41 +25,73 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 	// Adding a block server
 	//this->_servers.push_back(t_server());
 	//std::cout << "dans finddirective location On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
-	struct stat buff;
+	// struct stat buff;
 
 	if (this->_servers[index_server].location.size() == 0)
 		this->_servers[index_server].nbr_location = 1;
 	else
 		this->_servers[index_server].nbr_location += 1;
+	// std::cout << "debut find directive location" << std::endl;
+	// std::cout << "k = " << k << std::endl;
+	// std::cout << "tmp[k] = " << tmp[k] << std::endl;
+	// std::cout << "size tmp = " << tmp.size() << std::endl;
+	// for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end(); it++)
+	// {
+	// 	std::cout << *it << std::endl;
+	// }
+	// std::cout << "\n\n";
+
+
 
 	this->_servers[index_server].location.push_back(t_location());
 	if (tmp[k] != "location" || tmp[k + 2] != "{")
 		throw Error(62, "Error,  in 'location' directive, it needs 'location' + '/' + '{'.", 1);
 	if (tmp[k + 1][0] != '/')
 		throw Error(62, "Error,  in 'location' directive, it needs 'location' + '/' + '{'.", 1);
+	
 	// Getting name of the location
 	size_t index_location = this->_servers[index_server].location.size() - 1;	
 	this->_servers[index_server].location[index_location].name_location = tmp[k + 1].substr(0, tmp[k + 1].size());
-	// Checking if the name of the location is a folder and if the rights are good
-	std::string tmp_name; // = "";
-	tmp_name.insert(0, this->_servers[index_server].root_server);
-	tmp_name.append(this->_servers[index_server].location[index_location].name_location);
-	if (stat(tmp_name.c_str(), &buff) == -1)
-		throw Error(620, "Error,  in 'location' directive, location doesn't exist.", 1);
-	if (S_ISDIR(buff.st_mode))
-	{
-		if ((buff.st_mode & S_IRWXU) != 448)
-			throw Error(620, "Error,  in 'location' directive, the folder location doesn't have the good right.", 1);
-	}
-	else
-		throw Error(620, "Error,  in 'location' directive, location is not a folder.", 1);
 	
 	// Getting the scope of the location block
 	k += 2;
-	std::vector<std::string>    scope_location = this->ft_get_scope(k);
+
+
+	std::vector<std::string> scope_location = this->ft_get_scope_location(k, tmp);
+
+	
+
+	// TEST REDIRECTION 301
+	// Actuellement on peut avoir un bloc location sans rien dedans
+	//	je vais changer ca et forcer a avoir au mois dav_methods
+	std::map<std::string, bool>            	location_dir;
+	location_dir.insert(std::pair<std::string, bool>("dav_methods", false));
+	size_t i = 0;
+	while (i < scope_location.size())
+	{
+		// std::cout << "truc = " << scope_location[i] << std::endl;
+		std::map<std::string, bool>::iterator it = location_dir.begin();
+		if (it->first == scope_location[i])
+		{
+			if (it->second == false)
+				it->second = true;
+			else
+				throw Error(7, "Error, in 'location bloc', it has doublon.", 1);
+		}
+		i++;
+	}
+	std::map<std::string, bool>::iterator it = location_dir.begin();
+	if (it->second == false)
+	{
+		if (it->first == "dav_methods")
+			throw Error(12, "Error, in 'location bloc', 'dav_methods' directive is missing.", 1);
+	}
+
+
+	// exit(1);
 
 	// Going through the scope to get data
-	size_t i = 1;
+	i = 1;
 	while (i < scope_location.size())
 	{
 		if (scope_location[i] == "root")
@@ -104,16 +136,66 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 			if (i == 0)
 				return (0);
 		}
+		else if (scope_location[i] == "return")
+		{
+			std::cout << "On trouve return dans location " << std::endl;
+			if (this->ft_find_return_location(i, scope_location, index_server, index_location))
+				return (true);
+			k += 3;
+			exit(1);
+		}
 		else
 		{
+			std::cout << "scope location i " << scope_location[i] << std::endl;
 			if (scope_location[i] == "}")
 				break;
 			else
-				throw Error(14, "Error, directive unrecognized.", 1);
+				throw Error(14, "Error, directive unrecognized dans location.", 1);
 		}
 	}
 	k += i + 1;
 	return (k);
+}
+
+bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location)
+{
+	std::cout << "DANS RETURN LOCATION" << std::endl;
+	(void)k;
+	(void)index_location;
+	(void)index_server;
+	(void)tmp;
+	std::cout << GREEN << "Dans ft_find_return location " << CLEAR << std::endl;
+	std::cout << "k = " << k << std::endl;
+	std::cout << "tmp[k] = " << tmp[k] << std::endl;
+
+	k += 1;
+	if (tmp[k].compare("301") != 0)
+		throw Error(0, "Error, in 'return' location's bloc directive, it should have 301 has first argument", 0);
+	k += 1;
+	if (tmp[k][tmp[k].size() -1] != ';')
+		throw Error(0, "Error, in 'return' location's bloc directive, it should have ';' at the end.", 0);
+	if (tmp[k][0] == '/') // on a un dossier
+	{
+		// si on a un root de setup on le rajoute
+		if (this->_servers[index_server].location[index_location].root_location.empty() == false)
+		{
+			std::string tmp2 = tmp[k];
+			tmp2.erase(0, 1);
+			tmp2.insert(0, this->_servers[index_server].location[index_location].root_location);
+
+			std::cout << "ICI" << std::endl;
+			struct stat buff;
+			if (stat(tmp2.c_str(), &buff) != 0)
+				throw Error(0, "Error, in 'return' location's bloc directive, the last argument doesn't exist.", 1);
+			else
+			{
+				std::cout << "tmp2 = " << tmp2 << std::endl;
+			}
+		}
+		std::cout << "root dans location n'est pas setup" << std::endl;
+		exit(1);
+	}
+	return (false);
 }
 
 /*
@@ -361,8 +443,11 @@ bool            Parsing::ft_find_root_location( size_t k, std::vector<std::strin
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 		throw Error(34, "Error, in 'root' directive, it should start with './'.", 1);
 	this->_servers[index_server].location[index_location].root_location = tmp[k].substr(0, len - 1);
-	if (stat(this->_servers[index_server].location[index_location].root_location.c_str(), &buffer) == -1)
-		throw Error(35, "Error, in 'root' directive doesn't exist!.", 1);
+	
+	std::cout << "pb root location = " << this->_servers[index_server].location[index_location].root_location << std::endl;
+	
+	// if (stat(this->_servers[index_server].location[index_location].root_location.c_str(), &buffer) == -1)
+	// 	throw Error(35, "Error, in 'root' location's bloc, the argument doesn't exist!.", 1);
 	
 // ATTENTION CA PEUT DEVENIR UNE FONCTION pour que ca soit plus propre ?
 	if (this->_servers[index_server].location[index_location].upload_store_location.empty() == false)
@@ -421,8 +506,8 @@ size_t          Parsing::ft_find_methods_location( size_t k, std::vector<std::st
 			else
 			{
 				if (tmp[k] == ";")
-					break ;			
-				throw Error(39, "Error, in 'dav_methods' directive, it can only have DELETE POST and GET methods!", 1);
+					break ;	
+				throw Error(39, "Error, in 'dav_methods' location's bloc  directive, it can only have DELETE POST and GET methods!", 1);
 			}
 			break;
 		}
@@ -464,7 +549,7 @@ size_t          Parsing::ft_find_methods_location( size_t k, std::vector<std::st
 */
 bool			Parsing::ft_find_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
-	struct stat buffer;
+	// struct stat buffer;
 	size_t  	len;
 	
 	k += 1;
@@ -478,9 +563,9 @@ bool			Parsing::ft_find_index_location( size_t k, std::vector<std::string> tmp, 
 	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
 		throw Error(29, "Error, in 'index' directive, it should end with '.html'.", 1);
 	this->_servers[index_server].location[index_location].index_location = tmp[k].substr(0, len - 1);
-	if (stat(this->_servers[index_server].location[index_location].index_location.c_str(), &buffer) == -1)
-		throw Error(30, "Error, in 'index' directive, file doesn't exist.", 1);
-	if (buffer.st_size == 0)
-		throw Error(31, "Error, in 'index' directive, file is empty.", 1);
+	// if (stat(this->_servers[index_server].location[index_location].index_location.c_str(), &buffer) == -1)
+	// 	throw Error(30, "Error, in 'index' location bloc directive, file doesn't exist.", 1);
+	// if (buffer.st_size == 0)
+	// 	throw Error(31, "Error, in 'index' directive, file is empty.", 1);
 	return (false);
 }

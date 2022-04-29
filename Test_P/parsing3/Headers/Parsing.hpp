@@ -22,6 +22,7 @@
 #include <vector>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "Error.hpp"
 
@@ -95,6 +96,7 @@ class Parsing {
 
 		std::string                     ft_delete_comm( std::string &line );
 		std::vector<std::string>        ft_get_scope( size_t index );
+		std::vector<std::string>		ft_get_scope_location( size_t index, std::vector<std::string> scope_bloc_location );
 
 		/*
 		**	Functions used to find the data from multiple directives stored in a server block.
@@ -124,7 +126,7 @@ class Parsing {
 		bool							ft_find_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t          				ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t                      	ft_find_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
-
+		bool							ft_find_return_location( size_t i, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t							ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server );
 
 		/*
@@ -138,6 +140,7 @@ class Parsing {
 		**	Need to be delete.
 		*/
 		void							display_all( void );
+
 
 	private:
 		Parsing( void );

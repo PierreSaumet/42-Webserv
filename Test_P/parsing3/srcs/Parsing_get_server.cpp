@@ -60,7 +60,7 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 	}
 	for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
 	{
-		std::cout << "first = " << it_b->first << " et second = " << it_b->second << std::endl;
+		// std::cout << "first = " << it_b->first << " et second = " << it_b->second << std::endl;
 		if (it_b->second == false)
 		{
 			if (it_b->first == "listen")
@@ -78,6 +78,7 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 		}
 	}
 	this->_servers.push_back(t_server());
+	// std::cout << "fin directive server, nbr de server = " << this->_servers.size() << std::endl;
 	// std::cout << "On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
 	return (false);
 }
@@ -163,7 +164,7 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 		}
 		else if (scope_server[k] == "return")
 		{
-			std::cout << "on trouve return" << std::endl;
+			std::cout << "on trouve return dans server" << std::endl;
 			if (this->ft_find_return(k, scope_server, i))
 				return (true);
 			k += 3;
@@ -179,12 +180,13 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 	}
 	return (false);
 }
+
 bool			Parsing::ft_find_return( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	std::cout << GREEN << "Dans ft_find_return " << CLEAR << std::endl;
-	std::cout << "k = " << k << std::endl;
-	std::cout << "tmp[k] = " << tmp[k] << std::endl;
-	std::cout << "index_server = " << index_server << std::endl;
+	std::cout << GREEN << "Dans ft_find_return server " << CLEAR << std::endl;
+	// std::cout << "k = " << k << std::endl;
+	// std::cout << "tmp[k] = " << tmp[k] << std::endl;
+	// std::cout << "index_server = " << index_server << std::endl;
 
 	k += 1;
 	std::cout << "tmp[k] = " << tmp[k] << std::endl;
@@ -276,7 +278,7 @@ bool			Parsing::ft_find_return( size_t k, std::vector<std::string> tmp, size_t i
 					if (S_ISREG(buff.st_mode))
 					{
 						this->_servers[index_server].return_server = tmp_2;
-						// this->_servers[index_server].index_server = tmp_2;
+						std::cout << "REturn a ete setup = " << this->_servers[index_server].return_server << std::endl;
 					}
 					else if (S_ISDIR(buff.st_mode))
 					{
@@ -559,7 +561,7 @@ size_t          Parsing::ft_find_methods( size_t k, std::vector<std::string> tmp
 			{
 				if (tmp[k] == ";")
 					break ;
-				throw Error(39, "Error, in 'dav_methods' directive, it can only have DELETE POST and GET methods!", 0);
+				throw Error(39, "Error, in 'dav_methods' server's bloc directive, it can only have DELETE POST and GET methods!", 0);
 			}
 			break;
 		}
@@ -698,6 +700,8 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 	}
 	this->_servers[index_server].host_server = tmp[k].substr(0, 9);
 	this->_servers[index_server].port_server = std::strtol(tmp[k].substr(10, 4).c_str(), NULL, 10);
+	// std::cout << "tmp[k] = " << tmp[k] << " et k = " << k << std::endl;
+	// std::cout << "ce server[" << index_server << "] a le port = " << this->_servers[index_server].port_server << std::endl;
 	if (this->_servers[index_server].port_server < 1 || this->_servers[index_server].port_server > 65535)
 		throw Error(21, "Error, in 'listen directive'  port should be between 0 and 65535.", 1);
 	if (index_server > 0)
@@ -705,10 +709,14 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 		i = 0;
 		while (i < index_server)
 		{
+			// std::cout << "\nNombre de server = " << this->_servers.size() << std::endl;
+			// std::cout << " i = " << i << " index server = " << index_server << std::endl;
+			// std::cout << "Display les port server, ce server = " << this->_servers[index_server].port_server << " et l'autre = " << this->_servers[i].port_server << std::endl;
 			if (this->_servers[index_server].port_server == this->_servers[i].port_server)
 				throw Error(22, "Error, in 'listen directive'  bloc servers have the same port.", 1);
 			i++;
 		}
+		// std::cout << "\n\n";
 	}
 	if (this->_servers[index_server].host_server == "localhost")
 		this->_servers[index_server].host_server = "127.0.0.1";
@@ -725,7 +733,7 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 */
 bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	struct stat buffer;
+	// struct stat buffer;
 	size_t  	len;
 	
 	if (this->_servers[index_server].root_server.empty() == true)
@@ -741,11 +749,13 @@ bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t in
 	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
 		throw Error(29, "Error, in 'index' directive, it should end with '.html'.", 1);
 	this->_servers[index_server].index_server = tmp[k].substr(0, len - 1);
-	this->_servers[index_server].index_server.erase(0, 1);
-	this->_servers[index_server].index_server.insert(0, this->_servers[index_server].root_server);
-	if (stat(this->_servers[index_server].index_server.c_str(), &buffer) == -1)
-		throw Error(30, "Error, in 'index' directive, file doesn't exist.", 1);
-	if (buffer.st_size == 0)
-		throw Error(31, "Error, in 'index' directive, file is empty.", 1);
+	std::cout << "index = " <<  this->_servers[index_server].index_server << std::endl;
+	// exit(1);
+	// this->_servers[index_server].index_server.erase(0, 1);
+	// this->_servers[index_server].index_server.insert(0, this->_servers[index_server].root_server);
+	// if (stat(this->_servers[index_server].index_server.c_str(), &buffer) == -1)
+	// 	throw Error(30, "Error, in 'index' directive, file doesn't exist.", 1);
+	// if (buffer.st_size == 0)
+	// 	throw Error(31, "Error, in 'index' directive, file is empty.", 1);
 	return (false);
 }

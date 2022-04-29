@@ -72,6 +72,12 @@ std::vector<std::string>        Parsing::ft_get_scope( size_t index )
 	size_t                  				i = index;
 	size_t                  				count = 0;
 
+	// std::cout << "\n\nDans get scope index = " << index << std::endl;
+	// for (std::vector<std::string>::iterator it = this->_data.begin(); it != this->_data.end(); it++)
+	// {
+	// 	std::cout << *it << std::endl;
+	// }
+	// std::cout << "\n\n";
 	while (i++ < size_data)
 	{
 		if (this->_data[i] == "{")
@@ -137,4 +143,36 @@ bool			Parsing::ft_check_code_error( int code ) const
 		return (this->ft_check_code_serv(code));
 	else
 		return (true);
+}
+
+
+std::vector<std::string>        Parsing::ft_get_scope_location( size_t index , std::vector<std::string> scope_bloc_server)
+{
+	std::vector<std::string>::iterator      it_b;
+	std::vector<std::string>::iterator      it_e;
+	size_t                  				count = 0;
+
+	while (index < scope_bloc_server.size())
+	{
+		if (scope_bloc_server[index] == "{")
+		{
+			if (count == 0)
+				it_b = scope_bloc_server.begin() + index;
+			count++;
+		}
+		if (scope_bloc_server[index] == "}" && count != 0)
+		{
+			count--;
+			if (count == 0)
+			{
+				it_e = scope_bloc_server.begin() + index + 1;
+				break ;
+			}
+		}
+
+		index++;
+	}
+	std::vector<std::string>    tmp(it_b, it_e);
+
+	return (tmp);
 }

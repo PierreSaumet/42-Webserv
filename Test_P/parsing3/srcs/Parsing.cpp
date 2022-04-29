@@ -142,10 +142,19 @@ bool                            Parsing::ft_check_server( void )
 		i++;
 	}
 	i = 0;
+	// std::cout << "dans ft_check_server : nbr server = " << this->_nbr_servers << std::endl;
 	while (i < this->_nbr_servers)
 	{
 		std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
-		server_size = scope_server.size();
+
+		// std::cout << RED << "DISPLAY SCOPE -" CLEAR << std::endl;
+		// for (std::vector<std::string>::iterator it = scope_server.begin(); it != scope_server.end(); it++)
+		// {
+		// 	std::cout << "it = " << *it << std::endl;
+		// }
+		// // i++;
+		// sleep(2);
+		server_size += scope_server.size();
 		if (ft_check_directive_server(scope_server, server_size))
 		{
 			std::cout << "ft_check_directive_server return true " << std::endl;
@@ -156,6 +165,8 @@ bool                            Parsing::ft_check_server( void )
 			std::cout << "ft_find_directive_server return true" << std::endl;
 			return (true);
 		}
+
+
 		// else
 		// 	std::cout << "cool ca marche " << std::endl;
 		// std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;

@@ -23,6 +23,106 @@ HttpServer::HttpServer( void ) { // a terminer, initialiser toutes les variables
 	return ;
 }
 
+// je ne suis pas sur que cette fonction soit necessaire
+// l'idee est de mettre les roots sur tous les index et ou les upload store et ou les errors
+void HttpServer::ft_put_root( void )
+{	
+	std::cout << "\n\n\n" << std::endl;
+	std::cout << GREEN << "Dans ft_put_root" << CLEAR << std::endl;
+
+	size_t i = 0;
+	while (i < this->_servers.size())
+	{
+		if (this->_servers[i].root_server.empty() == false)
+		{
+			std::cout << " root last = " << this->_servers[i].root_server[this->_servers[i].root_server.size() - 1] << std::endl;
+			if (this->_servers[i].root_server[this->_servers[i].root_server.size() - 1] == '/')
+			{
+				this->_servers[i].index_server.insert(0, this->_servers[i].root_server);
+				this->_servers[i].upload_store_server.insert(0, this->_servers[i].root_server);
+			}
+			else
+			{
+				this->_servers[i].index_server.insert(0, "/");
+				this->_servers[i].index_server.insert(0, this->_servers[i].root_server);
+				if (this->_servers[i].upload_store_server.empty() == false)
+				{
+					this->_servers[i].upload_store_server.insert(0, "/");
+					this->_servers[i].upload_store_server.insert(0, this->_servers[i].root_server);
+				}
+			}
+		}
+		
+		i++;
+	}
+
+}
+
+
+void HttpServer::DISPLAY_ALL_DATA_PARSING( void )
+{
+	std::cout << "\n\n\n" << std::endl;
+	std::cout << GREEN << "Dans DISPLAY_ALL_DATA_PARSING" << CLEAR << std::endl;
+
+	std::cout << "Nombre de servers: " << this->_servers.size() << std::endl;
+	size_t i = 0;
+	while (i < this->_servers.size())
+	{
+		std::cout << "Server numero : " << i << std::endl;
+		std::cout << "nom server = " << this->_servers[i].name_server << std::endl;
+		std::cout << "host server = " << this->_servers[i].host_server << std::endl;
+		std::cout << "port server = " << this->_servers[i].port_server << std::endl;
+		std::cout << "root server = " << this->_servers[i].root_server << std::endl;
+		std::cout << "index server = " << this->_servers[i].index_server << std::endl;
+		std::cout << "return server = " << this->_servers[i].return_server << std::endl;
+		std::cout << "autoindex server = " << this->_servers[i].autoindex_server << std::endl;
+		std::cout << "buffer size server = " << this->_servers[i].buffer_size_server << std::endl;
+		std::cout << "cgi path server = " << this->_servers[i].cgi_path_server << std::endl;
+		std::cout << "upload store  server = " << this->_servers[i].upload_store_server << std::endl;
+		
+
+		std::cout << "Method accepted server ";
+		for (std::vector<std::string>::iterator it = this->_servers[i].methods_server.begin(); it != this->_servers[i].methods_server.end(); it++)
+			std::cout << *it << "\t";
+		std::cout << "\n";
+
+		std::cout << "folder_error server = " << this->_servers[i].folder_error << std::endl;
+		std::cout << "Error accepted server ";
+		for (std::map<int, std::string>::iterator it = this->_servers[i].error_server.begin(); it != this->_servers[i].error_server.end(); it++)
+			std::cout << it->first << " et " << it->second << "\n";
+
+		
+		std::cout << "Nbr location server =" << this->_servers[i].nbr_location << std::endl;
+		std::cout << " test = " << this->_servers[i].location.empty() << std::endl;
+		size_t y = 0;
+		while (y < this->_servers[i].nbr_location)
+		{
+			std::cout << "Loction numero : " << y << std::endl;
+			std::cout << "nom location = " << this->_servers[i].location[y].name_location << std::endl;
+			std::cout << "root location = " << this->_servers[i].location[y].root_location << std::endl;
+			std::cout << "index location = " << this->_servers[i].location[y].index_location << std::endl;
+			std::cout << "autoindex location = " << this->_servers[i].location[y].autoindex_location << std::endl;
+			std::cout << "upload store location = " << this->_servers[i].location[y].upload_store_location << std::endl;
+			std::cout << "buffer size location = " << this->_servers[i].location[y].buffer_size_location << std::endl;
+			std::cout << "folder error location = " << this->_servers[i].location[y].folder_error << std::endl;
+			std::cout << "Error accepted location ";
+			for (std::map<int, std::string>::iterator it = this->_servers[i].location[y].error_location.begin(); it != this->_servers[i].location[y].error_location.end(); it++)
+				std::cout << it->first << " et " << it->second << "\n";
+			std::cout << "\nMethod accepted location ";
+			for (std::vector<std::string>::iterator it = this->_servers[i].location[y].methods_location.begin(); it != this->_servers[i].location[y].methods_location.end(); it++)
+				std::cout << *it << "\t";
+			std::cout << "\n";
+
+			std::cout << "\n";
+			y++;
+		}
+		std::cout << "\n\n";
+		i++;
+	}
+
+	// std::cout << "autre = " << 
+}
+
 /*
 **	HttpServer Constructor with argument.
 */
@@ -54,7 +154,10 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // a
 		if (this->_data->ft_get_error() == 1)
 			return ;
 		this->_servers = this->_data->ft_get_servers();											// on recupere les informations provenant de la class parsing
-		// exit(1);
+		ft_put_root();
+		this->DISPLAY_ALL_DATA_PARSING();
+
+		exit(1);
 		// std::cout << "display un truc = " << this->_servers[0].host_server << std::endl;
 		if (this->ft_create_servers() == 1)
 			return ;

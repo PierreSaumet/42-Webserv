@@ -196,6 +196,8 @@ class HttpServer {
 		// ICI nouveau lyundi 24 
 		size_t				ft_check_recv_complete(std::string tt_buffer);
 
+		void DISPLAY_ALL_DATA_PARSING( void );
+		void							ft_put_root( void );
 
 	private:
 		Parsing				*_data;
