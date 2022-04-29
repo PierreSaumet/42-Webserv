@@ -131,34 +131,6 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 	std::cout << GREEN << "Dans ft_check_method_allowed_header " << CLEAR << std::endl;
 	
 	std::cout << "Nbr de server = " << this->_servers.size() << std::endl;
-	// exit(1);
-
-	// if (this->_servers.size() > 1)
-	// {
-	// 	std::cout << "plusieurs servers" << std::endl;
-	// 	size_t y = 0;
-	// 	std::string tmp_port_request = this->_header_requete[0].host;
-	// 	size_t pos = tmp_port_request.find(":");
-	// 	tmp_port_request.erase(tmp_port_request.begin(), tmp_port_request.begin() + pos + 1);
-	// 	std::cout << "tmp_port_request = " << tmp_port_request << std::endl;
-	// 	while (y < this->_servers.size())
-	// 	{
-	// 		std::stringstream 	ss;
-	// 		std::string			port_server;
-
-	// 		ss << this->_servers[y].port_server;
-	// 		ss >> port_server;
-	// 		if (port_server == tmp_port_request)
-	// 		{
-	// 			std::cout << "OUI c'est egal = " << port_server << std::endl;
-
-	// 		}
-	// 		// std::cout << "port_server = " << port_server << std::endl;
-	// 		y++;
-	// 	}
-	// }
-	// std::cout << "1 server " << std::endl;
-	// exit(1);
 	
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
@@ -170,15 +142,21 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 			std::string test = this->_header_requete[0].path;
 			if (this->_header_requete[0].path != "/")	// si requete est differente de juste / on supprime le root
 				test.erase(0, this->_servers[this->_num_serv].root_server.size());
-			std::cout << "test = " << test << std::endl;
+			// std::cout << "test = " << test << std::endl;
 
 			std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
 			for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
 				all_location.push_back(it->name_location);
 			std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
-			for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); it++)
+			for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
 			{
-				size_t pos_slash = test.find("/", 1); // on cherche le deuxieme / pour avoir le premier dossier de la requete
+				size_t pos_slash = 0;
+				if (*it == "/")
+					pos_slash = 1; // on cherche le deuxieme / pour avoir le premier dossier de la requete
+				else
+					pos_slash = test.find("/", 1); 
+				
+				std::cout << "test = " << test << " et it = " << *it << " pos = " << pos_slash << std::endl;
 				if (test.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
 				{
 					for (std::vector<t_location>::iterator it_loc = this->_servers[this->_num_serv].location.begin(); it_loc != this->_servers[this->_num_serv].location.end(); it_loc++)
@@ -194,10 +172,12 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 						}
 					}
 				}
+				// std::cout << "*it[0] = " << it[0] << " et test [0] = " << test[0] << std::endl; 
 			}
 			std::cout << " ca correspond a qucun location erreur ? " << std::endl;
 			std::cout << "SAUF SI REDIRECTION ATTENTION PIERRE" << std::endl;
 			sleep(5);
+			exit(1);
 			return (2);
 			exit(1);
 			std::cout << "requete = " << test<< std::endl;

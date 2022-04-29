@@ -203,6 +203,7 @@ class HttpServer {
 		bool compareNameLocation( std::vector<t_location> a, std::vector<t_location> b);
 		int ft_trouve_le_server( void );
 
+		size_t check_location( std::string path);
 	private:
 		Parsing				*_data;
 		std::vector<t_server>           _servers;

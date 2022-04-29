@@ -216,7 +216,6 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		{
 			std::cout << "erreur verifie le drot res = " << res << std::endl;
 			sleep(2);
-			// exit(1);
 			this->_header_requete[0].error = true;
 			if (res == 2)
 				this->_header_requete[0].num_error = 403;
@@ -236,8 +235,6 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		}
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 		std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
-		// exit(1);
-		// exit(1);
 	}
 	else
 	{
@@ -246,74 +243,160 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	}
 	return (0);
 }
+
+size_t HttpServer::check_location( std::string path )
+{
+	size_t 	i = 0;
+
+	std::cout << "\n\n\n path = " << path << std::endl;
+	while ( i < this->_servers[this->_num_serv].location.size())
+	{
+		if ("/" == this->_servers[this->_num_serv].location[i].name_location)
+		{
+			if (path.size() - this->_servers[0].root_server.size() > 1)
+			{
+				struct stat buff;
+
+				if (stat(path.c_str(), &buff) < 0)
+				{
+					std::cout << "existe pas ca sort" << std::endl;
+					exit(1);
+					return (1); //404
+				}
+				if (S_ISDIR(buff.st_mode))
+				{
+					
+					if (this->_servers[this->_num_serv].location[i].root_location.empty() == false)
+					{
+						path.erase(0, this->_servers[this->_num_serv].root_server.size());
+						path.erase(0,this->_servers[this->_num_serv].location[i].root_location.size());
+						// std::cout << "DU COUP path = " << path << std::endl;
+						if (this->_servers[this->_num_serv].location[i].index_location.empty() == false)
+						{
+							std::cout << "on demande index" << std::endl;
+							// exit(1);
+							return (0);
+						}
+						// exit(1);
+					}
+					std::cout << "DOSSIER" << std::endl;
+					exit(1);
+					return (2); // 403
+				}
+				if (S_ISREG(buff.st_mode))
+				{
+					std::cout << "FICHIER " << std::endl;
+					exit(1);
+					return (0);
+				}
+
+
+			}
+			else	// path == / donc on return 0
+			{
+				std::cout << "path = /" << std::endl;
+				exit(1);
+				return (0);
+			}
+		}
+		i++;
+	}
+
+	return (0);
+}
+
+
 size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
 {
-	std::cout << GREEN <<  "Dans verifie le droit duchemin" << CLEAR << std::endl;
+	std::cout << GREEN <<  "\n\nDans verifie le droit duchemin" << CLEAR << std::endl;
 	if (this->_servers[this->_num_serv].nbr_location == 0)
 	{
 		std::cout << "pas de location donc on compare la demande avec l'acces de l'index" << std::endl;
 		if (this->_header_requete[0].path == "/")			// on retourne 0
 			return (0);
-		std::string tmp_index = this->_servers[this->_num_serv].index_server;			// notre index du server
+		std::string		 tmp_index = this->_servers[this->_num_serv].index_server;			// notre index du server
 		tmp_index.insert(0, this->_servers[this->_num_serv].root_server);			
-		struct stat buff_index;
+		
+		struct stat 	buff_index;
 		stat(tmp_index.c_str(), &buff_index);
-		struct stat buff_path;
+		
+		struct stat 	buff_path;
 		std::cout << "path = " << this->_header_requete[0].path << std::endl;
-		// exit(1);
 		stat(this->_header_requete[0].path.c_str(), &buff_path);
+
 		if (stat(this->_header_requete[0].path.c_str(), &buff_path) < 0)
 			return (1);	// erreur 404
 		std::cout << " la page demande existe ... " << std::endl;
 		// on compare les deux buffs si egaux alors la requete est l'index du server donc OK sinon on ressort 403
 		if (buff_index.st_dev == buff_path.st_dev && buff_index.st_ino == buff_path.st_ino)
 		{
-			std::cout << "c'est egal a lindex doncok " << std::endl;
+			std::cout << "c'est egal a l'index donc ok " << std::endl;
 			return (0);
 		}
 		else
 		{
-			std::cout << "ICI ce n'est pas egal a un index donc on verifie que c'est bien dans le root" << std::endl;
-			// std::cout << "le st_dev de la requete = " << buff_path.st_dev << std::endl;
-			// std::cout << " le st_dev de l'index = " << buff_tmp.st_dev << std::endl;
+			if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
+				return (0);
+			return (2); // 403
 
-			// std::cout << "\nle st_ino de la requete = " << buff_path.st_ino << std::endl;
-			// std::cout << " le st_ino de l'index = " << buff_tmp.st_ino << std::endl;
-			// on supprime le root de path
-			std::string tmp_path = this->_header_requete[0].path;
-			tmp_path.erase(0, this->_servers[this->_num_serv].root_server.size() + 1); // pour supprimer le / de la requete
-			// tmp_index.erase(0, this->_servers[this->_num_serv].root_server.size());
-			std::cout << "maintenant path  = -" << tmp_path << "-" << std::endl;
-
-			DIR *dp;
-			struct dirent *dirp;
-			if ((dp = opendir(this->_servers[this->_num_serv].root_server.c_str())) == NULL)
-			{
-				std::cout << "ERREUR OPEN WWW" << std::endl;
-				exit(1);
-			}
-			while ((dirp = readdir(dp)) != NULL)
-			{
-				std::cout << "nom = " << dirp->d_name << " et type = " << dirp->d_type << std::endl;
-				// if (dirp->d_name == tmp_path.c_str())
-				if (tmp_path.compare(dirp->d_name) == 0)
-				{
-					
-					if (dirp->d_type == DT_REG)
-					{
-						std::cout << "YES BINGO" << std::endl;
-						sleep(5);
-						return (0);
-					}
-				}
-			}
-			return (2);
-
-			exit(1);
-			return (2); // erreur 403?
 		}
 	}
-	std::cout << "plusieurs locations " << std::endl;
+	
+	// std::cout << "Il y a plusieurs locations" << std::endl;
+	std::cout << "path = " << this->_header_requete[0].path << std::endl;
+	std::string 	tmp_path = this->_header_requete[0].path;
+	if (tmp_path != "/")
+		tmp_path.erase(0, this->_servers[0].root_server.size());
+	std::cout << "new path = " << tmp_path << std::endl;
+
+	std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
+	for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
+		all_location.push_back(it->name_location);
+	std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
+	
+	for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
+	{
+		// std::cout << "bloc location = " << *it << std::endl;
+		size_t 	i = 0;
+
+		while ( i < this->_servers[this->_num_serv].location.size())
+		{
+			if (*it == this->_servers[this->_num_serv].location[i].name_location)
+			{
+				std::cout << "On est dans le bloc du server " << *it << std::endl;
+				std::cout << "path = " << tmp_path << std::endl;
+				if (tmp_path.compare(0, it->size(), *it) == 0)
+				{
+					std::cout << "la requete: " << tmp_path << " appartient au bloc location : " << *it << std::endl;
+					if (this->_servers[this->_num_serv].location[i].name_location[this->_servers[this->_num_serv].location[i].name_location.size() - 1] == '/')
+					{
+						std::cout << "\tla location est un dossier" << std::endl;
+					}
+
+					// si un root est setup on le met dans la requete
+					if (this->_servers[this->_num_serv].location[i].root_location.empty() == false)
+					{
+						tmp_path.insert(0, this->_servers[this->_num_serv].location[i].root_location);
+						// tmp.erase(0, 1);
+					}
+					tmp_path.insert(0, this->_servers[this->_num_serv].root_server);
+					std::cout << "la requete: " << tmp_path << std::endl;
+
+					if (*it == "/")
+					{
+						std::cout << "fonction speciale" << std::endl;
+						return (this->check_location(tmp_path));
+					}
+
+
+				}
+			}
+			i++;
+		}
+	}
+
+
+	std::cout << "NON rien " << std::endl;
 	exit(1);
 	return (0);
 }
