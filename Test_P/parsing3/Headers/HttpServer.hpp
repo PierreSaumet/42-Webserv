@@ -85,6 +85,9 @@ class HttpServer {
 			std::string			body_post;				//seulement post
 			std::string			script_file_name;	// nom du fichier
 			
+
+			std::string			path_file;
+
 			bool				return_used;
 			
 			bool				upload;

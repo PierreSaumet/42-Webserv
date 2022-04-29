@@ -68,11 +68,19 @@ std::string		HttpServer::ft_setup_header( void )
 		if (this->_header_requete[0].return_used == false)
 		{
 			std::cout << "Dans le cas ou il y a pas de redirection :" << std::endl;
-			this->_header_requete[0].path.append(this->_servers[this->_num_serv].index_server);
-			// this->_header_requete[0].path.erase(0, 1);								// on supprime le /
-			this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
-			std::cout << "du coup path = " << this->_header_requete[0].path << std::endl;
-			// exit(1);
+
+			if (this->_header_requete[0].path_file.empty() == true)
+			{
+				this->_header_requete[0].path.append(this->_servers[this->_num_serv].index_server);
+				// this->_header_requete[0].path.erase(0, 1);								// on supprime le /
+				this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
+				std::cout << "du coup path = " << this->_header_requete[0].path << std::endl;
+				// exit(1);
+			}
+			else
+			{
+				this->_header_requete[0].path = this->_header_requete[0].path_file;
+			}
 		}
 		else
 		{	// Redirection 301 dans un bloc server

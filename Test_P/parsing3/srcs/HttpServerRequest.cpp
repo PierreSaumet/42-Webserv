@@ -268,12 +268,14 @@ size_t HttpServer::check_location( std::string path )
 					
 					if (this->_servers[this->_num_serv].location[i].root_location.empty() == false)
 					{
+						this->_header_requete[0].path_file = path;
 						path.erase(0, this->_servers[this->_num_serv].root_server.size());
 						path.erase(0,this->_servers[this->_num_serv].location[i].root_location.size());
 						// std::cout << "DU COUP path = " << path << std::endl;
 						if (this->_servers[this->_num_serv].location[i].index_location.empty() == false)
 						{
 							std::cout << "on demande index" << std::endl;
+							this->_header_requete[0].path_file.append(this->_servers[this->_num_serv].location[i].index_location);
 							// exit(1);
 							return (0);
 						}
@@ -295,6 +297,7 @@ size_t HttpServer::check_location( std::string path )
 			else	// path == / donc on return 0
 			{
 				std::cout << "path = /" << std::endl;
+				this->_header_requete[0].path_file = path;
 				exit(1);
 				return (0);
 			}
@@ -309,6 +312,11 @@ size_t HttpServer::check_location( std::string path )
 size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
 {
 	std::cout << GREEN <<  "\n\nDans verifie le droit duchemin" << CLEAR << std::endl;
+
+	if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
+		return (0);
+
+	sleep(1);
 	if (this->_servers[this->_num_serv].nbr_location == 0)
 	{
 		std::cout << "pas de location donc on compare la demande avec l'acces de l'index" << std::endl;
@@ -348,7 +356,7 @@ size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
 	if (tmp_path != "/")
 		tmp_path.erase(0, this->_servers[0].root_server.size());
 	std::cout << "new path = " << tmp_path << std::endl;
-
+	sleep(1);
 	std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
 	for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
 		all_location.push_back(it->name_location);
