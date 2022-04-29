@@ -50,47 +50,89 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 	}
 	return ;
 }
+
+/*
+**	Cette fonction compare le port de la requete avec le port des servers pour connaitre
+**	quel server on utilise.
+**	retourne -1 si une erreur sinon retourne le numero de l'emplacement du server.
+*/
+int HttpServer::ft_trouve_le_server( void )
+{
+	std::cout << GREEN << "Dans ft_trouve_le_server " << CLEAR << std::endl;
+	std::string 	port_request = this->_header_requete[0].host;
+	size_t			pos = port_request.find(":");
+		
+	port_request.erase(port_request.begin(), port_request.begin() + pos + 1);
+	if (this->_servers.size() > 1)
+	{
+		size_t			y = 0;
+
+		while (y < this->_servers.size())
+		{
+			std::stringstream 	ss;
+			std::string			port_server;
+
+			ss << this->_servers[y].port_server;
+			ss >> port_server;
+			if (port_server == port_request)
+				return (y);
+			y++;
+		}
+		return (-1);
+
+	}
+	std::stringstream 	ss;
+	std::string			port_server;
+
+	ss << this->_servers[0].port_server;
+	ss >> port_server;
+	if (port_server == port_request)
+		return (0);
+	return (-1);
+}
+
+
 size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 {
 	std::cout << GREEN << "Dans get : " << CLEAR <<  std::endl;
-	
-	// On verifie que this->_header_requete est vide, apres chaque requete il doit etre vide.
-	
-	
+
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
-		
-		// exit(1);
-		// exit(1);
-		if (len_msg > 1023)													// on verifie que le header ne soit pas trop long
+		if (len_msg > 1023)
 		{
-
 			std::cout << RED << "On a une  ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
-			if (this->ft_setup_error_header(request_http, len_msg) == 0)
-				return (0);
-			else
+			if (this->ft_setup_error_header(request_http, len_msg) != 0)
 			{
 				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				
-				sleep(2);
-				return (1);
+				exit(1);
 			}
-
+			return (0);
 		}
-		
 		std::cout << BLUE << "Ok pas d'erreur 431 donc on continue." << CLEAR <<  std::endl;
-		size_t pos_header = request_http.find("\r\n\r\n");
-		std::string size_header(request_http, 0, pos_header);
 
-		// std::cout << "SIZE HEADER = -" << size_header << "-" << std::endl;
+		size_t 			pos_header = request_http.find("\r\n\r\n"); // faire erreur si pas de fin de header
+		std::string 	size_header(request_http, 0, pos_header);
 
 		this->_header_requete[0].method = "GET";
 		std::cout << "On a la method : " << this->_header_requete[0].method << "-" <<  std::endl;
 	
+		this->_header_requete[0].host = this->ft_check_host_header(size_header);
+		if (this->_header_requete[0].host.empty() == true)
+			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
+		std::cout << "On a le host : " << this->_header_requete[0].host << "-" << std::endl;
+		
+		int ret_serv = 0;
+		if ((ret_serv = this->ft_trouve_le_server()) == -1)
+		{
+			std::cout << "trouve pas le server exit" << std::endl;
+			exit(1);
+		}
+		this->_num_serv = ret_serv;			// on utiliser le numero du server
+		std::cout << "on a le server numero = " << ret_serv << std::endl;
+		
 		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
 		this->_header_requete[0].path = this->ft_check_path_header(size_header);
 		if (this->_header_requete[0].path.empty() == true)
@@ -105,12 +147,6 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
 		std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
 
-		this->_header_requete[0].host = this->ft_check_host_header(size_header);
-		if (this->_header_requete[0].host.empty() == true)
-			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
-		std::cout << "On a le host : " << this->_header_requete[0].host << "-" << std::endl;
-		
-		
 
 		// RAJOUT VENDREDi
 		this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
@@ -119,10 +155,11 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		std::cout << "On a le accept = "<< this->_header_requete[0].accept << std::endl;
 	
 		
+		// fonction a verifier
 		this->_header_requete[0].path_http = this->ft_check_pathhttp_header(size_header);
 		if (this->_header_requete[0].path_http.empty() == true)
 			throw Error(16, "Error, in recieved header, the path of the file si not correct." , 2);
-		std::cout << "le path = " << this->_header_requete[0].path_http << std::endl;
+		// std::cout << "le path = " << this->_header_requete[0].path_http << std::endl;
 		
 
 		size_t ret_method = 0;
@@ -163,7 +200,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		// TEST REDIRECTION
 		std::cout << "path request -" << this->_header_requete[0].path << "-" << std::endl;
 
-		if (this->_header_requete[0].path == "/" && this->_servers[0].return_server.empty() == false)
+		if (this->_header_requete[0].path == "/" && this->_servers[this->_num_serv].return_server.empty() == false)
 		{
 			std::cout << "oui" << std::endl;
 			this->_header_requete[0].return_used = true;
@@ -177,6 +214,9 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		size_t res = 0;
 		if ((res = this->ft_verifie_ledroit_du_chemin()) > 0)
 		{
+			std::cout << "erreur verifie le drot res = " << res << std::endl;
+			sleep(2);
+			// exit(1);
 			this->_header_requete[0].error = true;
 			if (res == 2)
 				this->_header_requete[0].num_error = 403;
@@ -195,6 +235,9 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			}
 		}
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+		std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
+		// exit(1);
+		// exit(1);
 	}
 	else
 	{
@@ -206,13 +249,13 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
 {
 	std::cout << GREEN <<  "Dans verifie le droit duchemin" << CLEAR << std::endl;
-	if (this->_servers[0].nbr_location == 0)
+	if (this->_servers[this->_num_serv].nbr_location == 0)
 	{
 		std::cout << "pas de location donc on compare la demande avec l'acces de l'index" << std::endl;
 		if (this->_header_requete[0].path == "/")			// on retourne 0
 			return (0);
-		std::string tmp_index = this->_servers[0].index_server;			// notre index du server
-		tmp_index.insert(0, this->_servers[0].root_server);			
+		std::string tmp_index = this->_servers[this->_num_serv].index_server;			// notre index du server
+		tmp_index.insert(0, this->_servers[this->_num_serv].root_server);			
 		struct stat buff_index;
 		stat(tmp_index.c_str(), &buff_index);
 		struct stat buff_path;
@@ -238,13 +281,13 @@ size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
 			// std::cout << " le st_ino de l'index = " << buff_tmp.st_ino << std::endl;
 			// on supprime le root de path
 			std::string tmp_path = this->_header_requete[0].path;
-			tmp_path.erase(0, this->_servers[0].root_server.size() + 1); // pour supprimer le / de la requete
-			// tmp_index.erase(0, this->_servers[0].root_server.size());
+			tmp_path.erase(0, this->_servers[this->_num_serv].root_server.size() + 1); // pour supprimer le / de la requete
+			// tmp_index.erase(0, this->_servers[this->_num_serv].root_server.size());
 			std::cout << "maintenant path  = -" << tmp_path << "-" << std::endl;
 
 			DIR *dp;
 			struct dirent *dirp;
-			if ((dp = opendir(this->_servers[0].root_server.c_str())) == NULL)
+			if ((dp = opendir(this->_servers[this->_num_serv].root_server.c_str())) == NULL)
 			{
 				std::cout << "ERREUR OPEN WWW" << std::endl;
 				exit(1);
@@ -451,18 +494,18 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		
 		// test en rajoutant root
 		std::string tmp_2 = this->_header_requete[0].script_file_name;
-		tmp_2.insert(0, this->_servers[0].root_server);
+		tmp_2.insert(0, this->_servers[this->_num_serv].root_server);
 		std::cout << "\n tmp_2 = " << tmp_2 << std::endl;
 		this->_cgi->setScriptName(tmp_2);
 		this->_cgi->setScriptFileName(tmp_2);
 
 		tmp_2 = this->_header_requete[0].request_uri;
-		tmp_2.insert(0, this->_servers[0].root_server);
+		tmp_2.insert(0, this->_servers[this->_num_serv].root_server);
 		this->_cgi->setRequestUri(tmp_2);
 
 
 		// probleme si plusieurs servers ...
-		this->_cgi->setServerName(this->_servers[0].name_server);
+		this->_cgi->setServerName(this->_servers[this->_num_serv].name_server);
 		
 		
 
@@ -472,13 +515,13 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		// exit(1);
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
 		
-		// std::cout << "address cgi = " << this->_servers[0].cgi_path_server << std::endl;
+		// std::cout << "address cgi = " << this->_servers[this->_num_serv].cgi_path_server << std::endl;
 		std::string tmp = this->_header_requete[0].script_file_name;
-		tmp.insert(0, this->_servers[0].root_server);
+		tmp.insert(0, this->_servers[this->_num_serv].root_server);
 		// std::cout << "tmp = " << tmp << std::endl;
 
 		// std::string BINGO = "";
-		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp);
+		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp);
 		
 		// sleep(1);
 		// std::cout << "\n\n\n BINGO = \n" << this->_header_requete[0].body_error << std::endl;
@@ -713,16 +756,16 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 	(void)len_msg;
 	std::cout << GREEN << "Dans ft_setup_error_header" << CLEAR << std::endl;
 	// exit(1);
-	if (this->_servers[0].nbr_location > 0)
+	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
-		std::cout << "il y a des loctions : " << this->_servers[0].nbr_location << std::endl;
+		std::cout << "il y a des loctions : " << this->_servers[this->_num_serv].nbr_location << std::endl;
 		size_t i = 0;
-		while ( i < this->_servers[0].nbr_location)
+		while ( i < this->_servers[this->_num_serv].nbr_location)
 		{
-			std::cout << "affiche le nom de la location : " << this->_servers[0].location[i].name_location << std::endl;
+			std::cout << "affiche le nom de la location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
 			
 			size_t found = request_http.find("/");
-			// size_t size_name_location = this->_servers[0].location[i].name_location.length();
+			// size_t size_name_location = this->_servers[this->_num_serv].location[i].name_location.length();
 			if (found == std::string::npos)
 			{
 				std::cout << "ERREUR euh pas normal ne trouve pas / dans la requete a traiter "<< std::endl;
@@ -731,9 +774,9 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 			else
 			{
 				// std::cout << "request http = " << request_http << std::endl;
-				// std::cout << "nom lcoation = " << this->_servers[0].location[i].name_location << std::endl;
+				// std::cout << "nom lcoation = " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
 				// std::cout << "found = " << found << std::endl;
-				std::string tmp = this->_servers[0].location[i].name_location;
+				std::string tmp = this->_servers[this->_num_serv].location[i].name_location;
 				if (tmp[tmp.size() - 1] != '/')
 					tmp.append("/");
 				// std::cout << "tmp = " << tmp << std::endl;
@@ -747,9 +790,9 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 						if (this->_header_requete[0].num_error)
 						{
 
-							std::map<int, std::string>::iterator it = this->_servers[0].location[i].error_location.begin();
+							std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].location[i].error_location.begin();
 							// on cherche si l'erreur a ete idique dans une directive error_page
-							for (; it != this->_servers[0].location[i].error_location.end(); it++)
+							for (; it != this->_servers[this->_num_serv].location[i].error_location.end(); it++)
 							{
 								std::cout << "on display les erreur dans location... " << it->first << std::endl;
 								if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
@@ -772,11 +815,11 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 							}
 							std::cout << RED << "l'erreur n'a pas ete trouve dans error_page " << CLEAR << std::endl;
 							this->_header_requete[0].body_error = "/";
-							this->_header_requete[0].body_error.insert(0, this->_servers[0].location[i].name_location);
-							// this->_header_requete[0].body_error = this->_servers[0].location[i].name_location;
-							this->_header_requete[0].body_error.insert(0, this->_servers[0].root_server);
+							this->_header_requete[0].body_error.insert(0, this->_servers[this->_num_serv].location[i].name_location);
+							// this->_header_requete[0].body_error = this->_servers[this->_num_serv].location[i].name_location;
+							this->_header_requete[0].body_error.insert(0, this->_servers[this->_num_serv].root_server);
 							std::cout << "euh le body error = " << this->_header_requete[0].body_error << std::endl;
-							// this->_header_requete[0].body_error = this->_servers[0].root_server;
+							// this->_header_requete[0].body_error = this->_servers[this->_num_serv].root_server;
 							// this->_header_requete[0].body_error = "NULL";
 						}
 						else
@@ -798,9 +841,9 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 		}
 		std:: cout << RED << " la pierre ca ne correspond pas des location  " << CLEAR << std::endl;
 
-		std::map<int, std::string>::iterator it = this->_servers[0].error_server.begin();
+		std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();
 		// on cherche si l'erreur a ete idique dans une directive error_page
-		for (; it != this->_servers[0].error_server.end(); it++)
+		for (; it != this->_servers[this->_num_serv].error_server.end(); it++)
 		{
 			std::cout << "on display les erreur setup du server... " << it->first << std::endl;
 			if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
@@ -821,8 +864,8 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 		std:: cout << RED << " la pierre que faire ?  " << CLEAR << std::endl;
 		this->_header_requete[0].body_error = "/";
 		
-		// this->_header_requete[0].body_error = this->_servers[0].location[i].name_location;
-		this->_header_requete[0].body_error.insert(0, this->_servers[0].root_server);
+		// this->_header_requete[0].body_error = this->_servers[this->_num_serv].location[i].name_location;
+		this->_header_requete[0].body_error.insert(0, this->_servers[this->_num_serv].root_server);
 		// this->_servers[index_server].location[index_location].name_location
 	}
 	else
@@ -830,9 +873,9 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 		std::cout << "il y a pas de location, on cherche les erreurs dans root" << std::endl;
 		std:: cout << RED << " la pierre ca ne correspond pas des location  " << CLEAR << std::endl;
 
-		std::map<int, std::string>::iterator it = this->_servers[0].error_server.begin();
+		std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();
 		// on cherche si l'erreur a ete idique dans une directive error_page
-		for (; it != this->_servers[0].error_server.end(); it++)
+		for (; it != this->_servers[this->_num_serv].error_server.end(); it++)
 		{
 			std::cout << "on display les erreur setup du server... " << it->first << std::endl;
 			if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
@@ -853,8 +896,8 @@ int			HttpServer::ft_setup_error_header( std::string request_http, int len_msg )
 		std:: cout << RED << " la pierre que faire ?  " << CLEAR << std::endl;
 		this->_header_requete[0].body_error = "/";
 		
-		// this->_header_requete[0].body_error = this->_servers[0].location[i].name_location;
-		this->_header_requete[0].body_error.insert(0, this->_servers[0].root_server);
+		// this->_header_requete[0].body_error = this->_servers[this->_num_serv].location[i].name_location;
+		this->_header_requete[0].body_error.insert(0, this->_servers[this->_num_serv].root_server);
 		
 	}
 	return (0);
@@ -869,6 +912,12 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 	std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
 	// std::cout << "request_http = " << request_http << std::endl;
 	std::cout << "len_msg = " << len_msg << std::endl;
+
+
+
+
+	exit(1); // il faut rajouter this->_servers[this->_num_serv]
+
 	// sleep(5);
 	// exit(1);
 	if (this->_header_requete.empty() == true)

@@ -19,7 +19,7 @@ std::string		HttpServer::ft_setup_header( void )
 	// cette fonction doit voir si le path de la requete est valide et existe.
 	// ouvrir le fichier, verifier qu'il ne soit pas vide.
 	// setup up le header avec le numero de la reponse du server.
-	std::string filename(this->_servers[0].index_server.c_str());
+	std::string filename(this->_servers[this->_num_serv].index_server.c_str());
 	FILE *input_file = NULL;
 	std::string res;
 	std::string file_contents;
@@ -67,10 +67,11 @@ std::string		HttpServer::ft_setup_header( void )
 		std::cout << "path = " << this->_header_requete[0].path << std::endl;
 		if (this->_header_requete[0].return_used == false)
 		{
-			this->_header_requete[0].path.append(this->_servers[0].index_server);
-			this->_header_requete[0].path.erase(0, 1);								// on supprime le /
-			this->_header_requete[0].path.insert(0, this->_servers[0].root_server);
-			// std::cout << "du coup path = " << this->_header_requete[0].path << std::endl;
+			std::cout << "Dans le cas ou il y a pas de redirection :" << std::endl;
+			this->_header_requete[0].path.append(this->_servers[this->_num_serv].index_server);
+			// this->_header_requete[0].path.erase(0, 1);								// on supprime le /
+			this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
+			std::cout << "du coup path = " << this->_header_requete[0].path << std::endl;
 			// exit(1);
 		}
 		else
@@ -108,7 +109,7 @@ std::string		HttpServer::ft_setup_header( void )
 		if (ret == 0)
 		{
 			std::cout << "alors erreur dans le root server " << std::endl;
-			pos = this->_header_requete[0].body_error.find(this->_servers[0].folder_error);
+			pos = this->_header_requete[0].body_error.find(this->_servers[this->_num_serv].folder_error);
 		}
 		else if (ret > 0 || ret == -1)
 		{
@@ -116,9 +117,9 @@ std::string		HttpServer::ft_setup_header( void )
 			// A TERMINER LA POSITION 2
 			if (ret == -1)
 				ret = 0;
-			std::cout << "kek " << this->_servers[0].location[ret].folder_error << std::endl;
+			std::cout << "kek " << this->_servers[this->_num_serv].location[ret].folder_error << std::endl;
 			std::cout << "bur " << this->_header_requete[0].body_error << std::endl;
-			pos = this->_header_requete[0].body_error.find(this->_servers[0].location[ret].folder_error);
+			pos = this->_header_requete[0].body_error.find(this->_servers[this->_num_serv].location[ret].folder_error);
 		}
 		else
 		{
@@ -328,11 +329,11 @@ std::string		HttpServer::ft_get_allow( void ) const
 	std::string tmp = "Allow: ";
 	
 	// std::cout << "le body = " <<  this->_header_requete[0].body_error << std::endl;
-	if (this->_servers[0].nbr_location > 0)
+	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
-		//std::cout << "il y a des locations : " << this->_servers[0].nbr_location << std::endl;
+		//std::cout << "il y a des locations : " << this->_servers[this->_num_serv].nbr_location << std::endl;
 		size_t i = 0;
-		while ( i < this->_servers[0].nbr_location)
+		while ( i < this->_servers[this->_num_serv].nbr_location)
 		{
 			size_t found = this->_header_requete[0].body_error.find("/");
 			if (found == std::string::npos)
@@ -342,13 +343,13 @@ std::string		HttpServer::ft_get_allow( void ) const
 			}
 			else
 			{
-				std::string tmp_name = this->_servers[0].location[i].name_location;
+				std::string tmp_name = this->_servers[this->_num_serv].location[i].name_location;
 				if (tmp_name[tmp_name.size() - 1] != '/')
 					tmp_name.append("/");
 				if (this->_header_requete[0].body_error.find(tmp_name) != std::string::npos)
 				{
-					std::vector<std::string>::const_iterator	it_b = this->_servers[0].location[i].methods_location.begin();
-					for (; it_b != this->_servers[0].location[i].methods_location.end(); it_b++)
+					std::vector<std::string>::const_iterator	it_b = this->_servers[this->_num_serv].location[i].methods_location.begin();
+					for (; it_b != this->_servers[this->_num_serv].location[i].methods_location.end(); it_b++)
 					{
 						tmp.append(*it_b);
 						tmp.append(", ");
@@ -362,8 +363,8 @@ std::string		HttpServer::ft_get_allow( void ) const
 		}
 	}
 	std::cout << "on va chercher dans le root" << std::endl;
-	std::vector<std::string>::const_iterator  it_b = this->_servers[0].methods_server.begin();
-	for (; it_b != this->_servers[0].methods_server.end(); it_b++)
+	std::vector<std::string>::const_iterator  it_b = this->_servers[this->_num_serv].methods_server.begin();
+	for (; it_b != this->_servers[this->_num_serv].methods_server.end(); it_b++)
 	{
 		tmp.append(*it_b);
 		tmp.append(", ");
@@ -457,7 +458,7 @@ std::string		HttpServer::ft_get_status( bool x ) const
 		if (this->_header_requete[0].num_error == 500)
 			return ("HTTP/1.1 500 Internal Server Error\r\n");
 	}
-	// if (this->_servers[0].return_server.empty() == false)
+	// if (this->_servers[this->_num_serv].return_server.empty() == false)
 	// 	return ("HTTP/1.1 301 Moved Permanently\r\n");
 	return ("HTTP/1.1 200 OK\r\n");
 }
@@ -468,9 +469,9 @@ std::string		HttpServer::ft_get_server_name( void ) const
 	// a changer en fonctin du server qu'on utilise KEK...
 	std::string		tmp;
 
-	// std::cout << " je dois prendre ca = " << this->_servers[0].name_server << std::endl;
+	// std::cout << " je dois prendre ca = " << this->_servers[this->_num_serv].name_server << std::endl;
 	tmp.insert(0, "\r\n");
-	tmp.insert(0, this->_servers[0].name_server);
+	tmp.insert(0, this->_servers[this->_num_serv].name_server);
 	tmp.insert(0, "Server: ");
 	return (tmp);
 }

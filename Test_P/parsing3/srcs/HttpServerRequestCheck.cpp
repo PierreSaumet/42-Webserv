@@ -66,7 +66,7 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 			else
 			{
 				std::string 	total(cwd);
-				std::string 	tmp = this->_servers[0].root_server;
+				std::string 	tmp = this->_servers[this->_num_serv].root_server;
 
 				size_t pos = tmp.find("."); 
 				tmp.erase(pos, 1);
@@ -129,20 +129,51 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 {
 	(void)request_http;
 	std::cout << GREEN << "Dans ft_check_method_allowed_header " << CLEAR << std::endl;
-	if (this->_servers[0].nbr_location > 0)
+	
+	std::cout << "Nbr de server = " << this->_servers.size() << std::endl;
+	// exit(1);
+
+	// if (this->_servers.size() > 1)
+	// {
+	// 	std::cout << "plusieurs servers" << std::endl;
+	// 	size_t y = 0;
+	// 	std::string tmp_port_request = this->_header_requete[0].host;
+	// 	size_t pos = tmp_port_request.find(":");
+	// 	tmp_port_request.erase(tmp_port_request.begin(), tmp_port_request.begin() + pos + 1);
+	// 	std::cout << "tmp_port_request = " << tmp_port_request << std::endl;
+	// 	while (y < this->_servers.size())
+	// 	{
+	// 		std::stringstream 	ss;
+	// 		std::string			port_server;
+
+	// 		ss << this->_servers[y].port_server;
+	// 		ss >> port_server;
+	// 		if (port_server == tmp_port_request)
+	// 		{
+	// 			std::cout << "OUI c'est egal = " << port_server << std::endl;
+
+	// 		}
+	// 		// std::cout << "port_server = " << port_server << std::endl;
+	// 		y++;
+	// 	}
+	// }
+	// std::cout << "1 server " << std::endl;
+	// exit(1);
+	
+	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
-		std::cout << "il y a des locations : " << this->_servers[0].nbr_location << std::endl;
+		std::cout << "il y a des locations : " << this->_servers[this->_num_serv].nbr_location << std::endl;
 		size_t i = 0;
-		while ( i < this->_servers[0].nbr_location)
+		while ( i < this->_servers[this->_num_serv].nbr_location)
 		{
 			// on recupere la requete, le path
 			std::string test = this->_header_requete[0].path;
 			if (this->_header_requete[0].path != "/")	// si requete est differente de juste / on supprime le root
-				test.erase(0, this->_servers[0].root_server.size());
+				test.erase(0, this->_servers[this->_num_serv].root_server.size());
 			std::cout << "test = " << test << std::endl;
 
 			std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
-			for (std::vector<t_location>::iterator it = this->_servers[0].location.begin(); it != this->_servers[0].location.end(); it++)
+			for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
 				all_location.push_back(it->name_location);
 			std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
 			for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); it++)
@@ -150,7 +181,7 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 				size_t pos_slash = test.find("/", 1); // on cherche le deuxieme / pour avoir le premier dossier de la requete
 				if (test.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
 				{
-					for (std::vector<t_location>::iterator it_loc = this->_servers[0].location.begin(); it_loc != this->_servers[0].location.end(); it_loc++)
+					for (std::vector<t_location>::iterator it_loc = this->_servers[this->_num_serv].location.begin(); it_loc != this->_servers[this->_num_serv].location.end(); it_loc++)
 					{
 						if (it_loc->name_location == *it)
 						{
@@ -176,9 +207,11 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 		}
 		exit(1);
 	}
+	
+	
 	std::cout << "on va chercher dans le root" << std::endl;
-	std::vector<std::string>::iterator  it_b = this->_servers[0].methods_server.begin();
-	for (; it_b != this->_servers[0].methods_server.end(); it_b++)
+	std::vector<std::string>::iterator  it_b = this->_servers[this->_num_serv].methods_server.begin();
+	for (; it_b != this->_servers[this->_num_serv].methods_server.end(); it_b++)
 	{
 		if (*it_b == method)
 		{
@@ -251,7 +284,7 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 			std::cout << "script file name = " << this->_header_requete[0].script_file_name << std::endl;
 			
 			if (tmp.size() != 1)							// on rajoute le root au debut de la string
-				tmp.insert(0, this->_servers[0].root_server);
+				tmp.insert(0, this->_servers[this->_num_serv].root_server);
 			return (tmp);
 			
 		}

@@ -201,7 +201,7 @@ class HttpServer {
 		void							ft_put_root( void );
 		size_t ft_verifie_ledroit_du_chemin( void );
 		bool compareNameLocation( std::vector<t_location> a, std::vector<t_location> b);
-
+		int ft_trouve_le_server( void );
 
 	private:
 		Parsing				*_data;
@@ -224,6 +224,8 @@ class HttpServer {
 		std::vector<t_header_request>		_header_requete;
 
 		Cgi_exec			*_cgi;
+
+		size_t _num_serv; // c'est le numero du server, le port.
 
 	protected:
 };
