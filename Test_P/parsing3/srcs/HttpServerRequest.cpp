@@ -260,35 +260,72 @@ size_t HttpServer::check_location( std::string path )
 				if (stat(path.c_str(), &buff) < 0)
 				{
 					std::cout << "existe pas ca sort" << std::endl;
-					exit(1);
+					sleep(1);
+					// exit(1);
 					return (1); //404
 				}
 				if (S_ISDIR(buff.st_mode))
 				{
-					
+					std::cout << "DOSSIER" << std::endl;
 					if (this->_servers[this->_num_serv].location[i].root_location.empty() == false)
 					{
 						this->_header_requete[0].path_file = path;
 						path.erase(0, this->_servers[this->_num_serv].root_server.size());
 						path.erase(0,this->_servers[this->_num_serv].location[i].root_location.size());
-						// std::cout << "DU COUP path = " << path << std::endl;
+						std::cout << "DU COUP path = " << path << std::endl;
 						if (this->_servers[this->_num_serv].location[i].index_location.empty() == false)
 						{
-							std::cout << "on demande index" << std::endl;
-							this->_header_requete[0].path_file.append(this->_servers[this->_num_serv].location[i].index_location);
-							// exit(1);
-							return (0);
+							std::cout << "on demande index avec root" << std::endl;
+							if (path[path.size() - 1] == '/')
+							{
+								this->_header_requete[0].path_file.append(this->_servers[this->_num_serv].location[i].index_location);
+								std::cout << "on doit renvoyer : " << this->_header_requete[0].path_file << std::endl;
+								return (0);
+							}
+
+							return (2); // 403;
 						}
 						// exit(1);
 					}
-					std::cout << "DOSSIER" << std::endl;
-					exit(1);
+					else
+					{
+						if (this->_servers[this->_num_serv].location[i].index_location.empty() == false)
+						{
+							std::cout << "on demande index sans root" << std::endl;
+							std::cout << "path = " << path << std::endl;
+							
+							if (path[path.size() - 1] == '/')
+							{
+								// this->_header_requete[0].path_file.append(this->_servers[this->_num_serv].location[i].index_location);
+								std::cout << "on doit renvoyer : " << this->_header_requete[0].path_file << std::endl;
+								std::cout << "header path avant= " << this->_header_requete[0].path << std::endl;
+								this->_header_requete[0].path.clear();
+								this->_header_requete[0].path = path;
+								this->_header_requete[0].path.append(this->_servers[this->_num_serv].location[i].index_location);
+								// std::cout << "header path apres  = " << this->_header_requete[0].path << std::endl;
+								// exit(1);
+								return (0);
+							}
+							std::cout << "403\n";
+							// exit(1);
+							return (2);
+						}
+
+					}
+					
+					// sleep(1);
+					// exit(1);
 					return (2); // 403
 				}
 				if (S_ISREG(buff.st_mode))
 				{
 					std::cout << "FICHIER " << std::endl;
-					exit(1);
+					std::cout << "header path = " << this->_header_requete[0].path << std::endl;
+					std::cout << " path = " << path << std::endl;
+					this->_header_requete[0].path.clear();
+					this->_header_requete[0].path = path;
+					sleep(1);
+					// exit(1);
 					return (0);
 				}
 
@@ -296,6 +333,8 @@ size_t HttpServer::check_location( std::string path )
 			}
 			else	// path == / donc on return 0
 			{
+				if (this->_servers[this->_num_serv].location[i].root_location.empty() == true)
+					return (1); //404
 				std::cout << "path = /" << std::endl;
 				this->_header_requete[0].path_file = path;
 				exit(1);

@@ -97,6 +97,14 @@ std::string		HttpServer::ft_setup_header( void )
 		}
 		std::cout << "ICI path = " << this->_header_requete[0].path << std::endl;
 	}
+	else
+	{
+		if (this->_header_requete[0].path_file.empty() == false)
+		{
+			this->_header_requete[0].path = this->_header_requete[0].path_file;
+		}
+
+	}
 	// exit(1);
 
 	std::cout << "on doit avoir le fichier : " << this->_header_requete[0].path << std::endl;
