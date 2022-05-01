@@ -128,67 +128,45 @@ std::string		HttpServer::ft_check_referer( std::string request_http )
 int				HttpServer::ft_check_method_allowed_header( std::string request_http, std::string method )
 {
 	(void)request_http;
-	std::cout << GREEN << "Dans ft_check_method_allowed_header " << CLEAR << std::endl;
-	
-	std::cout << "Nbr de server = " << this->_servers.size() << std::endl;
-	
+	std::cout << GREEN << "\tDans ft_check_method_allowed_header " << CLEAR << std::endl;
+		
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
-		std::cout << "il y a des locations : " << this->_servers[this->_num_serv].nbr_location << std::endl;
-		size_t i = 0;
-		while ( i < this->_servers[this->_num_serv].nbr_location)
-		{
-			// on recupere la requete, le path
-			std::string test = this->_header_requete[0].path;
-			if (this->_header_requete[0].path != "/")	// si requete est differente de juste / on supprime le root
-				test.erase(0, this->_servers[this->_num_serv].root_server.size());
-			// std::cout << "test = " << test << std::endl;
+		// std::cout << "path = " << this->_header_requete[0].path << std::endl;
 
-			std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
-			for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
-				all_location.push_back(it->name_location);
-			std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
-			for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
+
+		std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
+		for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
+			all_location.push_back(it->name_location);
+		
+		std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
+		
+		for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
+		{
+			size_t pos_slash = 0;
+			if (*it == "/")
+				pos_slash = 1; // on cherche le deuxieme / pour avoir le premier dossier de la requete
+			else
+				pos_slash = this->_header_requete[0].path.find("/", 1); 
+			
+			// std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << " et it = " << *it << " pos = " << pos_slash << std::endl;
+			if (this->_header_requete[0].path.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
 			{
-				size_t pos_slash = 0;
-				if (*it == "/")
-					pos_slash = 1; // on cherche le deuxieme / pour avoir le premier dossier de la requete
-				else
-					pos_slash = test.find("/", 1); 
-				
-				std::cout << "test = " << test << " et it = " << *it << " pos = " << pos_slash << std::endl;
-				if (test.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
+				for (std::vector<t_location>::iterator it_loc = this->_servers[this->_num_serv].location.begin(); it_loc != this->_servers[this->_num_serv].location.end(); it_loc++)
 				{
-					for (std::vector<t_location>::iterator it_loc = this->_servers[this->_num_serv].location.begin(); it_loc != this->_servers[this->_num_serv].location.end(); it_loc++)
+					if (it_loc->name_location == *it)
 					{
-						if (it_loc->name_location == *it)
+						for (std::vector<std::string>::iterator it_method = it_loc->methods_location.begin(); it_method != it_loc->methods_location.end(); it_method++)
 						{
-							for (std::vector<std::string>::iterator it_method = it_loc->methods_location.begin(); it_method != it_loc->methods_location.end(); it_method++)
-							{
-								if (*it_method == method) // la method est autorisee
-									return (0);
-							}
-							return (1); // pas de method on return 1
+							if (*it_method == method) // la method est autorisee
+								return (0);
 						}
+						return (1); // pas de method on return 1
 					}
 				}
-				// std::cout << "*it[0] = " << it[0] << " et test [0] = " << test[0] << std::endl; 
 			}
-			std::cout << " ca correspond a qucun location erreur ? " << std::endl;
-			std::cout << "SAUF SI REDIRECTION ATTENTION PIERRE" << std::endl;
-			sleep(5);
-			exit(1);
-			return (2);
-			exit(1);
-			std::cout << "requete = " << test<< std::endl;
-			exit(1);
-			i++;
-			
 		}
-		exit(1);
 	}
-	
-	
 	std::cout << "on va chercher dans le root" << std::endl;
 	std::vector<std::string>::iterator  it_b = this->_servers[this->_num_serv].methods_server.begin();
 	for (; it_b != this->_servers[this->_num_serv].methods_server.end(); it_b++)
@@ -252,19 +230,14 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 				std::cout << "ERREUR le path doit etre avant le http version dans le header du client \n";
 				return ("");
 			}
-			std::string tmp(header, pos, pos_http - pos - 1);
+			std::string 	tmp(header, pos, pos_http - pos - 1);
 			// on setup aussi le request_uri
 			this->_header_requete[0].request_uri = tmp;
 			// on setup aussi scriptfilename
-			size_t pos_tmp = tmp.find("?");
-			std::string tmp2(tmp, 0, pos_tmp);
+			size_t 			pos_tmp = tmp.find("?");
+			std::string 	tmp2(tmp, 0, pos_tmp);
+
 			this->_header_requete[0].script_file_name = tmp2;
-			std::cout << "tmp = " << tmp << std::endl;
-			std::cout << "tmp2 = " << tmp2 << std::endl;
-			std::cout << "script file name = " << this->_header_requete[0].script_file_name << std::endl;
-			
-			if (tmp.size() != 1)							// on rajoute le root au debut de la string
-				tmp.insert(0, this->_servers[this->_num_serv].root_server);
 			return (tmp);
 			
 		}
@@ -289,6 +262,7 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 	{
 		// A FAIRE: creer une erreur propre.
 		std::cout << "ERREUR NE TROUVE PAS LE HOST DANS LE HEADER" << std::endl;
+		exit(1);
 		return ("");
 	}
 	else
@@ -302,6 +276,7 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 				std::cout << "OHOH" << std::endl;
 				std::cout << "header = " << header << std::endl;
 				std::cout << "ERREUR NE TROUVE PAS LE USER-AGENT DANS LE HEADER" << std::endl;
+				exit(1);
 				sleep(5);
 				return ("");
 			}	
@@ -311,49 +286,35 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 		{
 			// A FAIRE: creer une erreur propre.
 			std::cout << "ERREUR HOST doit etre avant USER-AGENT" << std::endl;
+			exit(1);
 			return ("");
 		}
 		// on recupere les informations apres Host et avant User-agent
 		std::string tmp(header, pos + 6, pos_end - (pos + 6));
 		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 		{
-			// on parcourt nos servers pour verifier que le host de la requete est
-			//	bien pour un de nos servers.
 			if (tmp.compare(0, 9, this->_servers[i].host_server) == 0 || tmp.compare(0, 9, "localhost") == 0 || tmp.compare(0, 9, "127.0.0.1") == 0)
 			{
-				// les host de la requete et de notre server sont egaux
-				//	ex: 127.0.0.1
-				// std::cout << "ILS SONT EGAUX les host" << std::endl;
+				std::stringstream 				ss;
+				std::string 					port;
 
-				// on convertit le port (std::size_t) en std::string.
-				std::stringstream ss;
 				ss << this->_servers[i].port_server;
-				std::string port;
 				ss >> port;
 				if (tmp.compare(10, 4, port) == 0)
-				{
-					// les ports sont bon, on retourne la string au complete
-					//		ex : 127.0.0.1:8080
-					// std::cout<< "Ils sont egaux les port cas 1" << std::endl;
 					return (tmp);
-				}
 				else
 				{
 					//	Les ports ne correspondent pas.
 					if (this->_data->ft_get_nbr_servers() > 1)
 					{
-						// Cas ou on a plusieurs servers
-						std::cout << "euh nbr serv = " << this->_data->ft_get_nbr_servers() << std::endl;
 						for (size_t y = 0; y < this->_data->ft_get_nbr_servers(); y++)
 						{
-							// on parcourt chaque servers pour voir si on a un port
-							//	qui correspond a la requete du client.
-							std::stringstream ss2;
-							std::string port2;
+							std::stringstream 	ss2;
+							std::string 		port2;
+
 							std::cout << RED << "y = " << y << " et port server = " << this->_servers[y].port_server << CLEAR << std::endl;
 							ss2 << this->_servers[y].port_server;
 							ss2 >> port2;
-							std::cout << "Punaise = " << port2 << " et y = " << y << std::endl;
 							if (tmp.compare(10, 4, port2) == 0)
 							{
 								std::cout<< "Ils sont egaux les port cas 2" << std::endl;
@@ -371,17 +332,12 @@ std::string		HttpServer::ft_check_host_header( std::string header )
 			}
 			else
 			{
-
 				std::cout << "les host ne sont pas egaux" << std::endl;
 				std::cout << "tmp " << tmp << std::endl;
 				std::cout << "host = " << this->_servers[i].host_server << std::endl;
-
-
-
 				throw Error(666, "Erreur test lol 2, ", 666);		// A FAIRE au propre
 			}
-			// if (this->_servers[i].host_server == tmp)
-			// 	return (tmp);
+
 		}
 		std::cout << "ERREUR ICI " << std::endl;			// A FAIRE au propre
 		exit(1);

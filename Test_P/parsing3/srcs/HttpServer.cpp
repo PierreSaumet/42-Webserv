@@ -474,7 +474,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 {
 	std::cout << GREEN << "Dans ft_check_recv_complete : " << CLEAR << std::endl;
 
-	std::cout << "BUFFER = " << tt_buffer << "\n\n\n\n" << std::endl;
+	// std::cout << "BUFFER = " << tt_buffer << "\n\n\n\n" << std::endl;
 
 	size_t pos = 0;
 	if (tt_buffer.compare(0, 5, "POST ") == 0)
@@ -570,7 +570,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 	}
 	else if (tt_buffer.compare(0, 4, "GET ") == 0)
 	{
-		std::cout << "YES GET " << std::endl;
+		// std::cout << "YES GET " << std::endl;
 		pos = tt_buffer.find("\r\n\r\n");
 		if (pos == std::string::npos)
 		{

@@ -206,7 +206,9 @@ class HttpServer {
 		bool compareNameLocation( std::vector<t_location> a, std::vector<t_location> b);
 		int ft_trouve_le_server( void );
 
-		size_t check_location( std::string path);
+		size_t check_location( std::string path, std::string name_location );
+	
+		std::string ft_create_autoindex( void );
 	private:
 		Parsing				*_data;
 		std::vector<t_server>           _servers;
@@ -230,7 +232,7 @@ class HttpServer {
 		Cgi_exec			*_cgi;
 
 		size_t _num_serv; // c'est le numero du server, le port.
-
+		size_t  _num_loc;
 	protected:
 };
 

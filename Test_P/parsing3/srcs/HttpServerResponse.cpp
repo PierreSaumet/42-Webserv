@@ -12,7 +12,69 @@
 
 #include "../Headers/HttpServer.hpp"
 
+bool is_directory( std::string const &name_file )
+{
+	struct stat		buff;
+	int				ret;
 
+	ret = stat(name_file.c_str(), &buff);
+	if (ret != 0)
+		return (false);
+	return (S_ISDIR(buff.st_mode) == 1);
+
+}
+
+std::string		HttpServer::ft_create_autoindex( void )
+{
+	std::string string;
+	std::stringstream ss;
+
+
+	
+
+	// <p>by Pierre.</p></body></html>";
+	DIR *dir = NULL;
+	struct dirent  *file = NULL;
+
+	this->_header_requete[0].path.erase(0, 13);
+	std::string actual_folder = this->_header_requete[0].path;
+	actual_folder.erase(0, this->_servers[this->_num_serv].root_server.size());
+
+
+	std::cout << " file path = " << this->_header_requete[0].path << std::endl;
+	std::cout << " actual folder = " << actual_folder << std::endl;
+	string = "<!DOCTYPE html><html><head><title>AutoIndex</title><style type=text/css>body {color: lightred;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>Auto-Index</h1>/";
+
+	if ((dir = opendir(this->_header_requete[0].path.c_str())) != NULL)
+	{
+		while ((file = readdir(dir)) != NULL)
+		{
+			// std::cout << "dossier = " << file->d_name << std::endl;
+			std::string file_name = file->d_name;
+
+			if (is_directory(this->_header_requete[0].path + "/" + file_name ))
+			{
+				std::cout << "dossier = " << file_name << std::endl;
+				file_name += '/';
+			}
+			// if (is_directory(actual_folder) && actual_folder[actual_folder.size() - 1] != '/')
+
+			// else
+			// 	std::cout << "fichier = " << file->d_name << std::endl;
+			string.append("<p><a href=\"");
+			string.append(file_name + "\" class=\"active\">" + file_name + "</a></p>\n");
+		}
+		closedir(dir);
+	}
+	else
+	{
+		closedir(dir);
+		exit(1);
+	}
+	string.append("<p>by Pierre.</p></body></html>");
+	// std::cout << "\nTOTAL = " << string << std::endl;
+	return (string);
+}
 
 std::string		HttpServer::ft_setup_header( void )
 {
@@ -99,16 +161,36 @@ std::string		HttpServer::ft_setup_header( void )
 	}
 	else
 	{
-		if (this->_header_requete[0].path_file.empty() == false)
+		std::cout << "ici " << std::endl;
+		if (this->_header_requete[0].path.compare(0, 13, "--AUTOINDEX--") == 0)
 		{
-			this->_header_requete[0].path = this->_header_requete[0].path_file;
+			std::cout << "bingo autoindex exit" << std::endl;
+			the_header = this->ft_create_autoindex();
+
+			std::cout << "header autorindex = \n" << the_header <<  std::endl;
+			the_header.insert(0, this->ft_get_end_header());
+			the_header.insert(0, this->ft_get_content_length(buff, the_header.size(), 0));
+			the_header.insert(0, this->ft_get_server_name());
+			the_header.insert(0, this->ft_get_date());
+			the_header.insert(0, this->ft_get_status(true));
+			// on utilise la variable error pour retourner directement tout le header avecle body
+			this->_header_requete[0].error = true;
+			return (the_header);
+			exit(1);
 		}
+		// exit(1);
+		// if (this->_header_requete[0].path_file.empty() == false)
+		// {
+		// 	this->_header_requete[0].path = this->_header_requete[0].path_file;
+		// }
+		// if ()
 
 	}
 	// exit(1);
 
 	std::cout << "on doit avoir le fichier : " << this->_header_requete[0].path << std::endl;
-
+	// exit(1);
+	// if ()
 	if (stat(this->_header_requete[0].path.c_str(), &buff) < 0)	// le fichier existe pas on return 404
 	{
 		// CONDITION A CHANGER 
