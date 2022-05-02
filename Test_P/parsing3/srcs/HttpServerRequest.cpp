@@ -261,8 +261,28 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 				
 				if (stat(path.c_str(), &buff) < 0)
 				{
+					
+					if (name_location != "/")
+					{
+						if (this->_servers[this->_num_serv].location[i].root_location.empty() == true)
+						{
+							if (this->_servers[this->_num_serv].location[i].index_location.empty() == true)
+							{
+								if (this->_servers[this->_num_serv].location[i].autoindex_location == true)
+								{
+									if (this->_header_requete[0].path[this->_header_requete[0].path.size() - 1] == '/')
+									{
+										this->_header_requete[0].path = this->_servers[this->_num_serv].root_server;
+										this->_header_requete[0].path.insert(0, "--AUTOINDEX--");
+										std::cout << "Requete exsite pas mais location diff de / pas de root, pas index, autoindex ON donc on retourne ce qu'il y a dans root";
+										return (0);
+									}
+									
+								}
+							}
+						}
+					}
 					std::cout << "Le fichier demande n'existe pas on sort 404" << std::endl;
-					// exit(1);
 					return (1); //404
 				}
 				// exit(1);
@@ -311,6 +331,12 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 							if (this->_servers[this->_num_serv].location[i].index_location.empty() == false)	// si l'index est setup on le rajoute
 							{
 								this->_header_requete[0].path.append(this->_servers[this->_num_serv].location[i].index_location);
+								return (0);
+							}
+							if (this->_servers[this->_num_serv].location[i].autoindex_location == true)
+							{
+								this->_header_requete[0].path.insert(0, "--AUTOINDEX--");
+								std::cout << "dans location, pas de root, pas de index, le dossier existe et il y a autoindex donc autoindex" << std::endl;
 								return (0);
 							}
 							std::cout << "buf " << std::endl;
