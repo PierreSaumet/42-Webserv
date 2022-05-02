@@ -173,6 +173,7 @@ class HttpServer {
 		std::string		ft_get_status( bool x ) const;
 		std::string		ft_get_date( void ) const;
 		std::string		ft_get_allow( void ) const;
+		std::string    	ft_get_code_redirection( void ) const;
 
 		std::string		ft_get_file( std::string path ) const;
 
@@ -209,6 +210,11 @@ class HttpServer {
 		size_t check_location( std::string path, std::string name_location );
 	
 		std::string ft_create_autoindex( void );
+
+
+		int ft_redirection( void );
+
+
 	private:
 		Parsing				*_data;
 		std::vector<t_server>           _servers;

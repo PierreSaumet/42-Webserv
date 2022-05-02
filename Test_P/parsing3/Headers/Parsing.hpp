@@ -47,6 +47,7 @@ typedef struct                  s_server {
 			std::string                 root_server;
 			std::string					index_server;
 			std::string					return_server;
+			std::string					code_return_server;
 			bool                        autoindex_server;
 			size_t						buffer_size_server;
 			std::string					cgi_path_server;

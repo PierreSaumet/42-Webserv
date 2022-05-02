@@ -91,8 +91,20 @@ std::string		HttpServer::ft_check_accept_header( std::string header )
 		size_t	pos_end = header.find("\r\n", pos);
 		if (pos_end == std::string::npos)
 		{
-			std::cout << RED << "dans ft_check_accpet, ne trouve pas \r\n: dans le header de la requete" << CLEAR << std::endl;
-			return ("");
+			// probleme avec curl...
+			pos_end = header.find("curl");
+			if (pos_end == std::string::npos)
+			{
+				std::cout << RED << "dans ft_check_accept, ne trouve pas \\r\\n: dans le header de la requete" << CLEAR << std::endl;
+				return ("");
+			}
+			else
+			{
+				std::string tmp(header, pos + 8, (pos + 8 + 3) - (pos + 8));
+				std::cout << "DU COUP TMP = " << tmp << std::endl;
+				// exit(1);
+				return (tmp); 
+			}
 		}
 		else
 		{

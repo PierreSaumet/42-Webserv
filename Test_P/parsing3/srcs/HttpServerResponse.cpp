@@ -123,10 +123,31 @@ std::string		HttpServer::ft_setup_header( void )
 		// // std::cout <<"\n\n tmp = \n" << tmp << std::endl;
 		return (tmp);
 	}
+	if (this->_header_requete[0].return_used == true)
+	{
+		std::cout << GREEN << "redirection 301" << CLEAR << std::endl;
+		the_header.insert(0, this->ft_get_end_header());
+		the_header.insert(0, "Content-Length: 0\r\n");
+		the_header.insert(0, this->ft_get_server_name());
+		the_header.insert(0, this->ft_get_date());
+		the_header.insert(0, "Location: " + this->_servers[this->_num_serv].return_server + "\r\n");
+		the_header.insert(0, this->ft_get_status(true));
+		// the_header.insert(0, "HTTP/1.1 301 Moved Permanently\r\n");
+
+		std::cout << "path requete = " << this->_header_requete[0].path << std::endl;
+		std::cout << "TEST 1 seulement avec une redirection dasn le server la redirection setup = " << this->_servers[this->_num_serv].return_server << std::endl;
+		// exit(1);
+		sleep(2);
+		std::cout << "\nTHE HEADER FOR THE REDIRECTION = \n\n " << the_header << std::endl;
+		// exit(1);
+		return (the_header);
+	}
+
+
 	// si -/- alors index du root
 	if (this->_header_requete[0].path == "/")
 	{
-		std::cout << "path = " << this->_header_requete[0].path << std::endl;
+		std::cout << "path = " << this->_header_requete[0].path << std::endl;   
 		if (this->_header_requete[0].return_used == false)
 		{
 			std::cout << "Dans le cas ou il y a pas de redirection :" << std::endl;
@@ -146,14 +167,9 @@ std::string		HttpServer::ft_setup_header( void )
 		}
 		else
 		{	// Redirection 301 dans un bloc server
-			std::cout << GREEN << "redirection 301" << CLEAR << std::endl;
-			the_header.insert(0, this->ft_get_end_header());
-			the_header.insert(0, "Content-Length: 0\r\n");
-			the_header.insert(0, this->ft_get_server_name());
-			the_header.insert(0, this->ft_get_date());
-			the_header.insert(0, "Location: http://localhost:8082/folder1/yolo.html\r\n");
-			the_header.insert(0, "HTTP/1.1 301 Moved Permanently\r\n");
-			sleep(2);
+
+			std::cout << "ICI ERREUR " << std::endl;
+			exit(1);
 			return (the_header);
 
 		}
@@ -178,19 +194,11 @@ std::string		HttpServer::ft_setup_header( void )
 			return (the_header);
 			exit(1);
 		}
-		// exit(1);
-		// if (this->_header_requete[0].path_file.empty() == false)
-		// {
-		// 	this->_header_requete[0].path = this->_header_requete[0].path_file;
-		// }
-		// if ()
-
 	}
-	// exit(1);
+
 
 	std::cout << "on doit avoir le fichier : " << this->_header_requete[0].path << std::endl;
-	// exit(1);
-	// if ()
+
 	if (stat(this->_header_requete[0].path.c_str(), &buff) < 0)	// le fichier existe pas on return 404
 	{
 		// CONDITION A CHANGER 
@@ -477,6 +485,42 @@ std::string		HttpServer::ft_get_end_header( void ) const
 {
 	return ("\r\n\r\n");
 }
+
+
+std::string  HttpServer::ft_get_code_redirection( void ) const
+{
+	std::string							ret;
+	std::map<std::string, std::string>  num;
+	num.insert(std::pair<std::string, std::string>("300", "Multiple Choices"));
+	num.insert(std::pair<std::string, std::string>("301", "Moved Permanently"));
+	num.insert(std::pair<std::string, std::string>("302", "Found"));
+	num.insert(std::pair<std::string, std::string>("303", "See Other"));
+	num.insert(std::pair<std::string, std::string>("304", "Not Modified"));
+	num.insert(std::pair<std::string, std::string>("307", "Temporary Redirect"));
+	num.insert(std::pair<std::string, std::string>("308", "Permanent Redirect"));
+	if (this->_servers[this->_num_serv].nbr_location == 0)
+	{
+		std::cout << GREEN << "Dans t_get_code_redirection" << CLEAR << std::endl;
+		std::map<std::string, std::string>::iterator it = num.begin();
+		for ( ; it != num.end(); ++it)
+		{
+			if (it->first == this->_servers[this->_num_serv].code_return_server)
+			{
+				std::cout << "BIngo on a le bon code" << std::endl;
+				ret = "\r\n";
+				ret.insert(0, it->second);
+				ret.insert(0, it->first + " ");
+				ret.insert(0, "HTTP/1.1 ");
+				std::cout << "RET = " << ret << std::endl;
+				// exit(1);
+				return (ret);
+			}
+		}
+	}
+	std::cout << "normalement impossible d'etre la ";
+	exit(1);
+}
+
 std::string		HttpServer::ft_get_status( bool x ) const 
 {
 	// a changer lol
@@ -546,6 +590,10 @@ std::string		HttpServer::ft_get_status( bool x ) const
 				break;
 			}
 		}
+	}
+	else if (this->_header_requete[0].return_used == true)
+	{
+		return (this->ft_get_code_redirection());
 	}
 	else
 	{

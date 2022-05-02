@@ -184,120 +184,169 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 bool			Parsing::ft_find_return( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	std::cout << GREEN << "Dans ft_find_return server " << CLEAR << std::endl;
-	// std::cout << "k = " << k << std::endl;
+
+	k += 1;
+	// Check the redirection number
+	std::vector<std::string> 	number;
+	number.push_back("300");
+	number.push_back("301");
+	number.push_back("302");
+	number.push_back("303");
+	number.push_back("304");
+	number.push_back("307");
+	number.push_back("308");
+
+	for (std::vector<std::string>::iterator it = number.begin(); it != number.end(); ++it)
+	{
+		if (tmp[k].compare(*it) == 0)
+		{
+			this->_servers[index_server].code_return_server = tmp[k];
+			k += 1;
+			size_t pos = tmp[k].find(";");
+			if (pos == std::string::npos)
+				throw Error(0, "Error, in 'return' server's bloc directive, it should have ';' at the end.", 0);
+			if (pos != tmp[k].size() - 1)
+				throw Error(0, "Error, in 'return' server's bloc directive, it should have only 1 ';' at the end.", 0);
+			if (tmp[k][0] != '/')
+				throw Error(0, "Error, in 'return' server's bloc directive, it should start with '/'.", 0);
+			this->_servers[index_server].return_server = tmp[k];
+			this->_servers[index_server].return_server.erase(this->_servers[index_server].return_server.size() - 1, 1);
+			// if (tmp[k][tmp[k].size() -1] != ';')
+			// 	throw Error(0, "Error, in 'return' server's bloc directive, it should have ';' at the end.", 0);
+			std::cout << "On a un return : " << this->_servers[index_server].return_server << std::endl;
+			return (false);
+		}
+	}
+	throw Error(0, "Error, in 'return' server's bloc directive, error's number is not correct.", 0);
+
+	std::cout << "code pas bon " << std::endl;
+	exit(1);
+
+	// if (tmp[k].compare("301") != 0)
+	// 	throw Error(0, "Error, in 'return' server's bloc directive, it should have 301 has first argument", 0);
+	// k += 1;
+
+	// // on verifie le semi colon
+	// if (tmp[k][tmp[k].size() -1] != ';')
+	// 	throw Error(0, "Error, in 'return' server's bloc directive, it should have ';' at the end.", 0);
+	
+
 	// std::cout << "tmp[k] = " << tmp[k] << std::endl;
-	// std::cout << "index_server = " << index_server << std::endl;
+	// exit(1);
 
-	k += 1;
-	std::cout << "tmp[k] = " << tmp[k] << std::endl;
-	
-	if (tmp[k].compare("301") != 0)
-		throw Error(0, "Error, in 'return' server's bloc directive, it should have 301 has first argument", 0);
-	k += 1;
-
-	// on verifie le semi colon
-	if (tmp[k][tmp[k].size() -1] != ';')
-		throw Error(0, "Error, in 'return' server's bloc directive, it should have ';' at the end.", 0);
-	// si debute par / alors c'est un dossier.
-	// on verifie qu'il existe
-	
-	if (tmp[k][0] == '/')
-	{
-		if (this->_servers[index_server].root_server.empty() == true)
-			throw Error(63, "Error, 'root' directive should be setup before 'return' directive.", 1);
-		std::string tmp2 = tmp[k];
-		//delete ;
-		tmp2.erase(tmp2.size() - 1, 1);
-		// adding root
-		tmp2.insert(0, this->_servers[index_server].root_server);
+	// if (tmp[k][0] == '/')
+	// {
+	// 	if (this->_servers[index_server].root_server.empty() == true)			// root doit etre setup // pas obligatoire a supprimer
+	// 		throw Error(63, "Error, 'root' directive should be setup before 'return' directive.", 1);
+	// 	std::string 	tmp2 = tmp[k];
+	// 	tmp2.erase(tmp2.size() - 1, 1); //delete ;
+	// 	tmp2.insert(0, this->_servers[index_server].root_server);  // adding root
 		
-		// on verifie que ca existe
-		struct stat buff;
-		if (stat(tmp2.c_str(), &buff) != 0)
-			throw Error(0, "Error, in 'return' server's bloc directive, the last argument doesn't exist.", 1);
-		else
-		{
-			// vu qu'on est dans root, si c'est un dossier c'est une erreur
-			if (S_ISDIR(buff.st_mode))
-				throw Error(0, "Error, in 'return' server's bloc directive, it cannot be a directory");
-			else if (S_ISREG(buff.st_mode))	// si c'est un fichier il remplacera index
-			{
-				if (this->_servers[index_server].index_server.empty() == true)
-					throw Error(63, "Error, 'index' directive should be setup before 'return' directive.", 1);
-				else
-				{
-					//  A REVERIFIER
-					this->_servers[index_server].return_server = tmp2;
-					// std::cout << "INDEX = " << this->_servers[index_server].index_server << std::endl;
-					// on change l'index par return
-					// this->_servers[index_server].index_server = this->_servers[index_server].return_server;
-					std::cout << "ca existe" << std::endl;
-					std::cout << "tmp2 = " << tmp2 << std::endl;
-					return (false);
-				}
-			}
-			else
-				throw Error(63, "Error, in 'return' server's bloc directive, the last argument should be file.", 1);
-		}
-	}
-	else if (tmp[k].compare(0, 17, "http://localhost:") == 0 || tmp[k].compare(0, 17, "http://127.0.0.1:") == 0)
-	{
-		std::cout << "on est egal a du locahost ou 127" << std::endl;
-		// on verifie que le port est setup
-		if (this->_servers[index_server].host_server.empty() == true)
-			throw Error(0, "Error, 'listen' directive should be setup before 'return' directive.", 1);
-		else
-		{
-			// on compare le port
-			std::cout << "PORt en size_t = " << this->_servers[index_server].port_server << std::endl;
-			std::stringstream ss;
-			ss << this->_servers[index_server].port_server;
-			std::string tmp_2;
-			ss >> tmp_2;
-			std::cout << "tmp_2 = " << tmp_2 << std::endl;
-			if (tmp[k].compare(17, tmp_2.size(), tmp_2) == 0)
-			{
-				std::cout << "yes" << std::endl;
-				size_t y = 17 + tmp_2.size();
-				std::cout << "y = " << y << std::endl;
-				tmp_2.clear();
-				std::cout << "2 = " << tmp_2 << std::endl;
-				tmp_2.append(tmp[k], y, tmp_2.size() - y -17);
-				std::cout << "tmp_2 = " << tmp_2 << std::endl;
+	// 	// on verifie que ca existe
+	// 	struct stat buff;
+	// 	if (stat(tmp2.c_str(), &buff) != 0)
+	// 		throw Error(0, "Error, in 'return' server's bloc directive, the last argument doesn't exist.", 1);  // pas obligatoire car si ca exite pas return 404 normlamenet
+	// 	else
+	// 	{
+	// 		// vu qu'on est dans root, si c'est un dossier c'est une erreur
+	// 		if (S_ISDIR(buff.st_mode))
+	// 			throw Error(0, "Error, in 'return' server's bloc directive, it cannot be a directory");
+	// 		else if (S_ISREG(buff.st_mode))	// si c'est un fichier il remplacera index
+	// 		{
+	// 			if (this->_servers[index_server].index_server.empty() == true)
+	// 				throw Error(63, "Error, 'index' directive should be setup before 'return' directive.", 1);
+	// 			else
+	// 			{
+	// 				//  A REVERIFIER
+	// 				this->_servers[index_server].return_server = tmp2;
+	// 				// std::cout << "INDEX = " << this->_servers[index_server].index_server << std::endl;
+	// 				// on change l'index par return
+	// 				// this->_servers[index_server].index_server = this->_servers[index_server].return_server;
+	// 				std::cout << "ca existe" << std::endl;
+	// 				std::cout << "tmp2 = " << tmp2 << std::endl;
+	// 				return (false);
+	// 			}
+	// 		}
+	// 		else
+	// 			throw Error(63, "Error, in 'return' server's bloc directive, the last argument should be file.", 1);
+	// 	}
+	// }
+	// else if (tmp[k].compare(0, 17, "http://localhost:") == 0 || tmp[k].compare(0, 17, "http://127.0.0.1:") == 0)
+	// {
+	// 	std::cout << "on est egal a du locahost ou 127" << std::endl;
+	// 	// on verifie que le port est setup
+	// 	if (this->_servers[index_server].host_server.empty() == true)
+	// 		throw Error(0, "Error, 'listen' directive should be setup before 'return' directive.", 1);
+	// 	else
+	// 	{
+	// 		// on compare le port
+	// 		std::cout << "PORt en size_t = " << this->_servers[index_server].port_server << std::endl;
+	// 		std::stringstream ss;
+	// 		ss << this->_servers[index_server].port_server;
+	// 		std::string tmp_2;
+	// 		ss >> tmp_2;
+	// 		std::cout << "tmp_2 = " << tmp_2 << std::endl;
+	// 		if (tmp[k].compare(17, tmp_2.size(), tmp_2) == 0)
+	// 		{
+	// 			std::cout << "yes" << std::endl;
+	// 			size_t y = 17 + tmp_2.size();
+	// 			std::cout << "y = " << y << std::endl;
+	// 			tmp_2.clear();
+	// 			std::cout << "2 = " << tmp_2 << std::endl;
+	// 			tmp_2.append(tmp[k], y, tmp_2.size() - y -17);
+	// 			std::cout << "tmp_2 = " << tmp_2 << std::endl;
 
-				if (this->_servers[index_server].root_server.empty() == true)
-					throw Error(0, "Error, 'root' directive should be setup before 'return' directive.", 1);
-				tmp_2.insert(0, this->_servers[index_server].root_server);
-				tmp_2.erase(tmp_2.size() - 1, 1);
-				std::cout << "tmp_2 = " << tmp_2 << std::endl;
-				struct stat buff;
-				if (stat(tmp_2.c_str(), &buff) != 0)
-					throw Error(0, "Error, in 'return' server's bloc directive, the last argument doesn't exist.", 1);
-				else
-				{
-					if (S_ISREG(buff.st_mode))
-					{
-						this->_servers[index_server].return_server = tmp_2;
-						std::cout << "REturn a ete setup = " << this->_servers[index_server].return_server << std::endl;
-					}
-					else if (S_ISDIR(buff.st_mode))
-					{
-						std::cout << "DIR : autoinde = " << 	this->_servers[index_server].autoindex_server << std::endl;
-						if (this->_servers[index_server].autoindex_server == 0)
-							throw Error(0, "Error, in 'return' server's bloc directive, you need autoindex on if you want to redirect a folder.", 0);
-						std::cout << RED << "A FAIRE " << CLEAR << std::endl;
-						exit(1);
-					}
-					else
-						throw Error(0, "Error, in 'return' server's bloc directive, the last argument should be a file or a folder.", 0);
-				}
-			}
-			else
-				throw Error(0, "Error, in 'return' server's bloc directive, the port is not corresponding.", 0);
-		}
-	}
-	else
-		throw Error(0, "Error, in 'return' server's bloc directive, the last argument should be a folder in the root directive or start with http://localhost or http://127.0.0.1", 0);
+	// 			if (this->_servers[index_server].root_server.empty() == true)
+	// 				throw Error(0, "Error, 'root' directive should be setup before 'return' directive.", 1);
+	// 			tmp_2.insert(0, this->_servers[index_server].root_server);
+	// 			tmp_2.erase(tmp_2.size() - 1, 1);
+	// 			std::cout << "tmp_2 = " << tmp_2 << std::endl;
+
+
+	// 			// INUTILE DE CHERCHER SI C'EST UN DOSSIER OU UN FICHIER ON RNVOIE DIRECTEMENT LA VARIABLE
+	// 			std::cout << "tmp[k] = " << tmp[k] << std::endl;
+	// 			this->_servers[index_server].return_server = tmp[k];
+	// 			this->_servers[index_server].return_server.erase(tmp[k].size() -1, 1);
+	// 			std::cout << "le return du server = " << this->_servers[index_server].return_server << std::endl;
+	// 			// exit(1);
+
+	// 			// struct stat buff;
+	// 			// if (stat(tmp_2.c_str(), &buff) != 0)
+	// 			// 	throw Error(0, "Error, in 'return' server's bloc directive, the last argument doesn't exist.", 1);
+	// 			// else
+	// 			// {
+	// 			// 	if (S_ISREG(buff.st_mode))
+	// 			// 	{
+	// 			// 		// this->_servers[index_server].return_server = tmp_2;
+	// 			// 		// std::cout << "REturn a ete setup = " << this->_servers[index_server].return_server << std::endl;
+	// 			// 		std::cout << "return origin = " << tmp[k];
+	// 			// 		this->_servers[index_server].return_server = tmp[k];
+	// 			// 		this->_servers[index_server].return_server.erase(tmp[k].size() -1, 1);
+	// 			// 		std::cout << "REturn a ete setup = " << this->_servers[index_server].return_server << std::endl;
+	// 			// 		// exit(1);
+	// 			// 	}
+	// 			// 	else if (S_ISDIR(buff.st_mode))
+	// 			// 	{
+	// 			// 		// std::cout << "DIR : autoinde = " << 	this->_servers[index_server].autoindex_server << std::endl;
+	// 			// 		// if (this->_servers[index_server].autoindex_server == 0)
+	// 			// 		// 	throw Error(0, "Error, in 'return' server's bloc directive, you need autoindex on if you want to redirect a folder.", 0);
+	// 			// 		std::cout << RED << "pas sur... " << CLEAR << std::endl;
+	// 			// 		std::cout << "on a une redirection dans un dossier... donc c'est bon, ca peut correspondre a une location ... " << std::endl;
+	// 			// 		this->_servers[index_server].return_server = tmp[k];
+	// 			// 		this->_servers[index_server].return_server.erase(tmp[k].size() - 1, 1);
+						
+	// 			// 		// exit(1);
+	// 			// 	}
+	// 			// 	else
+	// 			// 		throw Error(0, "Error, in 'return' server's bloc directive, the last argument should be a file or a folder.", 0);
+	// 			// }
+	// 		}
+	// 		else
+	// 			throw Error(0, "Error, in 'return' server's bloc directive, the port is not corresponding.", 0);
+	// 	}
+	// }
+	// else
+	// 	throw Error(0, "Error, in 'return' server's bloc directive, the last argument should be a folder in the root directive or start with http://localhost or http://127.0.0.1", 0);
 	return (false);
 }
 

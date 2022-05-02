@@ -460,7 +460,7 @@ int 		HttpServer::ft_test_writing( void )
 				std::cout << "\nle client = " << it_b_client->client_socket << std::endl;
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
-				std::cout << "On a retournee une reponse, on ferme le socket du client." << std::endl;
+				std::cout << "On a retournee une reponse,  on ferme le client ?." << std::endl;
 				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 				continue ;
 			}
@@ -628,7 +628,7 @@ int		HttpServer::ft_test_reading( void )
 					FD_CLR(it_b_client->client_socket, &this->_read_fs);
 					close(it_b_client->client_socket);
 					it_b_client = this->_all_client_socket.erase(it_b_client);
-					std::cerr << strerror(errno) << std::endl;
+					std::cerr << "strerror " <<  strerror(errno) << std::endl;
 					continue ;
 				}
 			}

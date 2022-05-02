@@ -191,22 +191,57 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
 		}
 
-		// TEST redirection avec return ... Pas termine et peut etre qu'il faut changer de place
-		// std::cout << "path request -" << this->_header_requete[0].path << "-" << std::endl;
-		if (this->_header_requete[0].path == "/" && this->_servers[this->_num_serv].return_server.empty() == false)
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// TEST REDIRECTION AVEC RETURN
+		size_t res = 0;
+		if ((res = this->ft_redirection()) > 0)
 		{
-			std::cout << "oui" << std::endl;
-			this->_header_requete[0].return_used = true;
+		
+			this->_header_requete[0].error = true;
+			if (res == 1)
+				this->_header_requete[0].num_error = 404;
+			if (res == 2)
+				this->_header_requete[0].num_error = 403;
+			if (this->ft_setup_error_header(request_http, len_msg) == 0)
+			{
+				std::cout << "ft_setup_error_header return 0, on continue " << std::endl;
+				sleep(2); 
+				return (0);
+			}
+			else
+			{
+				std::cout << "ERREUR dans la creation de ft_setup_error_header" << std::endl;
+				exit(1);
+				return (1);
+			}
+
 		}
+		// exit(1);
+		// if (this->_header_requete[0].path == "/" && this->_servers[this->_num_serv].return_server.empty() == false)
+		// {
+		// 	std::cout << RED << "\ton a une redirection ? " << CLEAR << std::endl;
+		// 	sleep(2);
+		// 	this->_header_requete[0].return_used = true;
+		// 	return (0);
+		// 	// exit(1);
+		// }
+		// else
+		// {
+		// 	std::cout << "test redirection  ps de redirection donc erreur" << std::endl;
+		// 	sleep(2);
+		// 	// exit(1);
+		// }
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// VENDREDI 29, il faut verifier si on a le droit
 		/*
 			si il y a pas de locations de setup alors une requete /www/coucou.html c'est pas possible
 			sauf si c'est un index setup dans le bloc server
 			*/
-		size_t res = 0;
+		
 		std::cout << "Avant ft_verifie_ledroit_du_chemin, le header.path = " << this->_header_requete[0].path << std::endl;
-		// exit(1);
+		res = 0;
 		if ((res = this->ft_verifie_ledroit_du_chemin()) > 0)
 		{
 			std::cout << "erreur verifie le drot res = " << res << std::endl;
@@ -240,17 +275,51 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	return (0);
 }
 
+
+int		HttpServer::ft_redirection( void )
+{
+	// size_t i = 0;
+	std::cout << GREEN << "Dans ft_redirection " << CLEAR << std::endl;
+	if (this->_servers[this->_num_serv].nbr_location == 0)
+	{
+		std::cout << "pas de location, la requete est " << this->_header_requete[0].path <<  std::endl;
+		if (this->_servers[this->_num_serv].return_server.empty() == false)
+		{
+			std::cout << "il y a une redirection, on setup 'this->_header_requete[0].return_used = true;'" << std::endl;
+			
+			std::cout << "requete= " << this->_header_requete[0].path << std::endl;
+			if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
+			{
+				std::cout << "flavicon " << std::endl;
+				// exit(1);
+				return (0);
+
+			}
+			this->_header_requete[0].return_used = true;
+			return (0);
+			exit(1);
+		}
+		
+	}
+	else
+	{
+		std::cout << "plusieurs locations " << std::endl;
+		exit(1);
+	}
+	return (0);
+}
+
 size_t HttpServer::check_location( std::string path, std::string name_location )
 {
 	size_t 	i = 0;
 
-	std::cout << "\nFonction check_location pour / path = -" << path << "-" << std::endl;
+	std::cout << "\nFonction check_location avec le path = -" << path << "-" << std::endl;
 	// if 
 	
 	while ( i < this->_servers[this->_num_serv].location.size())
 	{
 		// std::cout << "i = " << i << std::endl;
-		// std::cout << "no du server i = " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
+		std::cout << "no du server i = " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
 		if (name_location == this->_servers[this->_num_serv].location[i].name_location)
 		{
 			std::cout << "bloc location = " << name_location << std::endl;
@@ -283,6 +352,8 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 						}
 					}
 					std::cout << "Le fichier demande n'existe pas on sort 404" << std::endl;
+					std::cout << "car la requete est : " << this->_header_requete[0].path << std::endl;
+					exit(1);
 					return (1); //404
 				}
 				// exit(1);
@@ -409,15 +480,26 @@ size_t 	HttpServer::ft_verifie_ledroit_du_chemin( void )
 
 		path_index_server.insert(0, this->_servers[this->_num_serv].root_server);	
 		stat(path_index_server.c_str(), &buff_index_server);
+
 		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
+		std::cout << "\n\n vant le dernier stat, header[path] = " << this->_header_requete[0].path << " et le path de l'index du erver = " << path_index_server << std::endl;
+
 		if (stat(this->_header_requete[0].path.c_str(), &buff_path) < 0)
 			return (1); // 404
 		if (buff_path.st_dev == buff_index_server.st_dev && buff_path.st_ino == buff_index_server.st_ino)
+		{
+			std::cout << "egaux on demande l'index" << std::endl;
 			return (0);
+		}
 		else
 		{
 			if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
 				return (0);
+			// std::cout << "ICI, header requet  = " << this->_header_requete[0].path << " et index du server = " << path_index_server << std::endl;
+			// std::cout << "stat result : " << buff_path.st_dev << " et " << buff_index_server.st_dev << std::endl;
+			// std::cout << "stat result : " << buff_path.st_ino << " et " << buff_index_server.st_ino << std::endl;
+			// exit(1);
+			
 			return (2); // 403
 
 		}
