@@ -219,88 +219,30 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 			if (isdigit(tmp[k][y]))
 				y++;
 			else
-				throw Error(44, "Error: in 'error_page' directive, it should only have numbers then a directory!", 1);
+				throw Error(44, "Error: in 'error_page' location's bloc directive, it should only have numbers then a directory!", 1);
 		}
 		int error_code = std::strtol(tmp[k].c_str(), NULL, 10);
 		if (this->ft_check_code_error(error_code) == 1)
-			return (0);
-		std::cout << "ON insert error code = " << error_code << std::endl;
+			throw Error(0, "Error, in 'error_page' location's bloc directive, code error is not correct.", 1);
 		this->_servers[index_server].location[index_location].error_location.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
-	exit(1);
-	if (tmp[k][0] != '.' || tmp[k][1] != '/')
-		throw Error(45, "Error, in 'error_page' directive should end with a directory or file", 1);
+	if (tmp[k][0] != '/')
+		throw Error(45, "Error, in 'error_page' location's bloc directive, it should start with '/'.", 1);
+
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
-	struct stat buffer;
-	// Adding the root address of the location or root address of server
-	if (this->_servers[index_server].location[index_location].root_location.empty() == false)
-	{
-		address.erase(0, 1);
-		address.insert(0, this->_servers[index_server].location[index_server].root_location);
-	}
-	else
-	{
-		address.erase(0, 1);
-		address.insert(0, this->_servers[index_server].location[index_location].name_location);
-		address.insert(0, this->_servers[index_server].root_server);
-	}
-	if (stat(address.c_str(), &buffer) != 0)
-		throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
+
 	this->_servers[index_server].location[index_location].folder_error = address;
-	if (this->_servers[index_server].location[index_location].error_location.size() > 1)		// several error pages.
-	{
-		std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();
-		for (it = this->_servers[index_server].location[index_location].error_location.begin(); it != this->_servers[index_server].location[index_location].error_location.end(); it++)
-		{
-			struct stat buff;
 
-			if (it->second == "NULL")
-				it->second = address;
-
-			std::size_t found = it->second.find(".html");
-			if (found == std::string::npos)
-			{
-				std::stringstream ss;
-				std::string check_c;
-				ss << it->first;
-				ss >> check_c;
-				check_c.append(".html");
-				if (it->second[it->second.size() - 1] != '/')
-					it->second.append("/");
-				it->second.append(check_c);
-			}
-			if (stat(it->second.c_str(), &buff) < 0)
-				throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
-			if (buff.st_size == 0)
-				throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
-		}
-	}
-	else		// Case there is only 1 error page
+	std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();
+	for (it = this->_servers[index_server].location[index_location].error_location.begin(); it != this->_servers[index_server].location[index_location].error_location.end(); it++)
 	{
-		std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();
 		if (it->second == "NULL")
 			it->second = address;
-		struct stat buff;
-		std::size_t found = it->second.find(".html");
-		if (found == std::string::npos)
-		{
-			std::stringstream ss;
-			std::string check_c;
-			ss << it->first;
-			ss >> check_c;
-			check_c.append(".html");
-			if (it->second[it->second.size() - 1] != '/')
-				it->second.append("/");
-			it->second.append(check_c);
-		}
-		if (stat(it->second.c_str(), &buff) < 0)
-			throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
-		if (buff.st_size == 0)
-			throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
 	}
 	k++;
 	return (k);
+
 }
 
 /*

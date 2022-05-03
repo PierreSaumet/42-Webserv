@@ -164,10 +164,13 @@ std::string		HttpServer::ft_setup_header( void )
 		this->_header_requete[0].num_error = 404;
 
 		// on verifie si l'erreur existe
-		int ret = ft_setup_error_header(this->_header_requete[0].path);
+		std::cout << "PB ici" << std::endl;
+		ft_setup_error_header();
+		exit(1);
 		sleep(3);
 		std::cout << "\n\n fin du test " << std::endl;
 		size_t pos;
+		int ret = 0;
 		if (ret == 0)
 		{
 			std::cout << "alors erreur dans le root server " << std::endl;

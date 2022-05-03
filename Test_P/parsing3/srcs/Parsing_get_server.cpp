@@ -375,11 +375,9 @@ size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, 
 		int error_code = std::strtol(tmp[k].c_str(), NULL, 10);
 		if (this->ft_check_code_error(error_code) == 1)
 			throw Error(0, "Error, in 'error_page' server's bloc directive, code error is not correct.", 1);
-		std::cout << "Push = " << error_code << std::endl;
 		this->_servers[index_server].error_server.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
-	std::cout << "On a du recuperer tous les errors" << std::endl;
 
 	if (tmp[k][0] != '/')
 		throw Error(45, "Error, in 'error_page' in server's bloc directive, it should start with '/'.", 1);

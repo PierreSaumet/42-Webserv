@@ -163,10 +163,12 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 			// std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << " et it = " << *it << " pos = " << pos_slash << std::endl;
 			if (this->_header_requete[0].path.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
 			{
+				size_t count = 0;
 				for (std::vector<t_location>::iterator it_loc = this->_servers[this->_num_serv].location.begin(); it_loc != this->_servers[this->_num_serv].location.end(); it_loc++)
 				{
 					if (it_loc->name_location == *it)
 					{
+						this->_num_loc = count;
 						for (std::vector<std::string>::iterator it_method = it_loc->methods_location.begin(); it_method != it_loc->methods_location.end(); it_method++)
 						{
 							if (*it_method == method) // la method est autorisee
@@ -174,6 +176,7 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 						}
 						return (1); // pas de method on return 1
 					}
+					count++;
 				}
 			}
 		}

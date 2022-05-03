@@ -31,16 +31,14 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 			this->_header_requete.push_back(t_header_request());
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 405;
-			if (this->ft_setup_error_header(request_http) == 0)
-				return ;
+			this->ft_setup_error_header();
 		}
 		else
 		{
 			this->_header_requete.push_back(t_header_request());
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 500;
-			if (this->ft_setup_error_header(request_http) == 0)
-				return ;
+			this->ft_setup_error_header();
 		}
 	}
 	return ;
@@ -59,11 +57,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 			std::cout << RED << "On a une  ERREUR 431 car GET method et donnees trop grandes " << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
-			if (this->ft_setup_error_header(request_http) != 0)
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				exit(1);
-			}
+			this->ft_setup_error_header();
 			return (0);
 		}
 		std::cout << BLUE << "Ok pas d'erreur 431 donc on continue." << CLEAR <<  std::endl;
@@ -123,18 +117,8 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 				this->_header_requete[0].num_error = 405;
 			if (ret_method == 2)
 				this->_header_requete[0].num_error = 404;
-			if (this->ft_setup_error_header(request_http) == 0)
-			{
-				std::cout << "ft_setup_error_header return 0 donc bon " << std::endl;
-				// sleep(5); 
-				return (0);
-			}
-			else
-			{
-				std::cout << "ERREUR dans la creation de ft_setup_error_header" << std::endl;
-				exit(1);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 		}
 		std::cout << BLUE << "La methode GET est autorisee, on continue." << CLEAR << std::endl;
 		
@@ -157,18 +141,8 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 				this->_header_requete[0].num_error = 404;
 			if (res == 2)
 				this->_header_requete[0].num_error = 403;
-			if (this->ft_setup_error_header(request_http) == 0)
-			{
-				std::cout << "ft_setup_error_header return 0, on continue " << std::endl;
-				sleep(2); 
-				return (0);
-			}
-			else
-			{
-				std::cout << "ERREUR dans la creation de ft_setup_error_header" << std::endl;
-				exit(1);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 
 		}
 
@@ -184,18 +158,8 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 				this->_header_requete[0].num_error = 403;
 			if (res == 1)
 				this->_header_requete[0].num_error = 404;
-			if (this->ft_setup_error_header(request_http) == 0)
-			{
-				std::cout << "ft_setup_error_header return 0, on continue " << std::endl;
-				sleep(2); 
-				return (0);
-			}
-			else
-			{
-				std::cout << "ERREUR dans la creation de ft_setup_error_header" << std::endl;
-				exit(1);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 		}
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 		std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
@@ -238,15 +202,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			std::cout << RED << "On a une  ERREUR 431 car POSTR method et donnees trop grandes " << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
-			if (this->ft_setup_error_header(request_http) == 0)
-				return (0);
-			else
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				sleep(2);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 
 		}
 		// On regarde la taille du body si trop grand == erreur 413
@@ -293,15 +250,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			std::cout << RED << "La methode POST est interdite donc on sort une erreur 405" << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 405;
-			if (this->ft_setup_error_header(request_http) == 0)
-				return (0);
-			else
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				sleep(2);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 		}
 		std::cout << BLUE << "La methode POST est autorisee, on continue." << CLEAR << std::endl;
 
@@ -341,9 +291,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		{
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 411; 
-			if (this->ft_setup_error_header(request_http) == 0)
-				return (0);
-			throw Error(16, "Error, in recieved header, the content_length is  not correct." , 2);
+			this->ft_setup_error_header();
+			return (0);
 		}
 
 		std::cout << "\nOn a le content_length = -" << this->_header_requete[0].content_length << "-" <<  std::endl;
@@ -354,15 +303,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			std::cout << "OUI ERROR 400" << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 400; 
-			if (this->ft_setup_error_header(request_http) == 0)
-				return (0);
-			else
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				sleep(2);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 
 		}
 		else
@@ -457,16 +399,8 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 405;
 			exit(1);
-			if (this->ft_setup_error_header(request_http) == 0)
-				return (0);
-			else
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				exit(1);
-				sleep(2);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 		}
 		std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
 
@@ -480,15 +414,8 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 			// on a pas acces au fichier donc on sort une erreur 403
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 403;
-			if (this->ft_setup_error_header(request_http) == 0)
-				return (0);
-			else
-			{
-				std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-				std::cout << "on doit sortir une erreur 500" << std::endl;
-				sleep(2);
-				return (1);
-			}
+			this->ft_setup_error_header();
+			return (0);
 		}
 		else
 		{
@@ -497,15 +424,8 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 				std::cout << "ON NE PEUT PAS SUPPRIMER" << std::endl;
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 403;
-				if (this->ft_setup_error_header(request_http) == 0)
-					return (0);
-				else
-				{
-					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-					std::cout << "on doit sortir une erreur 500" << std::endl;
-					sleep(2);
-					return (1);
-				}
+				this->ft_setup_error_header();
+				return (0);
 			}
 			else
 			{

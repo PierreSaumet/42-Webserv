@@ -204,71 +204,31 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 400;
-				if (this->ft_setup_error_header(request_http) == 0)
-					return ;
-				else
-				{
-					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-					std::cout << "on doit sortir une erreur 400" << std::endl;
-					sleep(2);
-					return ;
-				}
+				this->ft_setup_error_header();
 			}
 			else if (ret == 403)
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 403;
-				if (this->ft_setup_error_header(request_http) == 0)
-					return ;
-				else
-				{
-					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-					std::cout << "on doit sortir une erreur 403" << std::endl;
-					sleep(2);
-					return ;
-				}
+				this->ft_setup_error_header();
 			}
 			else if (ret == 413)
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 413;
-				if (this->ft_setup_error_header(request_http) == 0)
-					return ;
-				else
-				{
-					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-					std::cout << "on doit sortir une erreur 413" << std::endl;
-					sleep(2);
-					return ;
-				}
+				this->ft_setup_error_header();
 			}
 			else if (ret == 431)
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 431;
-				if (this->ft_setup_error_header(request_http) == 0)
-					return ;
-				else
-				{
-					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-					std::cout << "on doit sortir une erreur 431" << std::endl;
-					sleep(2);
-					return ;
-				}
+				this->ft_setup_error_header();
 			}
 			else if (ret == 404)
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 404;
-				if (this->ft_setup_error_header(request_http) == 0)
-					return ;
-				else
-				{
-					std::cout << "ft_setup_erro_header return 1, ce qui est pas normal." << std::endl;
-					std::cout << "on doit sortir une erreur 404" << std::endl;
-					sleep(2);
-					return ;
-				}
+				this->ft_setup_error_header();
 			}
 			else if (ret == 500)
 			{

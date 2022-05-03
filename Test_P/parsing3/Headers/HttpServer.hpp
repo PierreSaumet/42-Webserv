@@ -189,7 +189,7 @@ class HttpServer {
 		/*
 		**	Function used if an error occurs in the request
 		*/
-		int			ft_setup_error_header( std::string request_http );
+		void			ft_setup_error_header( void );
 		std::string			ft_find_error_html( void );
 		std::string			ft_create_error( void );
 		std::string			ft_return_error( void );

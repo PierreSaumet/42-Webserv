@@ -233,7 +233,7 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 					}
 					std::cout << "Le fichier demande n'existe pas on sort 404" << std::endl;
 					std::cout << "car la requete est : " << this->_header_requete[0].path << std::endl;
-					exit(1);
+					// exit(1);
 					return (1); //404
 				}
 				// exit(1);
@@ -374,7 +374,14 @@ size_t 	HttpServer::ft_check_access_path( void )
 		else
 		{
 			if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
+			{
+				this->_header_requete[0].path.clear();
+				this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
+				this->_header_requete[0].path.append("/flavicon.ico");
+				std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
+				exit( 1);
 				return (0);
+			}
 			// std::cout << "ICI, header requet  = " << this->_header_requete[0].path << " et index du server = " << path_index_server << std::endl;
 			// std::cout << "stat result : " << buff_path.st_dev << " et " << buff_index_server.st_dev << std::endl;
 			// std::cout << "stat result : " << buff_path.st_ino << " et " << buff_index_server.st_ino << std::endl;
@@ -387,7 +394,15 @@ size_t 	HttpServer::ft_check_access_path( void )
 	
 	// std::cout << "Il y a plusieurs locations" << std::endl;
 	std::cout << "path = " << this->_header_requete[0].path << std::endl;
-	
+	if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
+	{
+		this->_header_requete[0].path.clear();
+		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
+		this->_header_requete[0].path.append("/flavicon.ico");
+		std::cout << "merde this->_header_requete[0].path = " <<this->_header_requete[0].path << std::endl;
+		// exit(1);	
+		return (0);
+	}
 
 	sleep(1);
 	std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
@@ -408,6 +423,8 @@ size_t 	HttpServer::ft_check_access_path( void )
 				if (this->_header_requete[0].path.compare(0, it->size(), *it) == 0)
 				{
 					std::cout << "la requete: " << this->_header_requete[0].path << " appartient au bloc location : " << *it << std::endl;
+					
+					
 					// // si un root est setup on le met dans la requete
 					if (this->_servers[this->_num_serv].location[i].root_location.empty() == false)
 					{
