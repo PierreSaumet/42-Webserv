@@ -25,8 +25,11 @@ SOURCES			+=	main.cpp		\
 					HttpServer.cpp				\
 					HttpServerRequest.cpp		\
 					HttpServerRequestCheck.cpp	\
+					HttpServerRequestUtils.cpp	\
 					HttpServerResponse.cpp		\
 					HttpServerUtils.cpp			\
+					HttpServerSetResponse.cpp	\
+					HttpServerCGI.cpp			\
 					CGI_exec.cpp				\
 					Error.cpp					\
 					to_delete.cpp

@@ -141,8 +141,8 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 			std::cout << "On trouve return dans location " << std::endl;
 			if (this->ft_find_return_location(i, scope_location, index_server, index_location))
 				return (true);
-			k += 3;
-			exit(1);
+			i += 3;
+			// exit(1);
 		}
 		else
 		{
@@ -159,42 +159,42 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 
 bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location)
 {
-	std::cout << "DANS RETURN LOCATION" << std::endl;
-	(void)k;
-	(void)index_location;
-	(void)index_server;
-	(void)tmp;
 	std::cout << GREEN << "Dans ft_find_return location " << CLEAR << std::endl;
-	std::cout << "k = " << k << std::endl;
-	std::cout << "tmp[k] = " << tmp[k] << std::endl;
 
 	k += 1;
-	if (tmp[k].compare("301") != 0)
-		throw Error(0, "Error, in 'return' location's bloc directive, it should have 301 has first argument", 0);
-	k += 1;
-	if (tmp[k][tmp[k].size() -1] != ';')
-		throw Error(0, "Error, in 'return' location's bloc directive, it should have ';' at the end.", 0);
-	if (tmp[k][0] == '/') // on a un dossier
+	// Check the redirection number
+	std::vector<std::string> 	number;
+	number.push_back("300");
+	number.push_back("301");
+	number.push_back("302");
+	number.push_back("303");
+	number.push_back("304");
+	number.push_back("307");
+	number.push_back("308");
+
+	for (std::vector<std::string>::iterator it = number.begin(); it != number.end(); ++it)
 	{
-		// si on a un root de setup on le rajoute
-		if (this->_servers[index_server].location[index_location].root_location.empty() == false)
+		if (tmp[k].compare(*it) == 0)
 		{
-			std::string tmp2 = tmp[k];
-			tmp2.erase(0, 1);
-			tmp2.insert(0, this->_servers[index_server].location[index_location].root_location);
-
-			std::cout << "ICI" << std::endl;
-			struct stat buff;
-			if (stat(tmp2.c_str(), &buff) != 0)
-				throw Error(0, "Error, in 'return' location's bloc directive, the last argument doesn't exist.", 1);
-			else
-			{
-				std::cout << "tmp2 = " << tmp2 << std::endl;
-			}
+			this->_servers[index_server].location[index_location].code_return_location = tmp[k];
+			k += 1;
+			size_t pos = tmp[k].find(";");
+			if (pos == std::string::npos)
+				throw Error(0, "Error, in 'return' location's bloc directive, it should have ';' at the end.", 0);
+			if (pos != tmp[k].size() - 1)
+				throw Error(0, "Error, in 'return' location's bloc directive, it should have only 1 ';' at the end.", 0);
+			if (tmp[k][0] != '/')
+				throw Error(0, "Error, in 'return' location's bloc directive, it should start with '/'.", 0);
+			this->_servers[index_server].location[index_location].return_location = tmp[k];
+			this->_servers[index_server].location[index_location].return_location.erase(this->_servers[index_server].location[index_location].return_location.size() - 1, 1);
+			std::cout << "On a un return : " << this->_servers[index_server].location[index_location].return_location << std::endl;
+			return (false);
 		}
-		std::cout << "root dans location n'est pas setup" << std::endl;
-		exit(1);
 	}
+	throw Error(0, "Error, in 'return' location's bloc directive, error's number is not correct.", 0);
+
+	std::cout << "code pas bon " << std::endl;
+	exit(1);
 	return (false);
 }
 
@@ -437,11 +437,14 @@ bool            Parsing::ft_find_root_location( size_t k, std::vector<std::strin
 	k += 1;
 	len = tmp[k].size();
 	if (tmp[k][len] != '\0')
-		throw Error(32, "Error, in 'root' directive, it should end with '\0'.", 1);
+		throw Error(32, "Error, in 'root' location's bloc directive, it should end with '\0'.", 1);
 	if (tmp[k][len - 1] != ';')
-		throw Error(33, "Error, in 'root' directive, it should end with ';'.", 1);
-	if (tmp[k][0] != '.' || tmp[k][1] != '/')
-		throw Error(34, "Error, in 'root' directive, it should start with './'.", 1);
+		throw Error(33, "Error, in 'root' location's blocd irective, it should end with ';'.", 1);
+	if (tmp[k][0] != '/')
+		throw Error(34, "Error, in 'root' location's bloc directive, it should start with '/'.", 1);
+	size_t pos = tmp[k].find(".");
+	if (pos != std::string::npos)
+		throw Error(35, "Error, in 'root' location's bloc directive, it should not have a dot '.'", 1);
 	this->_servers[index_server].location[index_location].root_location = tmp[k].substr(0, len - 1);
 	
 	std::cout << "pb root location = " << this->_servers[index_server].location[index_location].root_location << std::endl;

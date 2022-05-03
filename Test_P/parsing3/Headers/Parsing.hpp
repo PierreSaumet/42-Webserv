@@ -31,6 +31,8 @@ typedef struct					s_location {
 			std::string					name_location;
 			std::string                 root_location;
 			std::string					index_location;
+			std::string					return_location;
+			std::string					code_return_location;
 			bool                        autoindex_location;
 			std::map<int, std::string>  error_location;
 			std::string					folder_error;

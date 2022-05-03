@@ -121,14 +121,14 @@ class HttpServer {
 		**	Functions used to creates server
 		*/
 		int					ft_create_servers( void );
-		int					ft_test_main_loop_server( void );
+		int					ft_main_loop( void );
 		void				ft_handle_connections( void );
-		void				ft_verifier_ensemble_isset( void );
-		int					ft_test_writing( void );
-		int					ft_test_reading( void );
+		void				ft_check_isset( void );
+		int					ft_write( void );
+		int					ft_reading( void );
 
 		void				ft_parser_requete( int len_msg, std::string msg );
-		std::string				ft_settup_http_response( void );
+		std::string				ft_setup_http_response( void );
 
 		/*	Functions used to get information from the header of a request.
 		*/
@@ -174,6 +174,7 @@ class HttpServer {
 		std::string		ft_get_date( void ) const;
 		std::string		ft_get_allow( void ) const;
 		std::string    	ft_get_code_redirection( void ) const;
+		std::string 	ft_get_return_location( void ) const;
 
 		std::string		ft_get_file( std::string path ) const;
 
@@ -201,11 +202,10 @@ class HttpServer {
 		// ICI nouveau lyundi 24 
 		size_t				ft_check_recv_complete(std::string tt_buffer);
 
-		void DISPLAY_ALL_DATA_PARSING( void );
-		void							ft_put_root( void );
-		size_t ft_verifie_ledroit_du_chemin( void );
+
+		size_t ft_check_access_path( void );
 		bool compareNameLocation( std::vector<t_location> a, std::vector<t_location> b);
-		int ft_trouve_le_server( void );
+		int ft_find_index_server( void );
 
 		size_t check_location( std::string path, std::string name_location );
 	
