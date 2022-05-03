@@ -204,7 +204,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 400;
-				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				if (this->ft_setup_error_header(request_http) == 0)
 					return ;
 				else
 				{
@@ -218,7 +218,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 403;
-				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				if (this->ft_setup_error_header(request_http) == 0)
 					return ;
 				else
 				{
@@ -232,7 +232,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 413;
-				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				if (this->ft_setup_error_header(request_http) == 0)
 					return ;
 				else
 				{
@@ -246,7 +246,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 431;
-				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				if (this->ft_setup_error_header(request_http) == 0)
 					return ;
 				else
 				{
@@ -260,7 +260,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 			{
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 404;
-				if (this->ft_setup_error_header(request_http, len_msg) == 0)
+				if (this->ft_setup_error_header(request_http) == 0)
 					return ;
 				else
 				{

@@ -361,9 +361,9 @@ bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, si
 */
 size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	// on incremente k on passe errr_page]
-	if (this->_servers[index_server].root_server.empty() == true)
-		throw Error(64, "Error: 'root' directive should be setup before 'error_page'.", 1);
+	// Normalement on s'en fout.
+	// if (this->_servers[index_server].root_server.empty() == true)
+	// 	throw Error(64, "Error: 'root' directive should be setup before 'error_page'.", 1);
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
@@ -377,75 +377,74 @@ size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, 
 		}
 		int error_code = std::strtol(tmp[k].c_str(), NULL, 10);
 		if (this->ft_check_code_error(error_code) == 1)
-			return (0);
+			throw Error(0, "Error, in 'error_page' server's bloc directive, code error is not correct.", 1);
+		std::cout << "Push = " << error_code << std::endl;
 		this->_servers[index_server].error_server.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
-	if (tmp[k][0] != '.' || tmp[k][1] != '/')
-	{
-		throw Error(45, "Error, in 'error_page' directive, it should end with a directory or file.", 1);
-		return (0);
-	}
+	std::cout << "On a du recuperer tous les errors" << std::endl;
+	// exit(1);
+
+	if (tmp[k][0] != '/')
+		throw Error(45, "Error, in 'error_page' in server's bloc directive, it should start with '/'.", 1);
+
+	
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
-	struct stat buffer;
-	address.erase(0, 1);
-	address.insert(0, this->_servers[index_server].root_server);
-	if (stat(address.c_str(), &buffer) != 0)
-		throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
+	// struct stat buffer;
+	// address.erase(0, 1);
+	// address.insert(0, this->_servers[index_server].root_server);
+	// std::cout << "address = " << address << std::endl;
+	// if (stat(address.c_str(), &buffer) != 0)
+	// 	throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
 	this->_servers[index_server].folder_error = address;
-	if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
-	{
-		// on ajute l'addresse a toutes les erreurs
-		std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
-		for (it = this->_servers[index_server].error_server.begin(); it != this->_servers[index_server].error_server.end(); it++)
-		{
-			struct stat buff;
 
-			if (it->second == "NULL")
-				it->second = address;
 
-			std::size_t found = it->second.find(".html");
-			if (found == std::string::npos)
-			{
-				std::stringstream ss;
-				std::string check_c;
-				ss << it->first;
-				ss >> check_c;
-				check_c.append(".html");
-				if (it->second[it->second.size() - 1] != '/')
-					it->second.append("/");
-				it->second.append(check_c);
-			}
-			if (stat(it->second.c_str(), &buff) < 0)
-				throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
-			if (buff.st_size == 0)
-				throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
-		}
-	}
-	else		// only one error page
+	std::cout << "address = " << address << std::endl;
+	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
+	for ( ; it != this->_servers[index_server].error_server.end(); ++it)
 	{
-		std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
 		if (it->second == "NULL")
 			it->second = address;
-		struct stat buff;
-		std::size_t found = it->second.find(".html");
-		if (found == std::string::npos)
-		{
-			std::stringstream ss;
-			std::string check_c;
-			ss << it->first;
-			ss >> check_c;
-			check_c.append(".html");
-			if (it->second[it->second.size() - 1] != '/')
-				it->second.append("/");
-			it->second.append(check_c);
-		}
-		if (stat(it->second.c_str(), &buff) < 0)
-			throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
-		if (buff.st_size == 0)
-			throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
 	}
+
+
+	// if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
+	// {
+	// 	// on ajute l'addresse a toutes les erreurs
+	// 	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
+	// 	for (it = this->_servers[index_server].error_server.begin(); it != this->_servers[index_server].error_server.end(); it++)
+	// 	{
+	// 		struct stat buff;
+
+	// 		if (it->second == "NULL")
+	// 			it->second = address;
+
+	// 		std::size_t found = it->second.find(".html");
+	// 		if (found == std::string::npos)
+	// 		{
+	// 			std::stringstream ss;
+	// 			std::string check_c;
+	// 			ss << it->first;
+	// 			ss >> check_c;
+	// 			check_c.append(".html");
+	// 			if (it->second[it->second.size() - 1] != '/')
+	// 				it->second.append("/");
+	// 			it->second.append(check_c);
+	// 		}
+	// 		if (stat(it->second.c_str(), &buff) < 0)
+	// 			throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
+	// 		if (buff.st_size == 0)
+	// 			throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
+	// 	}
+	// }
+	// else		// only one error page
+	// {
+	// 	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
+	// 	if (it->second == "NULL")
+	// 		it->second = address;
+	// }
 	k++;
+	// exit(1);
 	return (k);
 }
 
@@ -672,13 +671,6 @@ bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t in
 	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
 		throw Error(29, "Error, in 'index' directive, it should end with '.html'.", 1);
 	this->_servers[index_server].index_server = tmp[k].substr(0, len - 1);
-	std::cout << "index = " <<  this->_servers[index_server].index_server << std::endl;
-	// exit(1);
-	// this->_servers[index_server].index_server.erase(0, 1);
-	// this->_servers[index_server].index_server.insert(0, this->_servers[index_server].root_server);
-	// if (stat(this->_servers[index_server].index_server.c_str(), &buffer) == -1)
-	// 	throw Error(30, "Error, in 'index' directive, file doesn't exist.", 1);
-	// if (buffer.st_size == 0)
-	// 	throw Error(31, "Error, in 'index' directive, file is empty.", 1);
+	
 	return (false);
 }

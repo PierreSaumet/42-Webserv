@@ -14,9 +14,9 @@
 #include "../Headers/CGI_exec.hpp"
 
 
-std::string		HttpServer::ft_setup_http_response( void )				
+std::string		HttpServer::ft_setup_response_to_send( void )				
 {
-	std::cout << GREEN << "\n\n ft_setup_http_response " << CLEAR << std::endl;
+	std::cout << GREEN << "\n\n ft_setup_response_to_send " << CLEAR << std::endl;
 	std::string file_contents;
 	struct stat buff;
 	std::string res;
@@ -32,10 +32,10 @@ std::string		HttpServer::ft_setup_http_response( void )
 	input_file = fopen(this->_header_requete[0].path.c_str(), "r");
 	if (stat(this->_header_requete[0].path.c_str(), &buff) < 0)
 	{
-		std::cout << "Error dans ft_setup_http_response, cannot open the file, put error" << std::endl;
+		std::cout << "Error dans ft_setup_response_to_send, cannot open the file, put error" << std::endl;
 		this->_header_requete[0].error = true;
 		this->_header_requete[0].num_error = 500;
-		this->ft_setup_http_response();
+		this->ft_setup_response_to_send();
 
 	}
 	res.resize(buff.st_size + 100);											
@@ -68,8 +68,7 @@ std::string		HttpServer::ft_setup_header( void )
 			std::cout << "return de ft_setup_header : " << the_header << std::endl;
 			return (the_header);
 		}
-		std::cout << "IMPOSSIBLE D'ETRE LA, erreur =true et body = true" << std::endl;
-		return ("");
+		return (ft_create_error());
 	}
 	if (this->_header_requete[0].cgi == true)
 	{
@@ -165,7 +164,7 @@ std::string		HttpServer::ft_setup_header( void )
 		this->_header_requete[0].num_error = 404;
 
 		// on verifie si l'erreur existe
-		int ret = ft_setup_error_header(this->_header_requete[0].path, this->_header_requete[0].path.size());
+		int ret = ft_setup_error_header(this->_header_requete[0].path);
 		sleep(3);
 		std::cout << "\n\n fin du test " << std::endl;
 		size_t pos;

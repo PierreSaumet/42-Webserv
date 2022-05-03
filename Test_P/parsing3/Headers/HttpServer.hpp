@@ -44,7 +44,7 @@ class HttpServer {
 
 	public:
 
-		// structure utilise pour les socket et informatons des servers genre port 8080 ou autre
+		// This structure contains sockets necessary for the creation of the server
 		typedef struct			s_http_server {
 
 			int					enable;
@@ -52,7 +52,7 @@ class HttpServer {
 			int					sock;
 		}						t_http_server;
 
-		// structure utilise pour les socket et informations des clients genre port 8080 ou autre
+		// This structure contains sockets from the clients to be used by the server
 		typedef struct			s_client_socket {
 
 			int					client_socket;
@@ -60,20 +60,20 @@ class HttpServer {
 
 		}						t_client_socket;
 
+		// This structure is used to check if all data from the client have been recieved
 		typedef struct			s_recv_data {
 
-			std::string			method;				// useless
-			bool				chunked;			// oui
-			std::string			boundary;			// oui
+			bool				chunked;			// Recieved chunked data from POST method
+			std::string			boundary;			// Recieved data from POST with boundaries.
 		}						t_recv_data;
 
-
+		// This structure is the main structure used to parse the data send by the client.
 		typedef struct 			s_header_request {
 
-			std::string			method;				// Get Delete ou Post
+			std::string			method;				// GET, POST or DELETE
 			std::string			path;				// Le path c'est a dire l'URL transmise avec les donnees pour Get
 			std::string			protocol;
-			std::string			host;
+			std::string			host;				// Contains Host and Port: localhost:8080
 			std::string			accept;				// le Accept: de la requete
 			std::string			path_http;			// le path total du fichier demande.
 			std::string			query_string;		// les valeur donnees dans l'url pour une requete get
@@ -100,25 +100,15 @@ class HttpServer {
 		
 
 		/*
-		**	Canonical Form
+		**	Canonical Form in HttpServer.cpp
 		*/
-		HttpServer( void );
 		HttpServer( std::string &configfile );
-		HttpServer( const HttpServer &copy );
 		~HttpServer( void);
-
-		/*
-		**	Overload operator '='
-		*/
 		HttpServer			&operator=( const HttpServer &element );
 
-		/*
-		**	Functions TESTING used to display pierre.
-		*/
-		int					ft_test( void );
 
 		/*
-		**	Functions used to creates server
+		**	Functions in HttpServer.cpp, used to create servers.
 		*/
 		int					ft_create_servers( void );
 		int					ft_main_loop( void );
@@ -126,9 +116,32 @@ class HttpServer {
 		void				ft_check_isset( void );
 		int					ft_write( void );
 		int					ft_reading( void );
+		size_t				ft_check_recv_complete(std::string tt_buffer);
 
+
+		/*
+		**	Functions in HttpServerRequest.cpp, used to apply the corresponding method
+		*/
 		void				ft_parser_requete( int len_msg, std::string msg );
-		std::string				ft_setup_http_response( void );
+		size_t				ft_get(std::string request_http, int len_msg);
+		size_t				ft_post(std::string request_http, int len_msg);
+		size_t				ft_delete(std::string request_http, int len_msg);
+
+		
+		/*
+		**	Functions in HttpServerSetResponse.cpp, used to setup the header and the body response to send to the client
+		*/
+		std::string			ft_setup_response_to_send( void );
+		std::string			ft_setup_header( void );
+
+
+		/*
+		**
+		*/
+
+
+
+
 
 		/*	Functions used to get information from the header of a request.
 		*/
@@ -142,7 +155,7 @@ class HttpServer {
 		std::string		ft_check_content_length( std::string request_http );
 		std::string		ft_check_content_type( std::string request_http );
 		std::string		ft_check_body_post( std::string request_http );
-		std::string		ft_setup_header( void );
+		
 
 		size_t			ft_check_access_location( std::string path );
 
@@ -150,12 +163,6 @@ class HttpServer {
 
 
 		
-		/*
-		**	Functions used to set up the headers for the response
-		*/
-		size_t			ft_get(std::string request_http, int len_msg);
-		size_t			ft_post(std::string request_http, int len_msg);
-		size_t			ft_delete(std::string request_http, int len_msg);
 
 		std::string		ft_where_to_upload( std::string path);
 		size_t			ft_upload_file( std::string request_http );
@@ -182,7 +189,7 @@ class HttpServer {
 		/*
 		**	Function used if an error occurs in the request
 		*/
-		int			ft_setup_error_header( std::string request_http, int len_msg );
+		int			ft_setup_error_header( std::string request_http );
 		std::string			ft_find_error_html( void );
 		std::string			ft_create_error( void );
 		std::string			ft_return_error( void );
@@ -199,8 +206,6 @@ class HttpServer {
 		static int			int_signal;
 		static void			handler_signal( int num );
 
-		// ICI nouveau lyundi 24 
-		size_t				ft_check_recv_complete(std::string tt_buffer);
 
 
 		size_t ft_check_access_path( void );
@@ -216,30 +221,29 @@ class HttpServer {
 
 
 	private:
-		Parsing				*_data;
-		std::vector<t_server>           _servers;
 
+		HttpServer( const HttpServer &copy );					// Copy constructor
+		HttpServer( void );										// Empty constructor
 
-		// test
-		// int	_sock;
-		std::vector<t_http_server>		_http_servers;
-		int								_max_connections;
-		fd_set							_read_fs;
-		fd_set							_write_fs;
-		std::vector<t_client_socket>	_all_client_socket;	// va posseder toutes les conenctions. peut etre mettre en list
-		int								_return_select;
-		std::string						_HTTP_RESPONSE;
+		Cgi_exec						*_cgi;					// This variable is used to get data from Cgi's class
+		Parsing							*_data;					// This variable is used to get data from Parsing's class.
 
-		t_recv_data						_recv_complete;
-		std::string						_TOTAL_BUFFER;
+		std::vector<t_http_server>		_http_servers;			// This variable contains sockets for the server.
+		int								_max_connections;		// This variable is used setup a maximum of connection.
+		fd_set							_read_fs;				// This variable is used by the server to read on a fd.
+		fd_set							_write_fs;				// This variable is used by the server to write on a fd.
+		std::vector<t_client_socket>	_all_client_socket;		// This variable contains all client's file descriptor.
+		int								_return_select;			// This variable is the return of select().
 
-		std::vector<t_header_request>		_header_requete;
+		std::vector<t_server>           _servers;				// This variable contains all server's informations.
+		std::string						_response_to_send;		// This variable contains all data to send to the client.
+		t_recv_data						_recv_complete;			// This variable is used to see if the server has recieved everything from the client.
+		std::string						_tmp_buffer;			// This variable is a string used to collect the client's request.
+		std::vector<t_header_request>	_header_requete;		// This variable is used to collect data from the header or the body of the client's request
 
-		Cgi_exec			*_cgi;
-
-		size_t _num_serv; // c'est le numero du server, le port.
-		size_t  _num_loc;
-	protected:
+		size_t _num_serv;										// This variable is the index of the bloc server being currently used.												
+		size_t  _num_loc;										// This variable is the index of the bloc location being currently used.
+	
 };
 
 #endif

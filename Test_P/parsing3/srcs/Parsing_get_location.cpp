@@ -208,6 +208,8 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 */
 size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
+	std::cout << "Dans ft_find_error_location " << std::endl;
+	std::cout << "tmp[k] = " << tmp[k] << std::endl;
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
@@ -222,9 +224,11 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 		int error_code = std::strtol(tmp[k].c_str(), NULL, 10);
 		if (this->ft_check_code_error(error_code) == 1)
 			return (0);
+		std::cout << "ON insert error code = " << error_code << std::endl;
 		this->_servers[index_server].location[index_location].error_location.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
+	exit(1);
 	if (tmp[k][0] != '.' || tmp[k][1] != '/')
 		throw Error(45, "Error, in 'error_page' directive should end with a directory or file", 1);
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);

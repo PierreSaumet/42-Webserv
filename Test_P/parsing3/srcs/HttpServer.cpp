@@ -18,10 +18,8 @@
 /*
 **	HttpServer Empty Constructor.
 */
-HttpServer::HttpServer( void ) { // A FAIRE, init toutes les variables
-
-	std::cout << "Dans HttpServer constructor" << std::endl;
-	std::cout << "trying to catch the data form Parsing. " << std::endl;
+HttpServer::HttpServer( void ) : _max_connections(1000)
+{
 	return ;
 }
 
@@ -32,7 +30,6 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // A
 
 
 	this->_cgi = new Cgi_exec();
-	std::cout << "Constructor avec argument "<< std::endl;
 	try {
 		this->_data = new Parsing(configfile);
 		
@@ -53,9 +50,11 @@ HttpServer::HttpServer( std::string &configfile) : _max_connections(1000) { // A
 /*
 **	HttpServer Copy Constructor
 */
-HttpServer::HttpServer( const HttpServer &copy ): _data(copy._data) { // A FAIRE, init toutes les variables
-
-	this->_data = copy._data;
+HttpServer::HttpServer( const HttpServer &copy ): _cgi(copy._cgi), _data(copy._data), _http_servers(copy._http_servers), _max_connections(copy._max_connections),
+	_read_fs(copy._read_fs), _write_fs(copy._write_fs), _all_client_socket(copy._all_client_socket), _return_select(copy._return_select),
+	_servers(copy._servers), _response_to_send(copy._response_to_send), _recv_complete(copy._recv_complete), _tmp_buffer(copy._tmp_buffer),
+	_header_requete(copy._header_requete), _num_serv(copy._num_serv), _num_loc(copy._num_loc)
+{ 
 	return ;
 }
 
@@ -242,21 +241,21 @@ int 		HttpServer::ft_write( void )
 			if (this->_header_requete.empty() == true)
 				break;
 
-			_HTTP_RESPONSE = ft_setup_http_response();
-			if (_HTTP_RESPONSE.empty())
+			_response_to_send = ft_setup_response_to_send();
+			if (_response_to_send.empty())
 			{
 				std::cout << "La reponse a envoyer est null a cause de setttup http response() = ERROR / on ne doit jamais etre la " << std::endl;
 				return (0);
 			}
-			std::cout << " HTTP_RESPONSE = -" << _HTTP_RESPONSE << "-" << std::endl;
+			std::cout << " HTTP_RESPONSE = -" << _response_to_send << "-" << std::endl;
 		
-			ret_send = send(it_b_client->client_socket, _HTTP_RESPONSE.c_str(),  _HTTP_RESPONSE.size(), 0);
+			ret_send = send(it_b_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0);
 
 			if (ret_send < 0)
 			{
 				std::cout << "dans retour de send < 0 , cad send n'a pas marche " << std::endl;
-				if (_HTTP_RESPONSE.empty())
-					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
+				if (_response_to_send.empty())
+					_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
 				exit(1);
@@ -264,8 +263,8 @@ int 		HttpServer::ft_write( void )
 			else
 			{
 				std::cout << "send a fonctionne ret_send = " << ret_send << std::endl;
-				if (_HTTP_RESPONSE.empty())
-					_HTTP_RESPONSE.erase(_HTTP_RESPONSE.begin(), _HTTP_RESPONSE.end());
+				if (_response_to_send.empty())
+					_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
 				std::cout << "\nle client = " << it_b_client->client_socket << std::endl;
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
@@ -288,7 +287,6 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 	size_t pos = 0;
 	if (tt_buffer.compare(0, 5, "POST ") == 0)
 	{
-		this->_recv_complete.method = "POST";	// useless
 		if (this->_recv_complete.chunked == false)	//n'a pas ete setup ou pas de chunked
 		{
 			pos = tt_buffer.find("Transfer-Encoding: chunked");
@@ -441,20 +439,18 @@ int		HttpServer::ft_reading( void )
 					continue ;
 				}
 			}
-			_TOTAL_BUFFER.append(buffer, request_length);
+			_tmp_buffer.append(buffer, request_length);
 
-			if (ft_check_recv_complete(_TOTAL_BUFFER) == 1)
+			if (ft_check_recv_complete(_tmp_buffer) == 1)
 			{
 				// exit(1);
-				this->ft_parser_requete(_TOTAL_BUFFER.size() , _TOTAL_BUFFER);
+				this->ft_parser_requete(_tmp_buffer.size() , _tmp_buffer);
 				this->_recv_complete.chunked = false;
 				this->_recv_complete.boundary.clear();
-				this->_recv_complete.method = "";
-				_TOTAL_BUFFER.clear();
+				_tmp_buffer.clear();
 			}
 			else
 				std::cout << "ft_check_recv == 0" << std::endl;
-			this->_recv_complete.method = "";	// useless
 		}
 	}
 	return (0);

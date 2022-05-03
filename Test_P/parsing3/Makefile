@@ -30,6 +30,7 @@ SOURCES			+=	main.cpp		\
 					HttpServerUtils.cpp			\
 					HttpServerSetResponse.cpp	\
 					HttpServerCGI.cpp			\
+					HttpServerError.cpp			\
 					CGI_exec.cpp				\
 					Error.cpp					\
 					to_delete.cpp
