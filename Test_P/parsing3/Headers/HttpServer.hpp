@@ -129,7 +129,7 @@ class HttpServer {
 
 		
 		/*
-		**	Functions in HttpServerSetResponse.cpp, used to setup the header and the body response to send to the client
+		**	Functions in HttpServerResponse.cpp, used to setup the header and the body response to send to the client
 		*/
 		std::string			ft_setup_response_to_send( void );
 		std::string			ft_setup_header( void );
@@ -209,7 +209,7 @@ class HttpServer {
 
 
 		size_t ft_check_access_path( void );
-		bool compareNameLocation( std::vector<t_location> a, std::vector<t_location> b);
+
 		int ft_find_index_server( void );
 
 		size_t check_location( std::string path, std::string name_location );

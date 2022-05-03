@@ -177,7 +177,7 @@ std::string		HttpServer::ft_setup_header( void )
 	if (input_file == NULL)
 	{
 		this->_header_requete[0].error = true;
-		this->_header_requete[0].num_error = 503;
+		this->_header_requete[0].num_error = 503; // a changer
 
 		ft_setup_error_header();
 		if (this->_header_requete[0].body_error.empty() == false)
