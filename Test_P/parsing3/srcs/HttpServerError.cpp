@@ -118,3 +118,45 @@ std::string		HttpServer::ft_find_error_html( void )
 	closedir(dir);
 	return (ft_create_error()); // test
 }
+
+/*
+**	std::string	ft_create_error( void )
+**		This function is used if there is an error and if there is no error page setup.
+**
+**	It will creates a body and a header into a std::string and return it.
+*/
+std::string		HttpServer::ft_create_error( void )
+{
+	std::cout << "\n Dans ft_create_error " << std::endl;
+
+	std::string content_length;
+	std::string error_string;
+	std::stringstream ss;
+	std::string tmp;
+	size_t pos;
+
+	error_string = "<!DOCTYPE html><html><head><title></title><style type=text/css>body {color: red;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1></h1><p>by Pierre.</p></body></html>";
+	ss << this->_header_requete[0].num_error;
+	ss >> tmp;
+	pos = error_string.find("</title>");
+	error_string.insert(pos, tmp);
+	ss.str("");
+	ss.clear();
+	pos = error_string.find("by");
+	error_string.insert(pos, ft_get_status(false));
+	error_string.insert(0, this->ft_get_end_header());
+	ss << error_string.size();
+	ss >> content_length;
+	content_length.insert(0, "Content-Length: ");
+	content_length.append("\r\n");
+	error_string.insert(0, content_length);
+	error_string.insert(0, this->ft_get_server_name());
+	error_string.insert(0, this->ft_get_date());
+	error_string.insert(0, this->ft_get_charset());
+	error_string.insert(0, this->ft_get_content_type());
+	if(this->_header_requete[0].num_error == 405)
+		error_string.insert(0, this->ft_get_allow());
+	error_string.insert(0, this->ft_get_status(true));
+
+	return (error_string);
+}

@@ -179,7 +179,7 @@ int		HttpServer::ft_redirection( void )
 			}
 		}
 		std::cout << "la requete ne correspond a aucun bloc location donc error 404 ?" << std::endl;
-		exit(1);
+		// exit(1);
 		return (1);
 	}
 	return (0);

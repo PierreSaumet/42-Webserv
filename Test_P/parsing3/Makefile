@@ -27,8 +27,8 @@ SOURCES			+=	main.cpp		\
 					HttpServerRequestCheck.cpp	\
 					HttpServerRequestUtils.cpp	\
 					HttpServerResponse.cpp		\
+					HttpServerResponseUtils.cpp	\
 					HttpServerUtils.cpp			\
-					HttpServerSetResponse.cpp	\
 					HttpServerCGI.cpp			\
 					HttpServerError.cpp			\
 					CGI_exec.cpp				\

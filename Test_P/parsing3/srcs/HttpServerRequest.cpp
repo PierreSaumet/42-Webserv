@@ -126,7 +126,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
 			this->ft_exec_cgi_test( request_http, len_msg);
-			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
+			return (0);
 		}
 
 
