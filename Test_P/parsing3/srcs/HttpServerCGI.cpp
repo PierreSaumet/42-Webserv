@@ -183,62 +183,62 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		this->_cgi->setScriptName(tmp);
 		this->_cgi->setScriptFileName(tmp);
 		this->_cgi->setRequestUri("");
-		if (this->_header_requete[0].upload == true)
-		{
-			size_t  ret = this->ft_upload_file(request_http);
-			if (ret == 201)
-			{
-				this->_header_requete[0].cgi = true;
-				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>201</title><style type=text/css>body {color: green;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>201 Created, check it!</h1><p>by Pierre.</p></body></html>";
-				this->_header_requete[0].num_error = 201; // j'utilise error lol...
-				std::cout << "OUI 201 " << std::endl;
-				// sleep(2);
-			}
-			else if (ret == 200)
-			{
-				this->_header_requete[0].cgi = true;
-				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>200</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File Already uploaded =)</h1><p>by Pierre.</p></body></html>";				
-				this->_header_requete[0].num_error = 200;
-			}
-			else if (ret == 400)
-			{
-				this->_header_requete[0].error = true;
-				this->_header_requete[0].num_error = 400;
-				this->ft_setup_error_header();
-			}
-			else if (ret == 403)
-			{
-				this->_header_requete[0].error = true;
-				this->_header_requete[0].num_error = 403;
-				this->ft_setup_error_header();
-			}
-			else if (ret == 413)
-			{
-				this->_header_requete[0].error = true;
-				this->_header_requete[0].num_error = 413;
-				this->ft_setup_error_header();
-			}
-			else if (ret == 431)
-			{
-				this->_header_requete[0].error = true;
-				this->_header_requete[0].num_error = 431;
-				this->ft_setup_error_header();
-			}
-			else if (ret == 404)
-			{
-				this->_header_requete[0].error = true;
-				this->_header_requete[0].num_error = 404;
-				this->ft_setup_error_header();
-			}
-			else if (ret == 500)
-			{
-				this->_header_requete[0].cgi = true;
-				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>500</title><style type=text/css>body {color: red;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>500 Internal Server Error</h1><p>by Pierre.</p></body></html>";				
-				this->_header_requete[0].num_error = 500;
-			}
-			return ;
+		// if (this->_header_requete[0].upload == true)
+		// {
+		// 	size_t  ret = this->ft_upload_file(request_http);
+		// 	if (ret == 201)
+		// 	{
+		// 		this->_header_requete[0].cgi = true;
+		// 		this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>201</title><style type=text/css>body {color: green;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>201 Created, check it!</h1><p>by Pierre.</p></body></html>";
+		// 		this->_header_requete[0].num_error = 201; // j'utilise error lol...
+		// 		std::cout << "OUI 201 " << std::endl;
+		// 		// sleep(2);
+		// 	}
+		// 	else if (ret == 200)
+		// 	{
+		// 		this->_header_requete[0].cgi = true;
+		// 		this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>200</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File Already uploaded =)</h1><p>by Pierre.</p></body></html>";				
+		// 		this->_header_requete[0].num_error = 200;
+		// 	}
+		// 	else if (ret == 400)
+		// 	{
+		// 		this->_header_requete[0].error = true;
+		// 		this->_header_requete[0].num_error = 400;
+		// 		this->ft_setup_error_header();
+		// 	}
+		// 	else if (ret == 403)
+		// 	{
+		// 		this->_header_requete[0].error = true;
+		// 		this->_header_requete[0].num_error = 403;
+		// 		this->ft_setup_error_header();
+		// 	}
+		// 	else if (ret == 413)
+		// 	{
+		// 		this->_header_requete[0].error = true;
+		// 		this->_header_requete[0].num_error = 413;
+		// 		this->ft_setup_error_header();
+		// 	}
+		// 	else if (ret == 431)
+		// 	{
+		// 		this->_header_requete[0].error = true;
+		// 		this->_header_requete[0].num_error = 431;
+		// 		this->ft_setup_error_header();
+		// 	}
+		// 	else if (ret == 404)
+		// 	{
+		// 		this->_header_requete[0].error = true;
+		// 		this->_header_requete[0].num_error = 404;
+		// 		this->ft_setup_error_header();
+		// 	}
+		// 	else if (ret == 500)
+		// 	{
+		// 		this->_header_requete[0].cgi = true;
+		// 		this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>500</title><style type=text/css>body {color: red;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>500 Internal Server Error</h1><p>by Pierre.</p></body></html>";				
+		// 		this->_header_requete[0].num_error = 500;
+		// 	}
+		// 	return ;
 			
-		}
+		// }
 
 
 		this->_cgi->setContentLength(this->_header_requete[0].content_length);

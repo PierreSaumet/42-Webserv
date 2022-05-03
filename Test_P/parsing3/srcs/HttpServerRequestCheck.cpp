@@ -119,6 +119,7 @@ std::string		HttpServer::ft_check_accept_header( std::string header )
 	}
 }
 
+// surement useless du coup
 std::string		HttpServer::ft_check_referer( std::string request_http )
 {
 	size_t pos = request_http.find("Referer: ");

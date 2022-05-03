@@ -52,7 +52,14 @@
 		</form>
 	
 
-		<p> Test 3: envoie d'un fichier avec POST, pour cela cliquer sur le lien : <a href="page_upload_file.html">UPLOAD </a></p>
+		<p> Test 3: envoie d'un fichier avec POST, pour cela cliquer sur le lien :</p>
+		<form enctype="multipart/form-data" action="upload.php" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+		</form>
+		
+		<!-- <a href="page_upload_file.html">UPLOAD </a></p> -->
 	
 		<p> Test 4: supprimer des fichiers, pour cela cliquer sur le lien: <a href="page_delete.html">DELETE</a> </p>
 

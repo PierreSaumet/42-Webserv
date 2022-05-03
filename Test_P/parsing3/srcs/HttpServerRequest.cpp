@@ -181,60 +181,47 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 {
 	std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
-	// std::cout << "request_http = " << request_http << std::endl;
-	std::cout << "len_msg = " << len_msg << std::endl;
 
-
-
-
-	exit(1); // il faut rajouter this->_servers[this->_num_serv]
-
-	// sleep(5);
-	// exit(1);
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
-		size_t pos_hea = request_http.find("\r\n\r\n");
-		std::string size_header(request_http, 0, pos_hea);
+
+		size_t 			pos_hea = request_http.find("\r\n\r\n");
+		std::string 	size_header(request_http, 0, pos_hea);
+		std::string 			size_body(request_http, size_header.size(), request_http.size());		// on prend aussi le \r\n\r\n donc +4
+		
 		if (size_header.size() > 1023)	// on verifie que le header ne soit pas trop long
 		{
-			std::cout << "euh size_header = " << size_header << std::endl;
-			std::cout << RED << "On a une  ERREUR 431 car POSTR method et donnees trop grandes " << CLEAR << std::endl;
 			this->_header_requete[0].error = true;
 			this->_header_requete[0].num_error = 431; 
 			this->ft_setup_error_header();
 			return (0);
 
 		}
-		// On regarde la taille du body si trop grand == erreur 413
-		//	il faut comparer la capacity() de la string a la limite client_buffer_siuze()
-		//	si c'est trop grand retourner une erreur 
-		// a terminer
-		std::string size_body(request_http, size_header.size(), request_http.size());		// on prend aussi le \r\n\r\n donc +4
-		// std::cout << "euh size_body = -" << size_body << "-"<< std::endl;
-		std::cout << "et taille body = " << size_body.size() << std::endl;
-		sleep(3);
-		// exit(1);
-		// if (FT_FONCTION A FAIRE ())
-		// REGARDE LE LOCATION ET OU SERVER
-		//	SI CLIENT BUFFER SIZE < SIZE_BODY_CAPACITY()
-		//	RETOURNE 413
 
+		std::cout << "taille header = " << size_header.size() << std::endl;
+		std::cout << "taille body = " << len_msg - size_header.size() << std::endl;
+		std::cout << "et taille std::string body = " << size_body.size() << std::endl;
+		std::cout << "taille total = " << len_msg << std::endl;
+	
+		
+		
+		// Fonction a faire comparer la taille du body et les donnees avec buffer_size_server et buffer_size_location
 		std::cout << "capacity en bite = " << size_body.capacity() << std::endl;
 		std::cout << "length = " << size_body.length() << std::endl;
-		std::cout << BLUE << "Ok pas d'erreur 431 ou d'erreur 405 donc on continue." << CLEAR <<  std::endl;
+		std::cout << BLUE << "Ok pas d'erreur 431 donc on continue." << CLEAR <<  std::endl;
 	
 	
 		// On recupere la methode
 		this->_header_requete[0].method = "POST";
 		std::cout << "\nOn a la requete : " << this->_header_requete[0].method << "-" <<  std::endl;
 	
-		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
 		this->_header_requete[0].path = this->ft_check_path_header(size_header);
 		if (this->_header_requete[0].path.empty() == true)
 			throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
 		std::cout << "\nOn a le path : " << this->_header_requete[0].path << "\n" <<  std::endl;
 		
+		// Surement useless
 		this->_header_requete[0].referer = this->ft_check_referer(size_header);
 		if (this->_header_requete[0].referer.empty() == true && this->_recv_complete.chunked == false)
 		{
@@ -243,6 +230,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		}
 		std::cout << "\nOn a le referer : " << this->_header_requete[0].referer << "\n" <<  std::endl;
 
+
+	
 
 		// des qu'on a le path on verifie la method
 		if (ft_check_method_allowed_header(this->_header_requete[0].path, "POST") == 1)				// On verifie que la methode est autorisee
@@ -296,7 +285,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		}
 
 		std::cout << "\nOn a le content_length = -" << this->_header_requete[0].content_length << "-" <<  std::endl;
-		sleep(5);
+		// sleep(5);
 		// si body 0 genre un fichier avec 0 droit ex chmod 000
 		if (this->_header_requete[0].content_length == "0")
 		{
@@ -335,6 +324,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			std::cout << "OUI " << std::endl;
 			
 			this->ft_exec_cgi_test( request_http, len_msg);
+			exit(1);
 			return (0);
 			exit(1);
 			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();
