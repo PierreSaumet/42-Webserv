@@ -26,6 +26,7 @@ int			HttpServer::ft_setup_error_header( std::string request_http)
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
 		std::cout << "il y a des loctions : " << this->_servers[this->_num_serv].nbr_location << std::endl;
+		exit(1);
 		size_t i = 0;
 		while ( i < this->_servers[this->_num_serv].nbr_location)
 		{

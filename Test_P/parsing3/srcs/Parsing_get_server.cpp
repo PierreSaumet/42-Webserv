@@ -361,9 +361,6 @@ bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, si
 */
 size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	// Normalement on s'en fout.
-	// if (this->_servers[index_server].root_server.empty() == true)
-	// 	throw Error(64, "Error: 'root' directive should be setup before 'error_page'.", 1);
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
@@ -383,19 +380,13 @@ size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, 
 		k++;
 	}
 	std::cout << "On a du recuperer tous les errors" << std::endl;
-	// exit(1);
 
 	if (tmp[k][0] != '/')
 		throw Error(45, "Error, in 'error_page' in server's bloc directive, it should start with '/'.", 1);
 
 	
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
-	// struct stat buffer;
-	// address.erase(0, 1);
-	// address.insert(0, this->_servers[index_server].root_server);
-	// std::cout << "address = " << address << std::endl;
-	// if (stat(address.c_str(), &buffer) != 0)
-	// 	throw Error(46, "Error, in 'error_page' directive, the directory doesn't exist!", 1);
+
 	this->_servers[index_server].folder_error = address;
 
 
@@ -407,44 +398,7 @@ size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, 
 			it->second = address;
 	}
 
-
-	// if (this->_servers[index_server].error_server.size() > 1)		// several error pages.
-	// {
-	// 	// on ajute l'addresse a toutes les erreurs
-	// 	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
-	// 	for (it = this->_servers[index_server].error_server.begin(); it != this->_servers[index_server].error_server.end(); it++)
-	// 	{
-	// 		struct stat buff;
-
-	// 		if (it->second == "NULL")
-	// 			it->second = address;
-
-	// 		std::size_t found = it->second.find(".html");
-	// 		if (found == std::string::npos)
-	// 		{
-	// 			std::stringstream ss;
-	// 			std::string check_c;
-	// 			ss << it->first;
-	// 			ss >> check_c;
-	// 			check_c.append(".html");
-	// 			if (it->second[it->second.size() - 1] != '/')
-	// 				it->second.append("/");
-	// 			it->second.append(check_c);
-	// 		}
-	// 		if (stat(it->second.c_str(), &buff) < 0)
-	// 			throw Error(47, "Error, in 'error_page' directive, it cannot find the error file.", 1);
-	// 		if (buff.st_size == 0)
-	// 			throw Error(48, "Error, in 'error_page' directive, the file is empty.", 1);
-	// 	}
-	// }
-	// else		// only one error page
-	// {
-	// 	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
-	// 	if (it->second == "NULL")
-	// 		it->second = address;
-	// }
 	k++;
-	// exit(1);
 	return (k);
 }
 
