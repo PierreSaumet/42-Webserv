@@ -228,6 +228,45 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 	}
 }
 
+int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_client )
+{
+	long long ret = 0;
+
+	_response_to_send = ft_setup_response_to_send();
+	if ((ret = send(it_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0)) < 0)
+	{
+		if (_response_to_send.empty() == false)
+			_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
+		// close(it_client->client_socket);
+		// it_client = this->_all_client_socket.erase(it_client);
+		this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
+		_DATA = 0;
+		return (-1);
+	}
+	else
+	{
+		std::cout << "ON est ici on a return ret = " << ret  << " et size = " << _response_to_send.size() <<  std::endl;
+		if ((unsigned long)ret != _response_to_send.size())
+		{
+			std::cout << RED << "on a pas tout envoyer exit " << CLEAR << std::endl;
+			total_send = _response_to_send.size();
+			still_to_send = _response_to_send.size() - ret;
+			std::cout << "IL RESTE A ENVOYER : " << still_to_send << " sur : " << total_send << std::endl;
+			return (0);
+		}
+
+		// cas ou on a tout envouyer donc c'est bon
+		if (_response_to_send.empty() == false)
+			_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
+		// std::cout << "on envoie rien ? : " << _response_to_send << std::endl;
+		this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
+		_DATA = 0;
+		total_send = 0;
+		still_to_send = 0;
+		return (-1);
+	}
+	return (0);
+}
 int 		HttpServer::ft_write( void )
 {
 	std::vector<t_client_socket>::iterator it_b_client = this->_all_client_socket.begin();
@@ -235,43 +274,65 @@ int 		HttpServer::ft_write( void )
 
 	for (; it_b_client != it_e_client; it_b_client++)
 	{
-		int ret_send;
+		// int ret_send;
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
-			if (this->_header_requete.empty() == true)
-				break;
-
-			_response_to_send = ft_setup_response_to_send();
-			if (_response_to_send.empty())
+			// if (this->_header_requete.empty() == true)
+			// {
+			// 	std::cout << "AHAHA header empty ? " << std::endl;
+			// 	sleep(1);
+			// 	break;
+			// }
+			if (_DATA == 0)
+				break ;
+			std::cout << "on est dans write " << std::endl;
+			// sleep(3);
+			if (this->ft_continue_send(it_b_client) == -1)
 			{
-				std::cout << "La reponse a envoyer est null a cause de setttup http response() = ERROR / on ne doit jamais etre la " << std::endl;
-				return (0);
-			}
-			std::cout << " HTTP_RESPONSE = -" << _response_to_send << "-" << std::endl;
-		
-			ret_send = send(it_b_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0);
-
-			if (ret_send < 0)
-			{
-				std::cout << "dans retour de send < 0 , cad send n'a pas marche " << std::endl;
-				if (_response_to_send.empty())
-					_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
-				exit(1);
-			}
-			else
-			{
-				std::cout << "send a fonctionne ret_send = " << ret_send << std::endl;
-				if (_response_to_send.empty())
-					_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
-				std::cout << "\nle client = " << it_b_client->client_socket << std::endl;
-				close(it_b_client->client_socket);
-				it_b_client = this->_all_client_socket.erase(it_b_client);
-				std::cout << "On a retournee une reponse,  on ferme le client ?." << std::endl;
-				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
+				
 				continue ;
 			}
+			// if (_response_to_send.empty())
+			// {
+			// 	std::cout << "La reponse a envoyer est null a cause de setttup http response() = ERROR / on ne doit jamais etre la " << std::endl;
+			// 	return (0);
+			// }
+			// // std::cout << " HTTP_RESPONSE = -" << _response_to_send << "-" << std::endl;
+			// std::cout << "taille de la response = " << _response_to_send.size() << std::endl;
+			
+
+			// ret_send = send(it_b_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0);
+			// std::cout << "taille de send  = " << ret_send << std::endl;
+			// sleep(2);
+			// if (ret_send < 0)
+			// {
+			// 	std::cout << "dans retour de send < 0 , cad send n'a pas marche " << std::endl;
+			// 	if (_response_to_send.empty())
+			// 		_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
+			// 	close(it_b_client->client_socket);
+			// 	it_b_client = this->_all_client_socket.erase(it_b_client);
+			// 	exit(1);
+			// }
+			// else if ((size_t)ret_send == _response_to_send.size() || ret_send == 0)
+			// {
+			// 	std::cout << "send a fonctionne ret_send = " << ret_send << std::endl;
+			// 	if (_response_to_send.empty())
+			// 		_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
+			// 	std::cout << "\nle client = " << it_b_client->client_socket << std::endl;
+			// 	close(it_b_client->client_socket);
+			// 	it_b_client = this->_all_client_socket.erase(it_b_client);
+			// 	std::cout << "On a retournee une reponse,  on ferme le client ?." << std::endl;
+			// 	this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
+			// 	// continue ;
+			// }
+			// else
+			// {
+			// 	std::cout << "continue de sned ?" << std::endl;
+			// 	sleep(1);
+			// 	continue ;
+			// }
 		}
 	}
 	return (0);
@@ -394,7 +455,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 	else
 	{
 		std::cout << "NI GET NI POST NI DELETE doit sortir une erreur" << std::endl;
-		return (1);
+		return (0);
 	}
 	return (0);
 }
@@ -419,25 +480,29 @@ int		HttpServer::ft_reading( void )
 
 			if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) <= 0)
 			{
-				if (request_length == -1)
-				{
-					std::cout << "ERREUR RECV = -1 \t: " << request_length << std::endl;
-					std::cout << " on close le client et on continue" << std::endl;
-					FD_CLR(it_b_client->client_socket, &this->_read_fs);
-					close(it_b_client->client_socket);
-					it_b_client = this->_all_client_socket.erase(it_b_client);
-					std::cerr << strerror(errno) << std::endl;
-					exit(1);
-				}
-				else
-				{
-					std::cout << "La connection est fermee avc le client dans recv" << std::endl;
-					FD_CLR(it_b_client->client_socket, &this->_read_fs);
-					close(it_b_client->client_socket);
-					it_b_client = this->_all_client_socket.erase(it_b_client);
-					std::cerr << "strerror " <<  strerror(errno) << std::endl;
+				close(it_b_client->client_socket);
+				it_b_client = this->_all_client_socket.erase(it_b_client);
+				std::cerr << strerror(errno) << std::endl;
+				std::cout << "recv retrun 0 ou -1 on ferme le socket " << std::endl;
+				// if (request_length == -1)
+				// {
+				// 	std::cout << "ERREUR RECV = -1 \t: " << request_length << std::endl;
+				// 	std::cout << " on close le client et on continue" << std::endl;
+				// 	FD_CLR(it_b_client->client_socket, &this->_read_fs);
+				// 	close(it_b_client->client_socket);
+				// 	it_b_client = this->_all_client_socket.erase(it_b_client);
+				// 	std::cerr << strerror(errno) << std::endl;
+				// 	exit(1);
+				// }
+				// else
+				// {
+				// 	std::cout << "recv a retourner 0 donc tout est envouer donc la conenction est fermee avc le client dans recv" << std::endl;
+				// 	FD_CLR(it_b_client->client_socket, &this->_read_fs);
+				// 	close(it_b_client->client_socket);
+				// 	it_b_client = this->_all_client_socket.erase(it_b_client);
+				// 	std::cerr << "strerror " <<  strerror(errno) << std::endl;
 					continue ;
-				}
+				// }
 			}
 			_tmp_buffer.append(buffer, request_length);
 
@@ -448,9 +513,13 @@ int		HttpServer::ft_reading( void )
 				this->_recv_complete.chunked = false;
 				this->_recv_complete.boundary.clear();
 				_tmp_buffer.clear();
+				_DATA = 1;
 			}
 			else
+			{
 				std::cout << "ft_check_recv == 0" << std::endl;
+				_DATA = 0;
+			}		
 		}
 	}
 	return (0);

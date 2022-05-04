@@ -327,8 +327,74 @@ std::string		HttpServer::ft_get_charset( void ) const			// peut etre a changer
 	return ("charset=UTF-8\r\n");
 }
 
-std::string		HttpServer::ft_get_content_type( void ) const		// peut etre a changer 
+std::string		HttpServer::ft_get_content_type( size_t binary ) const		// peut etre a changer 
 {
+	std::vector<std::string> image;
+	image.push_back("gif");
+	image.push_back("png");
+	image.push_back("jpeg");
+	image.push_back("jpg");
+	image.push_back("bmp");
+	image.push_back("webp");
+
+	std::vector<std::string> music;
+	music.push_back("midi");
+	music.push_back("mpeg");
+	// image.push_back("webm");
+	music.push_back("ogg");
+	music.push_back("wav");
+	music.push_back("mp3");
+
+
+	std::vector<std::string> video;
+	video.push_back("mp4");	// video
+	video.push_back("avi");
+	video.push_back("mov");
+	video.push_back("mpeg4");
+	video.push_back("webm");
+	if (binary == 1)
+	{
+		for( std::vector<std::string>::iterator it = image.begin(); it != image.end(); ++it)
+		{
+			size_t find = this->_header_requete[0].path.find(*it);
+			if (find != std::string::npos)
+			{
+				if (this->_header_requete[0].path.size() == find + it->size())
+				{
+					std::cout << "IMAGE " << std::endl;
+					return ("Content-Type: image/" + *it + "; ");
+				}
+			}
+		}
+		for( std::vector<std::string>::iterator it = music.begin(); it != music.end(); ++it)
+		{
+			size_t find = this->_header_requete[0].path.find(*it);
+			if (find != std::string::npos)
+			{
+				if (this->_header_requete[0].path.size() == find + it->size())
+				{
+					std::cout << "SON " << std::endl;
+					if (*it == "mp3")
+						return ("Content-Type: audio/mpeg; ");
+					return ("Content-Type: audio/" + *it + "; ");
+				}
+			}
+		}
+		for( std::vector<std::string>::iterator it = video.begin(); it != video.end(); ++it)
+		{
+			size_t find = this->_header_requete[0].path.find(*it);
+			if (find != std::string::npos)
+			{
+				if (this->_header_requete[0].path.size() == find + it->size())
+				{
+					std::cout << "video " << std::endl;
+					// if (*it == "mp3")
+					// 	return ("Content-Type: audio/mpeg; ");
+					return ("Content-Type: video/" + *it + "; ");
+				}
+			}
+		}
+	}
 	return ("Content-Type: text/html; ");
 }
 

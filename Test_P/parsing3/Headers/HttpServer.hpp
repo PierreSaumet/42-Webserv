@@ -174,7 +174,7 @@ class HttpServer {
 
 		std::string		ft_get_content_length( struct stat buff, size_t len, size_t len_header ) const;
 		std::string		ft_get_end_header( void ) const;
-		std::string		ft_get_content_type( void ) const;
+		std::string		ft_get_content_type( size_t binary ) const;
 		std::string		ft_get_charset( void ) const;
 		std::string		ft_get_server_name( void ) const;
 		std::string		ft_get_status( bool x ) const;
@@ -219,7 +219,7 @@ class HttpServer {
 
 		int ft_redirection( void );
 
-
+		int ft_continue_send( std::vector<t_client_socket>::iterator it_client );
 	private:
 
 		HttpServer( const HttpServer &copy );					// Copy constructor
@@ -244,6 +244,10 @@ class HttpServer {
 		size_t _num_serv;										// This variable is the index of the bloc server being currently used.												
 		size_t  _num_loc;										// This variable is the index of the bloc location being currently used.
 	
+
+		size_t   _DATA;
+		unsigned long still_to_send;
+		unsigned long total_send;
 };
 
 #endif

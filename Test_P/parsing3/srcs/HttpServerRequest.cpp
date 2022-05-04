@@ -26,6 +26,8 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 		this->ft_delete(request_http, len_msg);
 	else
 	{
+		std::cout << "request = " << msg << std::endl;
+		sleep(2);
 		if (this->_header_requete.empty() == true)
 		{
 			this->_header_requete.push_back(t_header_request());

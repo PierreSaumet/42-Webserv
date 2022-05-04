@@ -42,7 +42,7 @@
 							header("Status: 200 OK\r\n");
 						} else{
 							move_uploaded_file($_FILES["uploadfile"]["tmp_name"], "upload/" . $_FILES["uploadfile"]["name"]); // verifiw aue le tmp file est un fichier telecharge et le deplace
-							echo "yes ca marche";
+							echo "yes ca marche\n";
 							header("Status: 201 Created\r\n");
 						}
 					} else{
@@ -60,5 +60,6 @@
 		}
 	?>
 
+	<p-> Maintenant cliquer ici pour le voir :   <a href="download/">ICI</a></p->
 </body>
 </html>

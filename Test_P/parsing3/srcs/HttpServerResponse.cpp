@@ -22,6 +22,16 @@ std::string		HttpServer::ft_setup_response_to_send( void )
 	std::string res;
 	FILE *input_file = NULL;
 
+	if (still_to_send > 0)
+	{
+		std::cout << "je dois encore envouye des donnees " << std::endl;
+		unsigned long truc = total_send - still_to_send;
+		std::cout << "truc = " << truc << std::endl;
+		_response_to_send.erase(0, truc);
+		return (_response_to_send);
+		exit(1);
+
+	}
 
 	std::string header = ft_setup_header();
     std::cout << "le fichier demande  est = -" << this->_header_requete[0].path << "-" << std::endl;
@@ -29,7 +39,7 @@ std::string		HttpServer::ft_setup_response_to_send( void )
 		
 	if (this->_header_requete[0].error == true || this->_header_requete[0].cgi == true || this->_header_requete[0].return_used == true)
 		return (header);
-	input_file = fopen(this->_header_requete[0].path.c_str(), "r");
+	input_file = fopen(this->_header_requete[0].path.c_str(), "rb");
 	if (stat(this->_header_requete[0].path.c_str(), &buff) < 0)
 	{
 		std::cout << "Error dans ft_setup_response_to_send, cannot open the file, put error" << std::endl;
@@ -46,6 +56,44 @@ std::string		HttpServer::ft_setup_response_to_send( void )
 	return (file_contents);
 }
 
+int				ft_open_binary( std::string const path )
+{
+	std::vector<std::string>  extension;
+	extension.push_back(".jpeg");	//image
+	extension.push_back(".jpg");
+	extension.push_back(".png");
+	extension.push_back(".gif");
+	extension.push_back(".bmp");
+	extension.push_back(".webp");  
+	extension.push_back(".midi");	//audio
+	extension.push_back(".mpeg");
+	// extension.push_back(".webm");
+	// extension.push_back(".ogg");
+	extension.push_back(".mp3");
+	extension.push_back(".mp4");	// video
+	extension.push_back(".avi");
+	extension.push_back(".mov");
+	extension.push_back(".mpeg4");
+	extension.push_back(".webm");
+
+
+	for (std::vector<std::string>::iterator it = extension.begin(); it != extension.end(); ++it)
+	{
+		size_t find = path.find(*it);
+		if (find != std::string::npos)
+		{
+			std::cout << "path = " << path << " et extension = " << *it << " et position " << find << std::endl;
+			std::cout << "path[find = " << path[find] << std::endl;
+			std::cout << "size path = " << path.size() << std::endl;
+			if (path.size() == find + it->size())
+			{
+				std::cout << "BINGO " << std::endl;
+				return (1);
+			}
+		}
+	}
+	return (0);
+}
 
 std::string		HttpServer::ft_setup_header( void )
 {
@@ -194,7 +242,23 @@ std::string		HttpServer::ft_setup_header( void )
 
 	}
 
-	input_file = fopen(this->_header_requete[0].path.c_str(), "r");
+
+	// doit ouvrir en binaire ? test afficher une image
+	size_t binary = 0;
+	if (ft_open_binary(this->_header_requete[0].path) == 0)
+	{
+		std::cout << "classic" << std::endl;
+		input_file = fopen(this->_header_requete[0].path.c_str(), "r");
+		
+	}
+	else
+	{
+		std::cout << "binary" << std::endl;
+		input_file = fopen(this->_header_requete[0].path.c_str(), "rb");
+		binary = 1;
+	}
+	sleep(2);
+	// exit(1);
 	if (input_file == NULL)
 	{
 		this->_header_requete[0].error = true;
@@ -217,7 +281,7 @@ std::string		HttpServer::ft_setup_header( void )
 	the_header.insert(0, this->ft_get_server_name());
 	the_header.insert(0, this->ft_get_date());
 	the_header.insert(0, this->ft_get_charset());
-	the_header.insert(0, this->ft_get_content_type());
+	the_header.insert(0, this->ft_get_content_type(binary));
 	the_header.insert(0, this->ft_get_status(true));
 
 	return (the_header);
