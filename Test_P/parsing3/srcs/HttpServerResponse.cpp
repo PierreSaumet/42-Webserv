@@ -76,6 +76,7 @@ int				ft_open_binary( std::string const path )
 	extension.push_back(".mpeg4");
 	extension.push_back(".webm");
 
+	extension.push_back(".pdf");
 
 	for (std::vector<std::string>::iterator it = extension.begin(); it != extension.end(); ++it)
 	{

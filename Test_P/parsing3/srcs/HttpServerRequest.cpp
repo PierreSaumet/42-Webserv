@@ -128,8 +128,12 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
 			this->ft_exec_cgi_test( request_http, len_msg);
+			std::cout << "CGI " << std::endl;
+			// sleep(20);
 			return (0);
 		}
+		std::cout << "PAS DE CGI" << std::endl;
+		sleep(3);
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -420,6 +424,15 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 
 		// exit(1);
 
+		int ret_serv = 0;
+		if ((ret_serv = this->ft_find_index_server()) == -1)
+		{
+			std::cout << "trouve pas le server exit" << std::endl;
+			exit(1);
+		}
+		this->_num_serv = ret_serv;			// on utiliser le numero du servers
+		std::cout << "le num du server est setup ? = " << this->_num_serv << std::endl;
+
 		if (ft_check_method_allowed_header(this->_header_requete[0].path, "DELETE") == 1)				// On verifie que la methode est autorisee
 		{
 			std::cout << RED << "La methode DELETE est interdite donc on sort une erreur 405" << CLEAR << std::endl;
@@ -431,16 +444,30 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 		}
 		std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
 
-
+		int res = 0;
+		if ((res = this->ft_check_access_path()) > 0)
+		{
+			std::cout << "ERREUR ACCESS DELETE= " << res << std::endl;
+			sleep(2);
+			exit(1);
+			this->_header_requete[0].error = true;
+			if (res == 2)
+				this->_header_requete[0].num_error = 403;
+			if (res == 1)
+				this->_header_requete[0].num_error = 404;
+			this->ft_setup_error_header();
+			return (0);
+		}
 
 		// Donc on peut delete
 		struct stat buff;
-
+		std::cout << "path this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
+		// exit(1); 
 		if (stat(this->_header_requete[0].path.c_str(), &buff) != 0)		// chmod 000 677
 		{
 			// on a pas acces au fichier donc on sort une erreur 403
 			this->_header_requete[0].error = true;
-			this->_header_requete[0].num_error = 403;
+			this->_header_requete[0].num_error = 404;
 			this->ft_setup_error_header();
 			return (0);
 		}

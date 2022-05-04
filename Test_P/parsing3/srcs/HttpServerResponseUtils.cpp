@@ -352,6 +352,10 @@ std::string		HttpServer::ft_get_content_type( size_t binary ) const		// peut etr
 	video.push_back("mov");
 	video.push_back("mpeg4");
 	video.push_back("webm");
+
+	std::vector<std::string> autre;
+	autre.push_back("pdf");	// video
+
 	if (binary == 1)
 	{
 		for( std::vector<std::string>::iterator it = image.begin(); it != image.end(); ++it)
@@ -391,6 +395,20 @@ std::string		HttpServer::ft_get_content_type( size_t binary ) const		// peut etr
 					// if (*it == "mp3")
 					// 	return ("Content-Type: audio/mpeg; ");
 					return ("Content-Type: video/" + *it + "; ");
+				}
+			}
+		}
+		for( std::vector<std::string>::iterator it = autre.begin(); it != autre.end(); ++it)
+		{
+			size_t find = this->_header_requete[0].path.find(*it);
+			if (find != std::string::npos)
+			{
+				if (this->_header_requete[0].path.size() == find + it->size())
+				{
+					std::cout << "autre " << std::endl;
+					// if (*it == "mp3")
+					// 	return ("Content-Type: audio/mpeg; ");
+					return ("Content-Type: application/" + *it + "; ");
 				}
 			}
 		}

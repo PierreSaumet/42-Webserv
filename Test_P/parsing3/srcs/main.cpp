@@ -25,8 +25,8 @@ int             main(int argc, char **argv)
 		exit(EXIT_FAILURE);
     if (argc == 1)
     {
-		std::string name("./confs/test1.conf");
-		Parsing test1 = Parsing(name);
+		std::string name("./srcs/base.conf");
+		HttpServer server_1(name);
     }
     else if (argc == 2)
     {

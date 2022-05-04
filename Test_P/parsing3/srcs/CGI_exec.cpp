@@ -342,7 +342,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		delete [] sysCline[i];
 	}
 	delete [] sysCline;
-
+	// sleep(50);
 	return (this->ft_return_string_cgi());
 }
 

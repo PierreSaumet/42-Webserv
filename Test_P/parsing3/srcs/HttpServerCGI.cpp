@@ -31,7 +31,11 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 	//	on cherche .php?
 	size_t		find_php;
 	if (this->_header_requete[0].method == "GET")
+	{
 		find_php = request_http.find(".php?");
+		if (find_php == std::string::npos)
+			find_php = request_http.find(".php");
+	}
 	if (this->_header_requete[0].method == "POST")
 		find_php = request_http.find(".php");
 
@@ -276,8 +280,8 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		std::cout << "second arg = -" << tmp_2 << "-" << std::endl;
 		// exit(1);
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
-		std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
-		// exit(1);
+		// std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
+		// sleep(10);// exit(1);
 	}
 	else
 	{

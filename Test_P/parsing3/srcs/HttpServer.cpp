@@ -227,7 +227,7 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 		}
 	}
 }
-
+// 167f525
 int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_client )
 {
 	long long ret = 0;
@@ -530,6 +530,7 @@ int		HttpServer::ft_reading( void )
 */
 int		HttpServer::ft_main_loop( void )
 {
+	_DATA = 0;
 	std::cout << "Dans la boucle principale" << std::endl;
 	std::cout << "signal = " << int_signal << std::endl;
 	while (int_signal == 0)
