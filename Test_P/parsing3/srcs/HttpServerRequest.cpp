@@ -186,7 +186,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 	{
 		this->_header_requete.push_back(t_header_request());
 
-		size_t 			pos_hea = request_http.find("\r\n\r\n");
+		size_t 			pos_hea = request_http.find("\r\n\r\n"); // si troue pas erreur
 		std::string 	size_header(request_http, 0, pos_hea);
 		std::string 			size_body(request_http, size_header.size(), request_http.size());		// on prend aussi le \r\n\r\n donc +4
 		
@@ -198,20 +198,44 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			return (0);
 
 		}
-
+		std::cout << "header = " << size_header << std::endl;
 		std::cout << "taille header = " << size_header.size() << std::endl;
 		std::cout << "taille body = " << len_msg - size_header.size() << std::endl;
 		std::cout << "et taille std::string body = " << size_body.size() << std::endl;
 		std::cout << "taille total = " << len_msg << std::endl;
 	
+		std::cout << "il faut enelever 4 a la size_bodysize(0 pour avoi le body exacte" << std::endl;
+
+		// test buffer size_ exclusivement dans le server
+		//////////////////////////////////////////////////////////////////////////////////
+		//				test size
+		////////////////////////////////////////////////////////////
+
+		this->_header_requete[0].host = this->ft_check_host_header(size_header);
+		if (this->_header_requete[0].host.empty() == true)
+			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
+		std::cout << "\nOn a le host : " << this->_header_requete[0].host << "-" << std::endl;
 		
-		
-		// Fonction a faire comparer la taille du body et les donnees avec buffer_size_server et buffer_size_location
-		std::cout << "capacity en bite = " << size_body.capacity() << std::endl;
-		std::cout << "length = " << size_body.length() << std::endl;
-		std::cout << BLUE << "Ok pas d'erreur 431 donc on continue." << CLEAR <<  std::endl;
-	
-	
+		int ret_serv = 0;
+		if ((ret_serv = this->ft_find_index_server()) == -1)
+		{
+			std::cout << "trouve pas le server exit" << std::endl;
+			exit(1);
+		}
+		this->_num_serv = ret_serv;			// on utiliser le numero du servers
+		std::cout << "le num du server est setup ? = " << this->_num_serv << std::endl;
+
+		if (this->_servers[this->_num_serv].buffer_size_server == 0)
+			this->_servers[this->_num_serv].buffer_size_server = 1000000;
+		if (size_body.size() - 4 > this->_servers[this->_num_serv].buffer_size_server)
+		{
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 431;
+			this->ft_setup_error_header();
+			return (0);
+		}
+		////////////////////////////////////////////////
+
 		// On recupere la methode
 		this->_header_requete[0].method = "POST";
 		std::cout << "\nOn a la requete : " << this->_header_requete[0].method << "-" <<  std::endl;
@@ -254,11 +278,6 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
 		std::cout << "\nOn a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
 
-		this->_header_requete[0].host = this->ft_check_host_header(size_header);
-		if (this->_header_requete[0].host.empty() == true)
-			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
-		std::cout << "\nOn a le host : " << this->_header_requete[0].host << "-" << std::endl;
-		
 		
 
 		// RAJOUT VENDREDi
@@ -324,7 +343,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			std::cout << "OUI " << std::endl;
 			
 			this->ft_exec_cgi_test( request_http, len_msg);
-			exit(1);
+			// exit(1);
 			return (0);
 			exit(1);
 			// this->_header_requete[0].cgi_return = this->_cgi->ft_execute_cgi();

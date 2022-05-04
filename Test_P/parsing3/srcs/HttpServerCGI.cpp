@@ -269,7 +269,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		std::cout << "second arg = -" << tmp_2 << "-" << std::endl;
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
 		std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
-		// exit(1);
+		exit(1);
 	}
 	else
 	{

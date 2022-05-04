@@ -29,8 +29,8 @@
 
 
 				// taille du fichier donc useless // a suppriner et a verifier soit meme
-				$maxsize = 2 * 1024 * 1024; // 5mo
-				if($filesize > $maxsize) exit("Error: fichir trop grad: ($filesize)");
+				// $maxsize = 2 * 1024 * 1024; // 5mo
+				// if($filesize > $maxsize) exit("Error: fichir trop grad: ($filesize)");
 
 				
 				if (is_dir("upload/")) {

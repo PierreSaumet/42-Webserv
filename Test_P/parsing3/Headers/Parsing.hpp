@@ -37,7 +37,7 @@ typedef struct					s_location {
 			std::map<int, std::string>  error_location;
 			std::string					folder_error;
 			std::vector<std::string>    methods_location;
-			size_t						buffer_size_location;
+			// size_t						buffer_size_location;
 		}								t_location;
 
 typedef struct                  s_server {
@@ -121,7 +121,7 @@ class Parsing {
 		*/
 		bool           					ft_find_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool           					ft_find_autoindex_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
-		bool							ft_find_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
+		// bool							ft_find_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		bool							ft_find_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t          				ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location );
 		size_t                      	ft_find_methods_location( size_t k, std::vector<std::string> tmp, size_t index_server,  size_t index_location);
