@@ -39,9 +39,11 @@
 						// verifie sil existe
 						if(file_exists("upload/" . $_FILES["uploadfile"]["name"])){	// verifie que upload/ + le nom du fichier existe
 							echo $_FILES["uploadfile"]["name"] . " existe deja ";	// il existe deja
+							header("Status: 200 OK\r\n");
 						} else{
 							move_uploaded_file($_FILES["uploadfile"]["tmp_name"], "upload/" . $_FILES["uploadfile"]["name"]); // verifiw aue le tmp file est un fichier telecharge et le deplace
 							echo "yes ca marche";
+							header("Status: 201 Created\r\n");
 						}
 					} else{
 						echo " marche pas";

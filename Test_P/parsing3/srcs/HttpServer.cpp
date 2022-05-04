@@ -300,7 +300,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 						pos = tt_buffer.find("Content-Type: multipart/form-data;");
 						if (pos == std::string::npos)
 						{
-							std::cout << "Erreur requete post content-type " << std::endl;
+							std::cout << "Erreur requete post content-type " << std::endl; // doit setup bad request 400
 							exit(1);
 						}
 						else

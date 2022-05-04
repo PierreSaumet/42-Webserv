@@ -76,13 +76,34 @@ std::string		HttpServer::ft_setup_header( void )
 		std::cout << "\n\n display = " << this->_header_requete[0].body_error << std::endl;
 		
 		std::string tmp = this->_header_requete[0].body_error;
-		tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
+		size_t pos = tmp.find("\r\n\r\n");
+		if (pos == std::string::npos)
+		{
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 500;
+
+			ft_setup_error_header();
+			if (this->_header_requete[0].body_error.empty() == false)
+			{
+				the_header = ft_find_error_html( );
+				std::cout << "ls return de ft_setup_header : " << the_header << std::endl;
+				exit(1);
+				return (the_header);
+			}
+		}
+		// atentio
+		// tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
 		tmp.insert(0, this->ft_get_server_name());
 		tmp.insert(0, this->ft_get_date());
-		tmp.insert(0, this->ft_get_status(true));
 
+		if (tmp.find("Status: 201", pos) != std::string::npos)
+			this->_header_requete[0].num_error = 201;
+		else if (tmp.find("Status: 200", pos) != std::string::npos)
+			this->_header_requete[0].num_error = 200;
+		tmp.insert(0, this->ft_get_status(true));
 		return (tmp);
 	}
+
 	if (this->_header_requete[0].return_used == true)
 	{
 		std::cout << GREEN << "redirection 301" << CLEAR << std::endl;

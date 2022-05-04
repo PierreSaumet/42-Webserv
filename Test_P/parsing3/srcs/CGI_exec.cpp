@@ -178,25 +178,25 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysCline[i] = new char[aArgs[i].size() + 1];
 		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
-		// std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
 	}
 	sysCline[aArgs.size()] = NULL;
 
 	// exit(1);
 	aEnv = this->ft_convert_map_to_vector();
-	// std::cout << "\n\naEnv = " << std::endl;
-	// std::vector<std::string>::iterator it = aEnv.begin();
-	// for (; it != aEnv.end(); it++)
-	// {
-	// 	std::cout << "it = " << *it << std::endl;
-	// }
+	std::cout << "\n\naEnv = " << std::endl;
+	std::vector<std::string>::iterator it = aEnv.begin();
+	for (; it != aEnv.end(); it++)
+	{
+		std::cout << "it = " << *it << std::endl;
+	}
 
 	sysEnv = new char*[aEnv.size() + 1];
 	for (unsigned long i = 0; i < aEnv.size(); i++)
 	{
 		sysEnv[i] = new char[aEnv[i].size() + 1];
 		strncpy(sysEnv[i], aEnv[i].c_str(), aEnv[i].size() + 1);
-		// std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
+		std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
 
 	}
 	sysEnv[aEnv.size()] = NULL;
@@ -244,7 +244,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
 		exit(1);
 	}
-	else if (pid == 0)		// enfant lol
+	else if (pid == 0)		// enfant 
 	{
 		// On duplique les files descriptors d'entree et de sortie.
 		if (dup2(fd_in, 0) == -1) // STDIN_FILENO
@@ -297,6 +297,30 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		}
 
 	}
+
+	std::cout << RED << "\n\n\nFINNN " << CLEAR << std::endl;
+	for (unsigned long i = 0; i < aArgs.size(); i++)
+	{
+
+		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+	}
+	
+
+	it = aEnv.begin();
+	for (; it != aEnv.end(); it++)
+	{
+		std::cout << "it = " << *it << std::endl;
+	}
+
+
+	for (unsigned long i = 0; i < aEnv.size(); i++)
+	{
+
+		std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
+
+	}
+	// exit(1);
+
 	dup2(stdin_tmp, 0);
 	dup2(stdout_tmp, 1);
 	fclose(file_in);

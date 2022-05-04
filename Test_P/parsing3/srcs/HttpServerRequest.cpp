@@ -334,7 +334,23 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		
 
 
-		
+		std::cout << "Avant ft_check_access_path, le header.path = " << this->_header_requete[0].path << std::endl;
+		int res = 0;
+		if ((res = this->ft_check_access_path()) > 0)
+		{
+			std::cout << "erreur verifie le drot res = " << res << std::endl;
+			sleep(2);
+			exit(1);
+			this->_header_requete[0].error = true;
+			if (res == 2)
+				this->_header_requete[0].num_error = 403;
+			if (res == 1)
+				this->_header_requete[0].num_error = 404;
+			this->ft_setup_error_header();
+			return (0);
+		}
+		std::cout << "ACCES EST BON ??????????" << std::endl;
+		// exit(1);
 
 		if (this->ft_check_cgi_or_php(request_http) == 1)  // verifier cette fonction
 		{

@@ -294,6 +294,8 @@ std::string		HttpServer::ft_get_status( bool x ) const
 	}
 	else
 	{
+		if (this->_header_requete[0].num_error == 200)
+			return ("HTTP/1.1 200 OK\r\n");
 		if (this->_header_requete[0].num_error == 201)
 			return ("HTTP/1.1 201 Created\r\n");
 		if (this->_header_requete[0].num_error == 204)

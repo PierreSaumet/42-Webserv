@@ -102,7 +102,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		std::cout << "first = " << it->first << " et = " << it->second << std::endl;
 
 	}
-	
+	// exit(1);
 	sleep(2);
 	// on setup les variables a NULL
 	std::cout << "\n ON SETUP les variables de _env_cgi " << std::endl;
@@ -154,7 +154,9 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		std::string tmp = this->_header_requete[0].script_file_name;
 		tmp.insert(0, this->_servers[this->_num_serv].root_server);
 		// std::cout << "tmp = " << tmp << std::endl;
-
+		
+			this->_cgi->ft_display_all_variable_env();
+		// exit(1);
 		// std::string BINGO = "";
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp);
 		
@@ -171,6 +173,11 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
 		this->_cgi->setRedirectStatus("200");
 		this->_cgi->setStatusCode("200");
+		// this->_cgi->setRedirectStatus("");
+		// this->_cgi->setStatusCode("");
+		
+		
+		
 		this->_cgi->setRequestMethod(this->_header_requete[0].method);
 		this->_cgi->setServerSoftware("Webserv/1.0");
 		this->_cgi->setServerProtocol("HTTP/1.1");
@@ -250,7 +257,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		this->_cgi->set_body_string_post(this->_header_requete[0].body_post);
 
 		this->_cgi->ft_display_all_variable_env();
-
+		
 
 
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
@@ -267,9 +274,10 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		std::cout << "test tmp_2 = / " << std::endl;
 		tmp_2 = "/";
 		std::cout << "second arg = -" << tmp_2 << "-" << std::endl;
+		// exit(1);
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
 		std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
-		exit(1);
+		// exit(1);
 	}
 	else
 	{
