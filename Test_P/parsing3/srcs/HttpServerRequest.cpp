@@ -317,7 +317,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 
 		
 
-		if (this->ft_check_cgi_or_php(request_http) == 1)
+		if (this->ft_check_cgi_or_php(request_http) == 1)  // verifier cette fonction
 		{
 			// on a du php ou du cgi ?
 			// donc faut utiliser cgi

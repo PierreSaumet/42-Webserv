@@ -33,7 +33,6 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 	serv_dir.insert(std::pair<std::string, bool>("dav_methods", false));
 	serv_dir.insert(std::pair<std::string, bool>("index", false));
 	serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
-	serv_dir.insert(std::pair<std::string, bool>("upload_store", false));
 	serv_dir.insert(std::pair<std::string, bool>("client_max_body_size", false));
 	serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
 	serv_dir.insert(std::pair<std::string, bool>("return", false));
@@ -142,12 +141,7 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 				return (true);
 			k += 2;
 		}
-		else if (scope_server[k] == "upload_store")
-		{
-			if (this->ft_find_upload_store(k, scope_server, i))
-				return (true);
-			k += 2;
-		}
+
 		else if (scope_server[k] == "server" && scope_server[k + 1] == "{")
 			throw Error(61, "Error, a bloc server cannot have another bloc server inside.", 1);
 		else if (scope_server[k] == "location")
@@ -302,54 +296,6 @@ bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t
 	exit(0);
 }
 
-/*
-**	ft_find_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server ):
-**		This function will check the information given in the 'upload_store' directive.
-**		The information given is an fodler where we can find files uploaded.
-**
-**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
-*/
-bool			Parsing::ft_find_upload_store( size_t k, std::vector<std::string> tmp, size_t index_server )
-{
-	struct stat buffer;
-	size_t  	len;
-	
-
-	if (this->_servers[index_server].root_server.empty() == true)
-		throw Error(63, "Error, 'root' directive should be setup before 'upload_store' directive.", 1);
-	k += 1;
-	len = tmp[k].size();
-	if (tmp[k][len] != '\0')
-		throw Error(49, "Error, in 'upload_store' directive, it should end with '\0'.", 1);
-	if (tmp[k][len - 1] != ';')
-		throw Error(50, "Error, in 'upload_store' directive, it should end with ';'.",1);
-	if (tmp[k][0] !=  '/')
-		throw Error(51, "Error, in 'upload_store' directive, it should start with '/'.", 1);
-	this->_servers[index_server].upload_store_server = tmp[k].substr(0, len - 1);
-
-	// on ajoute le root
-	this->_servers[index_server].upload_store_server.insert(0, this->_servers[index_server].root_server);
-	// std::cout << "upload store = " << this->_servers[index_server].upload_store_server << std::endl;
-
-	if (stat(this->_servers[index_server].upload_store_server.c_str(), &buffer) == -1)
-		throw Error(52, "Error, in 'upload_store' directive , the folder doesn't exist!", 1);
-	
-	// Checks if it is a folder and if it has the good rights
-	if (S_ISDIR(buffer.st_mode))
-	{									// pareil dans locatio nje crois
-		if ((buffer.st_mode & S_IRWXU) != 448)
-			throw Error(520, "Error, in 'upload_store' directive , the folder doesn't have the good rights", 1);
-	}
-	else
-		throw Error(521, "Error, in 'upload_store' directive , you need to use a fodler", 1);
-
-	// std::cout << "upload store = " << this->_servers[index_server].upload_store_server << std::endl;
-
-	// exit(1);
-
-	
-	return (false);
-}
 
 /*
 **	ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server ):

@@ -164,7 +164,7 @@ class HttpServer {
 
 		
 
-		std::string		ft_where_to_upload( std::string path);
+		// std::string		ft_where_to_upload( std::string path);
 		size_t			ft_upload_file( std::string request_http );
 		
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );

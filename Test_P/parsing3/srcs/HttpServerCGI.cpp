@@ -76,7 +76,8 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 {
 	std::cout << GREEN << "\n\nDANS exec CGI ... " << CLEAR << std::endl;
-	std::cout << "request_http = " << request_http << std::endl;
+	(void)request_http;
+	// std::cout << "request_http = " << request_http << std::endl;
 	std::cout << "longueur msg = " << len_msg << "\n\n" << std::endl;
 
 	std::cout << "method = " << this->_header_requete[0].method << std::endl;

@@ -35,9 +35,6 @@ DIRECTIVES:
 		ex:		dav_methods		POST GET DELETE;
 				dav_methods		DELETE;
 
-	- upload_store:	On trouve cette 'directive' dans server et location
-				Specifies a directory to which output files will be saved to.
-		ex:		upload_store	./upload
 	
 	- client_max_body_size:	On trouve cette directive dans server et location
 				Sets buffer size for reading client request body.
@@ -57,7 +54,7 @@ DIRECTIVES:
 	dav_methods
 	index 
 	
-	upload_store
+	
 	client_max_body_size
 	cgi_path
 	autoindex
