@@ -116,28 +116,45 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 			this->_http_servers[i].svr_addr.sin_addr.s_addr = INADDR_ANY;
 			this->_http_servers[i].svr_addr.sin_port = htons(this->_servers[i].port_server);
 
-			if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
-			{
-				std::cerr << "error bind = " << strerror(errno) << std::endl;
-				if (close(this->_http_servers[i].sock) < 0)
-				{
-					close(this->_http_servers[i].sock);
-					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
-				}
-				throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
-			}
 
-			if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
+			// test si plusieurs servers on la meme addresse
+			size_t y= 0;
+			size_t binded = 0;
+			while (y < i)
 			{
-				if (close(this->_http_servers[i].sock) < 0)
-				{
-					close(this->_http_servers[i].sock);
-					throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
-				}
-				throw Error(5, "Error, 'creation of server', cannot listen.", 2);
+				if (this->_servers[i].port_server == this->_servers[y].port_server)
+					binded = 1;
+				y++;
 			}
-			std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
-			std::cout << std::endl;
+			
+			if (binded == 0)
+			{
+
+				if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
+				{
+					std::cerr << "error bind = " << strerror(errno) << std::endl;
+					if (close(this->_http_servers[i].sock) < 0)
+					{
+						close(this->_http_servers[i].sock);
+						throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
+					}
+					throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
+				}
+				std::cout << "SERVER sock bind = " << this->_http_servers[i].sock << std::endl;
+				if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
+				{
+					if (close(this->_http_servers[i].sock) < 0)
+					{
+						close(this->_http_servers[i].sock);
+						throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
+					}
+					throw Error(5, "Error, 'creation of server', cannot listen.", 2);
+				}
+				std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
+				std::cout << std::endl;
+			}
+			else
+				this->_http_servers.pop_back();
 		}
 	}
 	catch (std::exception &e)
@@ -202,10 +219,11 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 		struct sockaddr_in	addr_new_client;
 		socklen_t	size_addr_new_client = sizeof(addr_new_client);
 		memset((char*)&addr_new_client, 0, (int)size_addr_new_client);
-
+		// std::cout << "SERVER socke = " << it_b->sock << std::endl;
 		if (FD_ISSET(it_b->sock, &this->_read_fs))
 		{
 			socket_new_client = accept(it_b->sock, (struct sockaddr *)&addr_new_client, &size_addr_new_client);		
+			std::cerr << strerror(errno) << std::endl;
 			if (socket_new_client < 0 && int_signal == 0)
 				throw Error(6, "Error, 'main loop server', server cannot accept() a client.", 2);
 			else
@@ -222,6 +240,7 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 					new_client.client_addr = addr_new_client;
 					this->_all_client_socket.push_back(new_client);
 					std::cout << "Un nouveau client a ete ajoute, total de client = " << this->_all_client_socket.size() << std::endl;
+					// sleep(10);
 				}		
 			}
 		}

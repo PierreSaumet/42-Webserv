@@ -532,20 +532,25 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 	// std::cout << "ce server[" << index_server << "] a le port = " << this->_servers[index_server].port_server << std::endl;
 	if (this->_servers[index_server].port_server < 1 || this->_servers[index_server].port_server > 65535)
 		throw Error(21, "Error, in 'listen directive'  port should be between 0 and 65535.", 1);
-	if (index_server > 0)
-	{
-		i = 0;
-		while (i < index_server)
-		{
-			// std::cout << "\nNombre de server = " << this->_servers.size() << std::endl;
-			// std::cout << " i = " << i << " index server = " << index_server << std::endl;
-			// std::cout << "Display les port server, ce server = " << this->_servers[index_server].port_server << " et l'autre = " << this->_servers[i].port_server << std::endl;
-			if (this->_servers[index_server].port_server == this->_servers[i].port_server)
-				throw Error(22, "Error, in 'listen directive'  bloc servers have the same port.", 1);
-			i++;
-		}
-		// std::cout << "\n\n";
-	}
+	
+	////////////////////////////////////////////////////////////////////////////////////
+	// pour tester dans le sujet e truc avevc des servers avec le meme port .... 
+	
+	// if (index_server > 0)
+	// {
+	// 	i = 0;
+	// 	while (i < index_server)
+	// 	{
+	// 		// std::cout << "\nNombre de server = " << this->_servers.size() << std::endl;
+	// 		// std::cout << " i = " << i << " index server = " << index_server << std::endl;
+	// 		// std::cout << "Display les port server, ce server = " << this->_servers[index_server].port_server << " et l'autre = " << this->_servers[i].port_server << std::endl;
+	// 		if (this->_servers[index_server].port_server == this->_servers[i].port_server)
+	// 			throw Error(22, "Error, in 'listen directive'  bloc servers have the same port.", 1);
+	// 		i++;
+	// 	}
+	// 	// std::cout << "\n\n";
+	// }
+	//////////////////////////////////////////////////////////////////////////////////////////
 	if (this->_servers[index_server].host_server == "localhost")
 		this->_servers[index_server].host_server = "127.0.0.1";
 	return false;
