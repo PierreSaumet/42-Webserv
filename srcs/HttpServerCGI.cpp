@@ -35,6 +35,8 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 		find_php = request_http.find(".php?");
 		if (find_php == std::string::npos)
 			find_php = request_http.find(".php");
+		if (find_php == std::string::npos)
+			return (false);
 	}
 	if (this->_header_requete[0].method == "POST")
 		find_php = request_http.find(".php");

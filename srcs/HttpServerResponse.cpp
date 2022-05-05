@@ -36,7 +36,7 @@ std::string		HttpServer::ft_setup_response_to_send( void )
 	std::string header = ft_setup_header();
     std::cout << "le fichier demande  est = -" << this->_header_requete[0].path << "-" << std::endl;
 	std::cout << "le header recu est = " << header << std::endl;
-		
+	std::cout << "taille du header = " << header.size() << std::endl;
 	if (this->_header_requete[0].error == true || this->_header_requete[0].cgi == true || this->_header_requete[0].return_used == true)
 		return (header);
 	input_file = fopen(this->_header_requete[0].path.c_str(), "rb");
@@ -64,7 +64,8 @@ int				ft_open_binary( std::string const path )
 	extension.push_back(".png");
 	extension.push_back(".gif");
 	extension.push_back(".bmp");
-	extension.push_back(".webp");  
+	extension.push_back(".webp");
+	extension.push_back(".ico");  
 	extension.push_back(".midi");	//audio
 	extension.push_back(".mpeg");
 	// extension.push_back(".webm");

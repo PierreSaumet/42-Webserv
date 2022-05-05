@@ -22,7 +22,7 @@
 void			HttpServer::ft_setup_error_header( void) 
 {
 	std::cout << GREEN << "Dans ft_setup_error_header" << CLEAR << std::endl;
-	
+	std::string tmp = this->_header_requete[0].body_error;
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
 		this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].location[this->_num_loc].root_location);
@@ -33,16 +33,23 @@ void			HttpServer::ft_setup_error_header( void)
 		{
 			if (it_loc->first >= 0 && this->_header_requete[0].num_error == (size_t)it_loc->first)
 			{
+				std::cout << "ici = this->_header_requete[0].body_error = " << this->_header_requete[0].body_error << std::endl;
 				this->_header_requete[0].body_error.append(it_loc->second);
-				if (this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
+				std::cout << "ici = this->_header_requete[0].body_error = " << this->_header_requete[0].body_error << std::endl;
+				struct stat buff;
+				stat(this->_header_requete[0].body_error.c_str(), &buff);
+				if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
 					this->_header_requete[0].body_error.append("/");
+				std::cout << "ici = this->_header_requete[0].body_error = " << this->_header_requete[0].body_error << std::endl;
 				std::cout << "\nplusieurs bloc location sbody error contient = " << this->_header_requete[0].body_error << std::endl;
 				return ;
 			}
 		}
+		this->_header_requete[0].body_error = tmp;
+
 	}
-	else
-	{
+	// else
+	// {
 		this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].root_server);
 		
 		std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();
@@ -51,13 +58,15 @@ void			HttpServer::ft_setup_error_header( void)
 			if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
 			{
 				this->_header_requete[0].body_error.append(it->second);
-				if (this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
+				struct stat buff;
+				stat(this->_header_requete[0].body_error.c_str(), &buff);
+				if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
 					this->_header_requete[0].body_error.append("/");
 				std::cout << "\n 0 bloc location body error contient = " << this->_header_requete[0].body_error << std::endl;
 				return ;
 			}
 		}
-	}
+	// }
 	// on met le body error a 0
 	this->_header_requete[0].body_error.clear();
 	std::cout << " body error = " << this->_header_requete[0].body_error << std::endl;
@@ -78,7 +87,11 @@ std::string		HttpServer::ft_find_error_html( void )
 	std::cout << "body error = " << this->_header_requete[0].body_error << std::endl;
 	
 	if (stat(this->_header_requete[0].body_error.c_str(), &buff) < 0)
+	{
+		std::cout << "pas normal " << std::endl;
+		exit(1);
 		return (ft_create_error());
+	}
 
 	ss << this->_header_requete[0].num_error;
 	ss >> path_error;
@@ -116,6 +129,24 @@ std::string		HttpServer::ft_find_error_html( void )
 		}
 	}
 	closedir(dir);
+	
+	if (S_ISREG(buff.st_mode))
+	{
+		path_error.clear();
+		path_error =  ft_get_file(this->_header_requete[0].body_error);
+		path_error.insert(0, this->ft_get_end_header());
+		path_error.insert(0, this->ft_get_content_length(buff, 0, 0));
+		path_error.insert(0, this->ft_get_server_name());
+		path_error.insert(0, this->ft_get_date());
+		path_error.insert(0, this->ft_get_charset());
+		path_error.insert(0, this->ft_get_content_type(0)); // a changer
+		if(this->_header_requete[0].num_error == 405)
+			path_error.insert(0, this->ft_get_allow());
+		path_error.insert(0, this->ft_get_status(true));
+		return (path_error);
+	}
+std::cout << "mince " << std::endl;
+	exit(1);
 	return (ft_create_error()); // test
 }
 
@@ -125,6 +156,8 @@ std::string		HttpServer::ft_find_error_html( void )
 **
 **	It will creates a body and a header into a std::string and return it.
 */
+
+
 std::string		HttpServer::ft_create_error( void )
 {
 	std::cout << "\n Dans ft_create_error " << std::endl;
@@ -143,9 +176,27 @@ std::string		HttpServer::ft_create_error( void )
 	ss.str("");
 	ss.clear();
 	pos = error_string.find("by");
+	// test 
+	// std::string truc = "";
+	// truc.insert(pos, ft_get_status(false));
 	error_string.insert(pos, ft_get_status(false));
+	
+	pos = error_string.find("by Pierre");
+	error_string.erase(pos - 2, 2);
+	pos = error_string.find("by Pierre");
+	std::cout << "pos = " << pos << std::endl;
+	error_string.insert(pos, " ");
+	std::cout << "ERROR[pos] = " << error_string[pos] << std::endl;
+	std::cout << "ERROR[pos-1] = " << error_string[pos-1] << std::endl;
+	std::cout << "ERROR[pos-2] = " << error_string[pos-2] << std::endl;
+	std::cout << "ERROR[pos-3] = " << error_string[pos-3] << std::endl;
+	std::cout << "ERROR[pos+1] = " << error_string[pos+1] << std::endl;
+
+	
+	// error_string.erase(pos , 1);
+	//
 	error_string.insert(0, this->ft_get_end_header());
-	ss << error_string.size();
+	ss << error_string.size() - 2;
 	ss >> content_length;
 	content_length.insert(0, "Content-Length: ");
 	content_length.append("\r\n");
@@ -157,6 +208,19 @@ std::string		HttpServer::ft_create_error( void )
 	if(this->_header_requete[0].num_error == 405)
 		error_string.insert(0, this->ft_get_allow());
 	error_string.insert(0, this->ft_get_status(true));
+	error_string.append("\0");
 
+	std::cout << "error_string = " << error_string << std::endl;
+	// exit(1);
 	return (error_string);
 }
+
+// HTTP/1.1 400 Bad Request
+// Content-Type: text/html; charset=UTF-8
+// Date: Thu, 05 May 2022 14:49:58 GMT+02
+// Server: Webserv1
+// Content-Length: 368
+
+
+// <!DOCTYPE html><html><head><title>400</title><style type=text/css>body {color: red;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel="icon" type="image/x-con" href="/flavicon.ico"/><link rel="shortcut icon" type="image/x-con" href="/flavicon.ico" /></head><body><h1></h1><p>400 Bad Request
+// by Pierre.</p></body></html>

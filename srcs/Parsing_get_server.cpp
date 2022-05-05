@@ -47,13 +47,21 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 				if (it_b->second == false)
 					it_b->second = true;
 				else
+				{
+					std::cout << "doublon = " << it_b->first << std::endl;
 					throw Error(7, "Error, in 'server block', it has a doublon.", 1);
+				}
 			}
 		}
 		if (scope_server[k] == "location")
 		{
-			std::vector<std::string>    scope_location = this->ft_get_scope(k + 1);
+			std::cout << "on trouve un location scope_server[k]= " << scope_server[k] << " et k = " << k << std::endl;
+			// TEST
+			std::vector<std::string> scope_location = this->ft_get_scope_location(k, scope_server);
+			//std::vector<std::string>    scope_location = this->ft_get_scope(k + 1);
 			k = k + scope_location.size();
+			std::cout << "on passe le groupe location = " << scope_server[k] << " et k = " << k << std::endl;
+			std::cout << "talle du scope = " << scope_location.size() << std::endl;
 		}
 		k++;
 	}

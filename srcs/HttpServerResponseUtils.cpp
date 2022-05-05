@@ -336,6 +336,7 @@ std::string		HttpServer::ft_get_content_type( size_t binary ) const		// peut etr
 	image.push_back("jpg");
 	image.push_back("bmp");
 	image.push_back("webp");
+	image.push_back("ico");
 
 	std::vector<std::string> music;
 	music.push_back("midi");
@@ -358,18 +359,25 @@ std::string		HttpServer::ft_get_content_type( size_t binary ) const		// peut etr
 
 	if (binary == 1)
 	{
+		std::cout << "path = " << this->_header_requete[0].path << std::endl;
 		for( std::vector<std::string>::iterator it = image.begin(); it != image.end(); ++it)
 		{
-			size_t find = this->_header_requete[0].path.find(*it);
+			size_t find = this->_header_requete[0].path.find(*it, this->_header_requete[0].path.size() - 5);
+			std::cout << "it = " << *it << std::endl;
 			if (find != std::string::npos)
 			{
+				std::cout << "trouve ico ? " << std::endl;
+				std::cout << "find = " << find << " it-size = " << it->size() << " long path " << this->_header_requete[0].path.size() << std::endl;
 				if (this->_header_requete[0].path.size() == find + it->size())
 				{
 					std::cout << "IMAGE " << std::endl;
 					return ("Content-Type: image/" + *it + "; ");
 				}
+				
 			}
 		}
+		std::cout << "ne trouve pas ico " << std::endl;
+		exit(1);
 		for( std::vector<std::string>::iterator it = music.begin(); it != music.end(); ++it)
 		{
 			size_t find = this->_header_requete[0].path.find(*it);

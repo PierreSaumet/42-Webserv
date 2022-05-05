@@ -163,7 +163,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 
 
 	std::cout << GREEN << "\n On est dans ft_execute_cgi : " << CLEAR << std::endl;
-	std::cout << "body = " << this->_body_string_post << std::endl;
+	// std::cout << "body = " << this->_body_string_post << std::endl;
 	// exit(1);
 	char	**sysCline = NULL;
 	char	**sysEnv = NULL;
@@ -178,7 +178,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysCline[i] = new char[aArgs[i].size() + 1];
 		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
-		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+		// std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
 	}
 	sysCline[aArgs.size()] = NULL;
 
@@ -188,7 +188,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	std::vector<std::string>::iterator it = aEnv.begin();
 	for (; it != aEnv.end(); it++)
 	{
-		std::cout << "it = " << *it << std::endl;
+		// std::cout << "it = " << *it << std::endl;
 	}
 
 	sysEnv = new char*[aEnv.size() + 1];
@@ -196,7 +196,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysEnv[i] = new char[aEnv[i].size() + 1];
 		strncpy(sysEnv[i], aEnv[i].c_str(), aEnv[i].size() + 1);
-		std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
+		// std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
 
 	}
 	sysEnv[aEnv.size()] = NULL;
@@ -298,27 +298,27 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 
 	}
 
-	std::cout << RED << "\n\n\nFINNN " << CLEAR << std::endl;
-	for (unsigned long i = 0; i < aArgs.size(); i++)
-	{
+	// std::cout << RED << "\n\n\nFINNN " << CLEAR << std::endl;
+	// for (unsigned long i = 0; i < aArgs.size(); i++)
+	// {
 
-		std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
-	}
+	// 	std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
+	// }
 	
 
-	it = aEnv.begin();
-	for (; it != aEnv.end(); it++)
-	{
-		std::cout << "it = " << *it << std::endl;
-	}
+	// it = aEnv.begin();
+	// for (; it != aEnv.end(); it++)
+	// {
+	// 	std::cout << "it = " << *it << std::endl;
+	// }
 
 
-	for (unsigned long i = 0; i < aEnv.size(); i++)
-	{
+	// for (unsigned long i = 0; i < aEnv.size(); i++)
+	// {
 
-		std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
+	// 	std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
 
-	}
+	// }
 	// exit(1);
 
 	dup2(stdin_tmp, 0);

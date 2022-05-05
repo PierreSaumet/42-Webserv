@@ -407,7 +407,7 @@ std::string		HttpServer::ft_check_body_post( std::string request_http )
 	{
 		size_t pos_end = request_http.find("\r\n", pos);
 		std::string tmp(request_http, pos + 4, pos_end - (pos + 4));
-		std::cout << "tmp = -" << tmp << "-" << std::endl;
+		// std::cout << "tmp = -" << tmp << "-" << std::endl;
 
 		// on compare avec content_lenght
 		//	 on a une erreur si j'envoie un fichier genre mp3		

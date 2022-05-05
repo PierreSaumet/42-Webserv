@@ -53,7 +53,7 @@
 				}
 
 			} else{
-				echo "Error " . $_FILES["uploadfile"]["error"] . " trop grand ?: " . $_FILES["uploadfile"]["size"];
+				echo "Error method ";
 			}
 		} else{
 			echo "Method not good kek bur";

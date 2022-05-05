@@ -137,7 +137,10 @@ bool                            Parsing::ft_check_server( void )
 			if (this->_data[i + 1] == "{")
 				this->_nbr_servers++;
 			else
+			{
+				std::cout << "data[i] = " << this->_data[i] << " et data[i] + 1 " << this->_data[i + 1] << std::endl;
 				throw Error(6, "Error, a block server should start with 'server' and '{'.", 1);
+			}
 		}
 		i++;
 	}

@@ -263,7 +263,7 @@ int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_clie
 		_DATA = 0;
 		total_send = 0;
 		still_to_send = 0;
-		return (-1);
+		return (-1); // test
 	}
 	return (0);
 }
@@ -339,28 +339,39 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 	std::cout << GREEN << "Dans ft_check_recv_complete : " << CLEAR << std::endl;
 
 	// std::cout << "BUFFER = " << tt_buffer << "\n\n\n\n" << std::endl;
+	// sleep(3);
 
 	size_t pos = 0;
 	if (tt_buffer.compare(0, 5, "POST ") == 0)
 	{
+		std::cout << "la " << std::endl;
 		if (this->_recv_complete.chunked == false)	//n'a pas ete setup ou pas de chunked
 		{
+			std::cout << "la 2" << std::endl;
 			pos = tt_buffer.find("Transfer-Encoding: chunked");
 			if (pos == std::string::npos)	// Les data ne sont pas Chunked
 			{
+				std::cout << "la 3" << std::endl;
 				pos = tt_buffer.find("Content-Type: application/x-www-form-urlencoded\r\n");	
 				if (pos == std::string::npos)		// envoie formulaire via multipart
 				{
+					std::cout << "la 4" << std::endl;
 					if (this->_recv_complete.boundary.empty() == true)
 					{
+						std::cout << "la 5" << std::endl;
 						pos = tt_buffer.find("Content-Type: multipart/form-data;");
 						if (pos == std::string::npos)
 						{
 							std::cout << "Erreur requete post content-type " << std::endl; // doit setup bad request 400
+							this->_header_requete.push_back(t_header_request());
+							this->_header_requete[0].error = true;
+							this->_header_requete[0].num_error = 400;
+							return (1);
 							exit(1);
 						}
 						else
 						{
+							std::cout << "la 6" << std::endl;
 							size_t pos_end = tt_buffer.find("\r\n", pos);
 							std::string tmp(tt_buffer, pos + 34, pos_end - pos - 34);
 							pos = tmp.find("boundary=");
@@ -420,6 +431,16 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		}
 		else
 		{
+			std::cout << "ici" <<std::endl;
+			std::cout << "ize tt_buffer " << tt_buffer.size() << std::endl;
+			std::cout << "pos end header " << tt_buffer.find("\r\n\r\n");
+			if (tt_buffer.find("\r\n\r\n") == tt_buffer.size() - 4)
+			{
+				this->_header_requete.push_back(t_header_request());
+				this->_header_requete[0].error = true;
+				this->_header_requete[0].num_error = 400;
+				return (1);
+			}
 			std::string tmp(tt_buffer.end() - 5, tt_buffer.end());
 			if (tmp == "0\r\n\r\n")
 			{
@@ -450,7 +471,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 	else
 	{
 		std::cout << "NI GET NI POST NI DELETE doit sortir une erreur" << std::endl;
-		return (0);
+		return (1);
 	}
 	return (0);
 }

@@ -17,6 +17,13 @@
 //	et les 3 methods
 void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 {
+
+	if (this->_header_requete.empty() == false)
+	{
+		this->ft_setup_error_header();
+		return ;
+	}
+
 	std::string request_http(msg);
 	if (request_http.compare(0, 4, "GET ") == 0)
 		this->ft_get(request_http, len_msg);
@@ -153,7 +160,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		}
 
 		
-		std::cout << "Avant ft_check_access_path, le header.path = " << this->_header_requete[0].path << std::endl;
+		// std::cout << "Avant ft_check_access_path, le header.path = " << this->_header_requete[0].path << std::endl;
 		res = 0;
 		if ((res = this->ft_check_access_path()) > 0)
 		{
@@ -252,13 +259,13 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		std::cout << "\nOn a le path : " << this->_header_requete[0].path << "\n" <<  std::endl;
 		
 		// Surement useless
-		this->_header_requete[0].referer = this->ft_check_referer(size_header);
-		if (this->_header_requete[0].referer.empty() == true && this->_recv_complete.chunked == false)
-		{
-			std::cout << "ERREUR " << std::endl;
-			exit(1);
-		}
-		std::cout << "\nOn a le referer : " << this->_header_requete[0].referer << "\n" <<  std::endl;
+		// this->_header_requete[0].referer = this->ft_check_referer(size_header);
+		// if (this->_header_requete[0].referer.empty() == true && this->_recv_complete.chunked == false)
+		// {
+		// 	std::cout << "ERREUR " << std::endl;
+		// 	exit(1);
+		// }
+		// std::cout << "\nOn a le referer : " << this->_header_requete[0].referer << "\n" <<  std::endl;
 
 
 	
@@ -336,17 +343,17 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		this->_header_requete[0].body_post = this->ft_check_body_post(size_body);
 		if (this->_header_requete[0].body_post.empty() == true)
 			throw Error(16, "Error, in recieved header, the body_post is  not correct." , 2);
-		std::cout << "\nOn a le body_post = -" << this->_header_requete[0].body_post << "-" <<  std::endl;
+		// std::cout << "\nOn a le body_post = -" << this->_header_requete[0].body_post << "-" <<  std::endl;
 		
 
 
-		std::cout << "Avant ft_check_access_path, le header.path = " << this->_header_requete[0].path << std::endl;
+		// std::cout << "Avant ft_check_access_path, le header.path = " << this->_header_requete[0].path << std::endl;
 		int res = 0;
 		if ((res = this->ft_check_access_path()) > 0)
 		{
 			std::cout << "erreur verifie le drot res = " << res << std::endl;
 			
-			exit(1);
+			// exit(1);
 			this->_header_requete[0].error = true;
 			if (res == 2)
 				this->_header_requete[0].num_error = 403;

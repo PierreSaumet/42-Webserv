@@ -396,12 +396,20 @@ size_t 	HttpServer::ft_check_access_path( void )
 	std::cout << "path = " << this->_header_requete[0].path << std::endl;
 	if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
 	{
-		this->_header_requete[0].path.clear();
-		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
-		this->_header_requete[0].path.append("/flavicon.ico");
-		std::cout << "merde this->_header_requete[0].path = " <<this->_header_requete[0].path << std::endl;
-		// exit(1);	
-		return (0);
+		// this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].root_server.size());
+		if (this->_header_requete[0].path.compare("/flavicon.ico") == 0)
+		{
+			// std::cout << "bingo" << std::endl;
+			// exit(1);
+			this->_header_requete[0].path.clear();
+			this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
+			this->_header_requete[0].path.append("/flavicon.ico");
+			std::cout << "merde this->_header_requete[0].path = " <<this->_header_requete[0].path << std::endl;
+			// exit(1);	
+			return (0);
+		}
+		std::cout << "404" << std::endl;
+		return (1); // 404
 	}
 
 
