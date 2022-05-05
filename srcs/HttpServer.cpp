@@ -437,6 +437,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 			else
 			{
 				std::cout << " On a du data chunked" << std::endl;
+				sleep(2);
 				this->_recv_complete.chunked = true;
 				pos = tt_buffer.find("0\r\n\r\n");				// On cherche la fin du transfer encoding
 				if (pos == std::string::npos)					// On n'a pas la fin, on continue de recuperer de la data

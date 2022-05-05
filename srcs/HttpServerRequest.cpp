@@ -18,6 +18,13 @@
 void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 {
 
+	if (this->_recv_complete.chunked == true)
+	{
+		std::cout << "requte = " << msg<< std::endl;
+		std::string tmp(msg, 0, 200);
+		std::cout << "\n\ntm = " << tmp << std::endl;
+		sleep(10);
+	}
 	if (this->_header_requete.empty() == false)
 	{
 		this->ft_setup_error_header();
