@@ -132,7 +132,7 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 		}
 		else if (scope_location[i] == "return")
 		{
-			std::cout << "On trouve return dans location " << std::endl;
+			// std::cout << "On trouve return dans location " << std::endl;
 			if (this->ft_find_return_location(i, scope_location, index_server, index_location))
 				return (true);
 			i += 3;
@@ -140,7 +140,7 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 		}
 		else
 		{
-			std::cout << "scope location i " << scope_location[i] << std::endl;
+			// std::cout << "scope location i " << scope_location[i] << std::endl;
 			if (scope_location[i] == "}")
 				break;
 			else
@@ -153,7 +153,7 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 
 bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location)
 {
-	std::cout << GREEN << "Dans ft_find_return location " << CLEAR << std::endl;
+	// std::cout << GREEN << "Dans ft_find_return location " << CLEAR << std::endl;
 
 	k += 1;
 	// Check the redirection number
@@ -181,14 +181,14 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 				throw Error(0, "Error, in 'return' location's bloc directive, it should start with '/'.", 0);
 			this->_servers[index_server].location[index_location].return_location = tmp[k];
 			this->_servers[index_server].location[index_location].return_location.erase(this->_servers[index_server].location[index_location].return_location.size() - 1, 1);
-			std::cout << "On a un return : " << this->_servers[index_server].location[index_location].return_location << std::endl;
+			// std::cout << "On a un return : " << this->_servers[index_server].location[index_location].return_location << std::endl;
 			return (false);
 		}
 	}
 	throw Error(0, "Error, in 'return' location's bloc directive, error's number is not correct.", 0);
 
-	std::cout << "code pas bon " << std::endl;
-	exit(1);
+	// std::cout << "code pas bon " << std::endl;
+	// exit(1);
 	return (false);
 }
 
@@ -202,8 +202,8 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 */
 size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
-	std::cout << "Dans ft_find_error_location " << std::endl;
-	std::cout << "tmp[k] = " << tmp[k] << std::endl;
+	// std::cout << "Dans ft_find_error_location " << std::endl;
+	// std::cout << "tmp[k] = " << tmp[k] << std::endl;
 	k += 1;
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
@@ -332,7 +332,7 @@ bool            Parsing::ft_find_root_location( size_t k, std::vector<std::strin
 		throw Error(35, "Error, in 'root' location's bloc directive, it should not have a dot '.'", 1);
 	this->_servers[index_server].location[index_location].root_location = tmp[k].substr(0, len - 1);
 	
-	std::cout << "pb root location = " << this->_servers[index_server].location[index_location].root_location << std::endl;
+	// std::cout << "pb root location = " << this->_servers[index_server].location[index_location].root_location << std::endl;
 	
 
 	

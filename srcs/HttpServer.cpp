@@ -547,8 +547,8 @@ int		HttpServer::ft_reading( void )
 int		HttpServer::ft_main_loop( void )
 {
 	_DATA = 0;
-	std::cout << "Dans la boucle principale" << std::endl;
-	std::cout << "signal = " << int_signal << std::endl;
+	// std::cout << "Dans la boucle principale" << std::endl;
+	// std::cout << "signal = " << int_signal << std::endl;
 	while (int_signal == 0)
 	{
 		try {
@@ -559,23 +559,23 @@ int		HttpServer::ft_main_loop( void )
 				this->ft_check_isset();
 				if (this->ft_reading() == 1)
 				{
-					std::cout << "test_reading return -1" << std::endl;			// A FAIRE a changer quand erreur
+					// std::cout << "test_reading return -1" << std::endl;			// A FAIRE a changer quand erreur
 					return (1);
 				}
 				if (this->ft_write() == 1)								// A FAIRE a changer quand erreur
 				{
-					std::cout << "test_writing return -1" << std::endl;
+					// std::cout << "test_writing return -1" << std::endl;
 					return (1);
 				}
 			}		    
 		}
 		catch (std::exception &e)
 		{
-			std::cout << " on capte une erreur ici dans la boucle principale." << std::endl;
+			std::cout << " Error main loop" << std::endl;
 			std::cerr << e.what() << std::endl;
-			std::cout << "dans catch error main loop " << std::endl;
+			// std::cout << "dans catch error main loop " << std::endl;
 
-			/* A FAIRE  */
+			// /* A FAIRE  */
 
 			break ;
 		}
@@ -583,6 +583,6 @@ int		HttpServer::ft_main_loop( void )
 	this->ft_clean_socket_servers();
 	this->ft_clean_socket_clients();
 
-	std::cout << "FIN DU PROGRAMME " << std::endl;
+	// std::cout << "FIN DU PROGRAMME " << std::endl;
 	return (0);
 }

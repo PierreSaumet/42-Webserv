@@ -40,7 +40,7 @@ int             main(int argc, char **argv)
 	}
 	//Testing signal
 	// raise(SIGINT);
-	std::cout << "int sig = " << HttpServer::int_signal << std::endl;
+	// std::cout << "int sig = " << HttpServer::int_signal << std::endl;
 
 	if (&signal != 0)
 	{

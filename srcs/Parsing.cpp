@@ -40,8 +40,9 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_se
 		if (!this->ft_check_data())
 		{
 			//std::cout << "On continue 2" << std::endl;
-			//this->display_all();
+			//this->put_name_server();
 			std::cout << GREEN << "Parsing is terminated" << CLEAR << std::endl;
+			this->put_name_server();
 		}
 	}
 	catch(std::exception &e)
@@ -105,8 +106,8 @@ bool                            Parsing::ft_check_data( void )
 		throw Error(5, "Error, the configuration file miss one or multiple semi colon.", 1);
 	if (this->ft_check_server())
 	{
-		std::cout << "ERROR, problem bloc server" << std::endl;
-		throw Error(0, "Error a faire 1", 1);
+		// std::cout << "ERROR, problem bloc server" << std::endl;
+		throw Error(0, "Error, data conf file", 1);
 		return (true);
 	}
 	// std::cout << "lol ok " << std::endl;
@@ -138,7 +139,7 @@ bool                            Parsing::ft_check_server( void )
 				this->_nbr_servers++;
 			else
 			{
-				std::cout << "data[i] = " << this->_data[i] << " et data[i] + 1 " << this->_data[i + 1] << std::endl;
+				// std::cout << "data[i] = " << this->_data[i] << " et data[i] + 1 " << this->_data[i + 1] << std::endl;
 				throw Error(6, "Error, a block server should start with 'server' and '{'.", 1);
 			}
 		}
@@ -160,12 +161,12 @@ bool                            Parsing::ft_check_server( void )
 		server_size += scope_server.size();
 		if (ft_check_directive_server(scope_server, server_size))
 		{
-			std::cout << "ft_check_directive_server return true " << std::endl;
+			// std::cout << "ft_check_directive_server return true " << std::endl;
 			return (true);
 		}
 		if (ft_find_directive_server(1, scope_server, i))
 		{
-			std::cout << "ft_find_directive_server return true" << std::endl;
+			// std::cout << "ft_find_directive_server return true" << std::endl;
 			return (true);
 		}
 

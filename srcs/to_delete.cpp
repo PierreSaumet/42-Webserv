@@ -2,19 +2,18 @@
 #include <iostream>
 
 
-void		Parsing::display_all( void ) {
+void		Parsing::put_name_server( void ) {
 
+	char letter = 'a';
+	for (std::vector<t_server>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	{
+		std::string name = "random_serv_";
+		if (it->name_server.empty() == true)
+		{
+			name.push_back(letter);
+			it->name_server = name;
+			letter++;
+		}		
+	}
 
-	std::cout << "\n\n\n NOMBRE DE SERVER = " << this->_nbr_servers << std::endl;
-
-	std::cout << "\n Serveur name = " << this->_servers[0].name_server << std::endl;
-	std::cout << "\n Host server = " << this->_servers[0].host_server << std::endl;
-	std::cout << "\n index server = " << this->_servers[0].index_server << std::endl;
-	std::cout << "\n autoindex server = " << this->_servers[0].autoindex_server << std::endl;
-	std::cout << "\n error server = " << this->_servers[0].methods_server.size() << std::endl;
-	std::cout << "\n location server = " << this->_servers[0].location.size() << std::endl;
-
-	std::cout << "\n nbr location = " << this->_servers[0].nbr_location << std::endl;
-	// std::cout << "\n location server name 0 = " << this->_servers[0].location[0].name_location << std::endl;
-	// std::cout << "\n location server name 1 = " << this->_servers[0].location[1].name_location << std::endl;
 }

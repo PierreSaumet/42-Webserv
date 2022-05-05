@@ -138,7 +138,7 @@ class Parsing {
 		/*
 		**	Need to be delete.
 		*/
-		void							display_all( void );
+		void							put_name_server( void );
 
 
 	private:
