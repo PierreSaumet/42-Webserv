@@ -377,7 +377,7 @@ std::string		HttpServer::ft_get_content_type( size_t binary ) const		// peut etr
 			}
 		}
 		std::cout << "ne trouve pas ico " << std::endl;
-		exit(1);
+		// exit(1);
 		for( std::vector<std::string>::iterator it = music.begin(); it != music.end(); ++it)
 		{
 			size_t find = this->_header_requete[0].path.find(*it);

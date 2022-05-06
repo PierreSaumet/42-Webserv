@@ -134,12 +134,14 @@ int		HttpServer::ft_redirection( void )
 
 			}
 			this->_header_requete[0].return_used = true;
+			exit(1);
 			return (0);
 			exit(1);
 		}
 		else
 		{
 			std::cout << "pas de redirection dans le bloc server return 0" << std::endl;
+			this->_header_requete[0].return_used = false;
 			return (0);
 		}
 		
@@ -171,7 +173,10 @@ int		HttpServer::ft_redirection( void )
 							std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
 							this->_header_requete[0].return_used = true;
 							// exit(1);
-							return (0);
+							// test on supprime root et le nom de la location pour rempplacer par le return
+							this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[i].name_location.size());
+							this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[i].return_location);
+							return (1);
 						}
 					}
 				}
@@ -180,7 +185,7 @@ int		HttpServer::ft_redirection( void )
 		}
 		std::cout << "la requete ne correspond a aucun bloc location donc error 404 ?" << std::endl;
 		// exit(1);
-		return (1);
+		return (-1);
 	}
 	return (0);
 }

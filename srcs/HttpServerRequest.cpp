@@ -172,7 +172,7 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		}
 
 		// A TERMINER
-		if ((ret = this->ft_redirection()) > 0)
+		if ((ret = this->ft_redirection()) < 0)
 		{
 			// impossible
 			this->_header_requete[0].error = true;
@@ -182,9 +182,17 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 				this->_header_requete[0].num_error = 403;
 			this->ft_setup_error_header();
 			return (0);
-
 		}
-		
+		if (ret == 1)
+			return (0);
+		std::cout << "apres redirection : " << std::endl;
+		std::cout << "path = " << this->_header_requete[0].path << std::endl;
+		std::cout << "this->_header_requete[0].return_used = " << this->_header_requete[0].return_used << std::endl;
+		std::cout << "this->_servers[this->_num_serv].return_server  = " << this->_servers[this->_num_serv].return_server << std::endl;
+		std::cout << "this->_servers[this->_num_serv].location[this->_num_loc].return_location = " << this->_servers[this->_num_serv].location[this->_num_loc].return_location << std::endl;
+
+		// exit(1);
+
 		// Check the uri and change it to the corresponding location
 		if ((ret = this->ft_check_access_path()) > 0)
 		{

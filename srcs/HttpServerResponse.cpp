@@ -163,7 +163,8 @@ std::string		HttpServer::ft_setup_header( void )
 		the_header.insert(0, "Content-Length: 0\r\n");
 		the_header.insert(0, this->ft_get_server_name());
 		the_header.insert(0, this->ft_get_date());
-		the_header.insert(0, this->ft_get_return_location());
+		the_header.insert(0, "Location: " + this->_header_requete[0].path + "\r\n");
+		// the_header.insert(0, this->ft_get_return_location());
 		the_header.insert(0, this->ft_get_status(true));
 		std::cout << "\nTHE HEADER FOR THE REDIRECTION = \n\n " << the_header << std::endl;
 		// exit(1);
