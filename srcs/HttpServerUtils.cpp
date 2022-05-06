@@ -25,7 +25,11 @@ void	HttpServer::ft_clean_socket_clients( void )
 	std::vector<t_client_socket>::iterator it_e = this->_all_client_socket.end();
 
 	for (it_b = this->_all_client_socket.begin(); it_b != it_e; it_b++)
+	{
+		FD_CLR(it_b->client_socket, &this->_write_fs);
+		FD_CLR(it_b->client_socket, &this->_read_fs);
 		close(it_b->client_socket);
+	}
 	return ;
 }
 

@@ -201,8 +201,9 @@ void	HttpServer::ft_handle_connections( void )
 
 	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0 && int_signal == 0)
 	{
-		this->ft_clean_socket_servers();
+		
 		this->ft_clean_socket_clients();
+		this->ft_clean_socket_servers();
 		throw Error(5, "Error, 'main loop server', cannot select().", 2);
 	}
 	return ;
@@ -282,7 +283,8 @@ int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_clie
 		_DATA = 0;
 		total_send = 0;
 		still_to_send = 0;
-		return (-1); // test
+		
+		return (0); // test
 	}
 	return (0);
 }
@@ -299,15 +301,18 @@ int 		HttpServer::ft_write( void )
 			
 			if (_DATA == 0)
 				break ;
-			std::cout << "on est dans write " << std::endl;
-			
+			// std::cout << "on est dans write " << std::endl;
+			std::cout <<  BLUE << "C'est le client : " << it_b_client->client_socket << " qui va recevoir les donnes " << CLEAR << std::endl;
 			if (this->ft_continue_send(it_b_client) == -1)
 			{
+				std::cout << RED << "ft_continue_send return -1 donc on ferme le client " << CLEAR << std::endl;
+				FD_CLR(it_b_client->client_socket, &this->_write_fs);
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
 				
 				continue ;
 			}
+			std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " a recu toutes les donnees" << CLEAR << std::endl;
 			// if (_response_to_send.empty())
 			// {
 			// 	std::cout << "La reponse a envoyer est null a cause de setttup http response() = ERROR / on ne doit jamais etre la " << std::endl;
@@ -515,13 +520,15 @@ int		HttpServer::ft_reading( void )
 		{
 			memset((char *)buffer, 0, 10240 + 1);
 			int request_length;
-
+			// std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " nous a envoye des donnes" << CLEAR << std::endl;
 			if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) <= 0)
 			{
+				std::cout << RED << "recv return -1 donc on ferme le client " << CLEAR << std::endl;
+				FD_CLR(it_b_client->client_socket, &this->_read_fs);
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
 				std::cerr << strerror(errno) << std::endl;
-				std::cout << "recv retrun 0 ou -1 on ferme le socket " << std::endl;
+				// std::cout << "recv retrun 0 ou -1 on ferme le socket " << std::endl;
 				// if (request_length == -1)
 				// {
 				// 	std::cout << "ERREUR RECV = -1 \t: " << request_length << std::endl;
@@ -546,7 +553,7 @@ int		HttpServer::ft_reading( void )
 
 			if (ft_check_recv_complete(_tmp_buffer) == 1)
 			{
-				// exit(1);
+				std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " nous a envoye des donnes" << CLEAR << std::endl;
 				this->ft_parser_requete(_tmp_buffer.size() , _tmp_buffer);
 				this->_recv_complete.chunked = false;
 				this->_recv_complete.boundary.clear();
@@ -602,8 +609,9 @@ int		HttpServer::ft_main_loop( void )
 			break ;
 		}
 	}
-	this->ft_clean_socket_servers();
 	this->ft_clean_socket_clients();
+	this->ft_clean_socket_servers();
+	
 
 	// std::cout << "FIN DU PROGRAMME " << std::endl;
 	return (0);
