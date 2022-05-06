@@ -163,9 +163,9 @@ class HttpServer {
 
 
 		
-
+	void			ft_exec_cgi_test( void );
 		
-		void			ft_exec_cgi_test( std::string request_http, int len_msg );
+		// void			ft_exec_cgi_test( std::string request_http, int len_msg );
 
 		size_t		ft_parsing_path_get_request( void );
 		std::string		ft_clean_path_get_request( std::string tmp );
