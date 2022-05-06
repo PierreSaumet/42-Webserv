@@ -1,5 +1,5 @@
 .vscode/
-objects/
+*.o
 ./webserv
 .vscode/
 log.txt
