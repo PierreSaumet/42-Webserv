@@ -10,13 +10,22 @@
 </head>
 
 <body>
-	<h1> Test afficher du texte e </h1>
+	<h1> Test afficher du texte  </h1>
 
     <?php
     	if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             $entity = file_get_contents('php://input');
             echo "TEST = " . $entity;
+			// echo "path info = " . $_SERVER["PATH_INFO"] . "\n";
+			// // 'SCRIPT_NAME'
+			// echo "script name = " . $_SERVER['SCRIPT_NAME'] . "\n";
+			// echo "argv = " . $_SERVER['argv'] . "\n";
+			// echo "QUERY_STRING = " . $_SERVER["QUERY_STRING"] . "\n";
+
+			// echo "var dump post = " . var_dump($_POST) . "\n\n\n";
+
+			// echo "var dump server = " . var_dump($_SERVER) . "\n";
         } else{
             echo "Error";
         }
@@ -25,6 +34,3 @@
 </body>
 </html>
 
-<!-- curl -H "Transfer-Encoding: chunked " -d "bonjour je suis du texte " 127.0.0.1:4343/test.php -->
-
-<!-- curl -d "bonjour je suis du texte " 127.0.0.1:4343/test.php -->

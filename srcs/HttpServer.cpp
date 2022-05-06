@@ -452,10 +452,11 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		else
 		{
 			std::cout << "ici" <<std::endl;
-			std::cout << "ize tt_buffer " << tt_buffer.size() << std::endl;
+			std::cout << "size tt_buffer " << tt_buffer.size() << std::endl;
 			std::cout << "pos end header " << tt_buffer.find("\r\n\r\n");
 			if (tt_buffer.find("\r\n\r\n") == tt_buffer.size() - 4)
 			{
+				std::cout << "POST sans body" << std::endl;
 				this->_header_requete.push_back(t_header_request());
 				this->_header_requete[0].error = true;
 				this->_header_requete[0].num_error = 400;
@@ -467,6 +468,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 				std::cout << "Les toutes les donnees chunked sont transmises." << std::endl;
 				return (1);
 			}
+			std::cout << "return 0" << std::endl;
 			return (0);	
 		}
 		// impossible d'etre la

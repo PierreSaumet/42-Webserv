@@ -220,6 +220,8 @@ class HttpServer {
 		int ft_redirection( void );
 
 		int ft_continue_send( std::vector<t_client_socket>::iterator it_client );
+
+		std::string ft_decode_chunked( std::string body );
 	private:
 
 		HttpServer( const HttpServer &copy );					// Copy constructor

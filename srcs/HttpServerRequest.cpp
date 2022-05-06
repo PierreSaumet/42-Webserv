@@ -18,13 +18,13 @@
 void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 {
 
-	if (this->_recv_complete.chunked == true)
-	{
-		std::cout << "requte = " << msg<< std::endl;
-		std::string tmp(msg, 0, 200);
-		std::cout << "\n\ntm = " << tmp << std::endl;
-		sleep(10);
-	}
+	// if (this->_recv_complete.chunked == true)			// a supprier
+	// {
+	// 	std::cout << "requte = " << msg<< std::endl;
+	// 	std::string tmp(msg, 0, 200);
+	// 	std::cout << "\n\ntm = " << tmp << std::endl;
+	// 	sleep(10);
+	// }
 	if (this->_header_requete.empty() == false)
 	{
 		this->ft_setup_error_header();
@@ -192,8 +192,100 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 	return (0);
 }
 
+std::string  get_string( size_t pos_end, std::string body)
+{
+	std::string tmp = "";
 
+	tmp.append(body, 0, pos_end);
 
+	return (tmp);
+}
+
+long long int  convert_hex_to_dec( std::string const string )
+{
+	return (std::strtol(string.c_str(), NULL, 16));
+}
+
+std::string HttpServer::ft_decode_chunked( std::string body)
+{
+	std::cout << GREEN << "Dans ft_decode chunked " << CLEAR << std::endl;
+	// std::cout << "BODY = " << body << std::endl;
+
+	std::string total_body = "";
+
+	
+
+	//1) on supprime le \r\n\r\n du debut
+	body.erase(0, 4);
+	// std::cout << "body = -" << body << "-" << std::endl;
+	std::string tmp_2 = "";
+	while (body != "0\r\n\r\n")
+	{
+		size_t pos_end_number = 0;
+		size_t pos_end_string = 0;
+		// 2) on cherche la fin de ligne \r\n
+		pos_end_number = body.find("\r\n");
+
+		// 3) on recupere la string qui contient la longueur de la chaine
+		std::string tmp = get_string(pos_end_number, body);
+		// std::cout << "TMP = " << tmp << std::endl;
+
+		// 4) on convertit la taille hex en dec
+		long long int length = convert_hex_to_dec(tmp);
+		// std::cout << "length = " << length << std::endl;
+
+		// 5) on supprime cette ligne
+		body.erase(0, tmp.size() + 2);
+		// std::cout << "body = -" << body << "-" << std::endl;
+
+		// 6) on cherche la fin de la ligne
+		pos_end_string = body.find("\r\n");
+		// std::cout << "posendstring = " << body[pos_end_string] << std::endl;
+
+		// 6) bis On regarde si les deux prochains sont \r\n
+		if (body.compare(pos_end_string, pos_end_string + 4, "\r\n\r\n") == 0)
+		{
+			// std::cout << "IL FAUT RAJOUTER /r/n/r/n" << std::endl;
+			pos_end_string += 2;
+		}
+		else
+			// std::cout << "juste /r/n" << std::endl;
+
+		// 6) on recupere la phrase a afficher
+		
+		tmp_2 = get_string(pos_end_string, body);
+		// std::cout << "la phrase est : -" << tmp_2 << "-" << std::endl;
+
+		// 7) on ccompare la taille si ele est bonne
+		if (tmp_2.size() != (size_t)length)
+		{
+			std::cout << "car la taille de tmp_2 = " << tmp_2.size() << "et lenght = " << length << std::endl;
+			std::cout << "Erreur chunked data corrupt" << std::endl;
+			exit(1);
+		}
+		// 8) on ajoute la string a total body
+		total_body.append(tmp_2);
+
+		// 9) on supprime la tmp_2 de body
+		body.erase(0, tmp_2.size() + 2);
+		tmp_2.clear();
+	}
+
+	std::cout << "fin body = " << body << std::endl;
+
+	if (body == "0\r\n\r\n")
+	{
+		std::cout << "on a termine on retourne total_bdy"  << std::endl;
+		return (total_body);
+	}
+	else
+	{
+		std::cout << "On reommencce lol" << std::endl;
+	}
+	
+
+	return ("");
+}
 
 /*
 **		A FAIRE CAS DES REQUETE POST
@@ -225,6 +317,24 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		std::cout << "taille total = " << len_msg << std::endl;
 	
 		std::cout << "il faut enelever 4 a la size_bodysize(0 pour avoi le body exacte" << std::endl;
+		//////////////////////////////////////
+		// test decode chunked
+		////////////////////////////////////////////
+		// std::string ft_decode_chunked( void );
+		std::string TEST = "";
+		if (this->_recv_complete.chunked == true)
+		{
+			if (( TEST = this->ft_decode_chunked( size_body )) == "")
+			{
+				std::cout << "EREUR decode chunked" << std::endl;
+				exit(1);
+			}
+		}
+		// std::cout << "GOOD : test = " <<  TEST << std::endl;
+		// ? on lui rajouet \0
+		TEST.append("\0");
+		size_body = TEST;
+		// exit(1);
 
 		// test buffer size_ exclusivement dans le server
 		//////////////////////////////////////////////////////////////////////////////////
@@ -250,10 +360,12 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		if (size_body.size() - 4 > this->_servers[this->_num_serv].buffer_size_server)
 		{
 			this->_header_requete[0].error = true;
-			this->_header_requete[0].num_error = 431;
+			this->_header_requete[0].num_error = 413;
 			this->ft_setup_error_header();
 			return (0);
 		}
+		// std::cout << "TAILLE bonne " << std::endl;
+		// exit(1);
 		////////////////////////////////////////////////
 
 		// On recupere la methode
@@ -351,7 +463,8 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 		if (this->_header_requete[0].body_post.empty() == true)
 			throw Error(16, "Error, in recieved header, the body_post is  not correct." , 2);
 		// std::cout << "\nOn a le body_post = -" << this->_header_requete[0].body_post << "-" <<  std::endl;
-		
+		if (this->_recv_complete.chunked == true)
+			this->_header_requete[0].body_post = TEST;
 
 
 		// std::cout << "Avant ft_check_access_path, le header.path = " << this->_header_requete[0].path << std::endl;

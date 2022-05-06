@@ -397,6 +397,8 @@ std::string		HttpServer::ft_check_content_length( std::string request_http )
 
 std::string		HttpServer::ft_check_body_post( std::string request_http )
 {
+	if (this->_recv_complete.chunked == true)
+		return ("nothing");
 	size_t pos = request_http.find("\r\n\r\n"); // on cherche la fin
 	if (pos == std::string::npos)
 	{

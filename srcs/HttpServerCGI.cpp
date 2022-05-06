@@ -260,8 +260,17 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		this->_cgi->setRequestUri("");
 
 		// il faut mettre le body dans la string privee body
+		// std::cout << "BODY POST " << this->_header_requete[0].body_post <<  std::endl;
+		// exit(1);
 		this->_cgi->set_body_string_post(this->_header_requete[0].body_post);
+		if (this->_recv_complete.chunked == true)
+		{
+			std::stringstream ss;
+			ss << this->_header_requete[0].body_post.size();
+			std::string s = ss.str();
+			this->_cgi->setContentLength(s);
 
+		}
 		this->_cgi->ft_display_all_variable_env();
 		
 
