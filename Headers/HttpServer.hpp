@@ -222,6 +222,8 @@ class HttpServer {
 		int ft_continue_send( std::vector<t_client_socket>::iterator it_client );
 
 		std::string ft_decode_chunked( std::string body );
+
+		size_t ft_do_error( size_t num_error );
 	private:
 
 		HttpServer( const HttpServer &copy );					// Copy constructor

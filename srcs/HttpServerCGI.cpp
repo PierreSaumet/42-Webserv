@@ -90,6 +90,9 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 	std::cout << "path = " << this->_header_requete[0].path << std::endl;
 	std::cout << "protocol = " << this->_header_requete[0].protocol << std::endl;
 	std::cout << "host = " << this->_header_requete[0].host << std::endl;
+	//
+	// size_t pos = this->_header_requete[0].path.find("?");
+	// this->_header_requete[0].request_uri = 
 	std::cout << "request_uri = " << this->_header_requete[0].request_uri << std::endl;
 	std::cout << "script name = " << this->_header_requete[0].script_file_name << std::endl;
 	std::cout << "accept = " << this->_header_requete[0].accept << std::endl;
@@ -100,6 +103,8 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 	std::cout << "error = " << this->_header_requete[0].error << std::endl;
 	std::cout << "num_error = " << this->_header_requete[0].num_error << std::endl;
 	std::cout << "body_error = " << this->_header_requete[0].body_error << std::endl;
+
+	// exit(1);
 
 	std::map<std::string, std::string>::iterator it = this->_header_requete[0].data.begin();
 	std::cout << "data = " << std::endl;
@@ -134,15 +139,15 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		
 		
 		// test en rajoutant root
-		std::string tmp_2 = this->_header_requete[0].script_file_name;
-		tmp_2.insert(0, this->_servers[this->_num_serv].root_server);
-		std::cout << "\n tmp_2 = " << tmp_2 << std::endl;
-		this->_cgi->setScriptName(tmp_2);
-		this->_cgi->setScriptFileName(tmp_2);
+		// std::string tmp_2 = this->_header_requete[0].script_file_name;
+		// tmp_2.insert(0, this->_servers[this->_num_serv].root_server);
+		// std::cout << "\n tmp_2 = " << tmp_2 << std::endl;
+		this->_cgi->setScriptName( this->_header_requete[0].script_file_name);
+		this->_cgi->setScriptFileName( this->_header_requete[0].script_file_name);
 
-		tmp_2 = this->_header_requete[0].request_uri;
-		tmp_2.insert(0, this->_servers[this->_num_serv].root_server);
-		this->_cgi->setRequestUri(tmp_2);
+		// tmp_2 = this->_header_requete[0].request_uri;
+		// tmp_2.insert(0, this->_servers[this->_num_serv].root_server);
+		this->_cgi->setRequestUri(this->_header_requete[0].request_uri);
 
 
 		// probleme si plusieurs servers ...
@@ -158,7 +163,7 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		
 		// std::cout << "address cgi = " << this->_servers[this->_num_serv].cgi_path_server << std::endl;
 		std::string tmp = this->_header_requete[0].script_file_name;
-		tmp.insert(0, this->_servers[this->_num_serv].root_server);
+		// tmp.insert(0, this->_servers[this->_num_serv].root_server);
 		// std::cout << "tmp = " << tmp << std::endl;
 		
 			this->_cgi->ft_display_all_variable_env();
@@ -191,11 +196,11 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		// probleme si plusieurs servers ...
 		this->_cgi->setServerName(this->_servers[0].name_server);
 
-		std::string tmp = this->_header_requete[0].script_file_name;
-		tmp.insert(0, this->_servers[0].root_server);
-		std::cout << "\n tmp = " << tmp << std::endl;
-		this->_cgi->setScriptName(tmp);
-		this->_cgi->setScriptFileName(tmp);
+		// std::string tmp = this->_header_requete[0].script_file_name;
+		// tmp.insert(0, this->_servers[0].root_server);
+		// std::cout << "\n tmp = " << tmp << std::endl;
+		this->_cgi->setScriptName(this->_header_requete[0].script_file_name);
+		this->_cgi->setScriptFileName(this->_header_requete[0].script_file_name);
 		this->_cgi->setRequestUri("");
 		// if (this->_header_requete[0].upload == true)
 		// {

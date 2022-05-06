@@ -399,3 +399,31 @@ et je suis la fin apres 3 sauts" 127.0.0.1:4343/test.php
 curl --output - -H "Transfer-Encoding: chunked " --data-binary @2-kb.txt 127.0.0.1:4343/test.php > test.html
 
 curl --output - -H "Transfer-Encoding: chunked " -d @bison.png 127.0.0.1:4343/test.php > test.htm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+method = GET
+path = ./root1/data/query_get_test.php?name=SAumet&prenom=Pierre&message=salut
+protocol = HTTP/1.1
+host = 127.0.0.1:4343
+request_uri = /get_post/query_get_test.php?name=SAumet&prenom=Pierre&message=salut
+script name = /get_post/query_get_test.php
+accept = text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+path_http = /mnt/nfs/homes/psaumet/Desktop/Webserv/root1/get_post/query_get_test.php
+query_string = name=SAumet&prenom=Pierre&message=salut
+cgi_return = 
+cgi = 1
+error = 0
+num_error = 0
+body_error = 
