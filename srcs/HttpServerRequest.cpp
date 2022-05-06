@@ -142,9 +142,11 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
 			std::string tmp = this->_header_requete[0].path;
+			
 			size_t pos = this->_header_requete[0].path.find("?");
 			this->_header_requete[0].path.erase(pos, this->_header_requete[0].path.size());
-
+			std::cout << "kek ici " << std::endl;
+			exit(1);
 			std::cout << "du cooup = "  << this->_header_requete[0].path << std::endl;
 			// exit(1);
 			int res = 0;
@@ -246,118 +248,14 @@ size_t			HttpServer::ft_get( std::string request_http, int len_msg)
 		}
 		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 		std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
-		exit(1);
+		return (0);
 	}
 	else
-	{
-		std::cout << RED << "Probleme le container qui recupere la header de la requete n'est pas vide. " << std::endl;
-		std::cout << "Il faut le supprimer apres avoir fait traite une demande." << CLEAR << std::endl;
-	}
-	return (0);
-}
-
-std::string  get_string( size_t pos_end, std::string body)
-{
-	std::string tmp = "";
-
-	tmp.append(body, 0, pos_end);
-
-	return (tmp);
-}
-
-long long int  convert_hex_to_dec( std::string const string )
-{
-	return (std::strtol(string.c_str(), NULL, 16));
-}
-
-std::string HttpServer::ft_decode_chunked( std::string body)
-{
-	std::cout << GREEN << "Dans ft_decode chunked " << CLEAR << std::endl;
-	// std::cout << "BODY = " << body << std::endl;
-
-	std::string total_body = "";
-
+		return (ft_do_error(500));
 	
-
-	//1) on supprime le \r\n\r\n du debut
-	body.erase(0, 4);
-	// std::cout << "body = -" << body << "-" << std::endl;
-	std::string tmp_2 = "";
-	while (body != "0\r\n\r\n")
-	{
-		size_t pos_end_number = 0;
-		size_t pos_end_string = 0;
-		// 2) on cherche la fin de ligne \r\n
-		pos_end_number = body.find("\r\n");
-
-		// 3) on recupere la string qui contient la longueur de la chaine
-		std::string tmp = get_string(pos_end_number, body);
-		// std::cout << "TMP = " << tmp << std::endl;
-
-		// 4) on convertit la taille hex en dec
-		long long int length = convert_hex_to_dec(tmp);
-		// std::cout << "length = " << length << std::endl;
-
-		// 5) on supprime cette ligne
-		body.erase(0, tmp.size() + 2);
-		// std::cout << "body = -" << body << "-" << std::endl;
-
-		// 6) on cherche la fin de la ligne
-		pos_end_string = body.find("\r\n");
-		// std::cout << "posendstring = " << body[pos_end_string] << std::endl;
-
-		// 6) bis On regarde si les deux prochains sont \r\n
-		if (body.compare(pos_end_string, pos_end_string + 4, "\r\n\r\n") == 0)
-		{
-			// std::cout << "IL FAUT RAJOUTER /r/n/r/n" << std::endl;
-			pos_end_string += 2;
-		}
-		else
-			// std::cout << "juste /r/n" << std::endl;
-
-		// 6) on recupere la phrase a afficher
-		
-		tmp_2 = get_string(pos_end_string, body);
-		// std::cout << "la phrase est : -" << tmp_2 << "-" << std::endl;
-
-		// 7) on ccompare la taille si ele est bonne
-		if (tmp_2.size() != (size_t)length)
-		{
-			std::cout << "car la taille de tmp_2 = " << tmp_2.size() << "et lenght = " << length << std::endl;
-			std::cout << "Erreur chunked data corrupt" << std::endl;
-			exit(1);
-		}
-		// 8) on ajoute la string a total body
-		total_body.append(tmp_2);
-
-		// 9) on supprime la tmp_2 de body
-		body.erase(0, tmp_2.size() + 2);
-		tmp_2.clear();
-	}
-
-	std::cout << "fin body = " << body << std::endl;
-
-	if (body == "0\r\n\r\n")
-	{
-		std::cout << "on a termine on retourne total_bdy"  << std::endl;
-		return (total_body);
-	}
-	else
-	{
-		std::cout << "On reommencce lol" << std::endl;
-	}
-	
-
-	return ("");
 }
 
-size_t HttpServer::ft_do_error( size_t num_error )
-{
-	this->_header_requete[0].error = true;
-	this->_header_requete[0].num_error = num_error; 
-	this->ft_setup_error_header();
-	return (1);
-}
+
 /*
 **		A FAIRE CAS DES REQUETE POST
 */

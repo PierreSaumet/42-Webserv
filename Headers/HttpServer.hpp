@@ -164,8 +164,6 @@ class HttpServer {
 
 		
 
-		// std::string		ft_where_to_upload( std::string path);
-		size_t			ft_upload_file( std::string request_http );
 		
 		void			ft_exec_cgi_test( std::string request_http, int len_msg );
 
@@ -224,6 +222,8 @@ class HttpServer {
 		std::string ft_decode_chunked( std::string body );
 
 		size_t ft_do_error( size_t num_error );
+		std::string  get_string( size_t pos_end, std::string body);
+		long long int  convert_hex_to_dec( std::string const string );
 	private:
 
 		HttpServer( const HttpServer &copy );					// Copy constructor

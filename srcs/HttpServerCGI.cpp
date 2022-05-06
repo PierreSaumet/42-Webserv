@@ -184,89 +184,16 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
 		this->_cgi->setRedirectStatus("200");
 		this->_cgi->setStatusCode("200");
-		// this->_cgi->setRedirectStatus("");
-		// this->_cgi->setStatusCode("");
-		
-		
-		
 		this->_cgi->setRequestMethod(this->_header_requete[0].method);
 		this->_cgi->setServerSoftware("Webserv/1.0");
 		this->_cgi->setServerProtocol("HTTP/1.1");
-
-		// probleme si plusieurs servers ...
-		this->_cgi->setServerName(this->_servers[0].name_server);
-
-		// std::string tmp = this->_header_requete[0].script_file_name;
-		// tmp.insert(0, this->_servers[0].root_server);
-		// std::cout << "\n tmp = " << tmp << std::endl;
+		this->_cgi->setServerName(this->_servers[this->_num_serv].name_server);
 		this->_cgi->setScriptName(this->_header_requete[0].script_file_name);
 		this->_cgi->setScriptFileName(this->_header_requete[0].script_file_name);
 		this->_cgi->setRequestUri("");
-		// if (this->_header_requete[0].upload == true)
-		// {
-		// 	size_t  ret = this->ft_upload_file(request_http);
-		// 	if (ret == 201)
-		// 	{
-		// 		this->_header_requete[0].cgi = true;
-		// 		this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>201</title><style type=text/css>body {color: green;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>201 Created, check it!</h1><p>by Pierre.</p></body></html>";
-		// 		this->_header_requete[0].num_error = 201; // j'utilise error lol...
-		// 		std::cout << "OUI 201 " << std::endl;
-		// 		
-		// 	}
-		// 	else if (ret == 200)
-		// 	{
-		// 		this->_header_requete[0].cgi = true;
-		// 		this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>200</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File Already uploaded =)</h1><p>by Pierre.</p></body></html>";				
-		// 		this->_header_requete[0].num_error = 200;
-		// 	}
-		// 	else if (ret == 400)
-		// 	{
-		// 		this->_header_requete[0].error = true;
-		// 		this->_header_requete[0].num_error = 400;
-		// 		this->ft_setup_error_header();
-		// 	}
-		// 	else if (ret == 403)
-		// 	{
-		// 		this->_header_requete[0].error = true;
-		// 		this->_header_requete[0].num_error = 403;
-		// 		this->ft_setup_error_header();
-		// 	}
-		// 	else if (ret == 413)
-		// 	{
-		// 		this->_header_requete[0].error = true;
-		// 		this->_header_requete[0].num_error = 413;
-		// 		this->ft_setup_error_header();
-		// 	}
-		// 	else if (ret == 431)
-		// 	{
-		// 		this->_header_requete[0].error = true;
-		// 		this->_header_requete[0].num_error = 431;
-		// 		this->ft_setup_error_header();
-		// 	}
-		// 	else if (ret == 404)
-		// 	{
-		// 		this->_header_requete[0].error = true;
-		// 		this->_header_requete[0].num_error = 404;
-		// 		this->ft_setup_error_header();
-		// 	}
-		// 	else if (ret == 500)
-		// 	{
-		// 		this->_header_requete[0].cgi = true;
-		// 		this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>500</title><style type=text/css>body {color: red;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>500 Internal Server Error</h1><p>by Pierre.</p></body></html>";				
-		// 		this->_header_requete[0].num_error = 500;
-		// 	}
-		// 	return ;
-			
-		// }
-
-
 		this->_cgi->setContentLength(this->_header_requete[0].content_length);
 		this->_cgi->setContentType(this->_header_requete[0].content_type);
 		this->_cgi->setRequestUri("");
-
-		// il faut mettre le body dans la string privee body
-		// std::cout << "BODY POST " << this->_header_requete[0].body_post <<  std::endl;
-		// exit(1);
 		this->_cgi->set_body_string_post(this->_header_requete[0].body_post);
 		if (this->_recv_complete.chunked == true)
 		{
@@ -274,14 +201,14 @@ void			HttpServer::ft_exec_cgi_test( std::string request_http, int len_msg )
 			ss << this->_header_requete[0].body_post.size();
 			std::string s = ss.str();
 			this->_cgi->setContentLength(s);
-
 		}
+
+		// pas necessaire
 		this->_cgi->ft_display_all_variable_env();
 		
-
-
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
 		
+		// A CCHANGE RSUREENT
 		// std::cout << "address cgi = " << this->_servers[0].cgi_path_server << std::endl;
 		std::string tmp_2 = this->_header_requete[0].script_file_name;
 		tmp_2.insert(0, this->_servers[0].root_server);
