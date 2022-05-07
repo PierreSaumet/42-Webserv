@@ -97,7 +97,7 @@ int				ft_open_binary( std::string const path )
 	return (0);
 }
 
-std::string		HttpServer::ft_setup_header( void )
+std::string		HttpServer::ft_setup_header( t_header_request requete )
 {
 
 	std::string filename(this->_servers[this->_num_serv].index_server.c_str());

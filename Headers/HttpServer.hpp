@@ -145,7 +145,7 @@ class HttpServer {
 		**	Functions in HttpServerResponse.cpp, used to setup the header and the body response to send to the client
 		*/
 		std::string			ft_setup_response_to_send( t_header_request requete );
-		std::string			ft_setup_header( void );
+		std::string			ft_setup_header( t_header_request requete );
 
 
 		/*
