@@ -234,6 +234,12 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 					throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
 				else
 				{
+`					// il faut ajouter un client au BON server
+					// on a besoin de socket_new_client
+
+
+
+					/////////////////////////////////////// A REFAIRE /////////////////////////
 					// on ajoute le nouveau client.
 					t_client_socket new_client;
 
@@ -284,7 +290,7 @@ int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_clie
 		total_send = 0;
 		still_to_send = 0;
 		
-		return (0); // test
+		return (-1); // test
 	}
 	return (0);
 }
@@ -305,7 +311,7 @@ int 		HttpServer::ft_write( void )
 			std::cout <<  BLUE << "C'est le client : " << it_b_client->client_socket << " qui va recevoir les donnes " << CLEAR << std::endl;
 			if (this->ft_continue_send(it_b_client) == -1)
 			{
-				std::cout << RED << "ft_continue_send return -1 donc on ferme le client " << CLEAR << std::endl;
+				std::cout << RED << "SOCKET: " << it_b_client->client_socket << " CLOSE DANS WRITING" << CLEAR << std::endl;
 				FD_CLR(it_b_client->client_socket, &this->_write_fs);
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
@@ -523,7 +529,7 @@ int		HttpServer::ft_reading( void )
 			// std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " nous a envoye des donnes" << CLEAR << std::endl;
 			if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) <= 0)
 			{
-				std::cout << RED << "recv return -1 donc on ferme le client " << CLEAR << std::endl;
+				std::cout << RED << "recv return 0 ou -1 donc on ferme le client recv =  " << request_length <<  CLEAR << std::endl;
 				FD_CLR(it_b_client->client_socket, &this->_read_fs);
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
