@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpServerSetResponse.cpp                           :+:      :+:    :+:   */
+/*   HttpServerSetResponse.cpp                           :+:      :+:    :+:  */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psaumet <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,7 +14,7 @@
 #include "../Headers/CGI_exec.hpp"
 
 
-std::string		HttpServer::ft_setup_response_to_send( void )				
+std::string		HttpServer::ft_setup_response_to_send( t_header_request requete )				
 {
 	std::cout << GREEN << "\n\n ft_setup_response_to_send " << CLEAR << std::endl;
 	std::string file_contents;

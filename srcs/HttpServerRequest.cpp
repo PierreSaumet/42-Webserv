@@ -15,19 +15,17 @@
 // 4 fonctions
 //	 1 pour choisir la methode
 //	et les 3 methods
-void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
+HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int len_msg, std::string msg )
 {
-	if (this->_header_requete.empty() == false)
-	{
-		std::cout << "impossible  d'etre la ?? " << std::endl;
-		exit(1);
-		this->ft_setup_error_header();
-		return ;
-	}
+	std::cout << "le client : " << port_client << " est dans parser requete" << std::endl;
+	// this->_all_client_socket.client_socket
 
-	std::string request_http(msg);
+	std::string request_http(msg);  // useless
 	if (request_http.compare(0, 4, "GET ") == 0)
+	{
 		this->ft_get(request_http, len_msg);
+		return (this->_header_requete[0]);
+	}
 	else if (request_http.compare(0, 5, "POST ") == 0)
 		this->ft_post(request_http, len_msg);
 	else if (request_http.compare(0, 7, "DELETE ") == 0)
@@ -46,17 +44,21 @@ void	HttpServer::ft_parser_requete( int len_msg, std::string msg )
 			this->ft_do_error(500);
 		}
 	}
-	return ;
+	std::cout << "aie aie " << std::endl;
+	exit(1);
+	// return ;
+	return (this->_header_requete[0]);
 }
 
 
-size_t			HttpServer::ft_get( std::string request_http, int len_msg)
+size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 {
 	std::cout << GREEN << "Dans get : " << CLEAR <<  std::endl;
 
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
+		// this->_header_requete
 		if (len_msg > 1023)
 			return (ft_do_error(431));
 

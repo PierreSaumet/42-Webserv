@@ -50,15 +50,12 @@ class HttpServer {
 			int					enable;
 			struct sockaddr_in	svr_addr;
 			int					sock;
+
+			// test
+			// std::vector<t_client_socket> client_du_server;
 		}						t_http_server;
 
-		// This structure contains sockets from the clients to be used by the server
-		typedef struct			s_client_socket {
-
-			int					client_socket;
-			struct sockaddr_in	client_addr;
-
-		}						t_client_socket;
+						
 
 		// This structure is used to check if all data from the client have been recieved
 		typedef struct			s_recv_data {
@@ -70,6 +67,9 @@ class HttpServer {
 		// This structure is the main structure used to parse the data send by the client.
 		typedef struct 			s_header_request {
 
+			int port_client; // test
+			
+			
 			std::string			method;				// GET, POST or DELETE
 			std::string			path;				// Le path c'est a dire l'URL transmise avec les donnees pour Get
 			std::string			protocol;
@@ -99,6 +99,19 @@ class HttpServer {
 		}						t_header_request;
 		
 
+		// This structure contains sockets from the clients to be used by the server
+		typedef struct			s_client_socket {
+
+			int					client_socket;
+			struct sockaddr_in	client_addr;
+
+			//	rajout samedi 7 mai
+			//
+			int  server_socket;		// le socket du server sur lequel le client doit se conencter
+			t_header_request request;
+
+		}		t_client_socket;
+
 		/*
 		**	Canonical Form in HttpServer.cpp
 		*/
@@ -122,7 +135,7 @@ class HttpServer {
 		/*
 		**	Functions in HttpServerRequest.cpp, used to apply the corresponding method
 		*/
-		void				ft_parser_requete( int len_msg, std::string msg );
+		t_header_request				ft_parser_requete( int port_client, int len_msg, std::string msg );
 		size_t				ft_get(std::string request_http, int len_msg);
 		size_t				ft_post(std::string request_http, int len_msg);
 		size_t				ft_delete(std::string request_http, int len_msg);
@@ -131,7 +144,7 @@ class HttpServer {
 		/*
 		**	Functions in HttpServerResponse.cpp, used to setup the header and the body response to send to the client
 		*/
-		std::string			ft_setup_response_to_send( void );
+		std::string			ft_setup_response_to_send( t_header_request requete );
 		std::string			ft_setup_header( void );
 
 
@@ -140,7 +153,7 @@ class HttpServer {
 		*/
 
 
-
+		void ft_test_add_client(int client_sock, struct sockaddr_in client_adr, int server_port);
 
 
 		/*	Functions used to get information from the header of a request.
