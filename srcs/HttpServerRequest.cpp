@@ -19,6 +19,11 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 {
 	std::cout << "le client : " << port_client << " est dans parser requete" << std::endl;
 	// this->_all_client_socket.client_socket
+	if (this->_header_requete.empty() == false)
+	{
+		std::cout << "ERTRREUR impossible " << std::endl;
+		exit(1);
+	}
 
 	std::string request_http(msg);  // useless
 	if (request_http.compare(0, 4, "GET ") == 0)

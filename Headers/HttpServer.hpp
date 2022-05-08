@@ -109,6 +109,7 @@ class HttpServer {
 			//
 			int  server_socket;		// le socket du server sur lequel le client doit se conencter
 			t_header_request request;
+			bool 	recv;
 
 		}		t_client_socket;
 
@@ -185,10 +186,10 @@ class HttpServer {
 
 		std::string		ft_get_content_length( struct stat buff, size_t len, size_t len_header ) const;
 		std::string		ft_get_end_header( void ) const;
-		std::string		ft_get_content_type( size_t binary ) const;
+		std::string		ft_get_content_type(t_header_request requete, size_t binary ) const;
 		std::string		ft_get_charset( void ) const;
 		std::string		ft_get_server_name( void ) const;
-		std::string		ft_get_status( bool x ) const;
+		std::string		ft_get_status( t_header_request requete, bool x ) const;
 		std::string		ft_get_date( void ) const;
 		std::string		ft_get_allow( void ) const;
 		std::string    	ft_get_code_redirection( void ) const;
@@ -201,8 +202,10 @@ class HttpServer {
 		**	Function used if an error occurs in the request
 		*/
 		void			ft_setup_error_header( void );
-		std::string			ft_find_error_html( void );
-		std::string			ft_create_error( void );
+
+		void			ft_setup_error_header_response( t_header_request requete );
+		std::string			ft_find_error_html( t_header_request requete );
+		std::string			ft_create_error( t_header_request requete );
 		std::string			ft_return_error( void );
 
 		/*
@@ -225,7 +228,7 @@ class HttpServer {
 
 		size_t check_location( std::string path, std::string name_location );
 	
-		std::string ft_create_autoindex( void );
+		std::string ft_create_autoindex( t_header_request requete );
 
 
 		int ft_redirection( void );

@@ -279,7 +279,7 @@ int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_clie
 {
 	long long ret = 0;
 
-	_response_to_send = ft_setup_response_to_send();
+	_response_to_send = ft_setup_response_to_send(it_client->request);
 	if ((ret = send(it_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0)) < 0)
 	{
 		std::cout << "SEND retourn -1 erreur " << std::endl;
@@ -287,7 +287,7 @@ int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_clie
 			_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
 		close(it_client->client_socket);
 		it_client = this->_all_client_socket.erase(it_client);
-		this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
+		// this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 		_DATA = 0;
 		return (-1);
 	}
@@ -307,7 +307,7 @@ int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_clie
 		if (_response_to_send.empty() == false)
 			_response_to_send.erase(_response_to_send.begin(), _response_to_send.end());
 		// std::cout << "on envoie rien ? : " << _response_to_send << std::endl;
-		this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
+		// this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 		_DATA = 0;
 		total_send = 0;
 		still_to_send = 0;
@@ -327,29 +327,15 @@ int 		HttpServer::ft_write( void )
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
 			
-			if (_DATA == 0)
-				break ;
+			if (it_b_client->recv == false)
+				break;
+
+			//if (_DATA == 0) // uselss?
+			//	break ;
 			// std::cout << "on est dans write " << std::endl;
 			std::cout <<  BLUE << "C'est le client : " << it_b_client->client_socket << " qui va recevoir les donnes " << CLEAR << std::endl;
 			this->ft_continue_send(it_b_client);
-			// if (this->ft_continue_send(it_b_client) == -1)
-			// {
-			// 	std::cout << RED << "SOCKET: " << it_b_client->client_socket << " CLOSE DANS WRITING" << CLEAR << std::endl;
-			// 	FD_CLR(it_b_client->client_socket, &this->_write_fs);
-			// 	close(it_b_client->client_socket);
-			// 	it_b_client = this->_all_client_socket.erase(it_b_client);
-				
-			// 	/// test
-			// 	// sleep(2);
-			// 	std::cout << " \t\t\til reste :  " << this->_all_client_socket.size() << std::endl;
-			// 	std::vector<t_client_socket>::iterator it = this->_all_client_socket.begin();
-			// 	for(; it != this->_all_client_socket.end(); it++)
-			// 	{
-			// 		std::cout << "\t\t\tclient numero = " << it->client_socket << std::endl;
-			// 	}
-			// 	// sleep(2);
-			// 	continue ;
-			// }
+			it_b_client->recv = false;
 			std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " a recu toutes les donnees" << CLEAR << std::endl;
 		
 		}
@@ -386,12 +372,13 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 						pos = tt_buffer.find("Content-Type: multipart/form-data;");
 						if (pos == std::string::npos)
 						{
-							std::cout << "Erreur requete post content-type " << std::endl; // doit setup bad request 400
-							this->_header_requete.push_back(t_header_request());
-							this->_header_requete[0].error = true;
-							this->_header_requete[0].num_error = 400;
-							return (1);
+							std::cout << "Erreur requete post content-type a changer" << std::endl; // doit setup bad request 400
 							exit(1);
+							// this->_header_requete.push_back(t_header_request());
+							// this->_header_requete[0].error = true;
+							// this->_header_requete[0].num_error = 400;
+							// return (1);
+							
 						}
 						else
 						{
@@ -461,11 +448,12 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 			std::cout << "pos end header " << tt_buffer.find("\r\n\r\n");
 			if (tt_buffer.find("\r\n\r\n") == tt_buffer.size() - 4)
 			{
-				std::cout << "POST sans body" << std::endl;
-				this->_header_requete.push_back(t_header_request());
-				this->_header_requete[0].error = true;
-				this->_header_requete[0].num_error = 400;
-				return (1);
+				std::cout << "POST sans body   a cahgner" << std::endl;
+				exit(1);
+				// this->_header_requete.push_back(t_header_request());
+				// this->_header_requete[0].error = true;
+				// this->_header_requete[0].num_error = 400;
+				// return (1);
 			}
 			std::string tmp(tt_buffer.end() - 5, tt_buffer.end());
 			if (tmp == "0\r\n\r\n")
@@ -520,29 +508,31 @@ int		HttpServer::ft_reading( void )
 		{
 			memset((char *)buffer, 0, 10240 + 1);
 			int request_length;
-			// std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " nous a envoye des donnes" << CLEAR << std::endl;
+			std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " nous envoie des donnees" << CLEAR << std::endl;
 			if ((request_length = recv(it_b_client->client_socket, buffer, sizeof(buffer), 0)) <= 0)
 			{
-				std::cout << RED << "recv return 0 ou -1 donc on ferme le client recv =  " << request_length <<  CLEAR << std::endl;
+				std::cout << RED << "recv return 0 ou -1 donc on ferme le client: " <<  it_b_client->client_socket << " recv =" << request_length <<  CLEAR << std::endl;
 				FD_CLR(it_b_client->client_socket, &this->_read_fs);
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
 				std::cerr << strerror(errno) << std::endl;
-				continue ;
+				// continue ;
+				break ;
 				// }
 			}
 			_tmp_buffer.append(buffer, request_length);
 
 			if (ft_check_recv_complete(_tmp_buffer) == 1)
 			{
-				std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " nous a envoye des donnes" << CLEAR << std::endl;
+				std::cout <<  BLUE << "On a bien recu les donnees de client : " << it_b_client->client_socket << " on va les traiter" << CLEAR << std::endl;
 				
 				
 				it_b_client->request = this->ft_parser_requete(it_b_client->client_socket ,_tmp_buffer.size() , _tmp_buffer);
-				// 
+				it_b_client->recv = true;
+				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 				std::cout << "it_b_client test = " << it_b_client->request.method << std::endl;
 				std::cout << "good ?  " << std::endl;
-				exit(1);
+				// exit(1);
 				
 				// std::cout << "Euh good " 
 				this->_recv_complete.chunked = false;
