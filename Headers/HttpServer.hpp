@@ -98,6 +98,9 @@ class HttpServer {
 			size_t				num_error;
 			std::string			body_error;			// si cgi body_error contient la response du cgi sans le header
 			std::map<std::string, std::string>	data;	// Contient les information transmise a Get via un formulaire					// contient les informations en get.
+		
+			int				num_server;
+		
 		}						t_header_request;
 		
 
@@ -138,7 +141,7 @@ class HttpServer {
 		/*
 		**	Functions in HttpServerRequest.cpp, used to apply the corresponding method
 		*/
-		t_header_request				ft_parser_requete( int port_client, int len_msg, std::string msg );
+		t_header_request				ft_parser_requete( int port_client, int len_msg, std::string request );
 		size_t				ft_get(std::string request_http, int len_msg);
 		size_t				ft_post(std::string request_http, int len_msg);
 		size_t				ft_delete(std::string request_http, int len_msg);
@@ -243,7 +246,7 @@ class HttpServer {
 		std::string  get_string( size_t pos_end, std::string body);
 		long long int  convert_hex_to_dec( std::string const string );
 	
-		size_t ft_choose_wich_server( std::string header, int num);
+		int ft_choose_wich_server( std::string header, int num);
 	
 	private:
 

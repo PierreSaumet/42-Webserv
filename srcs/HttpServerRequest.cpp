@@ -12,108 +12,69 @@
 
 #include "../Headers/HttpServer.hpp"
 
-size_t HttpServer::ft_choose_wich_server( std::string header, int num )
+int			HttpServer::ft_choose_wich_server( std::string header, int num )
 {
-	std::cout << GREEN << "Dans ft_choose_wich_server( std::string header );" << CLEAR << std::endl;
-
-	std::cout << "HEADER = " << header << std::endl;
-	// si http/1.1 absent = erreur
-	size_t pos = 0;
+	size_t 		pos = 0;
 	if ((pos = header.find("HTTP/1.1\r\n")) == std::string::npos)
-	{
-		std::cout << "Erreur pas http/1/" << std::endl;
-		exit(1);
-	}
+		return (-1);
 	if ((pos = header.find("Host: ")) == std::string::npos)
-	{
-		std::cout << "Erreur pas host" << std::endl;
-		exit(1);
-	}
+		return (-1);
 	if ((pos = header.find("Accept: ")) == std::string::npos)
-	{
-		std::cout << "Erreur pas Accept" << std::endl;
-		exit(1);
-	}
-
-	// on parcourt les servers pour voir lequel choisir en fonction du HOST
-	// on cherche le host;
+		return (-1);
 	pos = header.find("Host: ");
-	size_t end = header.find("\r\n", pos);
+
+	size_t		end = header.find("\r\n", pos);
 	std::string tmp(header, pos + 6, end - (pos + 6));
-	std::cout << "on veut le server = " << tmp << std::endl;
-	std::cout << "le num du server du client = " << num << std::endl;
-	std::cout << " il y a :" << this->_data->ft_get_nbr_servers() << " server " << std::endl;
-	size_t i = 0;
+	size_t		i = 0;
 	if (this->_data->ft_get_nbr_servers() == 1)
 		return (0);
 	while ( i < this->_data->ft_get_nbr_servers())
 	{
-		std::cout << " host + port = " << this->_servers[i].host_server << " et " << this->_servers[i].port_server << std::endl;
 		if (this->_servers[i].host_server == this->_servers[num].host_server)
-		{
 			if (this->_servers[i].port_server == this->_servers[num].port_server)
-			{
 				if (tmp == this->_servers[i].name_server)
-				{
-					std::cout << "BINGO on utilise le server numero : = " << i << std::endl;
-					exit(1);
-				}
-			}
-		}
+					return (i);
 		i++;
-		
-		// if (tmp == this->_servers[i].name_server && num == (int)i)
-		// {
-		// 	// if (num == (int)i)
-		// 	// {
-		// 		std::cout << "Bingo = " << tmp << " et server = "  << i << std::endl;
-		// 		exit(1);
-		// 	// }
-		// }
-		// i++;
 	}
-	std::cout << "On trouve pas le nom qui correspond  on retourne num :" << num << std::endl;
 	return (num);
-
 }
 
-
-
-HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int len_msg, std::string msg )
+HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int len_msg, std::string request )
 {
-	std::cout << "le client : " << port_client << " est dans parser requete" << std::endl;
-	// this->_all_client_socket.client_socket
-	if (this->_header_requete.empty() == false)
+	size_t			pos = 0;
+	if (this->_header_requete.empty() == false)					// ca veut dire qu'une requete n'a pas ete clear apres son utilisation donc erreur interne
 	{
-		std::cout << "ERTRREUR impossible " << std::endl;
-		exit(1);
+		this->_header_requete.push_back(t_header_request());
+		this->ft_do_error(500);	
+		return (this->_header_requete[0]);								
 	}
-	size_t pos = 0;
-	if ((pos = msg.find("\r\n\r\n")) == std::string::npos)
+	if ((pos = request.find("\r\n\r\n")) == std::string::npos)	// ne trouve pas la fin du header
 	{
-		std::cout << "ERREURURURUR ";
-		exit(1);
-	}
-	std::string tmp(msg, 0, pos);
-	this->ft_choose_wich_server(tmp, port_client);
-
-	// std::cout << "MSG = " << msg << std::endl;
-	exit(1);
-
-
-	std::string request_http(msg);  // useless
-	if (request_http.compare(0, 4, "GET ") == 0)
-	{
-		this->ft_get(request_http, len_msg);
+		this->_header_requete.push_back(t_header_request());
+		this->ft_do_error(400);	
 		return (this->_header_requete[0]);
 	}
-	else if (request_http.compare(0, 5, "POST ") == 0)
-		this->ft_post(request_http, len_msg);
-	else if (request_http.compare(0, 7, "DELETE ") == 0)
-		this->ft_delete(request_http, len_msg);
+
+	std::string 	header(request, 0, pos);
+	if ((this->_num_serv = this->ft_choose_wich_server(header, port_client)) == -1 )	// manque des arguments
+	{
+		this->_header_requete.push_back(t_header_request());
+		this->ft_do_error(400);
+		return (this->_header_requete[0]);
+	}
+	
+	if (header.compare(0, 4, "GET ") == 0)
+	{
+		this->ft_get(request, len_msg);
+		return (this->_header_requete[0]);
+	}
+	else if (header.compare(0, 5, "POST ") == 0)
+		this->ft_post(request, len_msg);
+	else if (header.compare(0, 7, "DELETE ") == 0)
+		this->ft_delete(request, len_msg);
 	else
 	{
-		std::cout << "ERRUER NI GET NI POST NI DELETE = " << msg << std::endl;
+		std::cout << "ERRUER NI GET NI POST NI DELETE = " <<  std::endl;
 		if (this->_header_requete.empty() == true)    // a changer
 		{
 			this->_header_requete.push_back(t_header_request());
@@ -135,11 +96,10 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 {
 	std::cout << GREEN << "Dans get : " << CLEAR <<  std::endl;
-
+	std::cout << "on utilise le server = " << this->_num_serv << std::endl;
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
-		// this->_header_requete
 		if (len_msg > 1023)
 			return (ft_do_error(431));
 
@@ -148,16 +108,12 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		int 			ret = 0;
 
 		this->_header_requete[0].method = "GET";
-		// std::cout << "On a la method : " << this->_header_requete[0].method << "-" <<  std::endl;
-	
 		this->_header_requete[0].host = this->ft_check_host_header(size_header);
-		if (this->_header_requete[0].host.empty() == true)
-			return (ft_do_error(400));		
-
-		
-		if ((ret = this->ft_find_index_server()) == -1)
-			return (ft_do_error(500));
-		this->_num_serv = ret;
+		// if (this->_header_requete[0].host.empty() == true)
+		// 	return (ft_do_error(400));		
+	
+		std::cout << "host = " << this->_header_requete[0].host << std::endl;
+		exit(1);
 		
 		
 		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root

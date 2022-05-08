@@ -270,95 +270,19 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 */
 std::string		HttpServer::ft_check_host_header( std::string header )
 {
-	size_t pos;
+	std::cout << GREEN << "Dans ft_check_host_header " << CLEAR << std::endl;
+	size_t 		pos = header.find("Host: ");
+	size_t 		pos_end = header.find("\r\n", pos);
+	std::string host(header, pos + 6, pos_end - (pos + 6));
 
-	pos = 0;
-	if ((pos = header.find("Host: ", 0)) == std::string::npos)
-	{
-		// A FAIRE: creer une erreur propre.
-		std::cout << "ERREUR NE TROUVE PAS LE HOST DANS LE HEADER" << std::endl;
-		exit(1);
-		return ("");
-	}
-	else
-	{
-		size_t pos_end;
-		if ((pos_end = header.find("\r\n", pos)) == std::string::npos)
-		{
-			// condition redirection avec postman
-			if ((pos_end = header.find("\0", pos)) == std::string::npos)
-			{
-				std::cout << "OHOH" << std::endl;
-				std::cout << "header = " << header << std::endl;
-				std::cout << "ERREUR NE TROUVE PAS LE USER-AGENT DANS LE HEADER" << std::endl;
-				exit(1);
-				
-				return ("");
-			}	
-		}
-		// on verifie que la position de host est avant la position de user-agent.
-		if (pos > pos_end)
-		{
-			// A FAIRE: creer une erreur propre.
-			std::cout << "ERREUR HOST doit etre avant USER-AGENT" << std::endl;
-			exit(1);
-			return ("");
-		}
-		// on recupere les informations apres Host et avant User-agent
-		std::string tmp(header, pos + 6, pos_end - (pos + 6));
-		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
-		{
-			if (tmp.compare(0, 9, this->_servers[i].host_server) == 0 || tmp.compare(0, 9, "localhost") == 0 || tmp.compare(0, 9, "127.0.0.1") == 0)
-			{
-				std::stringstream 				ss;
-				std::string 					port;
-
-				ss << this->_servers[i].port_server;
-				ss >> port;
-				if (tmp.compare(10, 4, port) == 0)
-					return (tmp);
-				else
-				{
-					//	Les ports ne correspondent pas.
-					if (this->_data->ft_get_nbr_servers() > 1)
-					{
-						for (size_t y = 0; y < this->_data->ft_get_nbr_servers(); y++)
-						{
-							std::stringstream 	ss2;
-							std::string 		port2;
-
-							std::cout << RED << "y = " << y << " et port server = " << this->_servers[y].port_server << CLEAR << std::endl;
-							ss2 << this->_servers[y].port_server;
-							ss2 >> port2;
-							if (tmp.compare(10, 4, port2) == 0)
-							{
-								std::cout<< "Ils sont egaux les port cas 2" << std::endl;
-								return (tmp);
-							}
-							ss2.str("");
-							ss2.flush();
-							port2 = "";
-						}
-					}
-					std::cout << "port pas egaux ? " << std::endl;
-					std::cout << " tmp = -" << tmp << "- et nous = -" << port << "-" << std::endl;
-					throw Error(666, "Erreur test lol, ", 666);			// A FAIRE au propre
-				}
-			}
-			else
-			{
-				std::cout << "les host ne sont pas egaux" << std::endl;
-				std::cout << "tmp " << tmp << std::endl;
-				std::cout << "host = " << this->_servers[i].host_server << std::endl;
-				throw Error(666, "Erreur test lol 2, ", 666);		// A FAIRE au propre
-			}
-
-		}
-		std::cout << "ERREUR ICI " << std::endl;			// A FAIRE au propre
-		exit(1);
-		return (std::string(header, pos + 6, pos_end - (pos + 6)));
-		
-	}
+	if (host == this->_servers[this->_num_serv].name_server)
+		return (host);	
+	std::stringstream ss;
+	ss << this->_servers[this->_num_serv].port_server;
+	ss >> host;
+	host.insert(0, ":");
+	host.insert(0, this->_servers[this->_num_serv].host_server);
+	return (host);
 }
 
 std::string		HttpServer::ft_check_content_type( std::string request_http )
