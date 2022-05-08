@@ -15,7 +15,7 @@
 // A changer
 bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 {
-	std::cout << "dans la fonction find cgi or php " << std::endl;
+	std::cout << RED "dans la fonction find  php pour cgi : A REVOIR " << CLEAR << std::endl;
 	// on trouve le premier /
 	size_t 		find_backslash = request_http.find("/");
 	// on cherche HTTP

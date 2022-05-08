@@ -56,6 +56,7 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	}
 
 	std::string 	header(request, 0, pos);
+	std::cout << "\n\nHEader = \n" << header << std::endl;
 	if ((this->_num_serv = this->ft_choose_wich_server(header, port_client)) == -1 )	// manque des arguments
 	{
 		this->_header_requete.push_back(t_header_request());
@@ -95,7 +96,7 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 
 size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 {
-	std::cout << GREEN << "Dans get : " << CLEAR <<  std::endl;
+	std::cout << GREEN << "\nDans get : " << CLEAR <<  std::endl;
 	std::cout << "on utilise le server = " << this->_num_serv << std::endl;
 	if (this->_header_requete.empty() == true)
 	{
@@ -107,46 +108,28 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		std::string 	size_header(request_http, 0, pos_header);
 		int 			ret = 0;
 
-		this->_header_requete[0].method = "GET";
-		this->_header_requete[0].host = this->ft_check_host_header(size_header);
-		// if (this->_header_requete[0].host.empty() == true)
-		// 	return (ft_do_error(400));		
-	
-		std::cout << "host = " << this->_header_requete[0].host << std::endl;
-		exit(1);
-		
+		this->_header_requete[0].method = "GET";									// on a deja verifier ca avant
+		this->_header_requete[0].host = this->ft_check_host_header(size_header);				
 		
 		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
 		this->_header_requete[0].path = this->ft_check_path_header(size_header);
 		if (this->_header_requete[0].path.empty() == true)
-			throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
+			return (ft_do_error(400));
 		std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
 		
-		this->ft_parsing_path_get_request();
+		this->_header_requete[0].query_string = this->ft_parsing_path_get_request();
 		std::cout << "On a la query_string : " << this->_header_requete[0].query_string << std::endl;
 
-		this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
-		if (this->_header_requete[0].protocol.empty() == true)
-			throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
+		this->_header_requete[0].protocol = "HTTP/1.1";									// on a deja verifier ca avant
 		std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
 
 		this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
-		if (this->_header_requete[0].accept.empty() == true)
-			throw Error(15, "Error, in recieved header, the accept is not correct.", 2);
 		std::cout << "On a le accept = "<< this->_header_requete[0].accept << std::endl;
 
-
-		// Check the methodd
-		if ((ret = ft_check_method_allowed_header(request_http, "GET")) > 0)
-		{
-			this->_header_requete[0].error = true;
-			if (ret == 1)
-				this->_header_requete[0].num_error = 405;
-			if (ret == 2)
-				this->_header_requete[0].num_error = 404;
-			this->ft_setup_error_header();
-			return (1);
-		}
+		if ((ret = ft_check_method_allowed_header("GET")) > 0)
+			return (ft_do_error(405));
+		std::cout << "method ok " << std::endl;
+		
 		
 		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
@@ -209,30 +192,16 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 			this->ft_exec_cgi_test(); //request_http, len_msg);
 			return (0);
 		}
-
+		std::cout << "pas de cgi" << std::endl;
+		
 		// A TERMINER
-		if ((ret = this->ft_redirection()) < 0)
+		std::cout << "avant redirection num server = " << this->_num_serv << std::endl;
+		std::cout << "avant redirection num loc = " << this->_num_loc << std::endl;
+		if ((ret = this->ft_redirection()) == 1)
 		{
-			// impossible
-			this->_header_requete[0].error = true;
-			if (ret == 1)
-				this->_header_requete[0].num_error = 404;
-			if (ret == 2)
-				this->_header_requete[0].num_error = 403;
-			this->ft_setup_error_header();
+			std::cout << "On a une redirection " << std::endl;
 			return (0);
 		}
-		if (ret == 1)
-			return (0);
-		// std::cout << "apres redirection : " << std::endl;
-		// std::cout << "path = " << this->_header_requete[0].path << std::endl;
-		// std::cout << "this->_header_requete[0].return_used = " << this->_header_requete[0].return_used << std::endl;
-		// std::cout << "this->_servers[this->_num_serv].return_server  = " << this->_servers[this->_num_serv].return_server << std::endl;
-		// std::cout << "this->_servers[this->_num_serv].location[this->_num_loc].return_location = " << this->_servers[this->_num_serv].location[this->_num_loc].return_location << std::endl;
-
-		// exit(1);
-
-		// Check the uri and change it to the corresponding location
 		if ((ret = this->ft_check_access_path()) > 0)
 		{
 			std::cout << "erreur verifie le drot ret = " << ret << std::endl;
@@ -310,7 +279,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			return (ft_do_error(400));
 
 		// Check if the method used is allowed
-		if (ft_check_method_allowed_header(this->_header_requete[0].path, "POST") == 1)
+		if (ft_check_method_allowed_header("POST") == 1)
 			return (ft_do_error(405));
 		std::cout << BLUE << "La methode POST est autorisee, on continue." << CLEAR << std::endl;
 
@@ -443,7 +412,7 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 		this->_num_serv = ret_serv;			// on utiliser le numero du servers
 		std::cout << "le num du server est setup ? = " << this->_num_serv << std::endl;
 
-		if (ft_check_method_allowed_header(this->_header_requete[0].path, "DELETE") == 1)				// On verifie que la methode est autorisee
+		if (ft_check_method_allowed_header("DELETE") == 1)				// On verifie que la methode est autorisee
 		{
 			std::cout << RED << "La methode DELETE est interdite donc on sort une erreur 405" << CLEAR << std::endl;
 			this->_header_requete[0].error = true;

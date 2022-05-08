@@ -13,19 +13,16 @@
 #include "../Headers/HttpServer.hpp"
 
 
-size_t			HttpServer::ft_parsing_path_get_request( void )
+std::string			HttpServer::ft_parsing_path_get_request( void )
 {
-	std::cout << GREEN << "Dans ft_parsing_path_get_request : " << CLEAR << std::endl;
+	std::cout << RED << "Dans ft_parsing_path_get_request : FONCTION A CHANGER " << CLEAR << std::endl;
 	size_t		pos_cursor = this->_header_requete[0].path.find("?");
 	if (pos_cursor == std::string::npos)
-	{
-		std::cout << "\tIl n'y a pas de donnees a parser dans parsing ft_parsing_path_get_request." << std::endl;
-		this->_header_requete[0].query_string = "";
-		return (0);
-	}
+		return ("");
 	else
 	{
 		std::cout << "\tIl y a des donnees a parser dans la requete GET." << std::endl;
+		exit(1);
 		std::string tmp;
 		pos_cursor++;
 		size_t len = this->_header_requete[0].path.length();
@@ -63,13 +60,8 @@ size_t			HttpServer::ft_parsing_path_get_request( void )
 			pos_cursor++;
 		}
 	}
-	// std::map<std::string, std::string>::iterator it_b = this->_header_requete[0].data.begin();
-	// for (; it_b != this->_header_requete[0].data.end(); it_b++)
-	// {
-	// 	std::cout << it_b->first << " = " << it_b->second << std::endl;
-	// }
 	this->_header_requete[0].query_string.erase(this->_header_requete[0].query_string.end() - 1);
-	return (0);
+	return ("");
 }
 
 
@@ -128,14 +120,11 @@ int		HttpServer::ft_redirection( void )
 			std::cout << "requete= " << this->_header_requete[0].path << std::endl;
 			if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
 			{
-				std::cout << "flavicon " << std::endl;
-				// exit(1);
+				std::cout << "flavicon donc pas de redirection" << std::endl;
 				return (0);
-
 			}
 			this->_header_requete[0].return_used = true;
-			exit(1);
-			return (0);
+			return (1);
 			exit(1);
 		}
 		else
@@ -146,48 +135,60 @@ int		HttpServer::ft_redirection( void )
 		}
 		
 	}
-	else
+
+	// std::cout << "On a setup this->_num_loc = " << this->_num_loc << std::endl;
+	if (this->_servers[this->_num_serv].location[this->_num_loc].return_location.empty() == true)
 	{
-		std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
-		for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
-			all_location.push_back(it->name_location);
-		std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
-		
-		for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
-		{	
-			size_t i = 0;
-			while (i < this->_servers[this->_num_serv].nbr_location)
-			{
-				if (*it == this->_servers[this->_num_serv].location[i].name_location)
-				{
-					if (this->_header_requete[0].path.compare(0, it->size(), *it) == 0)
-					{
-						if (this->_servers[this->_num_serv].location[i].return_location.empty() == true)
-						{
-							std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
-							this->_header_requete[0].return_used = false;
-							return (0);
-						}
-						else
-						{
-							std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
-							this->_header_requete[0].return_used = true;
-							// exit(1);
-							// test on supprime root et le nom de la location pour rempplacer par le return
-							this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[i].name_location.size());
-							this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[i].return_location);
-							return (1);
-						}
-					}
-				}
-				i++;
-			}
-		}
-		std::cout << "la requete ne correspond a aucun bloc location donc error 404 ?" << std::endl;
-		// exit(1);
-		return (-1);
+		std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
+		this->_header_requete[0].return_used = false;
+		return (0);
 	}
-	return (0);
+	std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
+	this->_header_requete[0].return_used = true;
+	this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size());
+	this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[this->_num_loc].return_location);
+	return (1);
+
+		// std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
+		// for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
+		// 	all_location.push_back(it->name_location);
+		// std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
+		
+		// for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
+		// {	
+		// 	size_t i = 0;
+		// 	while (i < this->_servers[this->_num_serv].nbr_location)
+		// 	{
+		// 		if (*it == this->_servers[this->_num_serv].location[i].name_location)
+		// 		{
+		// 			if (this->_header_requete[0].path.compare(0, it->size(), *it) == 0)
+		// 			{
+		// 				if (this->_servers[this->_num_serv].location[i].return_location.empty() == true)
+		// 				{
+		// 					std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
+		// 					this->_header_requete[0].return_used = false;
+		// 					return (0);
+		// 				}
+		// 				else
+		// 				{
+		// 					std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
+		// 					this->_header_requete[0].return_used = true;
+		// 					// exit(1);
+		// 					// test on supprime root et le nom de la location pour rempplacer par le return
+		// 					this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[i].name_location.size());
+		// 					this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[i].return_location);
+		// 					return (1);
+		// 				}
+		// 			}
+		// 		}
+		// 		i++;
+		// 	}
+		// }
+		// std::cout << "la requete ne correspond a aucun bloc location donc error 404 ?" << std::endl;
+		// exit(1);
+		// return (-1);
+	// }
+	// return (0);
 }
 
 
@@ -372,10 +373,7 @@ size_t 	HttpServer::ft_check_access_path( void )
 		if (stat(this->_header_requete[0].path.c_str(), &buff_path) < 0)
 			return (1); // 404
 		if (buff_path.st_dev == buff_index_server.st_dev && buff_path.st_ino == buff_index_server.st_ino)
-		{
-			std::cout << "egaux on demande l'index" << std::endl;
 			return (0);
-		}
 		else
 		{
 			if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
@@ -384,16 +382,9 @@ size_t 	HttpServer::ft_check_access_path( void )
 				this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
 				this->_header_requete[0].path.append("/flavicon.ico");
 				std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
-				// exit( 1);
 				return (0);
 			}
-			// std::cout << "ICI, header requet  = " << this->_header_requete[0].path << " et index du server = " << path_index_server << std::endl;
-			// std::cout << "stat result : " << buff_path.st_dev << " et " << buff_index_server.st_dev << std::endl;
-			// std::cout << "stat result : " << buff_path.st_ino << " et " << buff_index_server.st_ino << std::endl;
-			// exit(1);
-			
 			return (2); // 403
-
 		}
 	}
 	
@@ -460,11 +451,8 @@ size_t 	HttpServer::ft_check_access_path( void )
 			i++;
 		}
 	}
-
-
-	std::cout << "NON rien " << std::endl;
-	exit(1);
-	return (0);
+	std::cout << "404" << std::endl;
+	return (1); // 404
 }
 
 

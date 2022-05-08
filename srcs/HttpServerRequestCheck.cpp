@@ -86,36 +86,16 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 std::string		HttpServer::ft_check_accept_header( std::string header )
 {
 	size_t		pos = header.find("Accept: ");
-	if (pos == std::string::npos)
+	size_t	pos_end = header.find("\r\n", pos);
+	if (pos_end == std::string::npos)
 	{
-		std::cout << RED << "dans ft_check_accpet, ne trouve pas ACCEPT: dans le header de la requete" << CLEAR << std::endl;
-		return ("");
+		std::string tmp(header, pos + 8, header.size() - pos - 8);
+		return (tmp);
 	}
 	else
 	{
-		size_t	pos_end = header.find("\r\n", pos);
-		if (pos_end == std::string::npos)
-		{
-			// probleme avec curl...
-			pos_end = header.find("curl");
-			if (pos_end == std::string::npos)
-			{
-				std::cout << RED << "dans ft_check_accept, ne trouve pas \\r\\n: dans le header de la requete" << CLEAR << std::endl;
-				return ("");
-			}
-			else
-			{
-				std::string tmp(header, pos + 8, (pos + 8 + 3) - (pos + 8));
-				std::cout << "DU COUP TMP = " << tmp << std::endl;
-				// exit(1);
-				return (tmp); 
-			}
-		}
-		else
-		{
-			std::string tmp(header, pos + 8, pos_end - (pos + 8));
-			return (tmp); 
-		}
+		std::string tmp(header, pos + 8, pos_end - (pos + 8));
+		return (tmp); 
 	}
 }
 
@@ -137,16 +117,12 @@ std::string		HttpServer::ft_check_referer( std::string request_http )
 }
 
 
-int				HttpServer::ft_check_method_allowed_header( std::string request_http, std::string method )
+int				HttpServer::ft_check_method_allowed_header( std::string method )
 {
-	(void)request_http;
-	std::cout << GREEN << "\tDans ft_check_method_allowed_header " << CLEAR << std::endl;
+	// std::cout << GREEN << "\tDans ft_check_method_allowed_header " << CLEAR << std::endl;
 		
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
-		// std::cout << "path = " << this->_header_requete[0].path << std::endl;
-
-
 		std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
 		for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
 			all_location.push_back(it->name_location);
@@ -160,8 +136,6 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 				pos_slash = 1; // on cherche le deuxieme / pour avoir le premier dossier de la requete
 			else
 				pos_slash = this->_header_requete[0].path.find("/", 1); 
-			
-			// std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << " et it = " << *it << " pos = " << pos_slash << std::endl;
 			if (this->_header_requete[0].path.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
 			{
 				size_t count = 0;
@@ -182,17 +156,12 @@ int				HttpServer::ft_check_method_allowed_header( std::string request_http, std
 			}
 		}
 	}
-	std::cout << "on va chercher dans le root" << std::endl;
 	std::vector<std::string>::iterator  it_b = this->_servers[this->_num_serv].methods_server.begin();
 	for (; it_b != this->_servers[this->_num_serv].methods_server.end(); it_b++)
 	{
 		if (*it_b == method)
-		{
-			std::cout << " la method est autorisee dans root " << std::endl;
 			return (0);		// oui ca marche
-		}
 	}
-	std::cout << " la method n'est PAS autorisee dans root " << std::endl;
 	return (1);
 }
 
@@ -222,41 +191,20 @@ std::string		HttpServer::ft_check_protocol_header( std::string header )
 
 std::string		HttpServer::ft_check_path_header( std::string header )
 {
-	size_t	pos;
-	if ((pos = header.find_first_of("/", 0)) == std::string::npos)
-	{
-		// A FAIRE: creer une erreur propre.
-		std::cout << "ERREUR NE TROUVE PAS de / dans le path du HEADER DE LA REQUETE \n";
-		return ("");
-	}
-	else
-	{
-		size_t pos_http;
-		if ((pos_http = header.find("HTTP/1.1\r\n")) == std::string::npos)
-		{
-			std::cout << "ERREUR NE TROUVE PAS  HTTP protocol dans le PATH du HEADER DE LA REQUETE \n";
-			return ("");
-		}
-		else
-		{
-			if (pos > pos_http)
-			{
-				// A FAIRE: creer une erreur propre.
-				std::cout << "ERREUR le path doit etre avant le http version dans le header du client \n";
-				return ("");
-			}
-			std::string 	tmp(header, pos, pos_http - pos - 1);
-			// on setup aussi le request_uri
-			this->_header_requete[0].request_uri = tmp;
-			// on setup aussi scriptfilename
-			size_t 			pos_tmp = tmp.find("?");
-			std::string 	tmp2(tmp, 0, pos_tmp);
+	size_t		pos = header.find_first_of("/", 0);
+	size_t		pos_http = header.find("HTTP/1.1\r\n");
 
-			this->_header_requete[0].script_file_name = tmp2;
-			return (tmp);
-			
-		}
-	}
+	if (pos > pos_http)
+		return ("");
+	std::string 	tmp(header, pos, pos_http - pos - 1);
+	// on setup aussi le request_uri pour le cgi
+	this->_header_requete[0].request_uri = tmp;
+	// on setup aussi scriptfilename pour le cgi
+	size_t 			pos_tmp = tmp.find("?");
+	std::string 	tmp2(tmp, 0, pos_tmp);
+	this->_header_requete[0].script_file_name = tmp2;
+	return (tmp);
+
 }
 
 
