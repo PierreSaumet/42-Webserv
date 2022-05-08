@@ -50,7 +50,9 @@ class HttpServer {
 			int					enable;
 			struct sockaddr_in	svr_addr;
 			int					sock;
-
+			bool 				binded;
+			
+			size_t				num;
 			// test
 			// std::vector<t_client_socket> client_du_server;
 		}						t_http_server;
@@ -110,7 +112,7 @@ class HttpServer {
 			int  server_socket;		// le socket du server sur lequel le client doit se conencter
 			t_header_request request;
 			bool 	recv;
-
+			size_t  num;
 		}		t_client_socket;
 
 		/*
@@ -240,6 +242,9 @@ class HttpServer {
 		size_t ft_do_error( size_t num_error );
 		std::string  get_string( size_t pos_end, std::string body);
 		long long int  convert_hex_to_dec( std::string const string );
+	
+		size_t ft_choose_wich_server( std::string header, int num);
+	
 	private:
 
 		HttpServer( const HttpServer &copy );					// Copy constructor

@@ -92,6 +92,7 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 		for (size_t i = 0; i < this->_data->ft_get_nbr_servers(); i++)
 		{
 			this->_http_servers.push_back(t_http_server());
+			this->_http_servers[i].num = i;
 			this->_http_servers[i].enable = 1;
 			this->_http_servers[i].sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -113,8 +114,35 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 
 			memset((char *)&this->_http_servers[i].svr_addr, 0, sizeof(this->_http_servers[i].svr_addr));
 			this->_http_servers[i].svr_addr.sin_family = AF_INET;
-			this->_http_servers[i].svr_addr.sin_addr.s_addr = INADDR_ANY;
+			/// test 127.0.0.2
+			// this->_http_servers[i].svr_addr.sin_addr.s_addr = INADDR_ANY;
+			if (this->_servers[i].host_server.empty() == true)
+				this->_http_servers[i].svr_addr.sin_addr.s_addr = INADDR_ANY;
+			else
+				this->_http_servers[i].svr_addr.sin_addr.s_addr = inet_addr(this->_servers[i].host_server.c_str());
+			
 			this->_http_servers[i].svr_addr.sin_port = htons(this->_servers[i].port_server);
+
+
+			// if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
+			// {
+			// 	std::cerr << "error bind = " << strerror(errno) << std::endl;
+			// 	close(this->_http_servers[i].sock);
+			// 	throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
+			// }
+			// std::cout << "SERVER sock bind = " << this->_http_servers[i].sock << std::endl;
+			// if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
+			// {
+			// 	if (close(this->_http_servers[i].sock) < 0)
+			// 	{
+			// 		close(this->_http_servers[i].sock);
+			// 		throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
+			// 	}
+			// 	throw Error(5, "Error, 'creation of server', cannot listen.", 2);
+			// }
+			// std::cout << GREEN << " Le server: -"<< this->_servers[i].name_server << "- tourne sur le host: -" << this->_servers[i].host_server << "- et le port: -" << this->_servers[i].port_server << "-" << CLEAR << std::endl;
+			// std::cout << std::endl;
+
 
 
 			// test si plusieurs servers on la meme addresse
@@ -122,7 +150,7 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 			size_t binded = 0;
 			while (y < i)
 			{
-				if (this->_servers[i].port_server == this->_servers[y].port_server)
+				if (this->_servers[i].port_server == this->_servers[y].port_server && this->_servers[y].host_server == this->_servers[i].host_server)
 					binded = 1;
 				y++;
 			}
@@ -133,11 +161,7 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 				if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
 				{
 					std::cerr << "error bind = " << strerror(errno) << std::endl;
-					if (close(this->_http_servers[i].sock) < 0)
-					{
-						close(this->_http_servers[i].sock);
-						throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
-					}
+					close(this->_http_servers[i].sock);
 					throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
 				}
 				std::cout << "SERVER sock bind = " << this->_http_servers[i].sock << std::endl;
@@ -150,11 +174,13 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 					}
 					throw Error(5, "Error, 'creation of server', cannot listen.", 2);
 				}
-				std::cout << GREEN << " Le server: "<< this->_servers[i].name_server << " tourne sur le port : " << this->_servers[i].port_server << CLEAR << std::endl;
+				// this->_servers[i].binded = true;
+				this->_http_servers[i].binded = true;
+				std::cout << GREEN << " Le server: -"<< this->_servers[i].name_server << "- tourne sur le host: -" << this->_servers[i].host_server << "- et le port: -" << this->_servers[i].port_server << "-" << CLEAR << std::endl;
 				std::cout << std::endl;
 			}
-			else
-				this->_http_servers.pop_back();
+			// else
+			// 	this->_http_servers.pop_back();
 		}
 	}
 	catch (std::exception &e)
@@ -209,24 +235,6 @@ void	HttpServer::ft_handle_connections( void )
 	return ;
 }
 
-void HttpServer::ft_test_add_client(int client_sock, struct sockaddr_in client_addr, int server_port)
-{
-	std::cout << GREEN << "Dans ft_test_add_client" << CLEAR<< std::endl;
-	std::cout << "On parcourt les servers pour voir le port qui correspond ?" << std::endl;
-
-	std::vector<t_http_server>::iterator it_b = this->_http_servers.begin();
-	for (; it_b != this->_http_servers.end(); it_b++)
-	{
-		std::cout << "On est dans le server : " << it_b->sock << std::endl;
-		if (it_b->sock == server_port)
-		{
-			std::cout << "Le client : " << client_sock << " appartient au server : " << server_port << std::endl;
-			// it_b->client_du_server
-		}
-	}
-	(void)client_addr;
-	return ;
-}
 
 void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 {
@@ -240,36 +248,44 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 		socklen_t	size_addr_new_client = sizeof(addr_new_client);
 		memset((char*)&addr_new_client, 0, (int)size_addr_new_client);
 		// std::cout << "SERVER socke = " << it_b->sock << std::endl;
-		if (FD_ISSET(it_b->sock, &this->_read_fs))
+		if (it_b->binded == true)
 		{
-			socket_new_client = accept(it_b->sock, (struct sockaddr *)&addr_new_client, &size_addr_new_client);		
-			std::cerr << strerror(errno) << std::endl;
-			if (socket_new_client < 0 && int_signal == 0)
-				throw Error(6, "Error, 'main loop server', server cannot accept() a client.", 2);
-			else
+			if (FD_ISSET(it_b->sock, &this->_read_fs))
 			{
-				std::cout << GREEN << "nouvelle connection client numero: " << socket_new_client << " avec le server " << CLEAR << std::endl;
-				if (fcntl(socket_new_client, F_SETFL, O_NONBLOCK) < 0)
-					throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
+
+				socket_new_client = accept(it_b->sock, (struct sockaddr *)&addr_new_client, &size_addr_new_client);		
+				std::cerr << strerror(errno) << std::endl;
+				if (socket_new_client < 0 && int_signal == 0)
+					throw Error(6, "Error, 'main loop server', server cannot accept() a client, maybe DDOS.", 2);
 				else
 				{
-					// il faut ajouter un client au BON server
-					// on a besoin de socket_new_client
-					// this->ft_test_add_client(socket_new_client, addr_new_client, it_b->sock);
+					std::cout << GREEN << "nouvelle connection client numero: " << socket_new_client << " avec le server " << CLEAR << std::endl;
+					if (fcntl(socket_new_client, F_SETFL, O_NONBLOCK) < 0)
+						throw Error(7, "Error, 'in main loop', server cannot change FD client with fcntl().", 2);
+					else
+					{
+						
+						t_client_socket new_client;
+
+						new_client.client_socket = socket_new_client;
+						new_client.client_addr = addr_new_client;
+						new_client.server_socket = it_b->sock;	// le port du server
+						new_client.num = it_b->num;
+						new_client.recv = false;
+						// new_client.request.push_back(t_header_request());
+						this->_all_client_socket.push_back(new_client);
+						// std::cout << "Un nouveau client a ete ajoute, total de client = " << this->_all_client_socket.size() << std::endl;
+						// // std::cout << "addr client = " << new_client.client_addr.sin_addr << std::endl;
+						// std::cout << "port client = " << new_client.client_addr.sin_port << std::endl;
+						// std::cout << "family client = " << new_client.client_addr.sin_family << std::endl;
+						// std::cout << "s addir client = " << new_client.client_addr.sin_addr.s_addr << std::endl;
+
+						// std::cout << "\nserver socket = " << new_client.server_socket << std::endl;
 
 
-					/////////////////////////////////////// A REFAIRE /////////////////////////
-					// on ajoute le nouveau client.
-					t_client_socket new_client;
-
-					new_client.client_socket = socket_new_client;
-					new_client.client_addr = addr_new_client;
-					new_client.server_socket = it_b->sock;	// le port du server
-					// new_client.request.push_back(t_header_request());
-					this->_all_client_socket.push_back(new_client);
-					std::cout << "Un nouveau client a ete ajoute, total de client = " << this->_all_client_socket.size() << std::endl;
-					// sleep(10);
-				}		
+						// sleep(10);
+					}		
+				}
 			}
 		}
 	}
@@ -279,6 +295,9 @@ int HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_clie
 {
 	long long ret = 0;
 
+	// if (it_b_client->recv
+	std::cout << "ICI et recv = " << it_client->recv <<  std::endl;
+	
 	_response_to_send = ft_setup_response_to_send(it_client->request);
 	if ((ret = send(it_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0)) < 0)
 	{
@@ -527,7 +546,7 @@ int		HttpServer::ft_reading( void )
 				std::cout <<  BLUE << "On a bien recu les donnees de client : " << it_b_client->client_socket << " on va les traiter" << CLEAR << std::endl;
 				
 				
-				it_b_client->request = this->ft_parser_requete(it_b_client->client_socket ,_tmp_buffer.size() , _tmp_buffer);
+				it_b_client->request = this->ft_parser_requete(it_b_client->num ,_tmp_buffer.size() , _tmp_buffer);
 				it_b_client->recv = true;
 				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 				std::cout << "it_b_client test = " << it_b_client->request.method << std::endl;

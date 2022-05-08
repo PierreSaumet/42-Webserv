@@ -12,9 +12,73 @@
 
 #include "../Headers/HttpServer.hpp"
 
-// 4 fonctions
-//	 1 pour choisir la methode
-//	et les 3 methods
+size_t HttpServer::ft_choose_wich_server( std::string header, int num )
+{
+	std::cout << GREEN << "Dans ft_choose_wich_server( std::string header );" << CLEAR << std::endl;
+
+	std::cout << "HEADER = " << header << std::endl;
+	// si http/1.1 absent = erreur
+	size_t pos = 0;
+	if ((pos = header.find("HTTP/1.1\r\n")) == std::string::npos)
+	{
+		std::cout << "Erreur pas http/1/" << std::endl;
+		exit(1);
+	}
+	if ((pos = header.find("Host: ")) == std::string::npos)
+	{
+		std::cout << "Erreur pas host" << std::endl;
+		exit(1);
+	}
+	if ((pos = header.find("Accept: ")) == std::string::npos)
+	{
+		std::cout << "Erreur pas Accept" << std::endl;
+		exit(1);
+	}
+
+	// on parcourt les servers pour voir lequel choisir en fonction du HOST
+	// on cherche le host;
+	pos = header.find("Host: ");
+	size_t end = header.find("\r\n", pos);
+	std::string tmp(header, pos + 6, end - (pos + 6));
+	std::cout << "on veut le server = " << tmp << std::endl;
+	std::cout << "le num du server du client = " << num << std::endl;
+	std::cout << " il y a :" << this->_data->ft_get_nbr_servers() << " server " << std::endl;
+	size_t i = 0;
+	if (this->_data->ft_get_nbr_servers() == 1)
+		return (0);
+	while ( i < this->_data->ft_get_nbr_servers())
+	{
+		std::cout << " host + port = " << this->_servers[i].host_server << " et " << this->_servers[i].port_server << std::endl;
+		if (this->_servers[i].host_server == this->_servers[num].host_server)
+		{
+			if (this->_servers[i].port_server == this->_servers[num].port_server)
+			{
+				if (tmp == this->_servers[i].name_server)
+				{
+					std::cout << "BINGO on utilise le server numero : = " << i << std::endl;
+					exit(1);
+				}
+			}
+		}
+		i++;
+		
+		// if (tmp == this->_servers[i].name_server && num == (int)i)
+		// {
+		// 	// if (num == (int)i)
+		// 	// {
+		// 		std::cout << "Bingo = " << tmp << " et server = "  << i << std::endl;
+		// 		exit(1);
+		// 	// }
+		// }
+		// i++;
+	}
+	std::cout << "On trouve pas le nom qui correspond  on retourne num :" << num << std::endl;
+	return (num);
+
+}
+
+
+
 HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int len_msg, std::string msg )
 {
 	std::cout << "le client : " << port_client << " est dans parser requete" << std::endl;
@@ -24,6 +88,18 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		std::cout << "ERTRREUR impossible " << std::endl;
 		exit(1);
 	}
+	size_t pos = 0;
+	if ((pos = msg.find("\r\n\r\n")) == std::string::npos)
+	{
+		std::cout << "ERREURURURUR ";
+		exit(1);
+	}
+	std::string tmp(msg, 0, pos);
+	this->ft_choose_wich_server(tmp, port_client);
+
+	// std::cout << "MSG = " << msg << std::endl;
+	exit(1);
+
 
 	std::string request_http(msg);  // useless
 	if (request_http.compare(0, 4, "GET ") == 0)

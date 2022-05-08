@@ -58,6 +58,8 @@ typedef struct                  s_server {
 
 			std::vector<t_location>		location;
 			size_t						nbr_location;
+
+			// bool						binded;
 		}                               t_server;
 
 
