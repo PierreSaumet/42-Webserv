@@ -81,13 +81,13 @@ size_t			Cgi_exec::ft_setup_env_cgi( void )
 	//	A rajouter un status code ? je ne sais pas si ca existe mais Jerome m'a dit que oui
 	//this->_env_cgi.insert(std::pair<std::string, std::string>("REDIRECT_STATUS", "NULL"));
 
-	std::cout << "this->_env_cgi contains : " << std::endl;
-	std::map<std::string, std::string>::const_iterator		it_b = this->_env_cgi.begin();
-	std::map<std::string, std::string>::const_iterator		it_e = this->_env_cgi.end();
-	for ( ; it_b != it_e; it_b++)
-	{
-		std::cout << "it_b->first = " << it_b->first << " and it_b->second = " << it_b->second << std::endl;
-	}
+	// std::cout << "this->_env_cgi contains : " << std::endl;
+	// std::map<std::string, std::string>::const_iterator		it_b = this->_env_cgi.begin();
+	// std::map<std::string, std::string>::const_iterator		it_e = this->_env_cgi.end();
+	// for ( ; it_b != it_e; it_b++)
+	// {
+	// 	std::cout << "it_b->first = " << it_b->first << " and it_b->second = " << it_b->second << std::endl;
+	// }
 	return (0);
 }
 
@@ -203,7 +203,9 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 
 	pid_t pid;
 	int stdin_tmp = dup(STDIN_FILENO);
+	std::cout << "stdin_tmp = " << stdin_tmp << std::endl;
 	int stdout_tmp = dup(STDOUT_FILENO);
+	std::cout << "stdout_tmp = " << stdout_tmp << std::endl;
 
 	FILE *file_in = tmpfile();		// cree un fichier temporaire dans le cas de grosse donnees je pense
 	if (file_in == NULL)
@@ -247,15 +249,15 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	else if (pid == 0)		// enfant 
 	{
 		// On duplique les files descriptors d'entree et de sortie.
-		if (dup2(fd_in, 0) == -1) // STDIN_FILENO
+		if (dup2(fd_in, STDIN_FILENO) == -1) // STDIN_FILENO
 		{
 			std::cout << "erreur dup2 fd_in " << std::endl;
 			std::cout << "doit retourner une erruer" << std::endl;
 			exit(1);
 		}
-		if (dup2(fd_out, 1) == -1) // STDOUT_FILENO
+		if (dup2(fd_out, STDOUT_FILENO) == -1) // STDOUT_FILENO
 		{
-			std::cout << "erreur dup2 fd_in " << std::endl;
+			std::cout << "erreur dup2 fd_out " << std::endl;
 			std::cout << "doit retourner une erruer" << std::endl;
 			exit(1);
 		}
@@ -298,39 +300,56 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 
 	}
 
-	// std::cout << RED << "\n\n\nFINNN " << CLEAR << std::endl;
-	// for (unsigned long i = 0; i < aArgs.size(); i++)
-	// {
 
-	// 	std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
-	// }
+	std::cerr << "ici avant dup stdin_tmp " << strerror(errno) << std::endl;
 	
-
-	// it = aEnv.begin();
-	// for (; it != aEnv.end(); it++)
-	// {
-	// 	std::cout << "it = " << *it << std::endl;
-	// }
+	dup2(stdin_tmp, STDIN_FILENO);
+	std::cerr << "dup stdin_tmp:\t" << strerror(errno) << std::endl;
+	dup2(stdout_tmp, STDOUT_FILENO);
+	std::cerr << "dup stdout_tmp:\t" << strerror(errno) << std::endl;
 
 
-	// for (unsigned long i = 0; i < aEnv.size(); i++)
-	// {
+	close(stdin_tmp);
+	std::cerr << "close stdin_tmp:\t" << strerror(errno) << std::endl;
 
-	// 	std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
+	close(stdout_tmp);
+	std::cerr << "close stdout _tmp:\t" << strerror(errno) << std::endl;
+	// close(fd_in);  // aimepas etre dernier
+	// std::cerr << "close fd_in:\t" << strerror(errno) << std::endl;
+	fclose(file_in);
+	std::cerr << "close file in:\t" << strerror(errno) << std::endl;
 
-	// }
+
+	fclose(file_out);
+	std::cerr << "close file out:\t" << strerror(errno) << std::endl;
+
+
+
+
+
+
+
+
+
+
+
+
+	// close(fd_out);
+	// std::cerr << "close fd_out:\t" << strerror(errno) << std::endl;
+
+
+
+
+
 	// exit(1);
 
-	dup2(stdin_tmp, 0);
-	dup2(stdout_tmp, 1);
-	fclose(file_in);
-	fclose(file_out);
-	close(fd_in);
-	close(fd_out);
-	close(stdin_tmp);
-	close(stdout_tmp);
 
-	// faut nettoyer pour les leaks
+
+
+	// exit(1);
+
+
+
 	for (unsigned long i = 0; i < aEnv.size(); i++)
 	{
 		delete [] sysEnv[i];
@@ -342,7 +361,16 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		delete [] sysCline[i];
 	}
 	delete [] sysCline;
+	
 
+	
+	// close(stdin_tmp);
+	// std::cerr << "ici  close stdin_tmp " << strerror(errno) << std::endl;
+
+
+	// faut nettoyer pour les leaks
+
+	
 	return (this->ft_return_string_cgi());
 }
 

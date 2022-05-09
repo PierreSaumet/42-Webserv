@@ -497,8 +497,8 @@ bool         	Parsing::ft_find_server_name( size_t k, std::vector<std::string> t
 
 	if (this->_servers[index_server].name_server.size() == 0)
 		throw Error(25, "Error, in 'server_name' directive, you should put a name'.", 1);
-	std::cout << "server_name = " << this->_servers[index_server].name_server << std::endl;
-	std::cout << "index server = " << index_server << std::endl;
+	// std::cout << "server_name = " << this->_servers[index_server].name_server << std::endl;
+	// std::cout << "index server = " << index_server << std::endl;
 
 	len = 0;
 	while (len < index_server)
@@ -531,18 +531,18 @@ bool ft_check_host( std::string const host )
 {
 	size_t i = 0;
 
-	std::cout << "\n\n host = " << host << std::endl;;
+	// std::cout << "\n\n host = " << host << std::endl;;
 	if (host[0] == '.' || host[host.size()] == '.')
 		return (true);
 
 	while (i < host.size())
 	{
-		std::cout << "host[i] = " << host[i] << std::endl;
+		// std::cout << "host[i] = " << host[i] << std::endl;
 		if (host[i] == '.' && host[i + 1] == '.')
 			return (true);
 		i++;
 	}
-	std::cout << "GOOD" << std::endl;
+	// std::cout << "GOOD" << std::endl;
 	return (false);
 }
 
@@ -559,9 +559,7 @@ bool all_digit(std::string string)
 
 bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, size_t index_server) 
 {
-	(void)k;
-	(void)tmp;
-	std::cout << "tmp[k] = " << tmp[k] <<std::endl;   // listen
+
 	k += 1;
 	size_t pos = 0;
 	std::string total(tmp[k]);
@@ -586,8 +584,8 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 	}
 	else
 	{
-		std::cout << "on a le host et le port" << std::endl;
-		std::cout << "la separation est : [os = " << pos << std::endl;
+		// std::cout << "on a le host et le port" << std::endl;
+		// std::cout << "la separation est : [os = " << pos << std::endl;
 		if (pos == 0 || pos == total.size() - 2)
 			throw Error(12, "Error, in 'listen directive' server's bloc,  it should have ':' between post and host.", 1); 
 		
@@ -621,80 +619,11 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 		if (ft_check_host(tmp_host) == true)
 			throw Error(16, "Error, in 'listen directive' server's bloc,  host is not correctly setup.", 1);
 		this->_servers[index_server].host_server = tmp_host;
-		std::cout << "host = " << tmp_host << std::endl;
-		std::cout << "port = " << tmp_port << std::endl;
+		// std::cout << "host = " << tmp_host << std::endl;
+		// std::cout << "port = " << tmp_port << std::endl;
 		return (false);
 	}
-	exit(1);
-	// size_t pos_port;
-	// // a refaire
-	// std::cout << "tmp[k] = " << tmp[k] << std::endl;
-	// k += 1;
-	// std::string tmp_str(tmp[k]);
-	
-	// // std::cout << "tmp[k] = " << tmp[k] << std::endl;
-
-	// if (tmp_str[tmp_str.size() - 1 ] != ';')
-	// 	throw Error(16, "Error, in 'listen directive' server's bloc,  it should end with ';'.", 1);
-	// if ((pos_port = tmp_str.find(":")) == std::string::npos)
-	// 	throw Error(16, "Error, in 'listen directive' server's bloc,  it should have ':' between post and host.", 1);
-
-	// std::string tmp_host(tmp_str, 0, pos_port);
-	// std::string tmp_port(tmp_str, pos_port + 1, tmp_str.size() );
-
-	// // on gere le host
-	// std::cout << "szie host = " << tmp_host.size() << std::endl;
-	// if (tmp_host.size() < 7)
-	// 	throw Error(16, "Error, in 'listen directive' server's bloc,  host is not correctly setup.", 1);
-	// if (ft_count_dot(tmp_host) == false)
-	// 	throw Error(16, "Error, in 'listen directive' server's bloc,  host should have 3 dots.", 1);
-	
-	// ft_check_host(tmp_host);
-	
-	
-	// std::cout << "check dot = " << ft_count_dot(tmp_host) << std::endl;
-
-	// std::cout << "tmp_host = " << tmp_host << std::endl;
-	// std::cout << "tmp_port = " << tmp_port << std::endl;
-
-	// std::cout << "tmp_str = " << tmp_str << std::endl;
-
-
-
-	// exit(1);
-	// k += 1;
-	// size_t      len = tmp[k].size();
-	// if (tmp[k][len] != '\0')
-	// 	throw Error(15, "Error, in 'listen directive' it should end with '\0'.", 1);
-	// if (tmp[k][len - 1] != ';')
-	// 	throw Error(16, "Error, in 'listen directive' it should end with ';'.", 1);
-	// if (tmp[k].find(":", 0) == std::string::npos)
-	// 	throw Error(17, "Error, in 'listen directive' it should have a ':' between host and port.", 1);
-	// if (len > 15)
-	// 	throw Error(18, "Error, in 'listen directive' it has bad host or port.", 1);
-	// if (tmp[k].compare(0, 10, "127.0.0.1:") != 0 && tmp[k].compare(0, 10, "localhost:") != 0)
-	// 	throw Error(19, "Error, in 'listen directive' host should be 127.0.0.1 or 'localhost'.", 1);
-
-	// size_t i = 9;
-	// while (++i < tmp[k].size())
-	// {
-	// 	if (isdigit(tmp[k][i]) == 0)
-	// 		if (i < tmp[k].size() - 1)
-	// 			throw Error(20, "Error, in 'listen directive' port should only have digit and a semicolon at the end.", 1);
-	// }
-	this->_servers[index_server].host_server = "127.0.0.1";  //tmp[k].substr(0, 9);
-	this->_servers[index_server].port_server = 8080; //std::strtol(tmp[k].substr(10, 4).c_str(), NULL, 10);
-	
-	std::cout << "le host est : " << this->_servers[index_server].host_server << std::endl;
-	std::cout << "le port est : " << this->_servers[index_server].port_server << std::endl;
-	// exit(1);
-
-	if (this->_servers[index_server].port_server < 1 || this->_servers[index_server].port_server > 65535)
-		throw Error(21, "Error, in 'listen directive'  port should be between 0 and 65535.", 1);
-	
-	if (this->_servers[index_server].host_server == "localhost")
-		this->_servers[index_server].host_server = "127.0.0.1";
-	return false;
+	return (true);
 }
 
 

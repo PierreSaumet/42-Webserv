@@ -63,10 +63,12 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		this->ft_do_error(400);
 		return (this->_header_requete[0]);
 	}
-	
+
 	if (header.compare(0, 4, "GET ") == 0)
 	{
 		this->ft_get(request, len_msg);
+	// 	std::cerr << "ici " << strerror(errno) << std::endl;
+	// exit(1);
 		return (this->_header_requete[0]);
 	}
 	else if (header.compare(0, 5, "POST ") == 0)
@@ -174,10 +176,10 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 				this->_header_requete[0].request_uri = this->_header_requete[0].path;
 				this->_header_requete[0].script_file_name = this->_header_requete[0].path;
 			}
-			std::cout << "fin = \n" << std::endl;
-			std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
-			std::cout << "this->_header_requete[0].request_uri  = " << this->_header_requete[0].request_uri  << std::endl;
-			std::cout << "this->_header_requete[0].script_file_name = " << this->_header_requete[0].script_file_name << std::endl;
+			// std::cout << "fin = \n" << std::endl;
+			// std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
+			// std::cout << "this->_header_requete[0].request_uri  = " << this->_header_requete[0].request_uri  << std::endl;
+			// std::cout << "this->_header_requete[0].script_file_name = " << this->_header_requete[0].script_file_name << std::endl;
 
 			// We get the total path for the varriable path_http
 			char	cwd[256];
@@ -189,7 +191,12 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 			this->_header_requete[0].path_http.append("/");
 			this->_header_requete[0].path_http.append(this->_header_requete[0].script_file_name);
 
+
+			
 			this->ft_exec_cgi_test(); //request_http, len_msg);
+
+			// std::cerr << "ici " << strerror(errno) << std::endl;
+			// exit(1);
 			return (0);
 		}
 		std::cout << "pas de cgi" << std::endl;

@@ -22,8 +22,8 @@ std::string		HttpServer::ft_setup_response_to_send( t_header_request requete )
 	std::string res;
 	FILE *input_file = NULL;
 
-	std::cout << "test on affiche la requete " << std::endl;
-	std::cout << "requete path = " << requete.path << std::endl;
+	// std::cout << "test on affiche la requete " << std::endl;
+	// std::cout << "requete path = " << requete.path << std::endl;
 
 	// exit(1);
 
@@ -39,9 +39,9 @@ std::string		HttpServer::ft_setup_response_to_send( t_header_request requete )
 	}
 
 	std::string header = ft_setup_header(requete);
-    std::cout << "le fichier demande  est = -" << requete.path << "-" << std::endl;
-	std::cout << "le header recu est = " << header << std::endl;
-	std::cout << "taille du header = " << header.size() << std::endl;
+    // std::cout << "le fichier demande  est = -" << requete.path << "-" << std::endl;
+	// std::cout << "le header recu est = " << header << std::endl;
+	// std::cout << "taille du header = " << header.size() << std::endl;
 	if (requete.error == true || requete.cgi == true || requete.return_used == true)
 		return (header);
 	input_file = fopen(requete.path.c_str(), "rb");
@@ -147,8 +147,12 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 				return (the_header);
 			}
 		}
-		// atentio
-		// tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
+		// Attention erreur
+		tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
+		
+		
+		
+		
 		tmp.insert(0, this->ft_get_server_name());
 		tmp.insert(0, this->ft_get_date());
 
@@ -157,6 +161,12 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 		else if (tmp.find("Status: 200", pos) != std::string::npos)
 			requete.num_error = 200;
 		tmp.insert(0, this->ft_get_status(requete, true));
+
+
+		std::cout << " tmp = " << tmp << std::endl;
+		std::cout << " tmp.sie() " << tmp.size() << std::endl;
+		std::cout << "pos = " << pos << std::endl;
+		// exit(1);
 		return (tmp);
 	}
 

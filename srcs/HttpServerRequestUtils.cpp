@@ -22,7 +22,7 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 	else
 	{
 		std::cout << "\tIl y a des donnees a parser dans la requete GET." << std::endl;
-		exit(1);
+		// exit(1);
 		std::string tmp;
 		pos_cursor++;
 		size_t len = this->_header_requete[0].path.length();
@@ -61,7 +61,7 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 		}
 	}
 	this->_header_requete[0].query_string.erase(this->_header_requete[0].query_string.end() - 1);
-	return ("");
+	return (this->_header_requete[0].query_string);
 }
 
 

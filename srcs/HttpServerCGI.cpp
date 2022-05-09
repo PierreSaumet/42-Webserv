@@ -91,7 +91,7 @@ void			HttpServer::ft_exec_cgi_test( void )
 	// std::cout << "num_error = " << this->_header_requete[0].num_error << std::endl;
 	// std::cout << "body_error = " << this->_header_requete[0].body_error << std::endl;
 
-	// uselss ????? 
+	// // uselss ????? 
 	// std::map<std::string, std::string>::iterator it = this->_header_requete[0].data.begin();
 	// std::cout << "data = " << std::endl;
 	// for (; it != this->_header_requete[0].data.end(); it++)
@@ -115,6 +115,7 @@ void			HttpServer::ft_exec_cgi_test( void )
 		this->_cgi->setHttpAccept(this->_header_requete[0].accept);
 		this->_cgi->setPathInfo(this->_header_requete[0].path_http);
 		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
+		std::cout << "query string = " << this->_header_requete[0].query_string << std::endl;
 		this->_cgi->setQueryString(this->_header_requete[0].query_string);
 		this->_cgi->setRedirectStatus("200");
 		this->_cgi->setStatusCode("200");
@@ -132,9 +133,13 @@ void			HttpServer::ft_exec_cgi_test( void )
 		std::string 	tmp = this->_header_requete[0].script_file_name;
 
 		// need to be delete
-		this->_cgi->ft_display_all_variable_env();
-
+		// this->_cgi->ft_display_all_variable_env();
+		
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp);
+		// std::cerr << "ici " << strerror(errno) << std::endl;
+		// 	exit(1);
+		// std::cout << "retourne cgi =  " << this->_header_requete[0].body_error  << std::endl;
+		// exit(1);
 		return ;
 	}
 	else if (this->_header_requete[0].method == "POST")
