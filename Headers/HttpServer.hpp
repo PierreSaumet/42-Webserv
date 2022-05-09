@@ -150,8 +150,8 @@ class HttpServer {
 		/*
 		**	Functions in HttpServerResponse.cpp, used to setup the header and the body response to send to the client
 		*/
-		std::string			ft_setup_response_to_send( t_header_request requete );
-		std::string			ft_setup_header( t_header_request requete );
+		std::string			ft_setup_response_to_send( t_header_request *requete );
+		std::string			ft_setup_header( t_header_request *requete );
 
 
 		/*
@@ -191,10 +191,10 @@ class HttpServer {
 
 		std::string		ft_get_content_length( struct stat buff, size_t len, size_t len_header ) const;
 		std::string		ft_get_end_header( void ) const;
-		std::string		ft_get_content_type(t_header_request requete, size_t binary ) const;
+		std::string		ft_get_content_type(t_header_request *requete, size_t binary ) const;
 		std::string		ft_get_charset( void ) const;
 		std::string		ft_get_server_name( void ) const;
-		std::string		ft_get_status( t_header_request requete, bool x ) const;
+		std::string		ft_get_status( t_header_request *requete, bool x ) const;
 		std::string		ft_get_date( void ) const;
 		std::string		ft_get_allow( void ) const;
 		std::string    	ft_get_code_redirection( void ) const;
@@ -208,9 +208,9 @@ class HttpServer {
 		*/
 		void			ft_setup_error_header( void );
 
-		void			ft_setup_error_header_response( t_header_request requete );
-		std::string			ft_find_error_html( t_header_request requete );
-		std::string			ft_create_error( t_header_request requete );
+		void			ft_setup_error_header_response( t_header_request *requete );
+		std::string			ft_find_error_html( t_header_request *requete );
+		std::string			ft_create_error( t_header_request *requete );
 		std::string			ft_return_error( void );
 
 		/*
@@ -233,7 +233,7 @@ class HttpServer {
 
 		size_t check_location( std::string path, std::string name_location );
 	
-		std::string ft_create_autoindex( t_header_request requete );
+		std::string ft_create_autoindex( t_header_request *requete );
 
 
 		int ft_redirection( void );

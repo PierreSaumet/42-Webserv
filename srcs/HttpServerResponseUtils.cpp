@@ -24,7 +24,7 @@ bool is_directory( std::string const &name_file )
 
 }
 
-std::string		HttpServer::ft_create_autoindex( t_header_request requete )
+std::string		HttpServer::ft_create_autoindex( t_header_request *requete )
 {
 	std::string string;
 	std::stringstream ss;
@@ -36,23 +36,23 @@ std::string		HttpServer::ft_create_autoindex( t_header_request requete )
 	DIR *dir = NULL;
 	struct dirent  *file = NULL;
 
-	requete.path.erase(0, 13);
-	std::string actual_folder = requete.path;
+	requete->path.erase(0, 13);
+	std::string actual_folder = requete->path;
 	actual_folder.erase(0, this->_servers[this->_num_serv].root_server.size());
 
 
-	std::cout << " file path = " << requete.path << std::endl;
+	std::cout << " file path = " << requete->path << std::endl;
 	std::cout << " actual folder = " << actual_folder << std::endl;
 	string = "<!DOCTYPE html><html><head><title>AutoIndex</title><style type=text/css>body {color: lightred;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>Auto-Index</h1>/";
 
-	if ((dir = opendir(requete.path.c_str())) != NULL)
+	if ((dir = opendir(requete->path.c_str())) != NULL)
 	{
 		while ((file = readdir(dir)) != NULL)
 		{
 			// std::cout << "dossier = " << file->d_name << std::endl;
 			std::string file_name = file->d_name;
 
-			if (is_directory(requete.path + "/" + file_name ))
+			if (is_directory(requete->path + "/" + file_name ))
 			{
 				std::cout << "dossier = " << file_name << std::endl;
 				file_name += '/';
@@ -218,7 +218,7 @@ std::string  HttpServer::ft_get_code_redirection( void ) const
 	exit(1);
 }
 
-std::string		HttpServer::ft_get_status( t_header_request requete, bool x ) const 
+std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) const 
 {
 	// a changer lol
 
@@ -263,7 +263,7 @@ std::string		HttpServer::ft_get_status( t_header_request requete, bool x ) const
 	list_error.insert(std::pair<size_t, std::string>(510, "Not Extended"));
 	list_error.insert(std::pair<size_t, std::string>(511, "Network Authentification Required"));
 
-	if (requete.error == true)
+	if (requete->error == true)
 	{
 		std::string status_str;
 		status_str = "\r\n";
@@ -271,7 +271,7 @@ std::string		HttpServer::ft_get_status( t_header_request requete, bool x ) const
 		std::map<size_t, std::string>::iterator it_b = list_error.begin();
 		for (; it_b != list_error.end(); it_b++)
 		{
-			if (it_b->first == requete.num_error)
+			if (it_b->first == requete->num_error)
 			{
 				status_str.insert(0, it_b->second);
 				status_str.insert(0, " ");
@@ -288,19 +288,19 @@ std::string		HttpServer::ft_get_status( t_header_request requete, bool x ) const
 			}
 		}
 	}
-	else if (requete.return_used == true)
+	else if (requete->return_used == true)
 	{
 		return (this->ft_get_code_redirection());
 	}
 	else
 	{
-		if (requete.num_error == 200)
+		if (requete->num_error == 200)
 			return ("HTTP/1.1 200 OK\r\n");
-		if (requete.num_error == 201)
+		if (requete->num_error == 201)
 			return ("HTTP/1.1 201 Created\r\n");
-		if (requete.num_error == 204)
+		if (requete->num_error == 204)
 			return ("HTTP/1.1 204 No Content\r\n");
-		if (requete.num_error == 500)
+		if (requete->num_error == 500)
 			return ("HTTP/1.1 500 Internal Server Error\r\n");
 	}
 	// if (this->_servers[this->_num_serv].return_server.empty() == false)
@@ -327,7 +327,7 @@ std::string		HttpServer::ft_get_charset( void ) const			// peut etre a changer
 	return ("charset=UTF-8\r\n");
 }
 
-std::string		HttpServer::ft_get_content_type( t_header_request requete, size_t binary ) const		// peut etre a changer 
+std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t binary ) const		// peut etre a changer 
 {
 	std::vector<std::string> image;
 	image.push_back("gif");
@@ -359,16 +359,16 @@ std::string		HttpServer::ft_get_content_type( t_header_request requete, size_t b
 
 	if (binary == 1)
 	{
-		std::cout << "path = " << requete.path << std::endl;
+		std::cout << "path = " << requete->path << std::endl;
 		for( std::vector<std::string>::iterator it = image.begin(); it != image.end(); ++it)
 		{
-			size_t find = requete.path.find(*it, requete.path.size() - 5);
+			size_t find = requete->path.find(*it, requete->path.size() - 5);
 			std::cout << "it = " << *it << std::endl;
 			if (find != std::string::npos)
 			{
 				std::cout << "trouve ico ? " << std::endl;
-				std::cout << "find = " << find << " it-size = " << it->size() << " long path " << requete.path.size() << std::endl;
-				if (requete.path.size() == find + it->size())
+				std::cout << "find = " << find << " it-size = " << it->size() << " long path " << requete->path.size() << std::endl;
+				if (requete->path.size() == find + it->size())
 				{
 					std::cout << "IMAGE " << std::endl;
 					return ("Content-Type: image/" + *it + "; ");
@@ -380,10 +380,10 @@ std::string		HttpServer::ft_get_content_type( t_header_request requete, size_t b
 		// exit(1);
 		for( std::vector<std::string>::iterator it = music.begin(); it != music.end(); ++it)
 		{
-			size_t find = requete.path.find(*it);
+			size_t find = requete->path.find(*it);
 			if (find != std::string::npos)
 			{
-				if (requete.path.size() == find + it->size())
+				if (requete->path.size() == find + it->size())
 				{
 					std::cout << "SON " << std::endl;
 					if (*it == "mp3")
@@ -394,10 +394,10 @@ std::string		HttpServer::ft_get_content_type( t_header_request requete, size_t b
 		}
 		for( std::vector<std::string>::iterator it = video.begin(); it != video.end(); ++it)
 		{
-			size_t find = requete.path.find(*it);
+			size_t find = requete->path.find(*it);
 			if (find != std::string::npos)
 			{
-				if (requete.path.size() == find + it->size())
+				if (requete->path.size() == find + it->size())
 				{
 					std::cout << "video " << std::endl;
 					// if (*it == "mp3")
@@ -408,10 +408,10 @@ std::string		HttpServer::ft_get_content_type( t_header_request requete, size_t b
 		}
 		for( std::vector<std::string>::iterator it = autre.begin(); it != autre.end(); ++it)
 		{
-			size_t find = requete.path.find(*it);
+			size_t find = requete->path.find(*it);
 			if (find != std::string::npos)
 			{
-				if (requete.path.size() == find + it->size())
+				if (requete->path.size() == find + it->size())
 				{
 					std::cout << "autre " << std::endl;
 					// if (*it == "mp3")

@@ -14,18 +14,13 @@
 #include "../Headers/CGI_exec.hpp"
 
 
-std::string		HttpServer::ft_setup_response_to_send( t_header_request requete )				
+std::string		HttpServer::ft_setup_response_to_send( t_header_request *requete )				
 {
 	std::cout << GREEN << "\n\n ft_setup_response_to_send " << CLEAR << std::endl;
 	std::string file_contents;
 	struct stat buff;
 	std::string res;
 	FILE *input_file = NULL;
-
-	// std::cout << "test on affiche la requete " << std::endl;
-	// std::cout << "requete path = " << requete.path << std::endl;
-
-	// exit(1);
 
 	if (still_to_send > 0)
 	{
@@ -39,17 +34,19 @@ std::string		HttpServer::ft_setup_response_to_send( t_header_request requete )
 	}
 
 	std::string header = ft_setup_header(requete);
-    // std::cout << "le fichier demande  est = -" << requete.path << "-" << std::endl;
-	// std::cout << "le header recu est = " << header << std::endl;
-	// std::cout << "taille du header = " << header.size() << std::endl;
-	if (requete.error == true || requete.cgi == true || requete.return_used == true)
+
+	std::cout << "APRES ft_setup_header, requete->num_errorerreur = " << requete->error << std::endl;
+	// exit(1);
+
+
+	if (requete->error == true || requete->cgi == true || requete->return_used == true)
 		return (header);
-	input_file = fopen(requete.path.c_str(), "rb");
-	if (stat(requete.path.c_str(), &buff) < 0)
+	input_file = fopen(requete->path.c_str(), "rb");
+	if (stat(requete->path.c_str(), &buff) < 0)
 	{
 		std::cout << "Error dans ft_setup_response_to_send, cannot open the file, put error" << std::endl;
-		requete.error = true;
-		requete.num_error = 500;
+		requete->error = true;
+		requete->num_error = 500;
 		this->ft_setup_response_to_send(requete);
 		exit(1); //return;
 
@@ -103,9 +100,9 @@ int				ft_open_binary( std::string const path )
 	return (0);
 }
 
-std::string		HttpServer::ft_setup_header( t_header_request requete )
+std::string		HttpServer::ft_setup_header( t_header_request *requete )
 {
-	(void)requete;
+
 	std::string filename(this->_servers[this->_num_serv].index_server.c_str());
 	FILE *input_file = NULL;
 	std::string res;
@@ -115,10 +112,10 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 	//							 on verifie le path
 	std::cout << GREEN <<  "\nFonction ft_setup_header" << CLEAR << std::endl;
 
-	if (requete.error == true)
+	if (requete->error == true)
 	{
-		std::cout << "On a une erreur : " << requete.num_error << std::endl;
-		if (requete.body_error.empty() == false)
+		std::cout << "On a une erreur ICI : " << requete->num_error << std::endl;
+		if (requete->body_error.empty() == false)
 		{
 			the_header = ft_find_error_html(requete);
 			std::cout << "return de ft_setup_header : " << the_header << std::endl;
@@ -126,21 +123,23 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 		}
 		return (ft_create_error(requete));
 	}
-	if (requete.cgi == true)
+	
+
+	if (requete->cgi == true)
 	{
 		std::cout << "IL Y A DU CGI" << std::endl;
-		std::cout << "\n\n display = " << requete.body_error << std::endl;
+		std::cout << "\n\n display = " << requete->body_error << std::endl;
 		
-		std::string tmp = requete.body_error;
-		std::cout << "size requete .body error = " << requete.body_error.size() << std::endl;
+		std::string tmp = requete->body_error;
+		std::cout << "size requete .body error = " << requete->body_error.size() << std::endl;
 		size_t pos = tmp.find("\r\n\r\n");
 		if (pos == std::string::npos)
 		{
-			requete.error = true;
-			requete.num_error = 500;
+			requete->error = true;
+			requete->num_error = 500;
 
 			ft_setup_error_header_response(requete);
-			if (requete.body_error.empty() == false)
+			if (requete->body_error.empty() == false)
 			{
 				the_header = ft_find_error_html(requete);
 				std::cout << "ls return de ft_setup_header : " << the_header << std::endl;
@@ -160,25 +159,25 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 		tmp.insert(0, this->ft_get_date());
 
 		if (tmp.find("Status: 201", pos) != std::string::npos)
-			requete.num_error = 201;
+			requete->num_error = 201;
 		else if (tmp.find("Status: 200", pos) != std::string::npos)
-			requete.num_error = 200;
+			requete->num_error = 200;
 		tmp.insert(0, this->ft_get_status(requete, true));
 
 
 		return (tmp);
 	}
 
-	if (requete.return_used == true)
+	if (requete->return_used == true)
 	{
 		std::cout << GREEN << "redirection 301" << CLEAR << std::endl;
-		std::cout << "path de la requete = " << requete.path << std::endl;
+		std::cout << "path de la requete = " << requete->path << std::endl;
 		
 		the_header.insert(0, this->ft_get_end_header());
 		the_header.insert(0, "Content-Length: 0\r\n");
 		the_header.insert(0, this->ft_get_server_name());
 		the_header.insert(0, this->ft_get_date());
-		the_header.insert(0, "Location: " + requete.path + "\r\n");
+		the_header.insert(0, "Location: " + requete->path + "\r\n");
 		// the_header.insert(0, this->ft_get_return_location());
 		the_header.insert(0, this->ft_get_status(requete, true));
 		std::cout << "\nTHE HEADER FOR THE REDIRECTION = \n\n " << the_header << std::endl;
@@ -188,24 +187,24 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 
 
 	// A CHANGER
-	if (requete.path == "/")
+	if (requete->path == "/")
 	{
-		std::cout << "path = " << requete.path << std::endl;   
-		if (requete.return_used == false)
+		std::cout << "path = " << requete->path << std::endl;   
+		if (requete->return_used == false)
 		{
 			std::cout << "Dans le cas ou il y a pas de redirection :" << std::endl;
 
-			if (requete.path_file.empty() == true)
+			if (requete->path_file.empty() == true)
 			{
-				requete.path.append(this->_servers[this->_num_serv].index_server);
-				// requete.path.erase(0, 1);								// on supprime le /
-				requete.path.insert(0, this->_servers[this->_num_serv].root_server);
-				std::cout << "du coup path = " << requete.path << std::endl;
+				requete->path.append(this->_servers[this->_num_serv].index_server);
+				// requete->path.erase(0, 1);								// on supprime le /
+				requete->path.insert(0, this->_servers[this->_num_serv].root_server);
+				std::cout << "du coup path = " << requete->path << std::endl;
 				// exit(1);
 			}
 			else
 			{
-				requete.path = requete.path_file;
+				requete->path = requete->path_file;
 			}
 		}
 		else
@@ -216,12 +215,12 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 			return (the_header);
 
 		}
-		std::cout << "ICI path = " << requete.path << std::endl;
+		std::cout << "ICI path = " << requete->path << std::endl;
 	}
 	else
 	{
 		std::cout << "ici " << std::endl;
-		if (requete.path.compare(0, 13, "--AUTOINDEX--") == 0)
+		if (requete->path.compare(0, 13, "--AUTOINDEX--") == 0)
 		{
 			std::cout << "bingo autoindex exit" << std::endl;
 			the_header = this->ft_create_autoindex(requete);
@@ -233,29 +232,34 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 			the_header.insert(0, this->ft_get_date());
 			the_header.insert(0, this->ft_get_status(requete, true));
 			// on utilise la variable error pour retourner directement tout le header avecle body
-			requete.error = true;
+			requete->error = true;
 			return (the_header);
 			exit(1);
 		}
 	}
 
 
-	std::cout << "on doit avoir le fichier : " << requete.path << std::endl;
+	std::cout << "on doit avoir le fichier : " << requete->path << std::endl;
 
-	if (stat(requete.path.c_str(), &buff) < 0)	// le fichier existe pas on return 404
+	if (stat(requete->path.c_str(), &buff) < 0)	// le fichier existe pas on return 404
 	{
 		std::cout << RED << "on doit setup 404" << CLEAR << std::endl;
-		requete.error = true;
-		requete.num_error = 404;
+		requete->error = true;
+		requete->num_error = 404;
 
-		ft_setup_error_header();
-		if (requete.body_error.empty() == false)
+		// ft_setup_error_header();
+		std::cout << "avant requete->body = " << requete->body_error << std::endl;
+		ft_setup_error_header_response(requete);
+		std::cout << "apre requete->body = " << requete->body_error << std::endl;
+		if (requete->body_error.empty() == false)
 		{
 			the_header = ft_find_error_html(requete);
 			std::cout << "ls return de ft_setup_header : " << the_header << std::endl;
 			// exit(1);
 			return (the_header);
 		}
+		std::cout << RED << "ICI requete error = " << requete->error << CLEAR <<std::endl;
+		// exit(1);
 		return (ft_create_error(requete));
 
 	}
@@ -263,26 +267,26 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 
 	// doit ouvrir en binaire ? test afficher une image
 	size_t binary = 0;
-	if (ft_open_binary(requete.path) == 0)
+	if (ft_open_binary(requete->path) == 0)
 	{
 		std::cout << "classic" << std::endl;
-		input_file = fopen(requete.path.c_str(), "r");
+		input_file = fopen(requete->path.c_str(), "r");
 		
 	}
 	else
 	{
 		std::cout << "binary" << std::endl;
-		input_file = fopen(requete.path.c_str(), "rb");
+		input_file = fopen(requete->path.c_str(), "rb");
 		binary = 1;
 	}
 	
 	if (input_file == NULL)
 	{
-		requete.error = true;
-		requete.num_error = 503; // a changer
+		requete->error = true;
+		requete->num_error = 503; // a changer
 
 		ft_setup_error_header();
-		if (requete.body_error.empty() == false)
+		if (requete->body_error.empty() == false)
 		{
 			the_header = ft_find_error_html(requete);
 			std::cout << "ici return de ft_setup_header : " << the_header << std::endl;
