@@ -75,33 +75,6 @@ void			HttpServer::ft_exec_cgi_test( void )
 {
 	std::cout << GREEN << "\n\nDANS exec CGI ... " << CLEAR << std::endl;
 
-
-	// std::cout << "method = " << this->_header_requete[0].method << std::endl;
-	// std::cout << "path = " << this->_header_requete[0].path << std::endl;
-	// std::cout << "protocol = " << this->_header_requete[0].protocol << std::endl;
-	// std::cout << "host = " << this->_header_requete[0].host << std::endl;
-	// std::cout << "request_uri = " << this->_header_requete[0].request_uri << std::endl;
-	// std::cout << "script name = " << this->_header_requete[0].script_file_name << std::endl;
-	// std::cout << "accept = " << this->_header_requete[0].accept << std::endl;
-	// std::cout << "path_http = " << this->_header_requete[0].path_http << std::endl;
-	// std::cout << "query_string = " << this->_header_requete[0].query_string << std::endl;
-	// std::cout << "cgi_return = " << this->_header_requete[0].cgi_return << std::endl;
-	// std::cout << "cgi = " << this->_header_requete[0].cgi << std::endl;
-	// std::cout << "error = " << this->_header_requete[0].error << std::endl;
-	// std::cout << "num_error = " << this->_header_requete[0].num_error << std::endl;
-	// std::cout << "body_error = " << this->_header_requete[0].body_error << std::endl;
-
-	// // uselss ????? 
-	// std::map<std::string, std::string>::iterator it = this->_header_requete[0].data.begin();
-	// std::cout << "data = " << std::endl;
-	// for (; it != this->_header_requete[0].data.end(); it++)
-	// {
-	// 	std::cout << "first = " << it->first << " et = " << it->second << std::endl;
-
-	// }
-	// exit(1);
-
-	// Setup CGI's variables to NULL
 	std::cout << "\n ON SETUP les variables de _env_cgi " << std::endl;
 	this->_cgi->ft_setup_env_cgi();
 
@@ -136,10 +109,11 @@ void			HttpServer::ft_exec_cgi_test( void )
 		// this->_cgi->ft_display_all_variable_env();
 		
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp);
-		// std::cerr << "ici " << strerror(errno) << std::endl;
-		// 	exit(1);
-		// std::cout << "retourne cgi =  " << this->_header_requete[0].body_error  << std::endl;
-		// exit(1);
+		if (this->_header_requete[0].body_error == "")
+		{
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 500;
+		}
 		return ;
 	}
 	else if (this->_header_requete[0].method == "POST")
@@ -169,35 +143,22 @@ void			HttpServer::ft_exec_cgi_test( void )
 			std::string s = ss.str();
 			this->_cgi->setContentLength(s);
 		}
-
-		// pas necessaire
-		this->_cgi->ft_display_all_variable_env();
-		
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
 		
-		// A CCHANGE RSUREENT
-		// std::cout << "address cgi = " << this->_servers[0].cgi_path_server << std::endl;
 		std::string tmp_2 = this->_header_requete[0].script_file_name;
 		tmp_2.insert(0, this->_servers[0].root_server);
-		// std::cout << "tmp = " << tmp << std::endl;
-
-		std::cout << " AVANT EXECUTE CGI : " << std::endl;
-		std::cout << "first arg = -" << this->_servers[0].cgi_path_server << "-" << std::endl;
-		
-
-		std::cout << "test tmp_2 = / " << std::endl;
 		tmp_2 = "/";
-		std::cout << "second arg = -" << tmp_2 << "-" << std::endl;
-		// exit(1);
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
-		// std::cout << "BINGO ? = " << this->_header_requete[0].body_error << std::endl;
-		
+		{
+			this->_header_requete[0].error = true;
+			this->_header_requete[0].num_error = 500;
+		}
 	}
 	else
 	{
-		std::cout << "cgi maais pas de post ou get" << std::endl;
-		exit(1);
-	} 
+		this->_header_requete[0].error = true;
+		this->_header_requete[0].num_error = 500;
+	}
 	return ;
 }
 

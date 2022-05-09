@@ -283,9 +283,7 @@ void 			HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_
 {
 	long long 	ret = 0;
 
-	std::cout << "Avant setup response to send , requete error = " << it_client->request.error << std::endl;
 	_response_to_send = ft_setup_response_to_send(&it_client->request);
-	std::cout << "apres setup response to send , requete error = " << it_client->request.error << std::endl;
 	if ((ret = send(it_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0)) < 0)
 	{
 		std::cout << "SEND retourn -1 erreur " << std::endl;
@@ -295,13 +293,9 @@ void 			HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_
 		it_client = this->_all_client_socket.erase(it_client);
 		_DATA = 0;
 		return ;
-		// return (-1);
 	}
 	else
 	{
-		std::cout << "ON est ici on a return ret = " << ret  << " et size = " << _response_to_send.size() <<  std::endl;
-		std::cerr << strerror(errno) << std::endl;
-		std::cout << "\n";
 		if (ret == 0)
 		{
 			std::cout << "send a envoyer 100%" << std::endl;
@@ -311,7 +305,6 @@ void 			HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_
 			total_send = 0;
 			still_to_send = 0;
 			return ;
-			// return (-1);
 		}
 		if ((unsigned long)ret != _response_to_send.size())
 		{
@@ -320,7 +313,6 @@ void 			HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_
 			still_to_send = _response_to_send.size() - ret;
 			std::cout << "IL RESTE A ENVOYER : " << still_to_send << " sur : " << total_send << std::endl;
 			return ;
-			// return (0);
 		}		
 	}
 	return ;
@@ -568,8 +560,6 @@ int		HttpServer::ft_reading( void )
 int		HttpServer::ft_main_loop( void )
 {
 	_DATA = 0;
-	// std::cout << "Dans la boucle principale" << std::endl;
-	// std::cout << "signal = " << int_signal << std::endl;
 	while (int_signal == 0)
 	{
 		try {
@@ -578,17 +568,8 @@ int		HttpServer::ft_main_loop( void )
 			if (this->_return_select != 0 && int_signal == 0)
 			{
 				this->ft_check_isset();
-				if (this->ft_write() == 1)								// A FAIRE a changer quand erreur
-				{
-					// std::cout << "test_writing return -1" << std::endl;
-					return (1);
-				}
-				if (this->ft_reading() == 1)
-				{
-					// std::cout << "test_reading return -1" << std::endl;			// A FAIRE a changer quand erreur
-					return (1);
-				}
-				
+				this->ft_write();
+				this->ft_reading();
 			}		    
 		}
 		catch (std::exception &e)
@@ -596,16 +577,11 @@ int		HttpServer::ft_main_loop( void )
 			std::cout << " Error main loop" << std::endl;
 			std::cerr << e.what() << std::endl;
 			// std::cout << "dans catch error main loop " << std::endl;
-
 			// /* A FAIRE  */
-
 			break ;
 		}
 	}
 	this->ft_clean_socket_clients();
 	this->ft_clean_socket_servers();
-	
-
-	// std::cout << "FIN DU PROGRAMME " << std::endl;
 	return (0);
 }

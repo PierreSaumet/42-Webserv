@@ -143,7 +143,7 @@ class HttpServer {
 		*/
 		t_header_request				ft_parser_requete( int port_client, int len_msg, std::string request );
 		size_t				ft_get(std::string request_http, int len_msg);
-		size_t				ft_post(std::string request_http, int len_msg);
+		size_t				ft_post(std::string request_http );
 		size_t				ft_delete(std::string request_http, int len_msg);
 
 		

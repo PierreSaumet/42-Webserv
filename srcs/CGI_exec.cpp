@@ -159,12 +159,8 @@ OK	SERVER_NAME = le nom du server
 
 std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_file )
 {
-	std::cout << "Dans ft_execute_cgi " << std::endl;
-
-
 	std::cout << GREEN << "\n On est dans ft_execute_cgi : " << CLEAR << std::endl;
-	// std::cout << "body = " << this->_body_string_post << std::endl;
-	// exit(1);
+
 	char	**sysCline = NULL;
 	char	**sysEnv = NULL;
 	std::vector<std::string>		aArgs;
@@ -178,177 +174,79 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysCline[i] = new char[aArgs[i].size() + 1];
 		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
-		// std::cout << "syscline[" << i << "] = " << sysCline[i] << std::endl;
 	}
 	sysCline[aArgs.size()] = NULL;
 
-	// exit(1);
 	aEnv = this->ft_convert_map_to_vector();
-	std::cout << "\n\naEnv = " << std::endl;
-	std::vector<std::string>::iterator it = aEnv.begin();
-	for (; it != aEnv.end(); it++)
-	{
-		// std::cout << "it = " << *it << std::endl;
-	}
 
 	sysEnv = new char*[aEnv.size() + 1];
 	for (unsigned long i = 0; i < aEnv.size(); i++)
 	{
 		sysEnv[i] = new char[aEnv[i].size() + 1];
 		strncpy(sysEnv[i], aEnv[i].c_str(), aEnv[i].size() + 1);
-		// std::cout << "sysEnv[" << i << "] = " << sysEnv[i] << std::endl;
-
 	}
 	sysEnv[aEnv.size()] = NULL;
 
 	pid_t pid;
 	int stdin_tmp = dup(STDIN_FILENO);
-	std::cout << "stdin_tmp = " << stdin_tmp << std::endl;
 	int stdout_tmp = dup(STDOUT_FILENO);
-	std::cout << "stdout_tmp = " << stdout_tmp << std::endl;
 
 	FILE *file_in = tmpfile();		// cree un fichier temporaire dans le cas de grosse donnees je pense
 	if (file_in == NULL)
-	{
-		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
+		exit(1);
 	FILE *file_out = tmpfile();
 	if (file_out == NULL)
-	{
-		std::cout << "ERREUR ne peut pas creer un fichier temporaire" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
+		exit(1);
 	long fd_in = fileno(file_in);
 	if (fd_in == -1)
-	{
-		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
+		exit(1);
 	long fd_out = fileno(file_out);
 	if (fd_out == -1)
-	{
-		std::cout << "errreur ne permet pas d'identifier le file descriptor" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
-	}
+		exit(1);
 
-	
-	// Je ne suis pas sur de ca ... a voir plus tard
 	write(fd_in, this->_body_string_post.c_str(), this->_body_string_post.size());
-
 	//	On replace le curseur de lecture de fd_in au debut
 	lseek(fd_in, 0, SEEK_SET);
 
 	pid = fork();
-	if (pid == -1)
-	{
-		std::cerr << "For kcrash" << std::endl;
-		std::cout << "doit nretourner une erreur de type server genre 500" << std::endl;
+	if (pid < 0)
 		exit(1);
-	}
-	else if (pid == 0)		// enfant 
+	else if (pid == 0)
 	{
-		// On duplique les files descriptors d'entree et de sortie.
-		if (dup2(fd_in, STDIN_FILENO) == -1) // STDIN_FILENO
-		{
-			std::cout << "erreur dup2 fd_in " << std::endl;
-			std::cout << "doit retourner une erruer" << std::endl;
+		if (dup2(fd_in, STDIN_FILENO) == -1)
 			exit(1);
-		}
-		if (dup2(fd_out, STDOUT_FILENO) == -1) // STDOUT_FILENO
-		{
-			std::cout << "erreur dup2 fd_out " << std::endl;
-			std::cout << "doit retourner une erruer" << std::endl;
+		if (dup2(fd_out, STDOUT_FILENO) == -1)
 			exit(1);
-		}
 		// on execute le cgi avec execve
 		if (execve(sysCline[0], sysCline, sysEnv) == -1)
-		{
-			std::cerr << strerror(errno) << std::endl;
-			std::cerr << "Error cgi EXECVE" << std::endl;
-			std::cout << "doit retourner une erruer genre 500" << std::endl;
-		}
+			return ("");
 	}
 	else // parenmt
 	{
-		// on setup un buffer pour recuperer les donnees
-		//	a voir pour la taille, j'ai mis 2000 aleatoirement
-		unsigned char buffer[2000] = {0};
-
-		// on attend la fin du processus 
+		unsigned char		buffer[2000] = {0};
+		int 				ret = 1;
+		
 		waitpid(-1, NULL, 0);
-		//	on place la tete de lecture de fd_out au debut
 		lseek(fd_out, 0, SEEK_SET);
-		// std::cout << "dans parent apres waitpid" << std::endl;
-
-		int ret = 1;
 		while (ret > 0)
 		{
 			memset(buffer, 0, 2000);
-			// on lit fd_out et on le place dans le buffer
 			ret = read(fd_out, buffer, 2000 - 1);
-			// std::cout << "dans parents et buffer = " << buffer << std::endl;
-			// on termine la chaine de charactere par 0
 			buffer[ret] = 0;
 			if (ret > 0)
 			{
-				// std::cout << "\n\n bingo buffer = " << buffer << std::endl;
 				this->ft_add_to_cgi_string(buffer, ret );
-				// du coup faudra rajouter la chaine de charactere a une string a chaque lecture
 			}
 		}
 
 	}
 
-
-	std::cerr << "ici avant dup stdin_tmp " << strerror(errno) << std::endl;
-	
 	dup2(stdin_tmp, STDIN_FILENO);
-	std::cerr << "dup stdin_tmp:\t" << strerror(errno) << std::endl;
 	dup2(stdout_tmp, STDOUT_FILENO);
-	std::cerr << "dup stdout_tmp:\t" << strerror(errno) << std::endl;
-
-
 	close(stdin_tmp);
-	std::cerr << "close stdin_tmp:\t" << strerror(errno) << std::endl;
-
 	close(stdout_tmp);
-	std::cerr << "close stdout _tmp:\t" << strerror(errno) << std::endl;
-	// close(fd_in);  // aimepas etre dernier
-	// std::cerr << "close fd_in:\t" << strerror(errno) << std::endl;
 	fclose(file_in);
-	std::cerr << "close file in:\t" << strerror(errno) << std::endl;
-
-
 	fclose(file_out);
-	std::cerr << "close file out:\t" << strerror(errno) << std::endl;
-
-
-
-
-
-
-
-
-
-
-
-
-	// close(fd_out);
-	// std::cerr << "close fd_out:\t" << strerror(errno) << std::endl;
-
-
-
-
-
-	// exit(1);
-
-
-
-
-	// exit(1);
-
-
 
 	for (unsigned long i = 0; i < aEnv.size(); i++)
 	{
@@ -361,16 +259,6 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		delete [] sysCline[i];
 	}
 	delete [] sysCline;
-	
-
-	
-	// close(stdin_tmp);
-	// std::cerr << "ici  close stdin_tmp " << strerror(errno) << std::endl;
-
-
-	// faut nettoyer pour les leaks
-
-	
 	return (this->ft_return_string_cgi());
 }
 

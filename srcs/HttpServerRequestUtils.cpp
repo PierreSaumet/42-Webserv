@@ -17,13 +17,21 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 {
 	std::cout << RED << "Dans ft_parsing_path_get_request : FONCTION A CHANGER " << CLEAR << std::endl;
 	size_t		pos_cursor = this->_header_requete[0].path.find("?");
+	this->_header_requete[0].query_string = "";
 	if (pos_cursor == std::string::npos)
 		return ("");
 	else
 	{
 		std::cout << "\tIl y a des donnees a parser dans la requete GET." << std::endl;
-		// exit(1);
-		std::string tmp;
+		std::cout << "pos_cursor = " << pos_cursor << std::endl;
+		std::cout << "taille patg = " << this->_header_requete[0].path.size() << std::endl;
+		if (pos_cursor == this->_header_requete[0].path.size() - 1)
+			return ("");
+
+		std::string tmp = "";
+
+
+		
 		pos_cursor++;
 		size_t len = this->_header_requete[0].path.length();
 		while (this->_header_requete[0].path[pos_cursor])
@@ -60,6 +68,8 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 			pos_cursor++;
 		}
 	}
+	if (this->_header_requete[0].query_string.empty())
+		return ("");
 	this->_header_requete[0].query_string.erase(this->_header_requete[0].query_string.end() - 1);
 	return (this->_header_requete[0].query_string);
 }

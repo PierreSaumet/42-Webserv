@@ -67,12 +67,13 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	if (header.compare(0, 4, "GET ") == 0)
 	{
 		this->ft_get(request, len_msg);
-	// 	std::cerr << "ici " << strerror(errno) << std::endl;
-	// exit(1);
 		return (this->_header_requete[0]);
 	}
 	else if (header.compare(0, 5, "POST ") == 0)
-		this->ft_post(request, len_msg);
+	{
+		this->ft_post(request);
+		return (this->_header_requete[0]);
+	}
 	else if (header.compare(0, 7, "DELETE ") == 0)
 		this->ft_delete(request, len_msg);
 	else
@@ -121,6 +122,9 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		
 		this->_header_requete[0].query_string = this->ft_parsing_path_get_request();
 		std::cout << "On a la query_string : " << this->_header_requete[0].query_string << std::endl;
+
+		// std::cout << "ici" << std::endl;
+		// exit(1);
 
 		this->_header_requete[0].protocol = "HTTP/1.1";									// on a deja verifier ca avant
 		std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
@@ -199,11 +203,7 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 			// exit(1);
 			return (0);
 		}
-		std::cout << "pas de cgi" << std::endl;
-		
-		// A TERMINER
-		std::cout << "avant redirection num server = " << this->_num_serv << std::endl;
-		std::cout << "avant redirection num loc = " << this->_num_loc << std::endl;
+
 		if ((ret = this->ft_redirection()) == 1)
 		{
 			std::cout << "On a une redirection " << std::endl;
@@ -234,10 +234,9 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 /*
 **		A FAIRE CAS DES REQUETE POST
 */
-size_t			HttpServer::ft_post(std::string request_http, int len_msg)
+size_t			HttpServer::ft_post(std::string request_http)
 {
 	std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
-	(void)len_msg;
 	if (this->_header_requete.empty() == true)
 	{
 		int 					res = 0;
@@ -259,7 +258,7 @@ size_t			HttpServer::ft_post(std::string request_http, int len_msg)
 			chunked_string.append("\0");
 			size_body = chunked_string;
 		}
-		
+
 		// Now, we setup all variables need to display an answer
 		// so we check all informations from the header.
 
