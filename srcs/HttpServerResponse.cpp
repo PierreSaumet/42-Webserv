@@ -132,6 +132,7 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 		std::cout << "\n\n display = " << requete.body_error << std::endl;
 		
 		std::string tmp = requete.body_error;
+		std::cout << "size requete .body error = " << requete.body_error.size() << std::endl;
 		size_t pos = tmp.find("\r\n\r\n");
 		if (pos == std::string::npos)
 		{
@@ -148,9 +149,11 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 			}
 		}
 		// Attention erreur
+		std::cout << " tmp.sie() " << tmp.size() << std::endl;
+		std::cout << " tmp.sie() -pos = " << tmp.size() - pos<< std::endl;
 		tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
 		
-		
+		// exit(1);
 		
 		
 		tmp.insert(0, this->ft_get_server_name());
@@ -163,10 +166,6 @@ std::string		HttpServer::ft_setup_header( t_header_request requete )
 		tmp.insert(0, this->ft_get_status(requete, true));
 
 
-		std::cout << " tmp = " << tmp << std::endl;
-		std::cout << " tmp.sie() " << tmp.size() << std::endl;
-		std::cout << "pos = " << pos << std::endl;
-		// exit(1);
 		return (tmp);
 	}
 

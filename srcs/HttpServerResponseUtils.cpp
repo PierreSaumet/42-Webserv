@@ -441,10 +441,11 @@ std::string		HttpServer::ft_get_content_length( struct stat buff, size_t len, si
 	}
 	else
 	{
-		ss_tmp << len - 38;		// - 38 = Content-type: text/html; charset=UTF-8
+		ss_tmp << len - 38 - 4;		// - 38 = Content-type: text/html; charset=UTF-8
 		ss_tmp >> tmp_size;
 		tmp_size.append("\r\n");
 		tmp_size.insert(0, "Content-Length: ");
+		std::cout << "tmp _size = " << tmp_size << std::endl;
 		return (tmp_size);
 	}
 }
