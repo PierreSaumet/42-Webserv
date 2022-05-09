@@ -12,7 +12,7 @@
 
 #include "../Headers/HttpServer.hpp"
 
-int			HttpServer::ft_choose_wich_server( std::string header, int num )
+int HttpServer::ft_check_basic( std::string header )
 {
 	size_t 		pos = 0;
 	if ((pos = header.find("HTTP/1.1\r\n")) == std::string::npos)
@@ -21,6 +21,12 @@ int			HttpServer::ft_choose_wich_server( std::string header, int num )
 		return (-1);
 	if ((pos = header.find("Accept: ")) == std::string::npos)
 		return (-1);
+	return (0);
+}
+
+int			HttpServer::ft_choose_wich_server( std::string header, int num )
+{
+	size_t 		pos = 0;
 	pos = header.find("Host: ");
 
 	size_t		end = header.find("\r\n", pos);
@@ -41,28 +47,24 @@ int			HttpServer::ft_choose_wich_server( std::string header, int num )
 
 HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int len_msg, std::string request )
 {
-	size_t			pos = 0;
-	if (this->_header_requete.empty() == false)					// ca veut dire qu'une requete n'a pas ete clear apres son utilisation donc erreur interne
-	{
-		this->_header_requete.push_back(t_header_request());
-		this->ft_do_error(500);	
-		return (this->_header_requete[0]);								
-	}
-	if ((pos = request.find("\r\n\r\n")) == std::string::npos)	// ne trouve pas la fin du header
-	{
-		this->_header_requete.push_back(t_header_request());
-		this->ft_do_error(400);	
-		return (this->_header_requete[0]);
-	}
-
+	this->_num_serv = port_client;
+	this->_num_loc = 666;
+	size_t			pos = request.find("\r\n\r\n");
 	std::string 	header(request, 0, pos);
+	
 	std::cout << "\n\nHEader = \n" << header << std::endl;
-	if ((this->_num_serv = this->ft_choose_wich_server(header, port_client)) == -1 )	// manque des arguments
+	this->_num_serv = this->ft_choose_wich_server(header, port_client);	// manque des arguments
+	
+	std::cout << "on utilise le server = " << this->_num_serv << std::endl;
+	
+	if (ft_check_basic(header) < 0)
 	{
 		this->_header_requete.push_back(t_header_request());
+		this->_header_requete[0].path = this->ft_check_path_header(header);
 		this->ft_do_error(400);
 		return (this->_header_requete[0]);
 	}
+	// exit(1);
 
 	if (header.compare(0, 4, "GET ") == 0)
 	{
@@ -76,23 +78,11 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	}
 	else if (header.compare(0, 7, "DELETE ") == 0)
 		this->ft_delete(request, len_msg);
-	else
-	{
-		std::cout << "ERRUER NI GET NI POST NI DELETE = " <<  std::endl;
-		if (this->_header_requete.empty() == true)    // a changer
-		{
-			this->_header_requete.push_back(t_header_request());
-			this->ft_do_error(405);
-		}
-		else
-		{
-			this->_header_requete.push_back(t_header_request());
-			this->ft_do_error(500);
-		}
-	}
-	std::cout << "aie aie " << std::endl;
-	exit(1);
-	// return ;
+
+	std::cout << "ERRUER NI GET NI POST NI DELETE = " <<  std::endl;
+	this->_header_requete.push_back(t_header_request());
+	this->_header_requete[0].path = this->ft_check_path_header(header);
+	this->ft_do_error(405);
 	return (this->_header_requete[0]);
 }
 
@@ -359,9 +349,13 @@ size_t			HttpServer::ft_post(std::string request_http)
 			this->ft_exec_cgi_test(); //request_http, len_msg);
 			return (0);
 		}
-		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+		// std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+		this->_header_requete[0].error = true;
+		this->_header_requete[0].num_error = 400;
+		this->ft_setup_error_header();
 		return (0);
 	}
+	this->_header_requete[0].error = true;
 	return (ft_do_error(500));
 }
 

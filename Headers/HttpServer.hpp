@@ -247,7 +247,13 @@ class HttpServer {
 		long long int  convert_hex_to_dec( std::string const string );
 	
 		int ft_choose_wich_server( std::string header, int num);
-	
+
+		int ft_check_basic( std::string header );
+
+		void ft_setup_error_header_2( void );
+
+		void put_error_in_body( void );
+
 	private:
 
 		HttpServer( const HttpServer &copy );					// Copy constructor

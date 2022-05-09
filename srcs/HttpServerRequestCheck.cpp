@@ -192,7 +192,7 @@ std::string		HttpServer::ft_check_protocol_header( std::string header )
 std::string		HttpServer::ft_check_path_header( std::string header )
 {
 	size_t		pos = header.find_first_of("/", 0);
-	size_t		pos_http = header.find("HTTP/1.1\r\n");
+	size_t		pos_http = header.find("HTTP/");
 
 	if (pos > pos_http)
 		return ("");

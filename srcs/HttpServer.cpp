@@ -370,15 +370,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 						std::cout << "la 5" << std::endl;
 						pos = tt_buffer.find("Content-Type: multipart/form-data;");
 						if (pos == std::string::npos)
-						{
-							std::cout << "Erreur requete post content-type a changer" << std::endl; // doit setup bad request 400
-							exit(1);
-							// this->_header_requete.push_back(t_header_request());
-							// this->_header_requete[0].error = true;
-							// this->_header_requete[0].num_error = 400;
-							// return (1);
-							
-						}
+							return (1);
 						else
 						{
 							std::cout << "la 6" << std::endl;
@@ -386,10 +378,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 							std::string tmp(tt_buffer, pos + 34, pos_end - pos - 34);
 							pos = tmp.find("boundary=");
 							if (pos == std::string::npos)
-							{
-								std::cout << "Erreur requete post pas de boundary dans le formulaire multipart" << std::endl;
-								exit(1);
-							}
+								return (1);
 							else
 							{
 								if (tmp[0] == ' ')
@@ -442,6 +431,8 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		}
 		else
 		{
+			std::cout << "this->_recv_complete.chunked = " << this->_recv_complete.chunked <<std::endl;
+			std::cout << "tt_buffer " << tt_buffer << std::endl;
 			std::cout << "ici" <<std::endl;
 			std::cout << "size tt_buffer " << tt_buffer.size() << std::endl;
 			std::cout << "pos end header " << tt_buffer.find("\r\n\r\n");
@@ -559,6 +550,7 @@ int		HttpServer::ft_reading( void )
 */
 int		HttpServer::ft_main_loop( void )
 {
+	this->_recv_complete.chunked = false;
 	_DATA = 0;
 	while (int_signal == 0)
 	{

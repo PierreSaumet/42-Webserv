@@ -73,6 +73,81 @@ void			HttpServer::ft_setup_error_header_response( t_header_request *requete)
 	return ;
 }
 
+void HttpServer::put_error_in_body( void )
+{
+	this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].location[this->_num_loc].root_location);
+	this->_header_requete[0].body_error.insert(0, this->_servers[this->_num_serv].root_server);
+	
+	std::map<int, std::string>::iterator it_loc = this->_servers[this->_num_serv].location[this->_num_loc].error_location.begin();
+	for (; it_loc != this->_servers[this->_num_serv].location[this->_num_loc].error_location.end(); ++it_loc)
+	{
+		if (it_loc->first >= 0 && this->_header_requete[0].num_error == (size_t)it_loc->first)
+		{
+			this->_header_requete[0].body_error.append(it_loc->second);
+			struct stat buff;
+			stat(this->_header_requete[0].body_error.c_str(), &buff);
+			if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
+				this->_header_requete[0].body_error.append("/");
+			return ;
+		}
+	}
+}
+// We setup an error before goint to get or other
+void				HttpServer::ft_setup_error_header_2( void)
+{
+	std::string tmp = this->_header_requete[0].body_error;
+	if (this->_servers[this->_num_serv].nbr_location > 0)
+	{
+		std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
+		for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
+			all_location.push_back(it->name_location);
+		
+		std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
+		
+		size_t i = 0;
+		for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
+		{
+			if (*it == "/")
+			{
+				this->_num_loc = i;
+				this->put_error_in_body();
+				return ;
+			}
+			else
+			{
+				if (this->_header_requete[0].path.compare(0, it->size(), *it) == 0)
+				{
+					if (this->_header_requete[0].path.size() == it->size() || this->_header_requete[0].path[it->size()] == '/')
+					{
+						this->_num_loc = i;
+						this->put_error_in_body();
+						return ;
+					}
+				}
+			}
+			i++;
+		}
+		
+	}
+
+	this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].root_server);
+	
+	std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();
+	for (; it != this->_servers[this->_num_serv].error_server.end(); it++)
+	{
+		if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
+		{
+			this->_header_requete[0].body_error.append(it->second);
+			struct stat buff;
+			stat(this->_header_requete[0].body_error.c_str(), &buff);
+			if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
+				this->_header_requete[0].body_error.append("/");
+			return ;
+		}
+	}
+	this->_header_requete[0].body_error.clear();
+	return ;
+}
 
 /*
 **	void		pour gerer les requete
@@ -81,8 +156,19 @@ void			HttpServer::ft_setup_error_header( void)
 {
 	std::cout << GREEN << "Dans ft_setup_error_header" << CLEAR << std::endl;
 	std::string tmp = this->_header_requete[0].body_error;
+	std::cout << "ici ? " << std::endl;
+
+	if (this->_num_loc == 666)
+	{
+		std::cout << "_num_loc = 666 " << std::endl;
+		this->ft_setup_error_header_2();
+		return ;
+		exit(1);
+	}
+
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
+		std::cout << "on a des locations " << std::endl;
 		this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].location[this->_num_loc].root_location);
 		this->_header_requete[0].body_error.insert(0, this->_servers[this->_num_serv].root_server);
 		
@@ -108,24 +194,22 @@ void			HttpServer::ft_setup_error_header( void)
 	}
 	// else
 	// {
-		this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].root_server);
-		
-		std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();
-		for (; it != this->_servers[this->_num_serv].error_server.end(); it++)
+	this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].root_server);
+	
+	std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();
+	for (; it != this->_servers[this->_num_serv].error_server.end(); it++)
+	{
+		if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
 		{
-			if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
-			{
-				this->_header_requete[0].body_error.append(it->second);
-				struct stat buff;
-				stat(this->_header_requete[0].body_error.c_str(), &buff);
-				if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
-					this->_header_requete[0].body_error.append("/");
-				std::cout << "\n 0 bloc location body error contient = " << this->_header_requete[0].body_error << std::endl;
-				return ;
-			}
+			this->_header_requete[0].body_error.append(it->second);
+			struct stat buff;
+			stat(this->_header_requete[0].body_error.c_str(), &buff);
+			if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
+				this->_header_requete[0].body_error.append("/");
+			std::cout << "\n 0 bloc location body error contient = " << this->_header_requete[0].body_error << std::endl;
+			return ;
 		}
-	// }
-	// on met le body error a 0
+	}
 	this->_header_requete[0].body_error.clear();
 	std::cout << " body error = " << this->_header_requete[0].body_error << std::endl;
 	return ;
@@ -203,8 +287,8 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 		path_error.insert(0, this->ft_get_status(requete, true));
 		return (path_error);
 	}
-std::cout << "mince " << std::endl;
-	exit(1);
+// std::cout << "mince " << std::endl;
+// 	exit(1);
 	return (ft_create_error(requete)); // test
 }
 
