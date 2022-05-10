@@ -254,6 +254,8 @@ class HttpServer {
 
 		void put_error_in_body( void );
 
+		std::string ft_last_modified( void );
+
 	private:
 
 		HttpServer( const HttpServer &copy );					// Copy constructor

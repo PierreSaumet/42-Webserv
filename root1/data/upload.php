@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <html>
 	<head>
 		<title>upload</title>
@@ -12,7 +14,17 @@
 <body>
 	<h1> Test upload de fichier image </h1>
 
+
+	<form enctype="multipart/form-data" action="upload.php" method="POST">
+			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
+			<input type="submit" value="upload_file" />
+			</p>
+	</form>
+
+
 	<?php
+
+
     	if($_SERVER["REQUEST_METHOD"] == "POST"){
 			
 			if(isset($_FILES["uploadfile"]) && $_FILES["uploadfile"]["error"] == 0){
@@ -26,26 +38,24 @@
 				// path info retourne info sur le path
 				$ext = pathinfo($filename, PATHINFO_EXTENSION);
 				if(!array_key_exists($ext, $allowed)) die("Error: format not good");	// verifique dans le ext il y a allowed
-
-
-				// taille du fichier donc useless // a suppriner et a verifier soit meme
-				// $maxsize = 2 * 1024 * 1024; // 5mo
-				// if($filesize > $maxsize) exit("Error: fichir trop grad: ($filesize)");
-
 				
 				if (is_dir("upload/")) {
 					// le type mime 
 					if (in_array($filetype, $allowed)){	//verifie que filetype est dans allowed
-						// verifie sil existe
+						
 						if(file_exists("upload/" . $_FILES["uploadfile"]["name"])){	// verifie que upload/ + le nom du fichier existe
-							echo $_FILES["uploadfile"]["name"] . " existe deja ";	// il existe deja
+							
 							header("Status: 200 OK\r\n");
-							// header("Location: /get_post/upload/");
+							echo $_FILES["uploadfile"]["name"] . " existe deja ";	// il existe deja
+							
+					
 						} else{
 							move_uploaded_file($_FILES["uploadfile"]["tmp_name"], "upload/" . $_FILES["uploadfile"]["name"]); // verifiw aue le tmp file est un fichier telecharge et le deplace
-							echo "yes ca marche\n";
+							
 							header("Status: 201 Created\r\n");
-							// header("Content-Location: /get_post/upload/");
+							echo "yes ca marche\n";
+							// echo "Content-Length: " . $filesize;
+							
 						}
 					} else{
 						echo " marche pas";
@@ -58,10 +68,10 @@
 				echo "Error method ";
 			}
 		} else{
-			echo "Method not good kek bur";
+			// echo "Method not good kek bur";
 		}
 	?>
 
-	<p-> Maintenant cliquer ici pour le voir :   <a href="get-post/upload">ICI</a></p->
+	
 </body>
 </html>
