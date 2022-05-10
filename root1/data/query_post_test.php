@@ -12,9 +12,17 @@
     <h1> On a bien recu les donnees =): </h1>
    <h2>
  <?php
-	echo 'Tu t appelles : '.htmlspecialchars($_POST["name"]);
-	echo ' et ton texte est -'.htmlspecialchars($_POST["message"]);
-	echo '-';
+ 	if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+		if(isset($_POST["name"])) {
+		
+			if (isset($_POST["message"])) {
+			echo 'Tu t appelles : '.htmlspecialchars($_POST["name"]);
+			echo ' et ton texte est -'.htmlspecialchars($_POST["message"]);
+			echo '-';
+	 		}
+		}
+	}
 ?>
     </h2>
  </body>

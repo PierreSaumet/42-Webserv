@@ -147,6 +147,8 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 				return (the_header);
 			}
 		}
+
+		// kB (4 650 bytes
 		// Attention erreur
 		std::cout << " tmp.sie() " << tmp.size() << std::endl;
 		std::cout << " tmp.sie() -pos = " << tmp.size() - pos<< std::endl;

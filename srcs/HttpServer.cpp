@@ -124,26 +124,6 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 			this->_http_servers[i].svr_addr.sin_port = htons(this->_servers[i].port_server);
 
 
-			// if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
-			// {
-			// 	std::cerr << "error bind = " << strerror(errno) << std::endl;
-			// 	close(this->_http_servers[i].sock);
-			// 	throw Error(4, "Error, 'creation of server', cannot bind socket.", 2);
-			// }
-			// std::cout << "SERVER sock bind = " << this->_http_servers[i].sock << std::endl;
-			// if (listen(this->_http_servers[i].sock, this->_max_connections) < 0)
-			// {
-			// 	if (close(this->_http_servers[i].sock) < 0)
-			// 	{
-			// 		close(this->_http_servers[i].sock);
-			// 		throw Error(1, "Error, 'creation of server', cannot close socket.", 2);
-			// 	}
-			// 	throw Error(5, "Error, 'creation of server', cannot listen.", 2);
-			// }
-			// std::cout << GREEN << " Le server: -"<< this->_servers[i].name_server << "- tourne sur le host: -" << this->_servers[i].host_server << "- et le port: -" << this->_servers[i].port_server << "-" << CLEAR << std::endl;
-			// std::cout << std::endl;
-
-
 
 			// test si plusieurs servers on la meme addresse
 			size_t y= 0;
@@ -292,6 +272,7 @@ void 			HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_
 		close(it_client->client_socket);
 		it_client = this->_all_client_socket.erase(it_client);
 		_DATA = 0;
+		it_client->recv = false;
 		return ;
 	}
 	else
@@ -304,14 +285,17 @@ void 			HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_
 			_DATA = 0;
 			total_send = 0;
 			still_to_send = 0;
+			it_client->recv = false;
 			return ;
 		}
+		std::cout << "ret  = " << ret << " et response to send = " << _response_to_send.size() << std::endl;
 		if ((unsigned long)ret != _response_to_send.size())
 		{
 			std::cout << RED << "on a pas tout envoyer exit " << CLEAR << std::endl;
 			total_send = _response_to_send.size();
 			still_to_send = _response_to_send.size() - ret;
 			std::cout << "IL RESTE A ENVOYER : " << still_to_send << " sur : " << total_send << std::endl;
+			it_client->recv = true;
 			return ;
 		}		
 	}
@@ -326,17 +310,21 @@ int 		HttpServer::ft_write( void )
 	{
 		if (FD_ISSET(it_b_client->client_socket, &this->_write_fs))
 		{
-			if (it_b_client->recv == false)
-				break;
-
-			//if (_DATA == 0) // uselss?
-			//	break ;
-			std::cout <<  BLUE << "C'est le client : " << it_b_client->client_socket << " qui va recevoir les donnes " << CLEAR << std::endl;
-			this->ft_continue_send(it_b_client);
-			it_b_client->recv = false;
-			std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " a recu toutes les donnees" << CLEAR << std::endl;
-			std::cerr << strerror(errno) << std::endl;
-			std::cout << "\n\n";
+			// std::cout << "le client est pret a ecrire ? = " << it_b_client->client_socket << std::endl;
+			if (it_b_client->recv == true || still_to_send > 0)
+			{
+					
+				// std::cout << "it_b_client->recv = " << it_b_client->recv << std::endl;
+				// sleep(2);
+				//if (_DATA == 0) // uselss?
+				//	break ;
+				std::cout <<  BLUE << "C'est le client : " << it_b_client->client_socket << " qui va recevoir les donnes " << CLEAR << std::endl;
+				this->ft_continue_send(it_b_client);
+				it_b_client->recv = false;
+				std::cout <<  BLUE << "Le client : " << it_b_client->client_socket << " a recu toutes les donnees" << CLEAR << std::endl;
+				std::cerr << strerror(errno) << std::endl;
+				std::cout << "\n\n";
+			}
 		}
 	}
 	return (0);
@@ -417,7 +405,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 			else
 			{
 				std::cout << " On a du data chunked" << std::endl;
-				sleep(2);
+				// sleep(2);
 				this->_recv_complete.chunked = true;
 				pos = tt_buffer.find("0\r\n\r\n");				// On cherche la fin du transfer encoding
 				if (pos == std::string::npos)					// On n'a pas la fin, on continue de recuperer de la data
@@ -521,19 +509,21 @@ int		HttpServer::ft_reading( void )
 				std::cout <<  BLUE << "On a bien recu les donnees de client : " << it_b_client->client_socket << " on va les traiter" << CLEAR << std::endl;
 				std::cerr << strerror(errno) << std::endl;
 				still_to_send = 0;
+
+				std::cout << "chunk = " << this->_recv_complete.chunked << std::endl;
+				// sleep(2);
+
 				it_b_client->request = this->ft_parser_requete(it_b_client->num ,_tmp_buffer.size() , _tmp_buffer);
 				it_b_client->recv = true;
 				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
-				std::cout << "it_b_client test = " << it_b_client->request.method << std::endl;
-				std::cerr << strerror(errno) << std::endl;
-				std::cout << "good ?  " << std::endl;
-				// exit(1);
 				
-				// std::cout << "Euh good " 
 				this->_recv_complete.chunked = false;
 				this->_recv_complete.boundary.clear();
 				_tmp_buffer.clear();
 				_DATA = 1;
+				std::cout << "fin du traitement de la requete" << std::endl;
+				// sleep(2);
+				return (0);
 			}
 			else
 			{

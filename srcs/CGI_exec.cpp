@@ -205,6 +205,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		exit(1);
 
 	write(fd_in, this->_body_string_post.c_str(), this->_body_string_post.size());
+	
 	//	On replace le curseur de lecture de fd_in au debut
 	lseek(fd_in, 0, SEEK_SET);
 

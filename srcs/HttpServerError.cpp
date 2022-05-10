@@ -115,6 +115,9 @@ void				HttpServer::ft_setup_error_header_2( void)
 			}
 			else
 			{
+				std::cout << "*it = " << *it << std::endl;
+				std::cout << "comp = " << this->_header_requete[0].path.compare(0, it->size(), *it) << std::endl;
+				std::cout << " root = " << this->_header_requete[0].path << std::endl;
 				if (this->_header_requete[0].path.compare(0, it->size(), *it) == 0)
 				{
 					if (this->_header_requete[0].path.size() == it->size() || this->_header_requete[0].path[it->size()] == '/')
@@ -123,13 +126,13 @@ void				HttpServer::ft_setup_error_header_2( void)
 						this->put_error_in_body();
 						return ;
 					}
+
 				}
 			}
 			i++;
 		}
 		
 	}
-
 	this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].root_server);
 	
 	std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();

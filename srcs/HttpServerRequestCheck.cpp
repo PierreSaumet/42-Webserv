@@ -238,15 +238,15 @@ std::string		HttpServer::ft_check_content_type( std::string request_http )
 	size_t pos = request_http.find("Content-Type: ");
 	if (pos == std::string::npos)
 	{
-		std::cout << "Erreur dans POST le header n'a pas Content-TYPE" << std::endl;
-		exit(1);
+		pos = request_http.find("Content-type: ");
+		if (pos == std::string::npos)
+		{
+			return ("");
+		}
 	}
-	else
-	{
-		size_t pos_end = request_http.find("\r\n", pos);
-		std::string tmp(request_http, pos + 14, pos_end - (pos + 14));
-		return (tmp);
-	}
+	size_t pos_end = request_http.find("\r\n", pos);
+	std::string tmp(request_http, pos + 14, pos_end - (pos + 14));
+	return (tmp);
 }
 
 std::string		HttpServer::ft_check_content_length( std::string request_http )
@@ -254,17 +254,19 @@ std::string		HttpServer::ft_check_content_length( std::string request_http )
 	size_t pos = request_http.find("Content-Length: ");
 	if (pos == std::string::npos)
 	{
-		std::cout << "Erreur dans POST le header n'a pas Content-Length" << std::endl;
-		return ("");
-		exit(1);
+		pos = request_http.find("Content-length: ");
+		if (pos == std::string::npos)
+		{
+			// std::cout << "Erreur dans POST le header n'a pas Content-Length" << std::endl;
+			// std::cout << "requet t= " << request_http << std::endl;
+			// std::cout << "what the fuck" << std::endl;
+			return ("");
+		}
 	}
-	else
-	{
-		size_t pos_end = request_http.find("\r\n", pos);
-		std::string tmp(request_http, pos + 16, pos_end - (pos + 16));
+	size_t pos_end = request_http.find("\r\n", pos);
+	std::string tmp(request_http, pos + 16, pos_end - (pos + 16));
 		
-		return (tmp);
-	}
+	return (tmp);
 }
 
 std::string		HttpServer::ft_check_body_post( std::string request_http )

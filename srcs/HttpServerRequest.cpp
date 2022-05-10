@@ -94,8 +94,7 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 	if (this->_header_requete.empty() == true)
 	{
 		this->_header_requete.push_back(t_header_request());
-		if (len_msg > 1023)
-			return (ft_do_error(431));
+		
 
 		size_t 			pos_header = request_http.find("\r\n\r\n"); // faire erreur si pas de fin de header
 		std::string 	size_header(request_http, 0, pos_header);
@@ -109,6 +108,12 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		if (this->_header_requete[0].path.empty() == true)
 			return (ft_do_error(400));
 		std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
+
+		if (len_msg > 1023)
+		{
+			this->_header_requete[0].path = this->ft_check_path_header(size_header);
+			return (ft_do_error(431));
+		}
 		
 		this->_header_requete[0].query_string = this->ft_parsing_path_get_request();
 		std::cout << "On a la query_string : " << this->_header_requete[0].query_string << std::endl;
@@ -220,10 +225,6 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 	
 }
 
-
-/*
-**		A FAIRE CAS DES REQUETE POST
-*/
 size_t			HttpServer::ft_post(std::string request_http)
 {
 	std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
@@ -232,13 +233,12 @@ size_t			HttpServer::ft_post(std::string request_http)
 		int 					res = 0;
 		this->_header_requete.push_back(t_header_request());
 
-		size_t 					pos_hea = request_http.find("\r\n\r\n"); // si troue pas erreur
-		std::string 			size_header(request_http, 0, pos_hea);
+		size_t 					pos_header = request_http.find("\r\n\r\n"); // si troue pas erreur
+		std::string 			size_header(request_http, 0, pos_header);
 		std::string 			size_body(request_http, size_header.size(), request_http.size());		// on prend aussi le \r\n\r\n donc +4
 		std::string 			chunked_string = "";
 
-		if (size_header.size() > 1023)
-			return (ft_do_error(431));
+		
 
 		if (this->_recv_complete.chunked == true)
 		{
@@ -273,6 +273,11 @@ size_t			HttpServer::ft_post(std::string request_http)
 		this->_header_requete[0].path = this->ft_check_path_header(size_header);
 		if (this->_header_requete[0].path.empty() == true)
 			return (ft_do_error(400));
+
+		if (size_header.size() > 1023)
+		{
+			return (ft_do_error(431));
+		}
 
 		// Check if the method used is allowed
 		if (ft_check_method_allowed_header("POST") == 1)
@@ -347,6 +352,7 @@ size_t			HttpServer::ft_post(std::string request_http)
 			this->_header_requete[0].request_uri = this->_header_requete[0].path;
 			this->_header_requete[0].script_file_name = this->_header_requete[0].path;
 			this->ft_exec_cgi_test(); //request_http, len_msg);
+			std::cout << "fin de cgi" << std::endl;
 			return (0);
 		}
 		// std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
