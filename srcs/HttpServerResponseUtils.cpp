@@ -483,3 +483,20 @@ std::string		HttpServer::ft_last_modified( void )
 	tmp.append("\r\n");
 	return (tmp);
 }
+
+std::string		HttpServer::ft_expire( void )
+{
+	struct timeval	tv;
+	time_t			t;
+	struct tm		*info;
+	char			buffer[64];
+
+	gettimeofday(&tv, NULL);
+	t = tv.tv_sec;
+	info = localtime(&t);
+	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %T GMT+02", info);
+	std::string		tmp(buffer);
+	tmp.insert(0, "Expires: ");
+	tmp.append("\r\n");
+	return (tmp);
+}

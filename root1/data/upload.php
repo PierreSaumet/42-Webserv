@@ -23,52 +23,49 @@
 
 
 	<?php
-
-
     	if($_SERVER["REQUEST_METHOD"] == "POST"){
-			
-			if(isset($_FILES["uploadfile"]) && $_FILES["uploadfile"]["error"] == 0){
+			//  && $_FILES["uploadfile"]["error"] == 0
+			if(isset($_FILES["uploadfile"]))
+			{
 				$allowed = array("jpg" => "image/jpg", "jpeg" => "image/jpeg", "gif" => "image/gif", "png" => "image/png");
 				$filename = $_FILES["uploadfile"]["name"];
 				$filetype = $_FILES["uploadfile"]["type"];
 				$filesize = $_FILES["uploadfile"]["size"];
-				// $errors = array()
 
-				// check extansin
-				// path info retourne info sur le path
 				$ext = pathinfo($filename, PATHINFO_EXTENSION);
-				if(!array_key_exists($ext, $allowed)) die("Error: format not good");	// verifique dans le ext il y a allowed
+				if(!array_key_exists($ext, $allowed)) die("Error: format not good");
 				
-				if (is_dir("upload/")) {
+				echo " 1";
+				if (is_dir("upload/"))
+				{
 					// le type mime 
-					if (in_array($filetype, $allowed)){	//verifie que filetype est dans allowed
-						
-						if(file_exists("upload/" . $_FILES["uploadfile"]["name"])){	// verifie que upload/ + le nom du fichier existe
-							
-							header("Status: 200 OK\r\n");
-							echo $_FILES["uploadfile"]["name"] . " existe deja ";	// il existe deja
-							
-					
-						} else{
-							move_uploaded_file($_FILES["uploadfile"]["tmp_name"], "upload/" . $_FILES["uploadfile"]["name"]); // verifiw aue le tmp file est un fichier telecharge et le deplace
-							
-							header("Status: 201 Created\r\n");
-							echo "yes ca marche\n";
-							// echo "Content-Length: " . $filesize;
-							
+					echo " 2";
+					if (in_array($filetype, $allowed))
+					{
+						if(file_exists("upload/" . $_FILES["uploadfile"]["name"]))
+						{	
+							echo $_FILES["uploadfile"]["name"] . " existe deja ";
 						}
-					} else{
-						echo " marche pas";
-					}
-				} else{
-					echo "dossier existe pas";
+						else
+						{
+							if (move_uploaded_file($_FILES["uploadfile"]["tmp_name"], "upload/" . $_FILES["uploadfile"]["name"]) == true)
+							{
+								$path = "./upload/".$filename ;
+								echo "Bingo <br/>";
+                     			echo "<img src=".$path." width=50% />";
+							}							
+						}
+					} 
 				}
-
-			} else{
-				echo "Error method ";
+				else
+				{
+					echo "Folder doesn't exist";
+				}
 			}
-		} else{
-			// echo "Method not good kek bur";
+			else
+			{
+				echo "Error file";
+			}
 		}
 	?>
 

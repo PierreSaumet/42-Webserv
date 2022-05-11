@@ -154,7 +154,8 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 
 		
 		tmp.insert(0, this->ft_get_server_name());
-		tmp.insert(0, this->ft_last_modified());
+		// tmp.insert(0, "Cache-Control: no-cache\r\n");
+		// tmp.insert(0, this->ft_last_modified());
 		tmp.insert(0, this->ft_get_date());
 
 		if (tmp.find("Status: 201", pos) != std::string::npos)
@@ -162,7 +163,8 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 			size_t pos_stat = tmp.find("Status:");
 			size_t pos_2 = tmp.find("\r\n", pos_stat);
 			tmp.erase(pos_stat, pos_2 - (pos_stat - 2));
-			tmp.insert(0, "Location: /upload/dice.jpeg\r\n");
+			// tmp.insert(0, "Location: /upload/dice.jpeg\r\n");
+			// tmp.insert(0, ft_expire());
 			requete->num_error = 201;
 		}
 		else if (tmp.find("Status: 200", pos) != std::string::npos)

@@ -352,7 +352,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 				pos = tt_buffer.find("Content-Type: application/x-www-form-urlencoded\r\n");	
 				if (pos == std::string::npos)		// envoie formulaire via multipart
 				{
-					std::cout << "la 4" << std::endl;
+					std::cout << "On regarde les boundarys" << std::endl;
 					if (this->_recv_complete.boundary.empty() == true)
 					{
 						std::cout << "la 5" << std::endl;
@@ -383,7 +383,10 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 					else
 					{
 						if (tt_buffer.find(this->_recv_complete.boundary) != std::string::npos)
+						{
+							std::cout << "On a trouve la boundary de fin" << std::endl;
 							return (1);
+						}
 						return (0);
 					}		
 				}

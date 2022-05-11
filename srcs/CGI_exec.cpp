@@ -160,7 +160,8 @@ OK	SERVER_NAME = le nom du server
 std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_file )
 {
 	std::cout << GREEN << "\n On est dans ft_execute_cgi : " << CLEAR << std::endl;
-
+	std::cout << "path_Cgi = " << path_cgi << std::endl;
+	std::cout << "pathc file = " << path_file << std::endl;
 	char	**sysCline = NULL;
 	char	**sysEnv = NULL;
 	std::vector<std::string>		aArgs;
@@ -174,6 +175,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysCline[i] = new char[aArgs[i].size() + 1];
 		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
+		std::cout << "SYScline = " << sysCline[i] << std::endl;
 	}
 	sysCline[aArgs.size()] = NULL;
 
@@ -184,8 +186,11 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysEnv[i] = new char[aEnv[i].size() + 1];
 		strncpy(sysEnv[i], aEnv[i].c_str(), aEnv[i].size() + 1);
+		std::cout << "Sysenv = " << sysEnv[i] << std::endl;
 	}
 	sysEnv[aEnv.size()] = NULL;
+
+	// sleep(5);
 
 	pid_t pid;
 	int stdin_tmp = dup(STDIN_FILENO);
@@ -304,7 +309,7 @@ std::vector<std::string>		Cgi_exec::ft_convert_map_to_vector( void )
 		string = it->first;
 		string.append("=");
 		string.append(it->second);
-		// std::cout << "string = " << string << std::endl;
+		std::cout << "aEnv = " << string << std::endl;
 		tmp.push_back(string);
 
 	}

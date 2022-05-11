@@ -53,10 +53,14 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	std::string 	header(request, 0, pos);
 	
 	std::cout << "\n\nHEader = \n" << header << std::endl;
+	// sleep(10);
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);	// manque des arguments
 	
 	std::cout << "on utilise le server = " << this->_num_serv << std::endl;
 	
+	std::cout << "\n\ntaille header = " << header.size() << std::endl;
+	std::cout << "taille fichier = " << request.size(); 
+	// sleep(5);
 	if (ft_check_basic(header) < 0)
 	{
 		this->_header_requete.push_back(t_header_request());
@@ -134,6 +138,12 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		
 		if (this->ft_check_cgi_or_php(request_http) == 1)
 		{
+
+			if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
+			{
+				return (ft_do_error(500));
+			}
+
 			int 				res = 0;
 			size_t 				pos = this->_header_requete[0].path.find("?");
 			
@@ -239,7 +249,9 @@ size_t			HttpServer::ft_post(std::string request_http)
 		std::string 			chunked_string = "";
 
 		
-
+		this->_header_requete[0].path = this->ft_check_path_header(size_header);
+			if (this->_header_requete[0].path.empty() == true)
+				return (ft_do_error(400));
 		if (this->_recv_complete.chunked == true)
 		{
 			// We recieved chunked data, so we have to decode it
@@ -270,9 +282,7 @@ size_t			HttpServer::ft_post(std::string request_http)
 
 		this->_header_requete[0].method = "POST";
 	
-		this->_header_requete[0].path = this->ft_check_path_header(size_header);
-		if (this->_header_requete[0].path.empty() == true)
-			return (ft_do_error(400));
+		
 
 		if (size_header.size() > 1023)
 		{
@@ -341,6 +351,11 @@ size_t			HttpServer::ft_post(std::string request_http)
 
 		if (this->ft_check_cgi_or_php(request_http) == 1)  // verifier cette fonction
 		{
+			if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
+			{
+				return (ft_do_error(500));
+			}
+			
 			// There is cgi so we need to change some variables, otherwise it doesn't work
 			char	cwd[256];
 			if (getcwd(cwd, sizeof(cwd)) == NULL)
@@ -433,7 +448,7 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 		if ((res = this->ft_check_access_path()) > 0)
 		{
 			std::cout << "ERREUR ACCESS DELETE= " << res << std::endl;
-			sleep(2);
+			// sleep(2);
 			exit(1);
 			this->_header_requete[0].error = true;
 			if (res == 2)

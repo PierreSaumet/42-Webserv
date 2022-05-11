@@ -123,8 +123,8 @@ void			HttpServer::ft_exec_cgi_test( void )
 		this->_cgi->setHttpAccept(this->_header_requete[0].accept);
 		this->_cgi->setPathInfo(this->_header_requete[0].path_http);
 		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
-		this->_cgi->setRedirectStatus("200");
-		this->_cgi->setStatusCode("200");
+		this->_cgi->setRedirectStatus("201");
+		this->_cgi->setStatusCode("201");
 		this->_cgi->setRequestMethod(this->_header_requete[0].method);
 		this->_cgi->setServerSoftware("Webserv/1.0");
 		this->_cgi->setServerProtocol("HTTP/1.1");
@@ -145,10 +145,17 @@ void			HttpServer::ft_exec_cgi_test( void )
 		}
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
 		
+
+		// A CAHNGER THIS->-Erver[0];
 		std::string tmp_2 = this->_header_requete[0].script_file_name;
-		tmp_2.insert(0, this->_servers[0].root_server);
+		tmp_2.insert(0, this->_servers[this->_num_serv].root_server);
 		tmp_2 = "/";
-		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[0].cgi_path_server, tmp_2);
+
+
+		this->_cgi->ft_display_all_variable_env();
+		std::cout << "tmp 2 = " << tmp_2 << std::endl;
+		// sleep(2);
+		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp_2);
 		
 		std::cout << "fin de cgi post " << std::endl;
 		std::cout << "bopdy cgo -= " << this->_header_requete[0].body_error << std::endl;
