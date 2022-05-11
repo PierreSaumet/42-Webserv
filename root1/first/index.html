@@ -25,7 +25,7 @@
 				<input type="text" id="prenom" name="prenom"/>
 			</div>
 			<div>
-				<label for="msg">message : </label>
+				<label for="msg">Message : </label>
 				<input type="text" id="msg" name="message"/>
 			</div>
 
@@ -41,7 +41,7 @@
 				<input type="text" id="name" name="name"/>
 			</div>
 			<div>
-				<label for="msg">message : </label>
+				<label for="msg">Message : </label>
 				<input type="text" id="msg" name="message"/>
 			</div>
 
@@ -50,28 +50,26 @@
 			</div>
 		</form>
 	
-		<p> Test 3: envoie d'un fichier avec POST, pour cela cliquer sur le lien : <a href="/get_post/upload.php"> ICI </a>
+		<p> Test 3 : On envoie d'un fichier avec POST, pour cela cliquer sur le lien : <a href="/get_post/upload.php"> ICI </a>
 
-			<p> Test 5 : telecharge un bison .. </p>
-		
-			<p><a href="/download/bison.png" download>Download bison</a></p>
 
-		<p> Test 4 : afficher un turbo truc : <a href="/get_post/info.php"> ICI </a></p>
-<!-- 
+		<p> Test 4 : On regarde dans le dossier upload: <a href="/download/"> Mes_Fichiers</a></p>
+
+		<p> Test 5 : On telecharge le bison: <a href="/download/bison.png" download>Download bison</a></p>
+
+		<p> Test 6 : On affiche des grosses donnees php : <a href="/get_post/info.php"> ICI </a></p>
+
+		<p> Test 7 : On envoie des donnees avec POST, ouvre un second terminal et tape les commandes ci dessous: <br/>
+			
+			curl --output - -d "bonjour je suis du texte " 127.0.0.4:4340/big/display.php    ===> ca va t'afficher DATA puis 'bonjour etc... '
 
 		</p>
-		<form enctype="multipart/form-data" action="./get_post/upload2.php" method="POST">
-			<p>Il faut choisir un fichier a uploader: <input name="uploadfile" type="file" /><br />
-			<input type="submit" value="upload_file" />
-			</p>
-		</form>
 
 
-
-		<p> Test 6: Page avec des images et autres mutimedias a afficher.
+		<p> Test 7: Page avec des images et autres mutimedias a afficher.
 
 			<a href="/media/page.html"> MULTIMEDIA </a>
-		</p>  -->
+		</p> 
 	
 	</body>
 </html>

@@ -68,7 +68,7 @@
 			}
 		}
 	?>
-
+	<p><a href="/" index>retour index</a></p>
 	
 </body>
 </html>
