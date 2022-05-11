@@ -117,7 +117,7 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);	// manque des arguments
 	
 	// std::cout << "on utilise le server = " << this->_num_serv << std::endl;
-	
+	std::cout << "header = " << header << std::endl;
 	// std::cout << "\n\ntaille header = " << header.size() << std::endl;
 	// std::cout << "taille fichier = " << request.size(); 
 	// sleep(5);
@@ -393,16 +393,16 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 		size_t ss_size;
 		ss << this->_header_requete[0].content_length;
 		ss >> ss_size;
-		std::cout << "taille requete = " << request_http.size() << std::endl;
-		std::cout << "taille header = " << size_header.size() << std::endl;
-		std::cout << "taille body = " << size_body.size() << std::endl;
-		std::cout << "content lenght = " << ss_size << std::endl;
+		// std::cout << "taille requete = " << request_http.size() << std::endl;
+		// std::cout << "taille header = " << size_header.size() << std::endl;
+		// std::cout << "taille body = " << size_body.size() << std::endl;
+		// std::cout << "content lenght = " << ss_size << std::endl;
 		
 		
 
 
-		if (this->_header_requete[0].content_length == "0")  // maybe uselss
-			return (ft_do_error(400));
+		// if (this->_header_requete[0].content_length == "0")  // maybe uselss
+		// 	return (ft_do_error(400));
 
 		this->_header_requete[0].content_type = this->ft_check_content_type(size_header);
 		if (this->_header_requete[0].content_type.empty() == true)
@@ -411,10 +411,14 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 		
 
 		this->_header_requete[0].body_post = this->ft_check_body_post(size_body);
-		if (this->_header_requete[0].body_post.empty() == true)
-			// throw Error(16, "Error, in recieved header, the body_post is  not correct." , 2);
+		// if (this->_header_requete[0].body_post.empty() == true)
+		// 	throw Error(16, "Error, in recieved header, the body_post is  not correct." , 2);
+		if (this->_header_requete[0].body_post == "nothing")
+			this->_header_requete[0].body_post = size_body;
+			
+		// exit(1);
 		// std::cout << "\nOn a le body_post = -" << this->_header_requete[0].body_post << "-" <<  std::endl;
-		
+		// exit(1);
 		// Put chunked decoded data to body_post
 		if (this->_recv_complete.chunked == true)
 			this->_header_requete[0].body_post = chunked_string;
@@ -431,7 +435,7 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 			return (0);
 		}
 
-		if (size_body.size() != ss_size)
+		if (size_body.size() != ss_size && this->_recv_complete.chunked == false)
 		{
 				// test taille content length et le body
 			std::stringstream ss;
@@ -454,10 +458,11 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 			}
 			if (ss_size > this->_servers[this->_num_serv].buffer_size_server)
 				return (ft_do_error(413));
+			
 			this->_header_requete[0].expect = true;
 			return (ft_do_error(100));
 		}
-		exit(1);
+		// exit(1);
 
 
 		if (this->ft_check_cgi_or_php(request_http) == 1)  // verifier cette fonction

@@ -438,3 +438,8 @@ Content-type: text/html; charset=UTF-8
 
 
 curl -H Expect: -d "truc" 127.0.0.4:4340/big/display.php
+
+
+
+doit faire une fonction qui trouve quel location il faut utiliser
+doit faire une fonction qui permet de recuperer toutes les infos dans les Headers
