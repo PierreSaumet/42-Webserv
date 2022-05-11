@@ -146,7 +146,7 @@ int		HttpServer::ft_redirection( void )
 		
 	}
 
-	// std::cout << "On a setup this->_num_loc = " << this->_num_loc << std::endl;
+	std::cout << "On a setup this->_num_loc = " << this->_num_loc << std::endl;
 	if (this->_servers[this->_num_serv].location[this->_num_loc].return_location.empty() == true)
 	{
 		std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;

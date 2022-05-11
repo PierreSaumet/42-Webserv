@@ -251,6 +251,7 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 						new_client.server_socket = it_b->sock;
 						new_client.num = it_b->num;
 						new_client.recv = false;
+						new_client.request = t_header_request();
 						this->_all_client_socket.push_back(new_client);
 					}		
 				}
@@ -515,9 +516,13 @@ int		HttpServer::ft_reading( void )
 				still_to_send = 0;
 
 				std::cout << "chunk = " << this->_recv_complete.chunked << std::endl;
-				// sleep(2);
-
-				it_b_client->request = this->ft_parser_requete(it_b_client->num ,_tmp_buffer.size() , _tmp_buffer);
+				
+				std::cout << " avant it_b_client request path = " << it_b_client->request.path << std::endl;
+				// it_b_client->request.path = "truc";
+				it_b_client->request = this->ft_parser_requete(it_b_client->num ,_tmp_buffer.size() , _tmp_buffer, it_b_client->request);
+				std::cout << " apres it_b_client request path = " << it_b_client->request.path << std::endl;
+				// exit(1);
+				
 				it_b_client->recv = true;
 				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 				
@@ -546,6 +551,7 @@ int		HttpServer::ft_main_loop( void )
 {
 	this->_recv_complete.chunked = false;
 	_DATA = 0;
+	still_to_send = 0;
 	while (int_signal == 0)
 	{
 		try {

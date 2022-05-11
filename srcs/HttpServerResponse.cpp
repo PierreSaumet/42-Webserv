@@ -133,6 +133,7 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 		std::string tmp = requete->body_error;
 		std::cout << "size requete .body error = " << requete->body_error.size() << std::endl;
 		size_t pos = tmp.find("\r\n\r\n");
+		// tmp.insert(pos, "\r\n");
 		if (pos == std::string::npos)
 		{
 			requete->error = true;
@@ -147,16 +148,25 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 				return (the_header);
 			}
 		}
-
+		// tmp.append("\r\n");
 		tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
 		tmp.insert(0, this->ft_get_server_name());
-		tmp.insert(0, "Cache-Control: no-cache\r\n");;
-		tmp.insert(0, this->ft_get_date());
+		// if (requete->connection_close == true)
+		// {
+		// 	size_t pos = tmp.find("\r\n\r\n");
+		// 	// tmp.insert(0, this->ft_get_date());
+		// 	tmp.insert(pos, "\r\nConnection: Closed");
+		// }
+		// else
+		// {
+			tmp.insert(0, this->ft_get_date());
+		// }
+		
 		
 
-		tmp.insert(0, "HTTP/1.1 100 Continue\r\n");
+		// tmp.insert(0, "HTTP/1.1 202 Accepted\r\n");
 		// test
-		// tmp.insert(0, this->ft_get_status(requete, true)); // obligatoire
+		tmp.insert(0, this->ft_get_status(requete, true)); // obligatoire
 		return (tmp);
 	}
 

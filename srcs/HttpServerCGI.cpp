@@ -123,8 +123,8 @@ void			HttpServer::ft_exec_cgi_test( void )
 		this->_cgi->setHttpAccept(this->_header_requete[0].accept);
 		this->_cgi->setPathInfo(this->_header_requete[0].path_http);
 		this->_cgi->setPathTranslated(this->_header_requete[0].path_http);
-		this->_cgi->setRedirectStatus("201");
-		this->_cgi->setStatusCode("201");
+		this->_cgi->setRedirectStatus("200");
+		this->_cgi->setStatusCode("200");
 		this->_cgi->setRequestMethod(this->_header_requete[0].method);
 		this->_cgi->setServerSoftware("Webserv/1.0");
 		this->_cgi->setServerProtocol("HTTP/1.1");
@@ -142,6 +142,8 @@ void			HttpServer::ft_exec_cgi_test( void )
 			ss << this->_header_requete[0].body_post.size();
 			std::string s = ss.str();
 			this->_cgi->setContentLength(s);
+			std::cout << "cheunk exit" << std::endl;
+			exit(1);
 		}
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
 		

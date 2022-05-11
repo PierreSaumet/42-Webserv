@@ -100,7 +100,8 @@ class HttpServer {
 			std::map<std::string, std::string>	data;	// Contient les information transmise a Get via un formulaire					// contient les informations en get.
 		
 			int				num_server;
-		
+			bool expect;
+			bool connection_close;
 		}						t_header_request;
 		
 
@@ -116,6 +117,8 @@ class HttpServer {
 			t_header_request request;
 			bool 	recv;
 			size_t  num;
+
+			// bool expect;
 		}		t_client_socket;
 
 		/*
@@ -125,6 +128,8 @@ class HttpServer {
 		~HttpServer( void);
 		HttpServer			&operator=( const HttpServer &element );
 
+
+		size_t ft_post_2(t_header_request data, std::string body);
 
 		/*
 		**	Functions in HttpServer.cpp, used to create servers.
@@ -141,9 +146,9 @@ class HttpServer {
 		/*
 		**	Functions in HttpServerRequest.cpp, used to apply the corresponding method
 		*/
-		t_header_request				ft_parser_requete( int port_client, int len_msg, std::string request );
+		t_header_request				ft_parser_requete( int port_client, int len_msg, std::string request, t_header_request test);
 		size_t				ft_get(std::string request_http, int len_msg);
-		size_t				ft_post(std::string request_http );
+		size_t				ft_post(std::string request_http , t_header_request data);
 		size_t				ft_delete(std::string request_http, int len_msg);
 
 		

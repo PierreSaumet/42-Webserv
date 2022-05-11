@@ -223,6 +223,7 @@ std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) cons
 	// a changer lol
 
 	std::map<size_t, std::string> list_error;
+	list_error.insert(std::pair<size_t, std::string>(100, "Continue"));
 	list_error.insert(std::pair<size_t, std::string>(400, "Bad Request"));
 	list_error.insert(std::pair<size_t, std::string>(401, "Unauthorized (RFC 7235)"));
 	list_error.insert(std::pair<size_t, std::string>(402, "Payment Required"));

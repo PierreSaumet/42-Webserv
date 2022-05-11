@@ -321,25 +321,13 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 	ss.str("");
 	ss.clear();
 	pos = error_string.find("by");
-	// test 
-	// std::string truc = "";
-	// truc.insert(pos, ft_get_status(false));
-	error_string.insert(pos, ft_get_status(requete, false));
+	;
 	
 	pos = error_string.find("by Pierre");
 	error_string.erase(pos - 2, 2);
 	pos = error_string.find("by Pierre");
-	// std::cout << "pos = " << pos << std::endl;
 	error_string.insert(pos, " ");
-	// std::cout << "ERROR[pos] = " << error_string[pos] << std::endl;
-	// std::cout << "ERROR[pos-1] = " << error_string[pos-1] << std::endl;
-	// std::cout << "ERROR[pos-2] = " << error_string[pos-2] << std::endl;
-	// std::cout << "ERROR[pos-3] = " << error_string[pos-3] << std::endl;
-	// std::cout << "ERROR[pos+1] = " << error_string[pos+1] << std::endl;
-
 	
-	// error_string.erase(pos , 1);
-	//
 	error_string.insert(0, this->ft_get_end_header());
 	ss << error_string.size() - 2;
 	ss >> content_length;
@@ -350,14 +338,25 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 	error_string.insert(0, this->ft_get_date());
 	error_string.insert(0, this->ft_get_charset());
 	error_string.insert(0, this->ft_get_content_type(requete, 0)); // a changer
-	if(this->_header_requete[0].num_error == 405)
+	if(requete->num_error == 405)
 		error_string.insert(0, this->ft_get_allow());
 	error_string.insert(0, this->ft_get_status(requete, true));
 	error_string.append("\0");
 
+	
+	// exit(1);
+	if (requete->num_error == 100)
+	{
+		error_string.clear();
+		// error_string.insert(0, this->ft_get_end_header());
+		error_string.insert(0, this->ft_get_server_name());
+		error_string.insert(0, this->ft_get_date());
+		error_string.insert(0, this->ft_get_status(requete, true));
+		// error_string.append("\0");
+
+	}
 	std::cout << "error_string = " << error_string << std::endl;
 	// exit(1);
-	
 	return (error_string);
 }
 
