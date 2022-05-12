@@ -99,6 +99,7 @@ class HttpServer {
 			std::string			body_error;			// si cgi body_error contient la response du cgi sans le header
 			std::map<std::string, std::string>	data;	// Contient les information transmise a Get via un formulaire					// contient les informations en get.
 		
+			bool			autoindex;
 			bool 			location;
 			int				num_loc;
 			int				num_server;

@@ -24,15 +24,19 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 	size_t		find_php;
 	if (this->_header_requete[0].method == "GET")
 	{
-		find_php = request_http.find(".php?");
-		if (find_php == std::string::npos)
-			find_php = request_http.find(".php");
-		if (find_php == std::string::npos)
-			return (false);
+		find_php = this->_header_requete[0].path.find(".php?");
+		if (find_php != std::string::npos)
+			return (true);
+		find_php = this->_header_requete[0].path.find(".php");
+		if (find_php != std::string::npos)
+			return (true);
+		return (false);
 	}
 	if (this->_header_requete[0].method == "POST")
 		find_php = request_http.find(".php");
 
+	std::cout << "cgi post = " << std::endl;
+	exit(1);
 
 	// si .php est entre / et HTTP c'est good, sinon erruer
 	if (find_php > find_backslash && find_php < find_http)

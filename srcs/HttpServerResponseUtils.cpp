@@ -26,41 +26,21 @@ bool is_directory( std::string const &name_file )
 
 std::string		HttpServer::ft_create_autoindex( t_header_request *requete )
 {
-	std::string string;
-	std::stringstream ss;
+	std::string 		string;
+	std::stringstream 	ss;
+	DIR 				*dir = NULL;
+	struct dirent  		*file = NULL;
+	std::string 		actual_folder = requete->path;
+	actual_folder.erase(0, this->_servers[requete->num_server].root_server.size());
 
-
-	
-
-	// <p>by Pierre.</p></body></html>";
-	DIR *dir = NULL;
-	struct dirent  *file = NULL;
-
-	requete->path.erase(0, 13);
-	std::string actual_folder = requete->path;
-	actual_folder.erase(0, this->_servers[this->_num_serv].root_server.size());
-
-
-	std::cout << " file path = " << requete->path << std::endl;
-	std::cout << " actual folder = " << actual_folder << std::endl;
 	string = "<!DOCTYPE html><html><head><title>AutoIndex</title><style type=text/css>body {color: lightred;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>Auto-Index</h1>/";
-
 	if ((dir = opendir(requete->path.c_str())) != NULL)
 	{
 		while ((file = readdir(dir)) != NULL)
 		{
-			// std::cout << "dossier = " << file->d_name << std::endl;
-			std::string file_name = file->d_name;
-
+			std::string 	file_name = file->d_name;
 			if (is_directory(requete->path + "/" + file_name ))
-			{
-				std::cout << "dossier = " << file_name << std::endl;
 				file_name += '/';
-			}
-			// if (is_directory(actual_folder) && actual_folder[actual_folder.size() - 1] != '/')
-
-			// else
-			// 	std::cout << "fichier = " << file->d_name << std::endl;
 			string.append("<p><a href=\"");
 			string.append(file_name + "\" class=\"active\">" + file_name + "</a></p>\n");
 		}
@@ -69,10 +49,10 @@ std::string		HttpServer::ft_create_autoindex( t_header_request *requete )
 	else
 	{
 		closedir(dir);
+		std::cerr << "Error opendir" << std::endl;
 		exit(1);
 	}
 	string.append("<p>by Pierre.</p></body></html>");
-	// std::cout << "\nTOTAL = " << string << std::endl;
 	return (string);
 }
 

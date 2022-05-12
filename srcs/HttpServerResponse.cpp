@@ -188,57 +188,72 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 	}
 
 
+	if (requete->autoindex == true)
+	{
+		std::cout << "do autoindex " << std::endl;
+		the_header = this->ft_create_autoindex(requete);
+		the_header.insert(0, this->ft_get_end_header());
+		the_header.insert(0, this->ft_get_content_length(buff, the_header.size(), 0));
+		the_header.insert(0, this->ft_get_server_name());
+		the_header.insert(0, this->ft_get_date());
+		the_header.insert(0, this->ft_get_status(requete, true));
+		requete->error = true;
+		return (the_header);
+	}
+
+	// exit(1);
 	// A CHANGER
-	if (requete->path == "/")
-	{
-		std::cout << "path = " << requete->path << std::endl;   
-		if (requete->return_used == false)
-		{
-			std::cout << "Dans le cas ou il y a pas de redirection :" << std::endl;
+	// if (requete->path == "/")
+	// {
+	// 	std::cout << "path = " << requete->path << std::endl;   
+	// 	if (requete->return_used == false)
+	// 	{
+	// 		std::cout << "Dans le cas ou il y a pas de redirection :" << std::endl;
 
-			if (requete->path_file.empty() == true)
-			{
-				requete->path.append(this->_servers[this->_num_serv].index_server);
-				// requete->path.erase(0, 1);								// on supprime le /
-				requete->path.insert(0, this->_servers[this->_num_serv].root_server);
-				std::cout << "du coup path = " << requete->path << std::endl;
-				// exit(1);
-			}
-			else
-			{
-				requete->path = requete->path_file;
-			}
-		}
-		else
-		{	// Redirection 301 dans un bloc server
+	// 		if (requete->path_file.empty() == true)
+	// 		{
+	// 			requete->path.append(this->_servers[this->_num_serv].index_server);
+	// 			// requete->path.erase(0, 1);								// on supprime le /
+	// 			requete->path.insert(0, this->_servers[this->_num_serv].root_server);
+	// 			std::cout << "du coup path = " << requete->path << std::endl;
+	// 			// exit(1);
+	// 		}
+	// 		else
+	// 		{
+	// 			requete->path = requete->path_file;
+	// 		}
+	// 	}
+	// 	else
+	// 	{	// Redirection 301 dans un bloc server
 
-			std::cout << "ICI ERREUR " << std::endl;
-			exit(1);
-			return (the_header);
+	// 		std::cout << "ICI ERREUR " << std::endl;
+	// 		exit(1);
+	// 		return (the_header);
 
-		}
-		std::cout << "ICI path = " << requete->path << std::endl;
-	}
-	else
-	{
-		std::cout << "ici " << std::endl;
-		if (requete->path.compare(0, 13, "--AUTOINDEX--") == 0)
-		{
-			std::cout << "bingo autoindex exit" << std::endl;
-			the_header = this->ft_create_autoindex(requete);
+	// 	}
+	// 	std::cout << "ICI path = " << requete->path << std::endl;
+	// }
+	// else
+	// {
+	// 	std::cout << "ici " << std::endl;
+	// 	exit(1);
+	// 	if (requete->path.compare(0, 13, "--AUTOINDEX--") == 0)
+	// 	{
+	// 		std::cout << "bingo autoindex exit" << std::endl;
+	// 		the_header = this->ft_create_autoindex(requete);
 
-			std::cout << "header autorindex = \n" << the_header <<  std::endl;
-			the_header.insert(0, this->ft_get_end_header());
-			the_header.insert(0, this->ft_get_content_length(buff, the_header.size(), 0));
-			the_header.insert(0, this->ft_get_server_name());
-			the_header.insert(0, this->ft_get_date());
-			the_header.insert(0, this->ft_get_status(requete, true));
-			// on utilise la variable error pour retourner directement tout le header avecle body
-			requete->error = true;
-			return (the_header);
-			exit(1);
-		}
-	}
+	// 		std::cout << "header autorindex = \n" << the_header <<  std::endl;
+	// 		the_header.insert(0, this->ft_get_end_header());
+	// 		the_header.insert(0, this->ft_get_content_length(buff, the_header.size(), 0));
+	// 		the_header.insert(0, this->ft_get_server_name());
+	// 		the_header.insert(0, this->ft_get_date());
+	// 		the_header.insert(0, this->ft_get_status(requete, true));
+	// 		// on utilise la variable error pour retourner directement tout le header avecle body
+	// 		requete->error = true;
+	// 		return (the_header);
+	// 		exit(1);
+	// 	}
+	// }
 
 
 	std::cout << "on doit avoir le fichier : " << requete->path << std::endl;
@@ -249,31 +264,18 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 		requete->error = true;
 		requete->num_error = 404;
 
-		// ft_setup_error_header();
-		std::cout << "avant requete->body = " << requete->body_error << std::endl;
 		ft_setup_error_header_response(requete);
-		std::cout << "apre requete->body = " << requete->body_error << std::endl;
-		if (requete->body_error.empty() == false)
-		{
-			the_header = ft_find_error_html(requete);
-			std::cout << "ls return de ft_setup_header : " << the_header << std::endl;
-			// exit(1);
-			return (the_header);
-		}
+		if (requete->body_error.empty() == false) // n'est pas vide
+			return (ft_find_error_html(requete));
 		std::cout << RED << "ICI requete error = " << requete->error << CLEAR <<std::endl;
-		// exit(1);
 		return (ft_create_error(requete));
 
 	}
-
-
-	// doit ouvrir en binaire ? test afficher une image
 	size_t binary = 0;
 	if (ft_open_binary(requete->path) == 0)
 	{
 		std::cout << "classic" << std::endl;
 		input_file = fopen(requete->path.c_str(), "r");
-		
 	}
 	else
 	{
@@ -286,15 +288,10 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 	{
 		requete->error = true;
 		requete->num_error = 503; // a changer
-
-		ft_setup_error_header();
-		if (requete->body_error.empty() == false)
-		{
-			the_header = ft_find_error_html(requete);
-			std::cout << "ici return de ft_setup_header : " << the_header << std::endl;
-			exit(1);
-			return (the_header);
-		}
+		ft_setup_error_header_response(requete);
+		if (requete->body_error.empty() == false) // n'est pas vide
+			return (ft_find_error_html(requete));
+		std::cout << RED << "ICI requete error = " << requete->error << CLEAR <<std::endl;
 		return (ft_create_error(requete));
 	}
 	fclose(input_file);
@@ -306,7 +303,6 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 	the_header.insert(0, this->ft_get_charset());
 	the_header.insert(0, this->ft_get_content_type(requete, binary));
 	the_header.insert(0, this->ft_get_status(requete, true));
-
 	return (the_header);
 
 }
