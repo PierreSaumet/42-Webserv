@@ -219,7 +219,6 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		}
 	}
 
-
 	this->ft_init_general_structure();
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);
 	if ((this->_num_loc = this->ft_choose_wich_location(header)) == -1) // on a deja recuperer le path
@@ -273,85 +272,68 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		return (ft_do_error(405));
 	std::cout << "path = " << this->_header_requete[0].path << std::endl;
 
-	// if (this->ft_check_cgi_or_php(request_http) == 1)
-	// {
-	// 	if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
-	// 		return (ft_do_error(500));
+	if (this->ft_check_cgi_or_php(request_http) == 1)
+	{
+		if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
+			return (ft_do_error(500));
 
-	// 	int 				res = 0;
-	// 	size_t 				pos = this->_header_requete[0].path.find("?");
-	// 	if (pos != std::string::npos)
-	// 	{
-	// 		std::string 	tmp = this->_header_requete[0].path;
+		int 				res = 0;
+		size_t 				pos = this->_header_requete[0].path.find("?");
+		if (pos != std::string::npos)
+		{
+			std::string 	tmp = this->_header_requete[0].path;
 
-	// 		this->_header_requete[0].path.erase(pos, this->_header_requete[0].path.size());				
-	// 		if ((res = this->ft_check_access_path()) > 0)
-	// 		{
-	// 			this->_header_requete[0].error = true;
-	// 			if (res == 2)
-	// 				this->_header_requete[0].num_error = 403;
-	// 			if (res == 1)
-	// 				this->_header_requete[0].num_error = 404;
-	// 			this->ft_setup_error_header();
-	// 			std::cout << "cgi p et path ps bon" << std::endl;
-	// 			exit(1);
-	// 			return (0);
-	// 		}
-	// 		std::cout << "ici perdu "<< std::endl;
-	// 		exit(1);
-	// 		pos = tmp.find("?");
-	// 		tmp.erase(0, pos);
-	// 		this->_header_requete[0].path.append(tmp);
-	// 		this->_header_requete[0].request_uri = this->_header_requete[0].path;
-	// 		this->_header_requete[0].script_file_name = this->_header_requete[0].path;
-	// 		pos = this->_header_requete[0].script_file_name.find("?");
-	// 		this->_header_requete[0].script_file_name.erase(pos, this->_header_requete[0].script_file_name.size());
-	// 	}
-	// 	else
-	// 	{
-	// 		std::cout << "ici  la" << std::endl;
-	// 		exit(1);
-	// 		if ((res = this->ft_check_access_path()) > 0)
-	// 		{
-	// 			this->_header_requete[0].error = true;
-	// 			if (res == 2)
-	// 				this->_header_requete[0].num_error = 403;
-	// 			if (res == 1)
-	// 				this->_header_requete[0].num_error = 404;
-	// 			this->ft_setup_error_header();
-	// 			return (0);
-	// 		}
-	// 		this->_header_requete[0].request_uri = this->_header_requete[0].path;
-	// 		this->_header_requete[0].script_file_name = this->_header_requete[0].path;
-	// 	}
-	// 	// std::cout << "fin = \n" << std::endl;
-	// 	// std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
-	// 	// std::cout << "this->_header_requete[0].request_uri  = " << this->_header_requete[0].request_uri  << std::endl;
-	// 	// std::cout << "this->_header_requete[0].script_file_name = " << this->_header_requete[0].script_file_name << std::endl;
-
-	// 	// We get the total path for the varriable path_http
-	// 	char	cwd[256];
-	// 	if (getcwd(cwd, sizeof(cwd)) == NULL)
-	// 		throw Error(666, "Error getcwd doesn't work.", 666);
+			this->_header_requete[0].path.erase(pos, this->_header_requete[0].path.size());				
+			if ((res = this->ft_check_access_path()) > 0)
+			{
+				this->_header_requete[0].error = true;
+				if (res == 2)
+					this->_header_requete[0].num_error = 403;
+				if (res == 1)
+					this->_header_requete[0].num_error = 404;
+				this->ft_setup_error_header();
+				return (0);
+			}
+			pos = tmp.find("?");
+			tmp.erase(0, pos);
+			this->_header_requete[0].path.append(tmp);
+			this->_header_requete[0].request_uri = this->_header_requete[0].path;
+			this->_header_requete[0].script_file_name = this->_header_requete[0].path;
+			pos = this->_header_requete[0].script_file_name.find("?");
+			this->_header_requete[0].script_file_name.erase(pos, this->_header_requete[0].script_file_name.size());
+		}
+		else
+		{
+			if ((res = this->ft_check_access_path()) > 0)
+			{
+				this->_header_requete[0].error = true;
+				if (res == 2)
+					this->_header_requete[0].num_error = 403;
+				if (res == 1)
+					this->_header_requete[0].num_error = 404;
+				this->ft_setup_error_header();
+				return (0);
+			}
+			this->_header_requete[0].request_uri = this->_header_requete[0].path;
+			this->_header_requete[0].script_file_name = this->_header_requete[0].path;
+		}
+		// We get the total path for the varriable path_http
+		char	cwd[256];
+		if (getcwd(cwd, sizeof(cwd)) == NULL)
+		{
+			std::cerr << "Error getcwd" << std::endl;
+			exit(1);
+		}
 		
-	// 	std::string tt(cwd);
-	// 	this->_header_requete[0].path_http = tt;
-	// 	this->_header_requete[0].path_http.append("/");
-	// 	this->_header_requete[0].path_http.append(this->_header_requete[0].script_file_name);
-
-
+		std::string tt(cwd);
+		this->_header_requete[0].path_http = tt;
+		this->_header_requete[0].path_http.append("/");
+		this->_header_requete[0].path_http.append(this->_header_requete[0].script_file_name);
 		
-	// 	this->ft_exec_cgi_test(); //request_http, len_msg);
-
-	// 	// std::cerr << "ici " << strerror(errno) << std::endl;
-	// 	// exit(1);
-	// 	return (0);
-	// }
-	// std::cout << "pas de cgi" << std::endl;
-	// exit(1);
-
-// http://127.0.0.4:4340/get_post/query_get_test.php?name=salut&prenom=salut&message=truic
-
+		this->ft_exec_cgi_test();
+		this->_header_requete[0].cgi = true;
+		return (0);
+	}
 
 	if ((ret = this->ft_redirection()) == 1)	// a deplacer avant cgi je pense
 	{

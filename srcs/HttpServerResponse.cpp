@@ -114,83 +114,49 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 
 	if (requete->error == true)
 	{
-		std::cout << "On a une erreur ICI : " << requete->num_error << std::endl;
+		std::cout << GREEN << "Erreur : " << CLEAR <<  requete->num_error << std::endl;
 		if (requete->body_error.empty() == false)
-		{
-			the_header = ft_find_error_html(requete);
-			std::cout << "return de ft_setup_header : " << the_header << std::endl;
-			return (the_header);
-		}
+			return (ft_find_error_html(requete));
 		return (ft_create_error(requete));
 	}
-	
 
 	if (requete->cgi == true)
 	{
-		std::cout << "IL Y A DU CGI" << std::endl;
-		std::cout << "\n\n display = " << requete->body_error << std::endl;
-		
-		std::string tmp = requete->body_error;
-		std::cout << "size requete .body error = " << requete->body_error.size() << std::endl;
-		size_t pos = tmp.find("\r\n\r\n");
-		// tmp.insert(pos, "\r\n");
+		std::cout << GREEN << "Cgi " << CLEAR << std::endl;	
+		std::string 	tmp = requete->body_error;
+		size_t 			pos = tmp.find("\r\n\r\n");
+
 		if (pos == std::string::npos)
 		{
 			requete->error = true;
 			requete->num_error = 500;
-
 			ft_setup_error_header_response(requete);
 			if (requete->body_error.empty() == false)
-			{
-				the_header = ft_find_error_html(requete);
-				std::cout << "ls return de ft_setup_header : " << the_header << std::endl;
-				// exit(1);
-				return (the_header);
-			}
+				return (ft_find_error_html(requete));
+			return (ft_create_error(requete));
 		}
-		// tmp.append("\r\n");
 		tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
 		tmp.insert(0, this->ft_get_server_name());
-		// if (requete->connection_close == true)
-		// {
-		// 	size_t pos = tmp.find("\r\n\r\n");
-		// 	// tmp.insert(0, this->ft_get_date());
-		// 	tmp.insert(pos, "\r\nConnection: Closed");
-		// }
-		// else
-		// {
-			tmp.insert(0, this->ft_get_date());
-		// }
-		
-		
-
-		// tmp.insert(0, "HTTP/1.1 202 Accepted\r\n");
-		// test
-		tmp.insert(0, this->ft_get_status(requete, true)); // obligatoire
+		tmp.insert(0, this->ft_get_date());
+		tmp.insert(0, this->ft_get_status(requete, true));
 		return (tmp);
 	}
 
 	if (requete->return_used == true)
 	{
-		std::cout << GREEN << "redirection 301" << CLEAR << std::endl;
-		std::cout << "path de la requete = " << requete->path << std::endl;
-		
+		std::cout << GREEN << "Redirection " << CLEAR << std::endl;
 		the_header.insert(0, this->ft_get_end_header());
 		the_header.insert(0, "Content-Length: 0\r\n");
 		the_header.insert(0, this->ft_get_server_name());
 		the_header.insert(0, this->ft_get_date());
 		the_header.insert(0, "Location: " + requete->path + "\r\n");
-		// the_header.insert(0, this->ft_get_return_location());
 		the_header.insert(0, this->ft_get_status(requete, true));
-		std::cout << "\nTHE HEADER FOR THE REDIRECTION = \n\n " << the_header << std::endl;
-		// sleep(10);
 		return (the_header);
 	}
 
-
 	if (requete->autoindex == true)
 	{
-		std::cout << "do autoindex " << std::endl;
+		std::cout << GREEN << "Autoindex " << CLEAR << std::endl;
 		the_header = this->ft_create_autoindex(requete);
 		the_header.insert(0, this->ft_get_end_header());
 		the_header.insert(0, this->ft_get_content_length(buff, the_header.size(), 0));
@@ -200,61 +166,6 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 		requete->error = true;
 		return (the_header);
 	}
-
-	// exit(1);
-	// A CHANGER
-	// if (requete->path == "/")
-	// {
-	// 	std::cout << "path = " << requete->path << std::endl;   
-	// 	if (requete->return_used == false)
-	// 	{
-	// 		std::cout << "Dans le cas ou il y a pas de redirection :" << std::endl;
-
-	// 		if (requete->path_file.empty() == true)
-	// 		{
-	// 			requete->path.append(this->_servers[this->_num_serv].index_server);
-	// 			// requete->path.erase(0, 1);								// on supprime le /
-	// 			requete->path.insert(0, this->_servers[this->_num_serv].root_server);
-	// 			std::cout << "du coup path = " << requete->path << std::endl;
-	// 			// exit(1);
-	// 		}
-	// 		else
-	// 		{
-	// 			requete->path = requete->path_file;
-	// 		}
-	// 	}
-	// 	else
-	// 	{	// Redirection 301 dans un bloc server
-
-	// 		std::cout << "ICI ERREUR " << std::endl;
-	// 		exit(1);
-	// 		return (the_header);
-
-	// 	}
-	// 	std::cout << "ICI path = " << requete->path << std::endl;
-	// }
-	// else
-	// {
-	// 	std::cout << "ici " << std::endl;
-	// 	exit(1);
-	// 	if (requete->path.compare(0, 13, "--AUTOINDEX--") == 0)
-	// 	{
-	// 		std::cout << "bingo autoindex exit" << std::endl;
-	// 		the_header = this->ft_create_autoindex(requete);
-
-	// 		std::cout << "header autorindex = \n" << the_header <<  std::endl;
-	// 		the_header.insert(0, this->ft_get_end_header());
-	// 		the_header.insert(0, this->ft_get_content_length(buff, the_header.size(), 0));
-	// 		the_header.insert(0, this->ft_get_server_name());
-	// 		the_header.insert(0, this->ft_get_date());
-	// 		the_header.insert(0, this->ft_get_status(requete, true));
-	// 		// on utilise la variable error pour retourner directement tout le header avecle body
-	// 		requete->error = true;
-	// 		return (the_header);
-	// 		exit(1);
-	// 	}
-	// }
-
 
 	std::cout << "on doit avoir le fichier : " << requete->path << std::endl;
 
