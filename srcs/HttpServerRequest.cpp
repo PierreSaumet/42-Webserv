@@ -585,6 +585,9 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 		return (ft_do_error(404));
 	else
 	{
+		std::stringstream ss;
+		ss << buff.st_size;
+		ss >> this->_header_requete[0].body_error;
 		if (remove(this->_header_requete[0].path.c_str()) != 0)
 		{
 			return (ft_do_error(403));
@@ -594,9 +597,11 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 			std::cout << "SI ON PEUT SUPPRIMER " << std::endl;
 			this->_header_requete[0].cgi = true;
 
+			
 			if (stat(this->_header_requete[0].path.c_str(), &buff) != 0)		// chmod 000 677
 			{
-				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>204</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File delete so No Content =)</h1><p>by Pierre.</p></body></html>";				
+				// this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>204</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File delete so No Content =)</h1><p>by Pierre.</p></body></html>";				
+				// this->_header_requete[0].body_error
 				this->_header_requete[0].num_error = 204;
 			}
 			else

@@ -126,6 +126,22 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 		std::string 	tmp = requete->body_error;
 		size_t 			pos = tmp.find("\r\n\r\n");
 
+		if (requete->num_error == 204)
+		{
+			std::cout << "icic" << std::endl;
+			std::cout << "body = " << requete->body_error << std::endl;
+			tmp.clear();
+			tmp.insert(0, "\r\n\r\n");
+			tmp.insert(0, "Accept: " + requete->accept);
+			tmp.insert(0, "Content-Length: " + requete->body_error + "\r\n");
+			tmp.insert(0, this->ft_get_server_name());
+			tmp.insert(0, this->ft_get_date());
+			tmp.insert(0, "HTTP/1.1 204 No Content\r\n");
+			return (tmp);
+		}
+
+
+
 		if (pos == std::string::npos)
 		{
 			requete->error = true;
