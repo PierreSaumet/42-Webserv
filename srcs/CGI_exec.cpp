@@ -244,7 +244,17 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 				this->ft_add_to_cgi_string(buffer, ret );
 			}
 		}
+	}
 
+	for (unsigned long i = 0; i < aArgs.size(); i++)
+	{
+		std::cout << "SYScline = " << sysCline[i] << std::endl;
+	}
+
+	for (unsigned long i = 0; i < aEnv.size(); i++)
+	{
+		std::cout << "Sysenv = " << sysEnv[i] << std::endl;
+		std::cout << "aEnv = " << aEnv[i] << std::endl;
 	}
 
 	dup2(stdin_tmp, STDIN_FILENO);

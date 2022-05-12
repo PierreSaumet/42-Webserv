@@ -16,11 +16,7 @@
 bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 {
 	std::cout << RED "dans la fonction find  php pour cgi : A REVOIR " << CLEAR << std::endl;
-	// on trouve le premier /
-	size_t 		find_backslash = request_http.find("/");
-	// on cherche HTTP
-	size_t		find_http = request_http.find("HTTP");
-	//	on cherche .php?
+	(void)request_http;
 	size_t		find_php;
 	if (this->_header_requete[0].method == "GET")
 	{
@@ -33,41 +29,11 @@ bool			HttpServer::ft_check_cgi_or_php( std::string request_http )
 		return (false);
 	}
 	if (this->_header_requete[0].method == "POST")
-		find_php = request_http.find(".php");
-
-	std::cout << "cgi post = " << std::endl;
-	exit(1);
-
-	// si .php est entre / et HTTP c'est good, sinon erruer
-	if (find_php > find_backslash && find_php < find_http)
 	{
-		std::cout << " good on a bien du php dans la requete qu'il faut utiliser avec cgi" << std::endl;
-		this->_header_requete[0].cgi = true;
-		return (true);
-	}
-	else
-	{
-		// on verifie si on a seulement du cgi
-		size_t	find_cgi = request_http.find(".cgi");
-		if (find_cgi > find_backslash && find_cgi < find_http)
-		{
-			std::cout << " good on a bien du cgi dans la requete qu'il faut utiliser avec cgi" << std::endl;
-			this->_header_requete[0].cgi = true;
+		find_php = this->_header_requete[0].path.find(".php");
+		std::cout << "find php = " << find_php << " et size = " << this->_header_requete[0].path.size() << std::endl;
+		if (find_php == this->_header_requete[0].path.size() - 4)
 			return (true);
-		}
-		if (this->_header_requete[0].content_type.compare(0, 30, "multipart/form-data; boundary=") == 0)
-		{
-			std::cout << "IL Y A DU boundary ET IL FAUT UPLOADER" << std::endl;
-			this->_header_requete[0].upload = true;
-			return (true);
-		}
-		if (this->_recv_complete.chunked == true)
-		{
-			std::cout << "Transfer chunked" << std::endl;
-			this->_header_requete[0].upload = true;
-			return (true);
-		}
-		std::cout << "non on a pas de php ou de cgi" << std::endl;
 		return (false);
 	}
 	return (false);

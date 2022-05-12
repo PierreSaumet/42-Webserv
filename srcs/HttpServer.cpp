@@ -265,7 +265,7 @@ void 			HttpServer::ft_continue_send( std::vector<t_client_socket>::iterator it_
 	long long 	ret = 0;
 
 	_response_to_send = ft_setup_response_to_send(&it_client->request);
-	std::cout << "response  = " << _response_to_send << std::endl;
+	// std::cout << "response  = " << _response_to_send << std::endl;
 	if ((ret = send(it_client->client_socket, _response_to_send.c_str(),  _response_to_send.size(), 0)) < 0)
 	{
 		std::cout << "SEND retourn -1 erreur " << std::endl;

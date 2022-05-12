@@ -26,7 +26,7 @@ size_t			HttpServer::ft_check_access_location( std::string path )
 }
 
 
-std::string		HttpServer::ft_check_pathhttp_header( std::string header )
+std::string		HttpServer::ft_check_pathhttp_header( std::string header ) // a changer
 {
 	// recupere le path complet, celui de l'ordinateur et du fichier demande 
 	//	le fichier demander se retrouve dans le header et on enleve les valeur apres le -?-
@@ -34,10 +34,7 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 	size_t		pos_backslash = header.find("/");
 
 	if (pos_backslash == std::string::npos)
-	{
-		std::cout << RED << "dans ft_check_path_header, ne trouve pas le -/-: dans le header de la requete" << CLEAR << std::endl;
 		return ("");
-	}
 	else
 	{
 		size_t pos_end;
@@ -50,14 +47,7 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 		}
 
 		if (pos_end == std::string::npos)
-		{
-			std::cout << RED << "dans ft_check_path_header, ne trouve pas -?-: dans le header de la requete" << CLEAR << std::endl;
-			
-			// erreur pour trouver img/chien donc on retourne simplement le path
-			std::cout << "on va retourner le path ? ..." << std::endl;
 			return (this->_header_requete[0].path);
-			return ("");
-		}
 		else
 		{
 			std::string file_name(header, pos_backslash, pos_end - pos_backslash);
@@ -65,8 +55,8 @@ std::string		HttpServer::ft_check_pathhttp_header( std::string header )
 			char	cwd[256];
 			if (getcwd(cwd, sizeof(cwd)) == NULL)
 			{
-				perror("getcwd() error");		// retour ne error
-				return ("");
+				std::cerr << "Error getcwd" << std::endl;
+				exit(1);
 			}
 			else
 			{
@@ -280,12 +270,7 @@ std::string		HttpServer::ft_check_content_length( std::string request_http )
 	{
 		pos = request_http.find("Content-length: ");
 		if (pos == std::string::npos)
-		{
-			// std::cout << "Erreur dans POST le header n'a pas Content-Length" << std::endl;
-			// std::cout << "requet t= " << request_http << std::endl;
-			// std::cout << "what the fuck" << std::endl;
 			return ("");
-		}
 	}
 	size_t pos_end = request_http.find("\r\n", pos);
 	std::string tmp(request_http, pos + 16, pos_end - (pos + 16));
@@ -299,36 +284,21 @@ std::string		HttpServer::ft_check_body_post( std::string request_http )
 		return ("nothing");
 	size_t pos = request_http.find("\r\n\r\n"); // on cherche la fin
 	if (pos == std::string::npos)
-	{
-		std::cout << "Erreur dans POST le header n'a pas /r/n/r/n" << std::endl;
-		exit(1);
-	}
+		return ("");
 	else
 	{
 		size_t pos_end = request_http.find("\r\n", pos);
 		std::string tmp(request_http, pos + 4, pos_end - (pos + 4));
-		// std::cout << "tmp = -" << tmp << "-" << std::endl;
-
-		// on compare avec content_lenght
-		//	 on a une erreur si j'envoie un fichier genre mp3		
+	
 		if ((long)tmp.size() == std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10))
 			return (tmp);
 		else if (std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10) < (long)tmp.size())	// pour le cas de mp3
 		{
-			std::cout << "tmp.size() = " << tmp.size() << std::endl;
-			std::cout << "content_length = " << this->_header_requete[0].content_length << std::endl;
-			std::cout << "ERROR size body differe de content length" << std::endl;
 			if (this->_recv_complete.chunked == true)		// chunked
 				return (tmp);
-			exit(1);
 		}
 		else
-		{
-			std::cout << "yolo" << std::endl;
 			return (tmp);
-		}
-		std::cout << "ici ? " << std::endl;
-		exit(1);
 		return (tmp); 
 	}
 }

@@ -138,7 +138,10 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 		tmp.insert(0, this->ft_get_content_length(buff, tmp.size(), 0));
 		tmp.insert(0, this->ft_get_server_name());
 		tmp.insert(0, this->ft_get_date());
-		tmp.insert(0, this->ft_get_status(requete, true));
+		if (tmp.find("upload") != std::string::npos && tmp.find("Bingo") != std::string::npos)
+			tmp.insert(0, "HTTP/1.1 201 Created\r\n");
+		else
+			tmp.insert(0, this->ft_get_status(requete, true));
 		return (tmp);
 	}
 

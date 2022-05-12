@@ -35,16 +35,14 @@
 				$ext = pathinfo($filename, PATHINFO_EXTENSION);
 				if(!array_key_exists($ext, $allowed)) die("Error: format not good");
 				
-				echo " 1";
 				if (is_dir("upload/"))
 				{
-					// le type mime 
-					echo " 2";
 					if (in_array($filetype, $allowed))
 					{
 						if(file_exists("upload/" . $_FILES["uploadfile"]["name"]))
 						{	
-							echo $_FILES["uploadfile"]["name"] . " existe deja ";
+							http_response_code();
+							echo $_FILES["uploadfile"]["name"] . "Existe deja ";
 						}
 						else
 						{
@@ -53,6 +51,7 @@
 								$path = "./upload/".$filename ;
 								echo "Bingo <br/>";
                      			echo "<img src=".$path." width=50% />";
+								
 							}							
 						}
 					} 
@@ -64,6 +63,7 @@
 			}
 			else
 			{
+			
 				echo "Error file";
 			}
 		}
