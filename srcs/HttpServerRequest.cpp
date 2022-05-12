@@ -353,11 +353,11 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 // http://127.0.0.4:4340/get_post/query_get_test.php?name=salut&prenom=salut&message=truic
 
 
-	// if ((ret = this->ft_redirection()) == 1)	// a deplacer avant cgi je pense
-	// {
-	// 	std::cout << "On a une redirection " << std::endl;
-	// 	return (0);
-	// }
+	if ((ret = this->ft_redirection()) == 1)	// a deplacer avant cgi je pense
+	{
+		std::cout << "On a une redirection " << std::endl;
+		return (0);
+	}
 	if ((ret = this->ft_check_access_path()) > 0)
 	{
 		std::cout << "erreur verifie le drot ret = " << ret << std::endl;

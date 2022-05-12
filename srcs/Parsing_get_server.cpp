@@ -35,7 +35,7 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 	serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
 	serv_dir.insert(std::pair<std::string, bool>("client_max_body_size", false));
 	serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
-	serv_dir.insert(std::pair<std::string, bool>("return", false));
+	// serv_dir.insert(std::pair<std::string, bool>("return", false));
 	
 	while (k < scope_server.size())
 	{
@@ -164,14 +164,14 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 				return (true);
 			k += 2;
 		}
-		else if (scope_server[k] == "return")
-		{
-			// std::cout << "on trouve return dans server" << std::endl;
-			if (this->ft_find_return(k, scope_server, i))
-				return (true);
-			k += 3;
-			// exit(1);
-		}
+		// else if (scope_server[k] == "return")
+		// {
+		// 	// std::cout << "on trouve return dans server" << std::endl;
+		// 	if (this->ft_find_return(k, scope_server, i))
+		// 		return (true);
+		// 	k += 3;
+		// 	// exit(1);
+		// }
 		else
 		{
 			if (scope_server[k] == "}")

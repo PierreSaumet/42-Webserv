@@ -183,7 +183,7 @@ std::string		HttpServer::ft_setup_header( t_header_request *requete )
 		// the_header.insert(0, this->ft_get_return_location());
 		the_header.insert(0, this->ft_get_status(requete, true));
 		std::cout << "\nTHE HEADER FOR THE REDIRECTION = \n\n " << the_header << std::endl;
-		// exit(1);
+		// sleep(10);
 		return (the_header);
 	}
 

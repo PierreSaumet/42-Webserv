@@ -115,87 +115,23 @@ int HttpServer::ft_find_index_server( void ) // A DEPLACER
 
 int		HttpServer::ft_redirection( void )
 {
-	// size_t i = 0;
+
 	std::cout << GREEN << "Dans ft_redirection " << CLEAR << std::endl;
-	if (this->_servers[this->_num_serv].nbr_location == 0)
+	if (this->_header_requete[0].location == true)
 	{
-		std::cout << "pas de location, la requete est " << this->_header_requete[0].path <<  std::endl;
-		if (this->_servers[this->_num_serv].return_server.empty() == false)
+		if (this->_servers[this->_num_serv].location[this->_num_loc].return_location.empty() == true)
 		{
-			std::cout << "il y a une redirection, on setup 'this->_header_requete[0].return_used = true;'" << std::endl;
-			
-			std::cout << "requete= " << this->_header_requete[0].path << std::endl;
-			if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
-			{
-				std::cout << "flavicon donc pas de redirection" << std::endl;
-				return (0);
-			}
-			this->_header_requete[0].return_used = true;
-			return (1);
-			exit(1);
-		}
-		else
-		{
-			std::cout << "pas de redirection dans le bloc server return 0" << std::endl;
+			std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
 			this->_header_requete[0].return_used = false;
 			return (0);
 		}
-		
+		std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
+		this->_header_requete[0].return_used = true;
+		this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size());
+		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[this->_num_loc].return_location);
+		return (1);
 	}
-
-	std::cout << "On a setup this->_num_loc = " << this->_num_loc << std::endl;
-	if (this->_servers[this->_num_serv].location[this->_num_loc].return_location.empty() == true)
-	{
-		std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
-		this->_header_requete[0].return_used = false;
-		return (0);
-	}
-	std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
-	this->_header_requete[0].return_used = true;
-	this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size());
-	this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[this->_num_loc].return_location);
-	return (1);
-
-		// std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
-		// for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
-		// 	all_location.push_back(it->name_location);
-		// std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
-		
-		// for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
-		// {	
-		// 	size_t i = 0;
-		// 	while (i < this->_servers[this->_num_serv].nbr_location)
-		// 	{
-		// 		if (*it == this->_servers[this->_num_serv].location[i].name_location)
-		// 		{
-		// 			if (this->_header_requete[0].path.compare(0, it->size(), *it) == 0)
-		// 			{
-		// 				if (this->_servers[this->_num_serv].location[i].return_location.empty() == true)
-		// 				{
-		// 					std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
-		// 					this->_header_requete[0].return_used = false;
-		// 					return (0);
-		// 				}
-		// 				else
-		// 				{
-		// 					std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[i].name_location << std::endl;
-		// 					this->_header_requete[0].return_used = true;
-		// 					// exit(1);
-		// 					// test on supprime root et le nom de la location pour rempplacer par le return
-		// 					this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[i].name_location.size());
-		// 					this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[i].return_location);
-		// 					return (1);
-		// 				}
-		// 			}
-		// 		}
-		// 		i++;
-		// 	}
-		// }
-		// std::cout << "la requete ne correspond a aucun bloc location donc error 404 ?" << std::endl;
-		// exit(1);
-		// return (-1);
-	// }
-	// return (0);
+	return (0);
 }
 
 
@@ -213,8 +149,6 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 		std::cout << "existe pas " << std::endl;
 		sleep(2);
 		return (1);
-		// if (this->_servers[this->_num_serv].location[this->_num_loc].root_location.empty() == true)
-		exit(1);
 	}
 	else if (S_ISREG(buff.st_mode))
 	{
@@ -246,155 +180,6 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 	}
 	else
 		return (1); // 404
-	exit(1);
-
-	// while ( i < this->_servers[this->_num_serv].location.size())
-	// {
-	// 	if (name_location == this->_servers[this->_num_serv].location[i].name_location)
-	// 	{
-	// 		std::cout << "bloc location = " << name_location << std::endl;
-	// 		// this->_num_loc = i;   // a changer tu peux savoir l'index du loc bienavant ...
-
-	// 		std::cout << "Et la requete est : "<< this->_header_requete[0].path << std::endl;
-	// 		std::cout << "path = " << path << std::endl;
-			
-	// 		 // Probleme avec les roots 
-	// 		if (path.size() - this->_servers[0].root_server.size() > 1)
-	// 		{
-	// 			std::cout << "ici" << std::endl;
-	// 			 exit(1);
-	// 			struct stat buff;
-				
-	// 			if (stat(path.c_str(), &buff) < 0)
-	// 			{
-					
-	// 				if (name_location != "/")
-	// 				{
-	// 					if (this->_servers[this->_num_serv].location[i].root_location.empty() == true)
-	// 					{
-	// 						if (this->_servers[this->_num_serv].location[i].index_location.empty() == true)
-	// 						{
-	// 							if (this->_servers[this->_num_serv].location[i].autoindex_location == true)
-	// 							{
-	// 								if (this->_header_requete[0].path[this->_header_requete[0].path.size() - 1] == '/')
-	// 								{
-	// 									this->_header_requete[0].path = this->_servers[this->_num_serv].root_server;
-	// 									this->_header_requete[0].path.insert(0, "--AUTOINDEX--");
-	// 									std::cout << "Requete exsite pas mais location diff de / pas de root, pas index, autoindex ON donc on retourne ce qu'il y a dans root";
-	// 									return (0);
-	// 								}
-									
-	// 							}
-	// 						}
-	// 					}
-	// 				}
-	// 				std::cout << "Le fichier demande n'existe pas on sort 404" << std::endl;
-	// 				std::cout << "car la requete est : " << this->_header_requete[0].path << std::endl;
-	// 				// exit(1);
-	// 				return (1); //404
-	// 			}
-	// 			// exit(1);
-	// 			if (S_ISDIR(buff.st_mode))
-	// 			{
-	// 				std::cout << "DOSSIER   i = " << i << std::endl;
-	// 				std::cout << "ICI requete[0].path = " << this->_header_requete[0].path << std::endl;
-	// 				if (this->_servers[this->_num_serv].location[i].root_location.empty() == false)		// root dans location est setup
-	// 				{
-	// 					// std::cout << "this->_header_requete[0].path[this->_header_requete[0].path.size() - 1] = " << this->_header_requete[0].path[this->_header_requete[0].path.size() - 1]<< std::endl;
-	// 					// exit(1);
-	// 					if (this->_header_requete[0].path[this->_header_requete[0].path.size() - 1] == '/')
-	// 					{
-	// 						if (this->_servers[this->_num_serv].location[i].index_location.empty() == false)	// si l'index est setup on le rajoute
-	// 						{
-	// 							this->_header_requete[0].path.append(this->_servers[this->_num_serv].location[i].index_location);
-	// 							return (0);
-	// 						}
-	// 						std::cout << "On demande un dossier, dans le bloc location / avec root sans index donc prend l'index du server" << std::endl;
-	// 						if (this->_servers[this->_num_serv].location[i].autoindex_location ==  true)
-	// 						{
-	// 							std::cout << "ON a AUTOINDEX exit" << std::endl;
-	// 							this->_header_requete[0].path.insert(0, "--AUTOINDEX--");
-								
-	// 							return (0);
-	// 							exit(1);
-	// 						}
-	// 						this->_header_requete[0].path.append(this->_servers[this->_num_serv].index_server);
-	// 						return (0); //403
-							
-	// 					}
-	// 					else
-	// 					{
-	// 						std::cout << "On demande un dossier, dans le bloc location / 403" << std::endl;
-	// 						return (2); // return 403/ demande first au lieu de first/
-	// 					}
-
-	// 					// exit(1);
-	// 				}
-	// 				else			// pas de root dans location
-	// 				{
-	// 					// on regarde si on demande un index.
-	// 					if (this->_header_requete[0].path[this->_header_requete[0].path.size() -1] == '/')
-	// 					{
-	// 						std::cout << "ON DEMANDE l'index d'un dossier" << std::endl;
-	// 						if (this->_servers[this->_num_serv].location[i].index_location.empty() == false)	// si l'index est setup on le rajoute
-	// 						{
-	// 							this->_header_requete[0].path.append(this->_servers[this->_num_serv].location[i].index_location);
-	// 							return (0);
-	// 						}
-	// 						if (this->_servers[this->_num_serv].location[i].autoindex_location == true)
-	// 						{
-	// 							this->_header_requete[0].path.insert(0, "--AUTOINDEX--");
-	// 							std::cout << "dans location, pas de root, pas de index, le dossier existe et il y a autoindex donc autoindex" << std::endl;
-	// 							return (0);
-	// 						}
-	// 						std::cout << "buf " << std::endl;
-	// 						exit(1);
-	// 						return (2); // 403
-	// 					}
-	// 					else
-	// 					{
-	// 						std::cout << "On demande un dossier sans /, dans le bloc location / 403" << std::endl;
-	// 						return (2); // return 403/ demande first au lieu de first/
-	// 					}
-	// 				}
-	// 			}
-	// 			else if (S_ISREG(buff.st_mode))
-	// 			{
-	// 				std::cout << "FICHIER donc bon" << std::endl;
-	// 				return (0);
-	// 			}
-	// 			else
-	// 				return (1); // 404
-	// 		}
-	// 		else	// path == / donc on return 0
-	// 		{
-	// 			std::cout << "la" << std::endl;
-	// 			exit(1);
-	// 			if (this->_servers[this->_num_serv].location[i].root_location.empty() == true)
-	// 			{
-	// 				if (this->_servers[this->_num_serv].location[i].index_location.empty() == true)
-	// 				{
-	// 					std::cout << "On est dans le bloc location, on demande l'index, pas de root ni d'index dans location donc on retourne l'index du server" << std::endl;
-	// 					this->_header_requete[0].path.append(this->_servers[this->_num_serv].index_server);
-	// 					return (0);
-	// 				}
-	// 				this->_header_requete[0].path.append(this->_servers[this->_num_serv].location[i].index_location);
-	// 				std::cout << "On est dans le bloc location, on demande l'index, pas de root  dans location donc on retourne l'index du location" << std::endl;
-	// 				return (0);
-	// 				// return (1); //404
-	// 			}
-
-	// 			std::cout << "autre path = /" << std::endl;
-	// 			this->_header_requete[0].path_file = path;
-	// 			exit(1);
-	// 			return (0);
-	// 		}
-	// 	}
-	// 	i++;
-	// }
-	std::cout << "MINCE " <<std::endl;
-	exit(1);
-	return (0);
 }
 
 
