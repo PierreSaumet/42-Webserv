@@ -175,7 +175,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysCline[i] = new char[aArgs[i].size() + 1];
 		strncpy(sysCline[i], aArgs[i].c_str(), aArgs[i].size() + 1);
-		std::cout << "SYScline = " << sysCline[i] << std::endl;
+		// std::cout << "SYScline = " << sysCline[i] << std::endl;
 	}
 	sysCline[aArgs.size()] = NULL;
 
@@ -186,7 +186,7 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 	{
 		sysEnv[i] = new char[aEnv[i].size() + 1];
 		strncpy(sysEnv[i], aEnv[i].c_str(), aEnv[i].size() + 1);
-		std::cout << "Sysenv = " << sysEnv[i] << std::endl;
+		// std::cout << "Sysenv = " << sysEnv[i] << std::endl;
 	}
 	sysEnv[aEnv.size()] = NULL;
 
@@ -246,16 +246,6 @@ std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_fil
 		}
 	}
 
-	for (unsigned long i = 0; i < aArgs.size(); i++)
-	{
-		std::cout << "SYScline = " << sysCline[i] << std::endl;
-	}
-
-	for (unsigned long i = 0; i < aEnv.size(); i++)
-	{
-		std::cout << "Sysenv = " << sysEnv[i] << std::endl;
-		std::cout << "aEnv = " << aEnv[i] << std::endl;
-	}
 
 	dup2(stdin_tmp, STDIN_FILENO);
 	dup2(stdout_tmp, STDOUT_FILENO);
@@ -319,7 +309,7 @@ std::vector<std::string>		Cgi_exec::ft_convert_map_to_vector( void )
 		string = it->first;
 		string.append("=");
 		string.append(it->second);
-		std::cout << "aEnv = " << string << std::endl;
+		// std::cout << "aEnv = " << string << std::endl;
 		tmp.push_back(string);
 
 	}

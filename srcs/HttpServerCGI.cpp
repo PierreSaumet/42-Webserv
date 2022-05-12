@@ -129,8 +129,9 @@ void			HttpServer::ft_exec_cgi_test( void )
 		// sleep(2);
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp_2);
 		
-		std::cout << "fin de cgi post " << std::endl;
-		std::cout << "bopdy cgo -= " << this->_header_requete[0].body_error << std::endl;
+		// std::cout << "fin de cgi post " << std::endl;
+
+		// std::cout << "bopdy cgo -= " << this->_header_requete[0].body_error << std::endl;
 		if (this->_header_requete[0].body_error == "")
 		{
 			this->_header_requete[0].error = true;

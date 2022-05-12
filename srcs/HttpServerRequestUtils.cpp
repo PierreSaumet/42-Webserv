@@ -147,7 +147,7 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 	if (stat(path.c_str(), &buff) < 0)
 	{
 		std::cout << "existe pas " << std::endl;
-		sleep(2);
+		// sleep(2);
 		return (1);
 	}
 	else if (S_ISREG(buff.st_mode))

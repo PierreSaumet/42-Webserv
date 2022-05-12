@@ -249,7 +249,9 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		this->ft_delete(request, len_msg);
 
 	std::cout << "ERRUER NI GET NI POST NI DELETE = " <<  std::endl;
-	this->_header_requete.push_back(t_header_request());
+	std::cout << "request = " << request << std::endl;
+	exit(1);
+	// this->_header_requete.push_back(t_header_request());
 	this->_header_requete[0].path = this->ft_check_path_header(header);
 	this->ft_do_error(405);
 	return (this->_header_requete[0]);
