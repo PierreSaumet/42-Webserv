@@ -94,13 +94,50 @@ size_t HttpServer::ft_post_2( t_header_request data, std::string body)
 }
 
 
+void		HttpServer::ft_init_general_structure( void )
+{
+	this->_header_requete[0].port_client = 0;
+	this->_header_requete[0].method = "";
+	this->_header_requete[0].path = "";
+	this->_header_requete[0].protocol = "";
+	this->_header_requete[0].host = "";
+	this->_header_requete[0].accept = "";
+	this->_header_requete[0].path_http = "";
+	this->_header_requete[0].query_string = "";
+	this->_header_requete[0].cgi_return = "";
+	this->_header_requete[0].referer = "";
+	this->_header_requete[0].request_uri = "";
+	this->_header_requete[0].content_type = "";
+	this->_header_requete[0].content_length = "";
+	this->_header_requete[0].body_post = "";
+	this->_header_requete[0].script_file_name = "";
+	this->_header_requete[0].path_file = "";
+	this->_header_requete[0].return_used = false;
+	this->_header_requete[0].upload = false;
+	this->_header_requete[0].cgi = false;
+	this->_header_requete[0].error = false;
+	this->_header_requete[0].num_error = 0;
+	this->_header_requete[0].body_error = "";
+	this->_header_requete[0].num_server = 0;
+	this->_header_requete[0].expect = false;
+	this->_header_requete[0].connection_close = false;
+}
+
 HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int len_msg, std::string request, t_header_request data)
 {
 	this->_num_serv = port_client;
 	this->_num_loc = 666;
 	size_t			pos = request.find("\r\n\r\n");
+
+	this->_header_requete.push_back(t_header_request());
+	if (pos == std::string::npos)
+	{
+		this->_header_requete[0].path = "/";
+		this->ft_do_error(400);
+		return (this->_header_requete[0]);
+	}
+
 	std::string 	header(request, 0, pos);
-	
 	if (data.expect == true)
 	{
 		if (data.method == "POST")
@@ -112,23 +149,17 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		{
 			exit(1);
 		}
-	}	
+	}
+	this->ft_init_general_structure();
 
-	this->_num_serv = this->ft_choose_wich_server(header, port_client);	// manque des arguments
-	
-	// std::cout << "on utilise le server = " << this->_num_serv << std::endl;
-	std::cout << "header = " << header << std::endl;
-	// std::cout << "\n\ntaille header = " << header.size() << std::endl;
-	// std::cout << "taille fichier = " << request.size(); 
-	// sleep(5);
+	this->_num_serv = this->ft_choose_wich_server(header, port_client);
+
 	if (ft_check_basic(header) < 0)
 	{
-		this->_header_requete.push_back(t_header_request());
 		this->_header_requete[0].path = this->ft_check_path_header(header);
 		this->ft_do_error(400);
 		return (this->_header_requete[0]);
 	}
-	// exit(1);
 
 	if (header.compare(0, 4, "GET ") == 0)
 	{
@@ -155,144 +186,136 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 {
 	std::cout << GREEN << "\nDans get : " << CLEAR <<  std::endl;
 	std::cout << "on utilise le server = " << this->_num_serv << std::endl;
-	if (this->_header_requete.empty() == true)
+	
+	size_t 			pos_header = request_http.find("\r\n\r\n"); // faire erreur si pas de fin de header
+	std::string 	size_header(request_http, 0, pos_header);
+	int 			ret = 0;
+
+	this->_header_requete[0].method = "GET";									// on a deja verifier ca avant
+	this->_header_requete[0].host = this->ft_check_host_header(size_header);				
+	
+	// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
+	this->_header_requete[0].path = this->ft_check_path_header(size_header);
+	if (this->_header_requete[0].path.empty() == true)
+		return (ft_do_error(400));
+	std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
+
+	if (len_msg > 1023)
 	{
-		this->_header_requete.push_back(t_header_request());
-		
-
-		size_t 			pos_header = request_http.find("\r\n\r\n"); // faire erreur si pas de fin de header
-		std::string 	size_header(request_http, 0, pos_header);
-		int 			ret = 0;
-
-		this->_header_requete[0].method = "GET";									// on a deja verifier ca avant
-		this->_header_requete[0].host = this->ft_check_host_header(size_header);				
-		
-		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
 		this->_header_requete[0].path = this->ft_check_path_header(size_header);
-		if (this->_header_requete[0].path.empty() == true)
-			return (ft_do_error(400));
-		std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
+		return (ft_do_error(431));
+	}
+	
+	this->_header_requete[0].query_string = this->ft_parsing_path_get_request();
+	std::cout << "On a la query_string : " << this->_header_requete[0].query_string << std::endl;
 
-		if (len_msg > 1023)
+	// std::cout << "ici" << std::endl;
+	// exit(1);
+
+	this->_header_requete[0].protocol = "HTTP/1.1";									// on a deja verifier ca avant
+	std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
+
+	this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
+	std::cout << "On a le accept = "<< this->_header_requete[0].accept << std::endl;
+
+	if ((ret = ft_check_method_allowed_header("GET")) > 0)
+		return (ft_do_error(405));
+	std::cout << "method ok " << std::endl;
+	
+	
+	if (this->ft_check_cgi_or_php(request_http) == 1)
+	{
+
+		if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
 		{
-			this->_header_requete[0].path = this->ft_check_path_header(size_header);
-			return (ft_do_error(431));
+			return (ft_do_error(500));
 		}
-		
-		this->_header_requete[0].query_string = this->ft_parsing_path_get_request();
-		std::cout << "On a la query_string : " << this->_header_requete[0].query_string << std::endl;
 
-		// std::cout << "ici" << std::endl;
+		int 				res = 0;
+		size_t 				pos = this->_header_requete[0].path.find("?");
+		
+		if (pos != std::string::npos)
+		{
+			std::string 	tmp = this->_header_requete[0].path;
+
+			this->_header_requete[0].path.erase(pos, this->_header_requete[0].path.size());				
+			if ((res = this->ft_check_access_path()) > 0)
+			{
+				this->_header_requete[0].error = true;
+				if (res == 2)
+					this->_header_requete[0].num_error = 403;
+				if (res == 1)
+					this->_header_requete[0].num_error = 404;
+				this->ft_setup_error_header();
+				return (0);
+			}
+			pos = tmp.find("?");
+			tmp.erase(0, pos);
+			this->_header_requete[0].path.append(tmp);
+			this->_header_requete[0].request_uri = this->_header_requete[0].path;
+			this->_header_requete[0].script_file_name = this->_header_requete[0].path;
+			pos = this->_header_requete[0].script_file_name.find("?");
+			this->_header_requete[0].script_file_name.erase(pos, this->_header_requete[0].script_file_name.size());
+		}
+		else
+		{
+			if ((res = this->ft_check_access_path()) > 0)
+			{
+				this->_header_requete[0].error = true;
+				if (res == 2)
+					this->_header_requete[0].num_error = 403;
+				if (res == 1)
+					this->_header_requete[0].num_error = 404;
+				this->ft_setup_error_header();
+				return (0);
+			}
+			this->_header_requete[0].request_uri = this->_header_requete[0].path;
+			this->_header_requete[0].script_file_name = this->_header_requete[0].path;
+		}
+		// std::cout << "fin = \n" << std::endl;
+		// std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
+		// std::cout << "this->_header_requete[0].request_uri  = " << this->_header_requete[0].request_uri  << std::endl;
+		// std::cout << "this->_header_requete[0].script_file_name = " << this->_header_requete[0].script_file_name << std::endl;
+
+		// We get the total path for the varriable path_http
+		char	cwd[256];
+		if (getcwd(cwd, sizeof(cwd)) == NULL)
+			throw Error(666, "Error getcwd doesn't work.", 666);
+		
+		std::string tt(cwd);
+		this->_header_requete[0].path_http = tt;
+		this->_header_requete[0].path_http.append("/");
+		this->_header_requete[0].path_http.append(this->_header_requete[0].script_file_name);
+
+
+		
+		this->ft_exec_cgi_test(); //request_http, len_msg);
+
+		// std::cerr << "ici " << strerror(errno) << std::endl;
 		// exit(1);
-
-		this->_header_requete[0].protocol = "HTTP/1.1";									// on a deja verifier ca avant
-		std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
-
-		this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
-		std::cout << "On a le accept = "<< this->_header_requete[0].accept << std::endl;
-
-		if ((ret = ft_check_method_allowed_header("GET")) > 0)
-			return (ft_do_error(405));
-		std::cout << "method ok " << std::endl;
-		
-		
-		if (this->ft_check_cgi_or_php(request_http) == 1)
-		{
-
-			if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
-			{
-				return (ft_do_error(500));
-			}
-
-			int 				res = 0;
-			size_t 				pos = this->_header_requete[0].path.find("?");
-			
-			if (pos != std::string::npos)
-			{
-				std::string 	tmp = this->_header_requete[0].path;
-
-				this->_header_requete[0].path.erase(pos, this->_header_requete[0].path.size());				
-				if ((res = this->ft_check_access_path()) > 0)
-				{
-					this->_header_requete[0].error = true;
-					if (res == 2)
-						this->_header_requete[0].num_error = 403;
-					if (res == 1)
-						this->_header_requete[0].num_error = 404;
-					this->ft_setup_error_header();
-					return (0);
-				}
-				pos = tmp.find("?");
-				tmp.erase(0, pos);
-				this->_header_requete[0].path.append(tmp);
-				this->_header_requete[0].request_uri = this->_header_requete[0].path;
-				this->_header_requete[0].script_file_name = this->_header_requete[0].path;
-				pos = this->_header_requete[0].script_file_name.find("?");
-				this->_header_requete[0].script_file_name.erase(pos, this->_header_requete[0].script_file_name.size());
-			}
-			else
-			{
-				if ((res = this->ft_check_access_path()) > 0)
-				{
-					this->_header_requete[0].error = true;
-					if (res == 2)
-						this->_header_requete[0].num_error = 403;
-					if (res == 1)
-						this->_header_requete[0].num_error = 404;
-					this->ft_setup_error_header();
-					return (0);
-				}
-				this->_header_requete[0].request_uri = this->_header_requete[0].path;
-				this->_header_requete[0].script_file_name = this->_header_requete[0].path;
-			}
-			// std::cout << "fin = \n" << std::endl;
-			// std::cout << "this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
-			// std::cout << "this->_header_requete[0].request_uri  = " << this->_header_requete[0].request_uri  << std::endl;
-			// std::cout << "this->_header_requete[0].script_file_name = " << this->_header_requete[0].script_file_name << std::endl;
-
-			// We get the total path for the varriable path_http
-			char	cwd[256];
-			if (getcwd(cwd, sizeof(cwd)) == NULL)
-				throw Error(666, "Error getcwd doesn't work.", 666);
-			
-			std::string tt(cwd);
-			this->_header_requete[0].path_http = tt;
-			this->_header_requete[0].path_http.append("/");
-			this->_header_requete[0].path_http.append(this->_header_requete[0].script_file_name);
-
-
-			
-			this->ft_exec_cgi_test(); //request_http, len_msg);
-
-			// std::cerr << "ici " << strerror(errno) << std::endl;
-			// exit(1);
-			return (0);
-		}
-
-		if ((ret = this->ft_redirection()) == 1)
-		{
-			std::cout << "On a une redirection " << std::endl;
-			return (0);
-		}
-		if ((ret = this->ft_check_access_path()) > 0)
-		{
-			std::cout << "erreur verifie le drot ret = " << ret << std::endl;
-			
-			this->_header_requete[0].error = true;
-			if (ret == 2)
-				this->_header_requete[0].num_error = 403;
-			if (ret == 1)
-				this->_header_requete[0].num_error = 404;
-			this->ft_setup_error_header();
-			return (0);
-		}
-		std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
-		std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
 		return (0);
 	}
-	else
-		return (ft_do_error(500));
-	
+
+	if ((ret = this->ft_redirection()) == 1)
+	{
+		std::cout << "On a une redirection " << std::endl;
+		return (0);
+	}
+	if ((ret = this->ft_check_access_path()) > 0)
+	{
+		std::cout << "erreur verifie le drot ret = " << ret << std::endl;
+		
+		this->_header_requete[0].error = true;
+		if (ret == 2)
+			this->_header_requete[0].num_error = 403;
+		if (ret == 1)
+			this->_header_requete[0].num_error = 404;
+		this->ft_setup_error_header();
+		return (0);
+	}
+	std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+	std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
+	return (0);
 }
 
 size_t			HttpServer::ft_post(std::string request_http, t_header_request data)

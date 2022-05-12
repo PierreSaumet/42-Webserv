@@ -129,6 +129,7 @@ class HttpServer {
 		HttpServer			&operator=( const HttpServer &element );
 
 
+		void ft_init_general_structure( void );
 		size_t ft_post_2(t_header_request data, std::string body);
 
 		/*
