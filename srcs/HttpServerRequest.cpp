@@ -32,6 +32,8 @@ int			HttpServer::ft_choose_wich_location( std::string header )
 		return (0);
 	}
 	this->_header_requete[0].path = ft_check_path_header(header);
+	if (this->_header_requete[0].path == "")
+		return (-1);
 
 	size_t pos = this->_header_requete[0].path.find("/", 1);
 	std::string tmp;
@@ -189,7 +191,7 @@ void		HttpServer::ft_init_general_structure( void )
 HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int len_msg, std::string request, t_header_request data)
 {
 	this->_num_serv = port_client;
-	this->_num_loc = 666;
+	this->_num_loc = 0;
 	size_t			pos = request.find("\r\n\r\n");
 
 	this->_header_requete.push_back(t_header_request());
@@ -225,13 +227,14 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		this->ft_do_error(404);
 		return (this->_header_requete[0]);
 	}
-
+	std::cout << "on a un num server = " << this->_num_serv << " et  loc " <<  this->_header_requete[0].location << " duc oup num = " << this->_num_loc << std::endl;
 	if (ft_check_basic(header) < 0)
 	{
-		// this->_header_requete[0].path = this->ft_check_path_header(header);
 		this->ft_do_error(400);
 		return (this->_header_requete[0]);
 	}
+
+
 
 	if (header.compare(0, 4, "GET ") == 0)
 	{
@@ -259,45 +262,25 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 	std::cout << GREEN << "\nDans get : " << CLEAR <<  std::endl;
 	std::cout << "on utilise le server = " << this->_num_serv << std::endl;
 	
-	size_t 			pos_header = request_http.find("\r\n\r\n"); // faire erreur si pas de fin de header
+	if (len_msg > 1023)
+		return (ft_do_error(431));
+
+	size_t 			pos_header = request_http.find("\r\n\r\n");
 	std::string 	size_header(request_http, 0, pos_header);
 	int 			ret = 0;
 
 	this->_header_requete[0].method = "GET";									// on a deja verifier ca avant
 	this->_header_requete[0].host = this->ft_check_host_header(size_header);				
-	
-	// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
-	this->_header_requete[0].path = this->ft_check_path_header(size_header);
-	if (this->_header_requete[0].path.empty() == true)
-		return (ft_do_error(400));
-	std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
-
-	if (len_msg > 1023)
-	{
-		this->_header_requete[0].path = this->ft_check_path_header(size_header);
-		return (ft_do_error(431));
-	}
-	
 	this->_header_requete[0].query_string = this->ft_parsing_path_get_request();
-	std::cout << "On a la query_string : " << this->_header_requete[0].query_string << std::endl;
-
-	// std::cout << "ici" << std::endl;
-	// exit(1);
-
-	this->_header_requete[0].protocol = "HTTP/1.1";									// on a deja verifier ca avant
-	std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
-
+	this->_header_requete[0].protocol = "HTTP/1.1";
 	this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
-	std::cout << "On a le accept = "<< this->_header_requete[0].accept << std::endl;
-
 	if ((ret = ft_check_method_allowed_header("GET")) > 0)
 		return (ft_do_error(405));
-	std::cout << "method ok " << std::endl;
-	
-	
 	if (this->ft_check_cgi_or_php(request_http) == 1)
 	{
-
+		
+		std::cout << "cgi " << std::endl;
+			exit(1);
 		if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
 		{
 			return (ft_do_error(500));
@@ -368,7 +351,7 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		return (0);
 	}
 
-	if ((ret = this->ft_redirection()) == 1)
+	if ((ret = this->ft_redirection()) == 1)	// a deplacer avant cgi je pense
 	{
 		std::cout << "On a une redirection " << std::endl;
 		return (0);

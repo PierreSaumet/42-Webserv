@@ -307,17 +307,17 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 	size_t pos;
 
 	error_string = "<!DOCTYPE html><html><head><title></title><style type=text/css>body {color: red;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1></h1><p>by Pierre.</p></body></html>";
-	ss << this->_header_requete[0].num_error;
+	ss << requete->num_error;
 	ss >> tmp;
 	pos = error_string.find("</title>");
 	error_string.insert(pos, tmp);
 	ss.str("");
 	ss.clear();
 	pos = error_string.find("by");
-	;
+	
 	
 	pos = error_string.find("by Pierre");
-	error_string.erase(pos - 2, 2);
+	error_string.insert(pos, tmp);
 	pos = error_string.find("by Pierre");
 	error_string.insert(pos, " ");
 	

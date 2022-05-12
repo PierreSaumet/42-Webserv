@@ -12,7 +12,14 @@
 
 #include "../Headers/HttpServer.hpp"
 
-
+/*
+**	std::string			HttpServer::ft_parsing_path_get_request( void ):
+**		This function setup 'this->_header_requete[0].query_string' and put 
+**	all data from a GET request, the data after ?.
+**	Return emtpy if there is no data.
+**		Alos, setup 'this->_header_requete[0].data' which is a container
+**	with a key and value;
+*/
 std::string			HttpServer::ft_parsing_path_get_request( void )
 {
 	std::cout << RED << "Dans ft_parsing_path_get_request : FONCTION A CHANGER " << CLEAR << std::endl;
@@ -22,16 +29,9 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 		return ("");
 	else
 	{
-		std::cout << "\tIl y a des donnees a parser dans la requete GET." << std::endl;
-		std::cout << "pos_cursor = " << pos_cursor << std::endl;
-		std::cout << "taille patg = " << this->_header_requete[0].path.size() << std::endl;
 		if (pos_cursor == this->_header_requete[0].path.size() - 1)
 			return ("");
-
 		std::string tmp = "";
-
-
-		
 		pos_cursor++;
 		size_t len = this->_header_requete[0].path.length();
 		while (this->_header_requete[0].path[pos_cursor])
@@ -50,11 +50,8 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 				{
 					if (it_b->second == "NULL")
 					{
-						// On change les characteres speciaux
-						tmp = ft_clean_path_get_request(tmp);
+						tmp = ft_clean_path_get_request(tmp); // a refaire
 						it_b->second = tmp;
-
-						// On ajoute les donnees a this->_header_requete[0].query_string
 						this->_header_requete[0].query_string.append(it_b->first);
 						this->_header_requete[0].query_string.append("=");
 						this->_header_requete[0].query_string.append(it_b->second);
