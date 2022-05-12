@@ -24,6 +24,69 @@ int HttpServer::ft_check_basic( std::string header )
 	return (0);
 }
 
+int			HttpServer::ft_choose_wich_location( std::string header )
+{
+	if (this->_servers[this->_num_serv].nbr_location == 0)
+	{
+		this->_header_requete[0].location = false;
+		return (0);
+	}
+	this->_header_requete[0].path = ft_check_path_header(header);
+
+	size_t pos = this->_header_requete[0].path.find("/", 1);
+	std::string tmp;
+	if (pos == std::string::npos)
+	{
+		tmp = this->_header_requete[0].path;
+		tmp.append("/");
+	}
+	else
+	{
+		tmp = this->_header_requete[0].path;
+		tmp.erase(pos + 1, this->_header_requete[0].path.size() - pos + 1);
+	}		
+	
+	std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
+	for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
+		all_location.push_back(it->name_location);
+		
+	std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
+	
+	for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
+	{
+		size_t i = 0;
+		while (i < this->_servers[this->_num_serv].nbr_location)
+		{
+			if (*it == this->_servers[this->_num_serv].location[i].name_location)
+			{
+				if (this->_servers[this->_num_serv].location[i].name_location[this->_servers[this->_num_serv].location[i].name_location.size() - 1] != '/')
+				{
+					if (tmp.compare(0, tmp.size() -1, this->_servers[this->_num_serv].location[i].name_location) == 0)
+					{
+						this->_header_requete[0].location = true;
+						return (i);
+					}
+				}
+				else
+				{
+					if (tmp.compare(0, tmp.size(), this->_servers[this->_num_serv].location[i].name_location) == 0)
+					{
+						this->_header_requete[0].location = true;
+						return (i);
+					}
+				}
+				if (*it == "/")
+				{
+					this->_header_requete[0].location = true;
+					return (i);
+				}
+			}
+			i++;
+		}
+	}
+	return (-1);
+}
+
 int			HttpServer::ft_choose_wich_server( std::string header, int num )
 {
 	size_t 		pos = 0;
@@ -138,8 +201,10 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	}
 
 	std::string 	header(request, 0, pos);
-	if (data.expect == true)
+	if (data.expect == true)		// a refaire
 	{
+		std::cout << "exepct 100 exit" << std::endl;
+		exit(1);
 		if (data.method == "POST")
 		{
 			this->ft_post_2(data, request);
@@ -147,16 +212,23 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		}
 		else
 		{
+			std::cout << "here exit" << std::endl;
 			exit(1);
 		}
 	}
-	this->ft_init_general_structure();
 
+
+	this->ft_init_general_structure();
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);
+	if ((this->_num_loc = this->ft_choose_wich_location(header)) == -1) // on a deja recuperer le path
+	{
+		this->ft_do_error(404);
+		return (this->_header_requete[0]);
+	}
 
 	if (ft_check_basic(header) < 0)
 	{
-		this->_header_requete[0].path = this->ft_check_path_header(header);
+		// this->_header_requete[0].path = this->ft_check_path_header(header);
 		this->ft_do_error(400);
 		return (this->_header_requete[0]);
 	}

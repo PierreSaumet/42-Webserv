@@ -99,6 +99,8 @@ class HttpServer {
 			std::string			body_error;			// si cgi body_error contient la response du cgi sans le header
 			std::map<std::string, std::string>	data;	// Contient les information transmise a Get via un formulaire					// contient les informations en get.
 		
+			bool 			location;
+			int				num_loc;
 			int				num_server;
 			bool expect;
 			bool connection_close;
@@ -253,6 +255,7 @@ class HttpServer {
 		long long int  convert_hex_to_dec( std::string const string );
 	
 		int ft_choose_wich_server( std::string header, int num);
+		int ft_choose_wich_location( std::string header );
 
 		int ft_check_basic( std::string header );
 
