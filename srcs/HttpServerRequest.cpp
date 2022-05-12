@@ -207,7 +207,6 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	if (data.expect == true)		// a refaire
 	{
 		std::cout << "exepct 100 exit" << std::endl;
-		// exit(1);
 		if (data.method == "POST")
 		{
 			this->ft_post_2(data, request);
@@ -215,8 +214,8 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		}
 		else
 		{
-			std::cout << "here exit" << std::endl;
-			exit(1);
+			ft_do_error(500);
+			return (this->_header_requete[0]);
 		}
 	}
 	
@@ -234,12 +233,14 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	this->ft_init_general_structure();
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);
 	std::cout << "on va utiliser le server = " << std::endl;
-	// exit(1);
+
 	if ((this->_num_loc = this->ft_choose_wich_location(header)) == -1) // on a deja recuperer le path
 	{
 		this->ft_do_error(404);
 		return (this->_header_requete[0]);
 	}
+	this->_header_requete[0].num_loc = this->_num_loc;
+	this->_header_requete[0].num_server = this->_num_serv;
 	std::cout << "on a un num server = " << this->_num_serv << " et  loc " <<  this->_header_requete[0].location << " duc oup num = " << this->_num_loc << std::endl;
 	if (ft_check_basic(header) < 0)
 	{
@@ -452,10 +453,7 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 	
 
 	this->_header_requete[0].body_post = this->ft_check_body_post(size_body);
-	// std::cout << "la" << std::endl;
-	// if (this->_header_requete[0].body_post.empty() == true)
-	// 	return (ft_do_error(400));
-	// exit(1);
+
 	if (this->_header_requete[0].body_post == "nothing")
 		this->_header_requete[0].body_post = size_body;
 
@@ -509,8 +507,6 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 		this->_header_requete[0].expect = true;
 		return (ft_do_error(100));
 	}
-	// exit(1);
-
 
 	if (this->ft_check_cgi_or_php(request_http) == 1)  // verifier cette fonction
 	{
@@ -569,6 +565,16 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 	std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
 
 	int res = 0;
+	if ((res = this->ft_redirection()) == 1)	// a deplacer avant cgi je pense
+	{
+		std::cout << "On a une redirection " << std::endl;
+		std::cout << "num server = " << this->_num_serv << std::endl;
+		std::cout << "loc = " << this->_num_loc << std::endl;
+		return (0);
+	}
+
+
+	
 	if ((res = this->ft_check_access_path()) > 0)
 	{
 		this->_header_requete[0].error = true;

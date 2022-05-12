@@ -244,14 +244,12 @@ size_t 	HttpServer::ft_check_access_path( void )
 			std::cout << "path = " << this->_header_requete[0].path << std::endl;
 			this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[this->_num_loc].root_location);
 			std::cout << "path = " << this->_header_requete[0].path << std::endl;
-			// exit(1);
+			
 		}
 		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
 		return (this->check_location(this->_header_requete[0].path, this->_servers[this->_num_serv].location[this->_num_loc].name_location ));
 	}
-	
-	std::cout << "pas bon " << std::endl;
-	exit(1);
+	return (1);
 
 }
 

@@ -155,8 +155,7 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 	DIR 				*dir = NULL;
 	struct dirent  		*file = NULL;
 
-	std::cout << "body error = " << requete->body_error << std::endl;
-	// exit(1);
+
 	if (stat(requete->body_error.c_str(), &buff) < 0)
 		return (ft_create_error(requete));
 
@@ -212,8 +211,6 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 		path_error.insert(0, this->ft_get_status(requete, true));
 		return (path_error);
 	}
-// std::cout << "mince " << std::endl;
-// 	exit(1);
 	return (ft_create_error(requete)); // test
 }
 
@@ -266,7 +263,6 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 	error_string.append("\0");
 
 	
-	// exit(1);
 	if (requete->num_error == 100)
 	{
 		error_string.clear();
@@ -278,6 +274,5 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 
 	}
 	std::cout << "error_string = " << error_string << std::endl;
-	// exit(1);
 	return (error_string);
 }

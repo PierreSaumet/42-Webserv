@@ -113,7 +113,6 @@ void			HttpServer::ft_exec_cgi_test( void )
 			std::string s = ss.str();
 			this->_cgi->setContentLength(s);
 			std::cout << "cheunk exit" << std::endl;
-			// exit(1);
 		}
 		std::cout << GREEN << "\n\nMaintenant on utilise le CGI avec les donnees " << CLEAR << std::endl;
 		

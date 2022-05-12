@@ -133,50 +133,7 @@ int				HttpServer::ft_check_method_allowed_header( std::string method )
 		return (1);
 	}
 	return (1);
-	
-	// exit(1);	
-	// if (this->_servers[this->_num_serv].nbr_location > 0)
-	// {
-	// 	std::vector<std::string> all_location; // container qui va avoir le nom de tous les locations
-	// 	for (std::vector<t_location>::iterator it = this->_servers[this->_num_serv].location.begin(); it != this->_servers[this->_num_serv].location.end(); it++)
-	// 		all_location.push_back(it->name_location);
-		
-	// 	std::sort(all_location.begin(), all_location.end(), std::greater<std::string>()); // on trie les noms des locations
-		
-	// 	for (std::vector<std::string>::iterator it = all_location.begin(); it != all_location.end(); ++it)
-	// 	{
-	// 		size_t pos_slash = 0;
-	// 		if (*it == "/")
-	// 			pos_slash = 1; // on cherche le deuxieme / pour avoir le premier dossier de la requete
-	// 		else
-	// 			pos_slash = this->_header_requete[0].path.find("/", 1); 
-	// 		if (this->_header_requete[0].path.compare(0, pos_slash , *it) == 0)  // on a un dossier location qui correspond
-	// 		{
-	// 			size_t count = 0;
-	// 			for (std::vector<t_location>::iterator it_loc = this->_servers[this->_num_serv].location.begin(); it_loc != this->_servers[this->_num_serv].location.end(); it_loc++)
-	// 			{
-	// 				if (it_loc->name_location == *it)
-	// 				{
-	// 					this->_num_loc = count;
-	// 					for (std::vector<std::string>::iterator it_method = it_loc->methods_location.begin(); it_method != it_loc->methods_location.end(); it_method++)
-	// 					{
-	// 						if (*it_method == method) // la method est autorisee
-	// 							return (0);
-	// 					}
-	// 					return (1); // pas de method on return 1
-	// 				}
-	// 				count++;
-	// 			}
-	// 		}
-	// 	}
-	// }
-	// std::vector<std::string>::iterator  it_b = this->_servers[this->_num_serv].methods_server.begin();
-	// for (; it_b != this->_servers[this->_num_serv].methods_server.end(); it_b++)
-	// {
-	// 	if (*it_b == method)
-	// 		return (0);		// oui ca marche
-	// }
-	// return (1);
+
 }
 
 
@@ -292,8 +249,7 @@ std::string		HttpServer::ft_check_body_post( std::string request_http )
 		size_t pos_end = request_http.find("\r\n", pos);
 		std::string tmp(request_http, pos + 4, pos_end - (pos + 4));
 
-		// std::cout << "tmp = " << tmp << std::endl;
-		// exit(1);
+		
 
 		if ((long)tmp.size() == std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10))
 			return (tmp);

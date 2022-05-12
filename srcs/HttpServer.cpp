@@ -403,7 +403,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 					if (pos == std::string::npos)
 					{
 						std::cout << "Erreur requete post content-lenght" << std::endl;
-						exit(1);
+						return (1);
 					}
 					else
 					{
@@ -462,7 +462,7 @@ size_t		HttpServer::ft_check_recv_complete( std::string tt_buffer )
 		if (pos == std::string::npos)
 		{
 			std::cout << "ERREUR GET NE TROUVE PAS de header" << std::endl;
-			exit(1);
+			return (1);
 		}
 		return (1);
 	}

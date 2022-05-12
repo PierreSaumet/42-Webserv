@@ -141,7 +141,7 @@ std::string		HttpServer::ft_get_end_header( void ) const
 }
 
 
-std::string  HttpServer::ft_get_code_redirection( void ) const
+std::string  HttpServer::ft_get_code_redirection( t_header_request *requete ) const
 {
 	std::string							ret;
 	std::map<std::string, std::string>  num;
@@ -152,13 +152,13 @@ std::string  HttpServer::ft_get_code_redirection( void ) const
 	num.insert(std::pair<std::string, std::string>("304", "Not Modified"));
 	num.insert(std::pair<std::string, std::string>("307", "Temporary Redirect"));
 	num.insert(std::pair<std::string, std::string>("308", "Permanent Redirect"));
-	if (this->_servers[this->_num_serv].nbr_location == 0)
+	if (this->_servers[requete->num_server].nbr_location == 0)
 	{
 		std::cout << GREEN << "Dans t_get_code_redirection" << CLEAR << std::endl;
 		std::map<std::string, std::string>::iterator it = num.begin();
 		for ( ; it != num.end(); ++it)
 		{
-			if (it->first == this->_servers[this->_num_serv].code_return_server)
+			if (it->first == this->_servers[requete->num_server].code_return_server)
 			{
 				std::cout << "BIngo on a le bon code" << std::endl;
 				ret = "\r\n";
@@ -173,15 +173,12 @@ std::string  HttpServer::ft_get_code_redirection( void ) const
 	}
 	else
 	{
-		if (this->_servers[this->_num_serv].location[this->_num_loc].return_location.empty() == true)
-		{
-			std::cout << "normalement impossible d'etre la 2 " << std::endl;
-			exit(1);
-		}
+		std::cout << this->_servers[requete->num_server].location[requete->num_loc].code_return_location << std::endl;
+		std::cout << "nom -=" << this->_servers[requete->num_server].location[requete->num_loc].name_location << std::endl;
 		std::map<std::string, std::string>::iterator it = num.begin();
 		for (; it != num.end(); ++it)
 		{
-			if (it->first == this->_servers[this->_num_serv].location[this->_num_loc].code_return_location)
+			if (it->first == this->_servers[requete->num_server].location[requete->num_loc].code_return_location)
 			{
 				std::cout << "BIngo on a le bon code" << std::endl;
 				ret = "\r\n";
@@ -271,7 +268,7 @@ std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) cons
 	}
 	else if (requete->return_used == true)
 	{
-		return (this->ft_get_code_redirection());
+		return (this->ft_get_code_redirection(requete));
 	}
 	else
 	{

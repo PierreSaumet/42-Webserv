@@ -206,7 +206,7 @@ class HttpServer {
 		std::string		ft_get_status( t_header_request *requete, bool x ) const;
 		std::string		ft_get_date( void ) const;
 		std::string		ft_get_allow( void ) const;
-		std::string    	ft_get_code_redirection( void ) const;
+		std::string    	ft_get_code_redirection( t_header_request *request ) const;
 		std::string 	ft_get_return_location( void ) const;
 
 		std::string		ft_get_file( std::string path ) const;
