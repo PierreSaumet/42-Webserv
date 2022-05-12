@@ -132,12 +132,17 @@ int					HttpServer::ft_create_servers( void )		// A FAIRE, changer les erreurs e
 			{
 				if (this->_servers[i].port_server == this->_servers[y].port_server && this->_servers[y].host_server == this->_servers[i].host_server)
 					binded = 1;
+				if (this->_servers[i].host_server.empty() == true)
+				{
+					if (this->_servers[y].host_server == "127.0.0.1")
+						if (this->_servers[i].port_server == this->_servers[y].port_server)
+							binded = 1;
+				}
 				y++;
 			}
-			
+			std::cout << "le server = " << this->_servers[i].name_server << " son host = " << this->_servers[y].host_server << "est binded ? = " << binded << std::endl;
 			if (binded == 0)
 			{
-
 				if (bind(this->_http_servers[i].sock, (struct sockaddr *) &this->_http_servers[i].svr_addr, sizeof(this->_http_servers[i].svr_addr)) < 0)
 				{
 					std::cerr << "error bind = " << strerror(errno) << std::endl;

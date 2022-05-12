@@ -398,3 +398,16 @@ siege --concurrent=5 --reps=10 -f urls.txt
 siege --concurrent=50 --reps=10 -f ./urls.txt
 
 siege -b -g --concurrent=3 --reps=1 127.0.0.4:4340
+
+
+avec servers.conf
+curl --output - -H "Host: Server1" 127.0.0.1:8081
+curl --output - -H "Host: Server2" 127.0.0.1:8081
+
+curl --output - -H "Host: Server2" 127.0.0.1:4343
+curl --output - -H "Host: relou" 127.0.0.1:4343
+
+
+curl -X "DELETE" 127.0.0.1:4343/delete/relou.mp3
+
+curl -i -X "DELETE" 127.0.0.1:4343/delete/relou.mp3

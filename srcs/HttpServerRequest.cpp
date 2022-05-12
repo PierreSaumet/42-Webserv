@@ -94,17 +94,26 @@ int			HttpServer::ft_choose_wich_server( std::string header, int num )
 	size_t 		pos = 0;
 	pos = header.find("Host: ");
 
+	std::cout << "header = " << header << std::endl;
+	sleep(2);
 	size_t		end = header.find("\r\n", pos);
 	std::string tmp(header, pos + 6, end - (pos + 6));
 	size_t		i = 0;
 	if (this->_data->ft_get_nbr_servers() == 1)
 		return (0);
+	std::cout << "tmp = " << tmp << " et num =  " << num << std::endl;
 	while ( i < this->_data->ft_get_nbr_servers())
 	{
+		if (this->_servers[i].host_server.empty() == true)
+			this->_servers[i].host_server = "127.0.0.1";
 		if (this->_servers[i].host_server == this->_servers[num].host_server)
 			if (this->_servers[i].port_server == this->_servers[num].port_server)
 				if (tmp == this->_servers[i].name_server)
+				{
+					std::cout << "bingo = " << tmp << std::endl;
 					return (i);
+				}
+		
 		i++;
 	}
 	return (num);
@@ -224,6 +233,8 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 
 	this->ft_init_general_structure();
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);
+	std::cout << "on va utiliser le server = " << std::endl;
+	// exit(1);
 	if ((this->_num_loc = this->ft_choose_wich_location(header)) == -1) // on a deja recuperer le path
 	{
 		this->ft_do_error(404);
@@ -246,7 +257,10 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		return (this->_header_requete[0]);
 	}
 	else if (header.compare(0, 7, "DELETE ") == 0)
+	{
 		this->ft_delete(request, len_msg);
+		return (this->_header_requete[0]);
+	}
 
 	std::cout << "ERRUER NI GET NI POST NI DELETE = " <<  std::endl;
 	std::cout << "request = " << request << std::endl;
@@ -538,114 +552,61 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 	std::cout << "REQUEST = " << request_http << std::endl;
 	std::cout << "len_msg = " << len_msg << std::endl;
 
+	size_t pos_header = request_http.find("\r\n\r\n");
+	std::string size_header(request_http, 0, pos_header);
 
+	// On recupere la methode
+	this->_header_requete[0].method = "DELETE";
+	this->_header_requete[0].protocol = "HTTP/1.1";
+	this->_header_requete[0].host = this->ft_check_host_header(size_header);
+	if (this->_header_requete[0].host.empty() == true)
+		return (ft_do_error(400));
 
-	if (this->_header_requete.empty() == true)
+	if (ft_check_method_allowed_header("DELETE") == 1)				// On verifie que la methode est autorisee
 	{
-		this->_header_requete.push_back(t_header_request());
+		return (ft_do_error(405));
+	}
+	std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
 
-
-		// si pas de fin de header faire une erreur
-		size_t pos_header = request_http.find("\r\n\r\n");
-		std::string size_header(request_http, 0, pos_header);
-
-		// On recupere la methode
-		this->_header_requete[0].method = "DELETE";
-		std::cout << "On a la requete : " << this->_header_requete[0].method << "-" <<  std::endl;
-	
-		// On recupere le path contenant des donnees s'il y en a. Et on y a rajoute le root
-		this->_header_requete[0].path = this->ft_check_path_header(size_header);
-		if (this->_header_requete[0].path.empty() == true)
-			throw Error(12, "Error, in recieved header, the path is not correct.", 2);;
-		std::cout << "On a le path : " << this->_header_requete[0].path << std::endl;
-		
-		this->_header_requete[0].protocol = this->ft_check_protocol_header(size_header);
-		if (this->_header_requete[0].protocol.empty() == true)
-			throw Error(13, "Error, in recieved header, the protocol is not correct.", 2);
-		std::cout << "On a le protocol : " << this->_header_requete[0].protocol << "-" << std::endl;
-
-		this->_header_requete[0].host = this->ft_check_host_header(size_header);
-		if (this->_header_requete[0].host.empty() == true)
-			throw Error(14, "Error, in recieved header, the host is not correct.", 2);			
-		std::cout << "On a le host : " << this->_header_requete[0].host << "-" << std::endl;
-
-		// exit(1);
-
-		int ret_serv = 0;
-		if ((ret_serv = this->ft_find_index_server()) == -1)
-		{
-			std::cout << "trouve pas le server exit" << std::endl;
-			exit(1);
-		}
-		this->_num_serv = ret_serv;			// on utiliser le numero du servers
-		std::cout << "le num du server est setup ? = " << this->_num_serv << std::endl;
-
-		if (ft_check_method_allowed_header("DELETE") == 1)				// On verifie que la methode est autorisee
-		{
-			std::cout << RED << "La methode DELETE est interdite donc on sort une erreur 405" << CLEAR << std::endl;
-			this->_header_requete[0].error = true;
-			this->_header_requete[0].num_error = 405;
-			exit(1);
-			this->ft_setup_error_header();
-			return (0);
-		}
-		std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
-
-		int res = 0;
-		if ((res = this->ft_check_access_path()) > 0)
-		{
-			std::cout << "ERREUR ACCESS DELETE= " << res << std::endl;
-			// sleep(2);
-			exit(1);
-			this->_header_requete[0].error = true;
-			if (res == 2)
-				this->_header_requete[0].num_error = 403;
-			if (res == 1)
-				this->_header_requete[0].num_error = 404;
-			this->ft_setup_error_header();
-			return (0);
-		}
-
-		// Donc on peut delete
-		struct stat buff;
-		std::cout << "path this->_header_requete[0].path = " << this->_header_requete[0].path << std::endl;
-		// exit(1); 
-		if (stat(this->_header_requete[0].path.c_str(), &buff) != 0)		// chmod 000 677
-		{
-			// on a pas acces au fichier donc on sort une erreur 403
-			this->_header_requete[0].error = true;
+	int res = 0;
+	if ((res = this->ft_check_access_path()) > 0)
+	{
+		this->_header_requete[0].error = true;
+		if (res == 2)
+			this->_header_requete[0].num_error = 403;
+		if (res == 1)
 			this->_header_requete[0].num_error = 404;
-			this->ft_setup_error_header();
-			return (0);
+		this->ft_setup_error_header();
+		return (0);
+	}
+
+	struct stat buff;
+	if (stat(this->_header_requete[0].path.c_str(), &buff) != 0)		// chmod 000 677
+		return (ft_do_error(404));
+	else
+	{
+		if (remove(this->_header_requete[0].path.c_str()) != 0)
+		{
+			return (ft_do_error(403));
 		}
 		else
 		{
-			if (remove(this->_header_requete[0].path.c_str()) != 0)
+			std::cout << "SI ON PEUT SUPPRIMER " << std::endl;
+			this->_header_requete[0].cgi = true;
+
+			if (stat(this->_header_requete[0].path.c_str(), &buff) != 0)		// chmod 000 677
 			{
-				std::cout << "ON NE PEUT PAS SUPPRIMER" << std::endl;
-				this->_header_requete[0].error = true;
-				this->_header_requete[0].num_error = 403;
-				this->ft_setup_error_header();
-				return (0);
+				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>204</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File delete so No Content =)</h1><p>by Pierre.</p></body></html>";				
+				this->_header_requete[0].num_error = 204;
 			}
 			else
 			{
-				std::cout << "SI ON PEUT SUPPRIMER " << std::endl;
-				this->_header_requete[0].cgi = true;
-				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>204</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>File delete so No Content =)</h1><p>by Pierre.</p></body></html>";				
-				this->_header_requete[0].num_error = 204;
-				return (0);
+				this->_header_requete[0].body_error = "\r\n\r\n<!DOCTYPE html><html><head><title>204</title><style type=text/css>body {color: blue;font-weight: 900;font-size: 20px;font-family: Arial, Helvetica, sans-serif; }</style><link rel=\"icon\" type=\"image/x-con\" href=\"/flavicon.ico\"/><link rel=\"shortcut icon\" type=\"image/x-con\" href=\"/flavicon.ico\" /></head><body><h1>accepted but no =)</h1><p>by Pierre.</p></body></html>";				
+				this->_header_requete[0].num_error = 202;
 			}
+			return (0);
 		}
-
 	}
-	else
-	{
-		std::cout << RED << "DELETE Probleme le container qui recupere la header de la requete n'est pas vide. " << std::endl;
-		std::cout << "Il faut le supprimer apres avoir fait traite une demande." << CLEAR << std::endl;
-	}
-	return (0);
-	exit(1);
 }
 
 

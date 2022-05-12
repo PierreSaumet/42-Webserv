@@ -332,6 +332,8 @@ bool            Parsing::ft_find_root_location( size_t k, std::vector<std::strin
 		throw Error(35, "Error, in 'root' location's bloc directive, it should not have a dot '.'", 1);
 	this->_servers[index_server].location[index_location].root_location = tmp[k].substr(0, len - 1);
 	
+	if (this->_servers[index_server].location[index_location].root_location[this->_servers[index_server].location[index_location].root_location.size() - 1] == '/')
+		this->_servers[index_server].location[index_location].root_location.erase(this->_servers[index_server].location[index_location].root_location.size()-1, 1);
 	// std::cout << "pb root location = " << this->_servers[index_server].location[index_location].root_location << std::endl;
 	
 
