@@ -518,12 +518,15 @@ int		HttpServer::ft_reading( void )
 				std::cout << "chunk = " << this->_recv_complete.chunked << std::endl;
 				
 				// std::cout << " avant it_b_client request path = " << it_b_client->request.path << std::endl;
-				// it_b_client->request.path = "truc";
+			
+				std::cout << "EXPECT = " << it_b_client->request.expect << std::endl;
 				it_b_client->request = this->ft_parser_requete(it_b_client->num ,_tmp_buffer.size() , _tmp_buffer, it_b_client->request);
-				std::cout << " apres it_b_client request path = " << it_b_client->request.path << std::endl;
-				// exit(1);
+				std::cout << " apresEXPECT = " << it_b_client->request.expect << std::endl;
+				sleep(2);
 				
 				it_b_client->recv = true;
+
+
 				this->_header_requete.erase(this->_header_requete.begin(), this->_header_requete.end());
 				
 				this->_recv_complete.chunked = false;

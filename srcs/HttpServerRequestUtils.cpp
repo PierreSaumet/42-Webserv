@@ -233,9 +233,18 @@ size_t 	HttpServer::ft_check_access_path( void )
 	{
 		if (this->_servers[this->_num_serv].location[this->_num_loc].root_location.empty() == false)
 		{
+			std::cout << "path = " << this->_header_requete[0].path << std::endl;
 			if (this->_servers[this->_num_serv].location[this->_num_loc].name_location != "/") // on supprime le nom du bloc location et on met le root location
-				this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size());
+			{
+				if (this->_servers[this->_num_serv].location[this->_num_loc].name_location[this->_servers[this->_num_serv].location[this->_num_loc].name_location.size() - 1] == '/')	
+					this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size() - 1);
+				else
+					this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size());
+			}
+			std::cout << "path = " << this->_header_requete[0].path << std::endl;
 			this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[this->_num_loc].root_location);
+			std::cout << "path = " << this->_header_requete[0].path << std::endl;
+			// exit(1);
 		}
 		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
 		return (this->check_location(this->_header_requete[0].path, this->_servers[this->_num_serv].location[this->_num_loc].name_location ));

@@ -118,7 +118,7 @@ size_t HttpServer::ft_post_2( t_header_request data, std::string body)
 
 	std::cout << "dans le body il y a un /r/n/r/n ?: " << body.find("\r\n\r\n") << std::endl;
 		
-	this->_header_requete.push_back(t_header_request());
+	
 	this->_header_requete[0] = data;
 	if (this->ft_check_cgi_or_php(this->_header_requete[0].path) == 1)  // verifier cette fonction
 	{
@@ -195,18 +195,10 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	size_t			pos = request.find("\r\n\r\n");
 
 	this->_header_requete.push_back(t_header_request());
-	if (pos == std::string::npos)
-	{
-		this->_header_requete[0].path = "/";
-		this->ft_do_error(400);
-		return (this->_header_requete[0]);
-	}
-
-	std::string 	header(request, 0, pos);
 	if (data.expect == true)		// a refaire
 	{
 		std::cout << "exepct 100 exit" << std::endl;
-		exit(1);
+		// exit(1);
 		if (data.method == "POST")
 		{
 			this->ft_post_2(data, request);
@@ -218,6 +210,17 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 			exit(1);
 		}
 	}
+	
+	
+	if (pos == std::string::npos)
+	{
+		this->_header_requete[0].path = "/";
+		this->ft_do_error(400);
+		return (this->_header_requete[0]);
+	}
+
+	std::string 	header(request, 0, pos);
+	
 
 	this->ft_init_general_structure();
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);
@@ -256,6 +259,10 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 {
 	std::cout << GREEN << "\nDans GET : " << CLEAR <<  std::endl;
+	
+	std::cout << "request = " << request_http << std::endl;
+	
+	
 	if (len_msg > 1023)
 		return (ft_do_error(431));
 
@@ -370,6 +377,13 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 	std::string 			size_body(request_http, size_header.size(), request_http.size());		// on prend aussi le \r\n\r\n donc +4
 	std::string 			chunked_string = "";
 
+	// std::cout << "size_header = " << size_header << std::endl;
+	// sleep(2);
+	// std::cout << "size_body = " << size_body << std::endl;
+	// sleep(2);
+
+
+
 	if (size_header.size() > 1023)
 		return (ft_do_error(431));
 
@@ -422,9 +436,10 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 	
 
 	this->_header_requete[0].body_post = this->ft_check_body_post(size_body);
-	if (this->_header_requete[0].body_post.empty() == true)
-		return (ft_do_error(400));
-
+	// std::cout << "la" << std::endl;
+	// if (this->_header_requete[0].body_post.empty() == true)
+	// 	return (ft_do_error(400));
+	// exit(1);
 	if (this->_header_requete[0].body_post == "nothing")
 		this->_header_requete[0].body_post = size_body;
 

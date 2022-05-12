@@ -280,6 +280,7 @@ std::string		HttpServer::ft_check_content_length( std::string request_http )
 
 std::string		HttpServer::ft_check_body_post( std::string request_http )
 {
+	// std::cout << "size body = " << request_http << std::endl;
 	if (this->_recv_complete.chunked == true)
 		return ("nothing");
 	size_t pos = request_http.find("\r\n\r\n"); // on cherche la fin
@@ -287,9 +288,13 @@ std::string		HttpServer::ft_check_body_post( std::string request_http )
 		return ("");
 	else
 	{
+		// std::cout << "GOOOOD" << std::endl;
 		size_t pos_end = request_http.find("\r\n", pos);
 		std::string tmp(request_http, pos + 4, pos_end - (pos + 4));
-	
+
+		// std::cout << "tmp = " << tmp << std::endl;
+		// exit(1);
+
 		if ((long)tmp.size() == std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10))
 			return (tmp);
 		else if (std::strtol(this->_header_requete[0].content_length.c_str(), NULL, 10) < (long)tmp.size())	// pour le cas de mp3
