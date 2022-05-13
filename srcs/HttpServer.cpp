@@ -209,7 +209,7 @@ void	HttpServer::ft_handle_connections( void )
 		FD_SET(it_b_client->client_socket, &this->_read_fs);
 		FD_SET(it_b_client->client_socket, &this->_write_fs);
 	}
-
+	
 	if ((this->_return_select = select(FD_SETSIZE, &this->_read_fs, &this->_write_fs, NULL, NULL)) < 0 && int_signal == 0)
 	{
 		
@@ -254,6 +254,7 @@ void		HttpServer::ft_check_isset( void )	// A FAIRE, supprimer les std::cout
 						new_client.client_socket = socket_new_client;
 						new_client.client_addr = addr_new_client;
 						new_client.server_socket = it_b->sock;
+					
 						new_client.num = it_b->num;
 						new_client.recv = false;
 						new_client.request = t_header_request();
