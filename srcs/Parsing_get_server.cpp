@@ -316,6 +316,8 @@ bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t
 size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
 	k += 1;
+	if (!isdigit(tmp[k][0]))
+		throw Error(0, "Error, in 'error_page' server's bloc directive, code error is not correct.", 1);
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
 		int y = 0;

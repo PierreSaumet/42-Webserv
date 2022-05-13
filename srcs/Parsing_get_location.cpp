@@ -203,11 +203,14 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
 	// std::cout << "Dans ft_find_error_location " << std::endl;
-	// std::cout << "tmp[k] = " << tmp[k] << std::endl;
+
 	k += 1;
+	if (!isdigit(tmp[k][0]))
+		throw Error(0, "Error, in 'error_page' location's bloc directive, code error is not correct.", 1);
 	while (tmp[k][tmp[k].size() - 1] != ';')
 	{
 		int y = 0;
+		
 		while (tmp[k][y])
 		{
 			if (isdigit(tmp[k][y]))
@@ -221,13 +224,14 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 		this->_servers[index_server].location[index_location].error_location.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
+	
 	if (tmp[k][0] != '/')
 		throw Error(45, "Error, in 'error_page' location's bloc directive, it should start with '/'.", 1);
 
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
 
 	this->_servers[index_server].location[index_location].folder_error = address;
-
+	
 	std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();
 	for (it = this->_servers[index_server].location[index_location].error_location.begin(); it != this->_servers[index_server].location[index_location].error_location.end(); it++)
 	{
