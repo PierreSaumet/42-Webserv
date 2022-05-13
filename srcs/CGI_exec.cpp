@@ -159,9 +159,9 @@ OK	SERVER_NAME = le nom du server
 
 std::string	Cgi_exec::ft_execute_cgi( std::string path_cgi, std::string path_file )
 {
-	std::cout << GREEN << "\n On est dans ft_execute_cgi : " << CLEAR << std::endl;
-	std::cout << "path_Cgi = " << path_cgi << std::endl;
-	std::cout << "pathc file = " << path_file << std::endl;
+	// std::cout << GREEN << "\n On est dans ft_execute_cgi : " << CLEAR << std::endl;
+	// std::cout << "path_Cgi = " << path_cgi << std::endl;
+	// std::cout << "pathc file = " << path_file << std::endl;
 	char	**sysCline = NULL;
 	char	**sysEnv = NULL;
 	std::vector<std::string>		aArgs;
@@ -827,7 +827,7 @@ void	Cgi_exec::ft_display_all_variable_env( void )
 	
 	for (; it_b != it_e; it_b++)
 	{
-		std::cout << it_b->first << " = " << it_b->second << std::endl;
+		// std::cout << it_b->first << " = " << it_b->second << std::endl;
 	}
 	return ;
 }

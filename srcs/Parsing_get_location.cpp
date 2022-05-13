@@ -88,8 +88,6 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 	}
 
 
-	// exit(1);
-
 	// Going through the scope to get data
 	i = 1;
 	while (i < scope_location.size())
@@ -112,12 +110,6 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 				return (0);
 			i += 2;
 		}
-		// else if (scope_location[i] == "client_max_body_size")
-		// {
-		// 	if (this->ft_find_buffer_size_location(i, scope_location, index_server, index_location))
-		// 		return (0);
-		// 	i += 2;
-		// }
 		else if (scope_location[i] == "index")
 		{
 			if (this->ft_find_index_location(i, scope_location, index_server, index_location))
@@ -136,7 +128,6 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 			if (this->ft_find_return_location(i, scope_location, index_server, index_location))
 				return (true);
 			i += 3;
-			// exit(1);
 		}
 		else
 		{
@@ -186,10 +177,6 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 		}
 	}
 	throw Error(0, "Error, in 'return' location's bloc directive, error's number is not correct.", 0);
-
-	// std::cout << "code pas bon " << std::endl;
-	// exit(1);
-	return (false);
 }
 
 /*

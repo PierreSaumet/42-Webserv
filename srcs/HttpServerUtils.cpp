@@ -59,7 +59,7 @@ long long int  HttpServer::convert_hex_to_dec( std::string const string )
 
 std::string HttpServer::ft_decode_chunked( std::string body)
 {
-	std::cout << GREEN << "Dans ft_decode chunked " << CLEAR << std::endl;
+	// std::cout << GREEN << "Dans ft_decode chunked " << CLEAR << std::endl;
 
 	std::string 		total_body = "";
 	std::string 		tmp_2 = "";
@@ -90,7 +90,7 @@ std::string HttpServer::ft_decode_chunked( std::string body)
 
 	if (body == "0\r\n\r\n")
 	{
-		std::cout << "on a termine on retourne total_bdy"  << std::endl;
+		// std::cout << "on a termine on retourne total_bdy"  << std::endl;
 		return (total_body);
 	}
 	return ("");

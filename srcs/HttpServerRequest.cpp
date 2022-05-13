@@ -94,14 +94,14 @@ int			HttpServer::ft_choose_wich_server( std::string header, int num )
 	size_t 		pos = 0;
 	pos = header.find("Host: ");
 
-	std::cout << "header = " << header << std::endl;
-	sleep(2);
+	// std::cout << "header = " << header << std::endl;
+	// sleep(2);
 	size_t		end = header.find("\r\n", pos);
 	std::string tmp(header, pos + 6, end - (pos + 6));
 	size_t		i = 0;
 	if (this->_data->ft_get_nbr_servers() == 1)
 		return (0);
-	std::cout << "tmp = " << tmp << " et num =  " << num << std::endl;
+	// std::cout << "tmp = " << tmp << " et num =  " << num << std::endl;
 	while ( i < this->_data->ft_get_nbr_servers())
 	{
 		if (this->_servers[i].host_server.empty() == true)
@@ -110,7 +110,7 @@ int			HttpServer::ft_choose_wich_server( std::string header, int num )
 			if (this->_servers[i].port_server == this->_servers[num].port_server)
 				if (tmp == this->_servers[i].name_server)
 				{
-					std::cout << "bingo = " << tmp << std::endl;
+					// std::cout << "bingo = " << tmp << std::endl;
 					return (i);
 				}
 		
@@ -121,11 +121,11 @@ int			HttpServer::ft_choose_wich_server( std::string header, int num )
 
 size_t HttpServer::ft_post_2( t_header_request data, std::string body)
 {
-	std::cout << "bingo " << std::endl;
-	std::cout << "method = " << data.method << std::endl;
-	std::cout << "path = " << data.path << std::endl;
+	// std::cout << "bingo " << std::endl;
+	// std::cout << "method = " << data.method << std::endl;
+	// std::cout << "path = " << data.path << std::endl;
 
-	std::cout << "dans le body il y a un /r/n/r/n ?: " << body.find("\r\n\r\n") << std::endl;
+	// std::cout << "dans le body il y a un /r/n/r/n ?: " << body.find("\r\n\r\n") << std::endl;
 		
 	
 	this->_header_requete[0] = data;
@@ -153,14 +153,14 @@ size_t HttpServer::ft_post_2( t_header_request data, std::string body)
 		this->_header_requete[0].script_file_name = this->_header_requete[0].path;
 		this->_header_requete[0].body_post = body;
 		this->ft_exec_cgi_test(); //request_http, len_msg);
-		std::cout << "fin de cgi" << std::endl;
+		// std::cout << "fin de cgi" << std::endl;
 		this->_header_requete[0].expect = false;
 		this->_header_requete[0].error = false;
 		this->_header_requete[0].connection_close = true;
 		this->_header_requete[0].cgi = true;
 		return (0);
 	}
-	std::cout << RED << "Erreur ft_post_2" << CLEAR << std::endl;
+	// std::cout << RED << "Erreur ft_post_2" << CLEAR << std::endl;
 	this->_header_requete[0].error = true;
 	this->_header_requete[0].num_error = 400;
 	this->ft_setup_error_header();
@@ -206,7 +206,7 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	this->_header_requete.push_back(t_header_request());
 	if (data.expect == true)		// a refaire
 	{
-		std::cout << "exepct 100 exit" << std::endl;
+		// std::cout << "exepct 100 exit" << std::endl;
 		if (data.method == "POST")
 		{
 			this->ft_post_2(data, request);
@@ -232,7 +232,7 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 
 	this->ft_init_general_structure();
 	this->_num_serv = this->ft_choose_wich_server(header, port_client);
-	std::cout << "on va utiliser le server = " << std::endl;
+	// std::cout << "on va utiliser le server = " << std::endl;
 
 	if ((this->_num_loc = this->ft_choose_wich_location(header)) == -1) // on a deja recuperer le path
 	{
@@ -241,7 +241,7 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 	}
 	this->_header_requete[0].num_loc = this->_num_loc;
 	this->_header_requete[0].num_server = this->_num_serv;
-	std::cout << "on a un num server = " << this->_num_serv << " et  loc " <<  this->_header_requete[0].location << " duc oup num = " << this->_num_loc << std::endl;
+	// std::cout << "on a un num server = " << this->_num_serv << " et  loc " <<  this->_header_requete[0].location << " duc oup num = " << this->_num_loc << std::endl;
 	if (ft_check_basic(header) < 0)
 	{
 		this->ft_do_error(400);
@@ -262,12 +262,6 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		this->ft_delete(request, len_msg);
 		return (this->_header_requete[0]);
 	}
-
-	std::cout << "ERRUER NI GET NI POST NI DELETE = " <<  std::endl;
-	std::cout << "request = " << request << std::endl;
-	exit(1);
-	// this->_header_requete.push_back(t_header_request());
-	this->_header_requete[0].path = this->ft_check_path_header(header);
 	this->ft_do_error(405);
 	return (this->_header_requete[0]);
 }
@@ -275,9 +269,9 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 
 size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 {
-	std::cout << GREEN << "\nDans GET : " << CLEAR <<  std::endl;
+	// std::cout << GREEN << "\nDans GET : " << CLEAR <<  std::endl;
 	
-	std::cout << "request = " << request_http << std::endl;
+	// std::cout << "request = " << request_http << std::endl;
 	
 	
 	if (len_msg > 1023)
@@ -294,7 +288,7 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 	this->_header_requete[0].accept = this->ft_check_accept_header(size_header);
 	if ((ret = ft_check_method_allowed_header("GET")) > 0)
 		return (ft_do_error(405));
-	std::cout << "path = " << this->_header_requete[0].path << std::endl;
+	// std::cout << "path = " << this->_header_requete[0].path << std::endl;
 
 	if (this->ft_check_cgi_or_php(request_http) == 1)
 	{
@@ -361,12 +355,12 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 
 	if ((ret = this->ft_redirection()) == 1)	// a deplacer avant cgi je pense
 	{
-		std::cout << "On a une redirection " << std::endl;
+		// std::cout << "On a une redirection " << std::endl;
 		return (0);
 	}
 	if ((ret = this->ft_check_access_path()) > 0)
 	{
-		std::cout << "erreur verifie le drot ret = " << ret << std::endl;
+		// std::cout << "erreur verifie le drot ret = " << ret << std::endl;
 		this->_header_requete[0].error = true;
 		if (ret == 2)
 			this->_header_requete[0].num_error = 403;
@@ -375,8 +369,8 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		this->ft_setup_error_header();
 		return (0);
 	}
-	std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
-	std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
+	// std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
+	// std::cout << " la requete est = " << this->_header_requete[0].path << std::endl;
 	this->_header_requete[0].num_loc = this->_num_loc;
 	this->_header_requete[0].num_server = this->_num_serv;
 	return (0);
@@ -384,7 +378,7 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 
 size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 {
-	std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
+	// std::cout << GREEN  << "Dans ft_POST: " << CLEAR << std::endl;
 
 	(void)data;
 	int 					res = 0;
@@ -399,7 +393,8 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 	// std::cout << "size_body = " << size_body << std::endl;
 	// sleep(2);
 
-
+	this->_header_requete[0].num_loc = this->_num_loc;
+	this->_header_requete[0].num_server = this->_num_serv;
 
 	if (size_header.size() > 1023)
 		return (ft_do_error(431));
@@ -432,7 +427,7 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 
 	if (ft_check_method_allowed_header("POST") == 1)
 		return (ft_do_error(405));
-	std::cout << BLUE << "La methode POST est autorisee, on continue." << CLEAR << std::endl;
+	// std::cout << BLUE << "La methode POST est autorisee, on continue." << CLEAR << std::endl;
 
 	
 	this->_header_requete[0].path_http = this->ft_check_pathhttp_header(size_header);
@@ -443,7 +438,7 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 	this->_header_requete[0].content_length = this->ft_check_content_length(size_header);
 	if (this->_header_requete[0].content_length.empty() == true && this->_recv_complete.chunked == false)
 		return (ft_do_error(411));
-	std::cout << "\nOn a le content_length = -" << this->_header_requete[0].content_length << "-" <<  std::endl;
+	// std::cout << "\nOn a le content_length = -" << this->_header_requete[0].content_length << "-" <<  std::endl;
 	
 
 
@@ -487,18 +482,18 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 		size_t ss_size;
 		ss << this->_header_requete[0].content_length;
 		ss >> ss_size;
-		std::cout << "taille requete = " << request_http.size() << std::endl;
-		std::cout << "taille header = " << size_header.size() << std::endl;
-		std::cout << "taille body = " << size_body.size() << std::endl;
-		std::cout << "content lenght = " << ss_size << std::endl;
+		// std::cout << "taille requete = " << request_http.size() << std::endl;
+		// std::cout << "taille header = " << size_header.size() << std::endl;
+		// std::cout << "taille body = " << size_body.size() << std::endl;
+		// std::cout << "content lenght = " << ss_size << std::endl;
 
 
-		std::cout << "content length est different de boy size" << std::endl;
-		std::cout << "On cherche exepect 100" << std::endl;
+		// std::cout << "content length est different de boy size" << std::endl;
+		// std::cout << "On cherche exepect 100" << std::endl;
 		size_t pos_expect = size_header.find("Expect: ");
 		if (pos_expect == std::string::npos)
 		{
-			std::cout << "corps body different content length = erruer " << std::endl;
+			// std::cout << "corps body different content length = erruer " << std::endl;
 			return (ft_do_error(403));
 		}
 		if (ss_size > this->_servers[this->_num_serv].buffer_size_server)
@@ -526,10 +521,14 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 		this->_header_requete[0].request_uri = this->_header_requete[0].path;
 		this->_header_requete[0].script_file_name = this->_header_requete[0].path;
 		this->ft_exec_cgi_test(); //request_http, len_msg);
-		std::cout << "fin de cgi" << std::endl;
+		// std::cout << "fin de cgi" << std::endl;
 		this->_header_requete[0].cgi = true;
+		this->_header_requete[0].num_loc = this->_num_loc;
+		this->_header_requete[0].num_server = this->_num_serv;
 		return (0);
 	}
+	this->_header_requete[0].num_loc = this->_num_loc;
+	this->_header_requete[0].num_server = this->_num_serv;
 	// std::cout << GREEN << "On a bien recu une demande " << CLEAR << std::endl;
 	this->_header_requete[0].error = true;
 	this->_header_requete[0].num_error = 400;
@@ -544,10 +543,10 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 #include "sys/stat.h"
 size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 {
-	std::cout << GREEN << "DANS FT_DELETE " << CLEAR << std::endl;
-	std::cout << "REQUEST = " << request_http << std::endl;
-	std::cout << "len_msg = " << len_msg << std::endl;
-
+	// std::cout << GREEN << "DANS FT_DELETE " << CLEAR << std::endl;
+	// std::cout << "REQUEST = " << request_http << std::endl;
+	// std::cout << "len_msg = " << len_msg << std::endl;
+	(void)len_msg;
 	size_t pos_header = request_http.find("\r\n\r\n");
 	std::string size_header(request_http, 0, pos_header);
 
@@ -562,14 +561,14 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 	{
 		return (ft_do_error(405));
 	}
-	std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
+	// std::cout << BLUE << "La methode DELETE est autorisee, on continue." << CLEAR << std::endl;
 
 	int res = 0;
 	if ((res = this->ft_redirection()) == 1)	// a deplacer avant cgi je pense
 	{
-		std::cout << "On a une redirection " << std::endl;
-		std::cout << "num server = " << this->_num_serv << std::endl;
-		std::cout << "loc = " << this->_num_loc << std::endl;
+		// std::cout << "On a une redirection " << std::endl;
+		// std::cout << "num server = " << this->_num_serv << std::endl;
+		// std::cout << "loc = " << this->_num_loc << std::endl;
 		return (0);
 	}
 
@@ -596,11 +595,11 @@ size_t			HttpServer::ft_delete(std::string request_http, int len_msg)
 		ss >> this->_header_requete[0].body_error;
 		if (remove(this->_header_requete[0].path.c_str()) != 0)
 		{
-			return (ft_do_error(403));
+			return (ft_do_error(202));
 		}
 		else
 		{
-			std::cout << "SI ON PEUT SUPPRIMER " << std::endl;
+			// std::cout << "SI ON PEUT SUPPRIMER " << std::endl;
 			this->_header_requete[0].cgi = true;
 
 			

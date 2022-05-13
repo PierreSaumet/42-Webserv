@@ -83,16 +83,12 @@ std::string	HttpServer::ft_get_file( std::string path ) const
 	input_file = fopen(path.c_str(), "r");
 	if (input_file == NULL)
 	{
-		std::cout << "Error, pour ouvrir la page demande avec fopen." << std::endl;
-		std::cerr << strerror(errno) << std::endl;
-		exit(1);
-		return (NULL);
+		return ("");
 	}
 	stat(path.c_str(), &sb);
 	file.resize(sb.st_size + 100);
 	fread(const_cast<char*>(file.data()), sb.st_size, 1, input_file);
 	fclose(input_file);
-	// std::cout << "file = " << file << std::endl;
 	return (file);
 }
 
@@ -100,13 +96,13 @@ std::string	HttpServer::ft_get_file( std::string path ) const
 
 std::string		HttpServer::ft_get_allow( void ) const
 {
-	std::cout << "Dans ft_get_allow:" << std::endl;
+	// std::cout << "Dans ft_get_allow:" << std::endl;
 	std::string tmp = "Allow: ";
 	
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
 		//std::cout << "il y a des locations : " << this->_servers[this->_num_serv].nbr_location << std::endl;
-		std::cout << "num loc et loc = " << this->_num_loc << " et " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
+		// std::cout << "num loc et loc = " << this->_num_loc << " et " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
 		
 		std::vector<std::string>::const_iterator it_loc = this->_servers[this->_num_serv].location[this->_num_loc].methods_location.begin();
 		for (; it_loc != this->_servers[this->_num_serv].location[this->_num_loc].methods_location.end(); it_loc++)
@@ -116,11 +112,9 @@ std::string		HttpServer::ft_get_allow( void ) const
 		}
 		tmp.resize(tmp.size() - 2);
 		tmp.append("\r\n");
-		std::cout << "tmp = " << tmp << std::endl;
-		// exit(1);
 		return (tmp);
 	}
-	std::cout << "on va chercher dans le root" << std::endl;
+	// std::cout << "on va chercher dans le root" << std::endl;
 	std::vector<std::string>::const_iterator  it_serv = this->_servers[this->_num_serv].methods_server.begin();
 	for (; it_serv != this->_servers[this->_num_serv].methods_server.end(); it_serv++)
 	{
@@ -129,8 +123,7 @@ std::string		HttpServer::ft_get_allow( void ) const
 	}
 	tmp.resize(tmp.size() - 2);
 	tmp.append("\r\n");
-	std::cout << "tmo 2  = " << tmp << std::endl;
-	// exit(1);
+
 	return (tmp);
 	
 }
@@ -154,45 +147,41 @@ std::string  HttpServer::ft_get_code_redirection( t_header_request *requete ) co
 	num.insert(std::pair<std::string, std::string>("308", "Permanent Redirect"));
 	if (this->_servers[requete->num_server].nbr_location == 0)
 	{
-		std::cout << GREEN << "Dans t_get_code_redirection" << CLEAR << std::endl;
+		// std::cout << GREEN << "Dans t_get_code_redirection" << CLEAR << std::endl;
 		std::map<std::string, std::string>::iterator it = num.begin();
 		for ( ; it != num.end(); ++it)
 		{
 			if (it->first == this->_servers[requete->num_server].code_return_server)
 			{
-				std::cout << "BIngo on a le bon code" << std::endl;
+				// std::cout << "BIngo on a le bon code" << std::endl;
 				ret = "\r\n";
 				ret.insert(0, it->second);
 				ret.insert(0, it->first + " ");
 				ret.insert(0, "HTTP/1.1 ");
-				std::cout << "RET = " << ret << std::endl;
-				// exit(1);
 				return (ret);
 			}
 		}
 	}
 	else
 	{
-		std::cout << this->_servers[requete->num_server].location[requete->num_loc].code_return_location << std::endl;
-		std::cout << "nom -=" << this->_servers[requete->num_server].location[requete->num_loc].name_location << std::endl;
+		// std::cout << this->_servers[requete->num_server].location[requete->num_loc].code_return_location << std::endl;
+		// std::cout << "nom -=" << this->_servers[requete->num_server].location[requete->num_loc].name_location << std::endl;
 		std::map<std::string, std::string>::iterator it = num.begin();
 		for (; it != num.end(); ++it)
 		{
 			if (it->first == this->_servers[requete->num_server].location[requete->num_loc].code_return_location)
 			{
-				std::cout << "BIngo on a le bon code" << std::endl;
+				// std::cout << "BIngo on a le bon code" << std::endl;
 				ret = "\r\n";
 				ret.insert(0, it->second);
 				ret.insert(0, it->first + " ");
 				ret.insert(0, "HTTP/1.1 ");
-				std::cout << "RET = " << ret << std::endl;
-				// exit(1);
+				// std::cout << "RET = " << ret << std::endl;
 				return (ret);
 			}
 		}
 	}
-	std::cout << "normalement impossible d'etre la ";
-	exit(1);
+	return ("");
 }
 
 std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) const 
@@ -268,7 +257,11 @@ std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) cons
 	}
 	else if (requete->return_used == true)
 	{
-		return (this->ft_get_code_redirection(requete));
+		std::string tmp = this->ft_get_code_redirection(requete);
+		if (tmp.empty() == true)
+			return ("HTTP/1.1 200 OK\r\n");
+		else
+			return (tmp);
 	}
 	else
 	{
@@ -333,29 +326,27 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 	video.push_back("webm");
 
 	std::vector<std::string> autre;
-	autre.push_back("pdf");	// video
+	autre.push_back("pdf");	// aure
 
 	if (binary == 1)
 	{
-		std::cout << "path = " << requete->path << std::endl;
+		// std::cout << "path = " << requete->path << std::endl;
 		for( std::vector<std::string>::iterator it = image.begin(); it != image.end(); ++it)
 		{
 			size_t find = requete->path.find(*it, requete->path.size() - 5);
-			std::cout << "it = " << *it << std::endl;
+			// std::cout << "it = " << *it << std::endl;
 			if (find != std::string::npos)
 			{
-				std::cout << "trouve ico ? " << std::endl;
-				std::cout << "find = " << find << " it-size = " << it->size() << " long path " << requete->path.size() << std::endl;
+				// std::cout << "trouve ico ? " << std::endl;
+				// std::cout << "find = " << find << " it-size = " << it->size() << " long path " << requete->path.size() << std::endl;
 				if (requete->path.size() == find + it->size())
 				{
-					std::cout << "IMAGE " << std::endl;
+					
 					return ("Content-Type: image/" + *it + "; ");
 				}
 				
 			}
 		}
-		// std::cout << "ne trouve pas ico " << std::endl;
-		// exit(1);
 		for( std::vector<std::string>::iterator it = music.begin(); it != music.end(); ++it)
 		{
 			size_t find = requete->path.find(*it);
@@ -363,7 +354,7 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 			{
 				if (requete->path.size() == find + it->size())
 				{
-					std::cout << "SON " << std::endl;
+					// std::cout << "SON " << std::endl;
 					if (*it == "mp3")
 						return ("Content-Type: audio/mpeg; ");
 					return ("Content-Type: audio/" + *it + "; ");
@@ -377,7 +368,7 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 			{
 				if (requete->path.size() == find + it->size())
 				{
-					std::cout << "video " << std::endl;
+					// std::cout << "video " << std::endl;
 					// if (*it == "mp3")
 					// 	return ("Content-Type: audio/mpeg; ");
 					return ("Content-Type: video/" + *it + "; ");
@@ -391,7 +382,7 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 			{
 				if (requete->path.size() == find + it->size())
 				{
-					std::cout << "autre " << std::endl;
+					// std::cout << "autre " << std::endl;
 					// if (*it == "mp3")
 					// 	return ("Content-Type: audio/mpeg; ");
 					return ("Content-Type: application/" + *it + "; ");
@@ -423,7 +414,7 @@ std::string		HttpServer::ft_get_content_length( struct stat buff, size_t len, si
 		ss_tmp >> tmp_size;
 		tmp_size.append("\r\n");
 		tmp_size.insert(0, "Content-Length: ");
-		std::cout << "tmp _size = " << tmp_size << std::endl;
+		// std::cout << "tmp _size = " << tmp_size << std::endl;
 		return (tmp_size);
 	}
 }

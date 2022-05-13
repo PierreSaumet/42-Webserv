@@ -19,9 +19,9 @@
 
 size_t			HttpServer::ft_check_access_location( std::string path )
 {
-	std::cout << GREEN << "Dans ft_check_access location " << CLEAR << std::endl;
-	std::cout << "path = " << path << std::endl;
-
+	// std::cout << GREEN << "Dans ft_check_access location " << CLEAR << std::endl;
+	// std::cout << "path = " << path << std::endl;
+	(void)path;
 	return (0);
 }
 
@@ -109,11 +109,11 @@ std::string		HttpServer::ft_check_accept_header( std::string header )
 
 int				HttpServer::ft_check_method_allowed_header( std::string method )
 {
-	std::cout << GREEN << "\tDans ft_check_method_allowed_header " << CLEAR << std::endl;
+	// std::cout << GREEN << "\tDans ft_check_method_allowed_header " << CLEAR << std::endl;
 	
 	if (this->_header_requete[0].location == true)
 	{
-		std::cout << "on est dans une location" << std::endl;
+		// std::cout << "on est dans une location" << std::endl;
 		for (std::vector<std::string>::iterator it_method = this->_servers[this->_num_serv].location[this->_num_loc].methods_location.begin(); it_method != this->_servers[this->_num_serv].location[this->_num_loc].methods_location.end(); it_method++)
 		{
 			if (*it_method == method)
@@ -123,7 +123,7 @@ int				HttpServer::ft_check_method_allowed_header( std::string method )
 	}
 	else
 	{
-		std::cout << "pas de location de setup" << std::endl;
+		// std::cout << "pas de location de setup" << std::endl;
 		std::vector<std::string>::iterator  it_b = this->_servers[this->_num_serv].methods_server.begin();
 		for (; it_b != this->_servers[this->_num_serv].methods_server.end(); it_b++)
 		{
@@ -150,7 +150,7 @@ std::string		HttpServer::ft_check_protocol_header( std::string header )
 	if ((pos = header.find("HTTP/1.1")) == std::string::npos)
 	{
 		// A FAIRE: creer une erreur propre.
-		std::cout << "ERREUR NE TROUBE PAS LE PROTOCOL DANS LE HEADER" << std::endl;
+		// std::cout << "ERREUR NE TROUBE PAS LE PROTOCOL DANS LE HEADER" << std::endl;
 		return ("");
 	}
 	else
@@ -189,7 +189,7 @@ std::string		HttpServer::ft_check_path_header( std::string header )
 */
 std::string		HttpServer::ft_check_host_header( std::string header )
 {
-	std::cout << GREEN << "Dans ft_check_host_header " << CLEAR << std::endl;
+	// std::cout << GREEN << "Dans ft_check_host_header " << CLEAR << std::endl;
 	size_t 		pos = header.find("Host: ");
 	size_t 		pos_end = header.find("\r\n", pos);
 	std::string host(header, pos + 6, pos_end - (pos + 6));

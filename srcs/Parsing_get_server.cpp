@@ -164,14 +164,6 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 				return (true);
 			k += 2;
 		}
-		// else if (scope_server[k] == "return")
-		// {
-		// 	// std::cout << "on trouve return dans server" << std::endl;
-		// 	if (this->ft_find_return(k, scope_server, i))
-		// 		return (true);
-		// 	k += 3;
-		// 	// exit(1);
-		// }
 		else
 		{
 			if (scope_server[k] == "}")
@@ -213,17 +205,11 @@ bool			Parsing::ft_find_return( size_t k, std::vector<std::string> tmp, size_t i
 				throw Error(0, "Error, in 'return' server's bloc directive, it should start with '/'.", 0);
 			this->_servers[index_server].return_server = tmp[k];
 			this->_servers[index_server].return_server.erase(this->_servers[index_server].return_server.size() - 1, 1);
-			// if (tmp[k][tmp[k].size() -1] != ';')
-			// 	throw Error(0, "Error, in 'return' server's bloc directive, it should have ';' at the end.", 0);
-			// std::cout << "On a un return : " << this->_servers[index_server].return_server << std::endl;
 			return (false);
 		}
 	}
 	throw Error(0, "Error, in 'return' server's bloc directive, error's number is not correct.", 0);
 
-	// std::cout << "code pas bon " << std::endl;
-	// exit(1);
-	return (false);
 }
 
 
@@ -301,7 +287,6 @@ bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t
 		throw Error(56, "Error, in 'cgi_path' directive, the folder doesn't exist!", 1);
 	
 	return (false);
-	exit(0);
 }
 
 
