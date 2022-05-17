@@ -51,13 +51,8 @@ class HttpServer {
 			struct sockaddr_in	svr_addr;
 			int					sock;
 			bool 				binded;
-			
 			size_t				num;
-			// test
-			// std::vector<t_client_socket> client_du_server;
 		}						t_http_server;
-
-						
 
 		// This structure is used to check if all data from the client have been recieved
 		typedef struct			s_recv_data {
@@ -69,42 +64,35 @@ class HttpServer {
 		// This structure is the main structure used to parse the data send by the client.
 		typedef struct 			s_header_request {
 
-			int port_client; // test
-			
-			
-			std::string			method;				// GET, POST or DELETE
-			std::string			path;				// Le path c'est a dire l'URL transmise avec les donnees pour Get
-			std::string			protocol;
-			std::string			host;				// Contains Host and Port: localhost:8080
-			std::string			accept;				// le Accept: de la requete
-			std::string			path_http;			// le path total du fichier demande.
-			std::string			query_string;		// les valeur donnees dans l'url pour une requete get
-			std::string			cgi_return;			// string contenant les donnees provenant du cgi
-			std::string			referer;
-			std::string			request_uri;		// path du file php plus les donnes de get  ( GET SEUELENT);
-			std::string			content_type;		// suelement post
-			std::string			content_length;		// seulement post
-			std::string			body_post;				//seulement post
-			std::string			script_file_name;	// nom du fichier
-			
-
-			std::string			path_file;
-
-			bool				return_used;
-			
-			bool				upload;
-			bool				cgi;
-			bool				error;
-			size_t				num_error;
-			std::string			body_error;			// si cgi body_error contient la response du cgi sans le header
-			std::map<std::string, std::string>	data;	// Contient les information transmise a Get via un formulaire					// contient les informations en get.
-		
-			bool			autoindex;
-			bool 			location;
-			int				num_loc;
-			int				num_server;
-			bool expect;
-			bool connection_close;
+			int 				port_client;
+			std::string			method;					// GET, POST or DELETE
+			std::string			path;					// URI with data for GET
+			std::string			protocol;				// Protocol from the header
+			std::string			host;					// Contains Host and Port: localhost:8080 from the header
+			std::string			accept;					// Accept form the header
+			std::string			path_http;				// Path of the file / binary used
+			std::string			query_string;			// Data from a GET request
+			std::string			cgi_return;				// String from CGI
+			std::string			referer;				// Useless
+			std::string			request_uri;			// Used onlu for GET, path of the cgi's file
+			std::string			content_type;			// Only for POST
+			std::string			content_length;			// Only for POST
+			std::string			body_post;				// Only for POST
+			std::string			script_file_name;		// File name
+			std::string			path_file;				// Useless
+			bool				return_used;			// Used if there is a return
+			bool				upload;					// Used if there is an upload
+			bool				cgi;					// Used if there is a cgi needed
+			bool				error;					// Used if there is an error
+			size_t				num_error;				// Number of error like 404/ 400
+			std::string			body_error;				// Used to contains the error to display or data from the cgi
+			std::map<std::string, std::string>	data;	// Contains data from GET
+			bool				autoindex;				// Used if there is autoindex on
+			bool 				location;				// Used if there is a location bloc
+			int					num_loc;				// Location number
+			int					num_server;				// Server number
+			bool			 	expect;					// Used if there is an expect
+			bool 				connection_close;		// Useless
 		}						t_header_request;
 		
 
@@ -113,27 +101,22 @@ class HttpServer {
 
 			int					client_socket;
 			struct sockaddr_in	client_addr;
-
-			//	rajout samedi 7 mai
-			//
-			int  server_socket;		// le socket du server sur lequel le client doit se conencter
-			t_header_request request;
-			bool 	recv;
-			size_t  num;
-
-			// bool expect;
+			int  				server_socket;			//	Server's socket which used by the client.
+			t_header_request 	request;				//	Contains all informations from the parsing of the request
+			bool 				recv;					//	Used if there is still data to recv
+			size_t  			num;					//	Server number
 		}		t_client_socket;
 
 		/*
 		**	Canonical Form in HttpServer.cpp
 		*/
 		HttpServer( std::string &configfile );
-		~HttpServer( void);
-		HttpServer			&operator=( const HttpServer &element );
+		~HttpServer( void );
 
-
-		void ft_init_general_structure( void );
-		size_t ft_post_2(t_header_request data, std::string body);
+		/*
+		**	Initialises the t_header_request structure
+		*/
+		void				ft_init_general_structure( void );
 
 		/*
 		**	Functions in HttpServer.cpp, used to create servers.
@@ -150,11 +133,11 @@ class HttpServer {
 		/*
 		**	Functions in HttpServerRequest.cpp, used to apply the corresponding method
 		*/
-		t_header_request				ft_parser_requete( int port_client, int len_msg, std::string request, t_header_request test);
+		t_header_request	ft_parser_requete( int port_client, int len_msg, std::string request, t_header_request test);
 		size_t				ft_get(std::string request_http, int len_msg);
 		size_t				ft_post(std::string request_http , t_header_request data);
 		size_t				ft_delete(std::string request_http, int len_msg);
-
+		size_t 				ft_post_continue(t_header_request data, std::string body);
 		
 		/*
 		**	Functions in HttpServerResponse.cpp, used to setup the header and the body response to send to the client
@@ -268,9 +251,9 @@ class HttpServer {
 		std::string	ft_expire( void );
 
 	private:
-
-		HttpServer( const HttpServer &copy );					// Copy constructor
 		HttpServer( void );										// Empty constructor
+		HttpServer( const HttpServer &copy );					// Copy constructor
+		HttpServer						&operator=( const HttpServer &element );	//	Overload operator =
 
 		Cgi_exec						*_cgi;					// This variable is used to get data from Cgi's class
 		Parsing							*_data;					// This variable is used to get data from Parsing's class.
@@ -281,20 +264,16 @@ class HttpServer {
 		fd_set							_write_fs;				// This variable is used by the server to write on a fd.
 		std::vector<t_client_socket>	_all_client_socket;		// This variable contains all client's file descriptor.
 		int								_return_select;			// This variable is the return of select().
-
 		std::vector<t_server>           _servers;				// This variable contains all server's informations.
 		std::string						_response_to_send;		// This variable contains all data to send to the client.
 		t_recv_data						_recv_complete;			// This variable is used to see if the server has recieved everything from the client.
 		std::string						_tmp_buffer;			// This variable is a string used to collect the client's request.
 		std::vector<t_header_request>	_header_requete;		// This variable is used to collect data from the header or the body of the client's request
-
-		size_t _num_serv;										// This variable is the index of the bloc server being currently used.												
-		size_t  _num_loc;										// This variable is the index of the bloc location being currently used.
-	
-
-		size_t   _DATA;
-		unsigned long still_to_send;
-		unsigned long total_send;
+		size_t 							_num_serv;				// This variable is the index of the bloc server being currently used.												
+		size_t  						_num_loc;				// This variable is the index of the bloc location being currently used.
+		size_t   						_DATA;
+		unsigned long 					_still_to_send;
+		unsigned long 					_total_send;
 };
 
 #endif

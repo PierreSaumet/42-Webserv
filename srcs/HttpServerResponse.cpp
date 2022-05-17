@@ -22,10 +22,10 @@ std::string		HttpServer::ft_setup_response_to_send( t_header_request *requete )
 	std::string res;
 	FILE *input_file = NULL;
 
-	if (still_to_send > 0)
+	if (_still_to_send > 0)
 	{
 		//std::cout << "je dois encore envouye des donnees " << std::endl;
-		unsigned long truc = total_send - still_to_send;
+		unsigned long truc = _total_send - _still_to_send;
 		//std::cout << "truc = " << truc << std::endl;
 		_response_to_send.erase(0, truc);
 		return (_response_to_send);

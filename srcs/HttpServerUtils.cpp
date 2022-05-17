@@ -12,9 +12,15 @@
 
 #include "../Headers/HttpServer.hpp"
 
-
-#include <stdio.h>
-
+/*
+**	Used to handle signal()
+*/
+int					HttpServer::int_signal = 0;
+void				HttpServer::handler_signal( int num )
+{
+	int_signal = num;
+	return ;
+}
 
 /*
 **	Functions a deplacer dans un autre fichier

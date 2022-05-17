@@ -119,7 +119,7 @@ int			HttpServer::ft_choose_wich_server( std::string header, int num )
 	return (num);
 }
 
-size_t HttpServer::ft_post_2( t_header_request data, std::string body)
+size_t HttpServer::ft_post_continue( t_header_request data, std::string body)
 {
 	// std::cout << "bingo " << std::endl;
 	// std::cout << "method = " << data.method << std::endl;
@@ -160,7 +160,7 @@ size_t HttpServer::ft_post_2( t_header_request data, std::string body)
 		this->_header_requete[0].cgi = true;
 		return (0);
 	}
-	// std::cout << RED << "Erreur ft_post_2" << CLEAR << std::endl;
+	// std::cout << RED << "Erreur ft_post_continue" << CLEAR << std::endl;
 	this->_header_requete[0].error = true;
 	this->_header_requete[0].num_error = 400;
 	this->ft_setup_error_header();
@@ -209,7 +209,7 @@ HttpServer::t_header_request	HttpServer::ft_parser_requete( int port_client, int
 		// std::cout << "exepct 100 exit" << std::endl;
 		if (data.method == "POST")
 		{
-			this->ft_post_2(data, request);
+			this->ft_post_continue(data, request);
 			return (this->_header_requete[0]);
 		}
 		else

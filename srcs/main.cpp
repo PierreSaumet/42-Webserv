@@ -13,7 +13,7 @@
 #include "../Headers/Parsing.hpp"
 #include "../Headers/HttpServer.hpp"
 #include "../Headers/Error.hpp"
-#include <iostream>
+#include "../Headers/CGI_exec.hpp"
 
 /*
 **	 main(int argc, char **argv):
@@ -26,22 +26,22 @@ int             main(int argc, char **argv)
     if (argc == 1)
     {
 		std::string name("./srcs/base.conf");
-		HttpServer server_1(name);
+		HttpServer server(name);
     }
     else if (argc == 2)
     {
         std::string name = argv[1];
-		HttpServer server_1(name);
+		HttpServer server(name);
 	}
 	else
 	{
 		std::cerr << RED << "Error, in the argument given." << CLEAR << std::endl;
+		return (1);
 	}
 	if (&signal != 0)
 	{
 		std::cout << RED << "Our webserv wish you a goodbye..." << CLEAR << std::endl;
 		return (1);
 	}
-
     return (0);
 }
