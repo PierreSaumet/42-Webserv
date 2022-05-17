@@ -75,8 +75,6 @@ void			HttpServer::ft_exec_cgi_test( void )
 		
 		std::string 	tmp = this->_header_requete[0].script_file_name;
 
-		// need to be delete
-		// this->_cgi->ft_display_all_variable_env();
 		
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp);
 		if (this->_header_requete[0].body_error == "")
@@ -123,7 +121,7 @@ void			HttpServer::ft_exec_cgi_test( void )
 		tmp_2 = "/";
 
 
-		this->_cgi->ft_display_all_variable_env();
+
 		// std::cout << "tmp 2 = " << tmp_2 << std::endl;
 		// sleep(2);
 		this->_header_requete[0].body_error = this->_cgi->ft_execute_cgi(this->_servers[this->_num_serv].cgi_path_server, tmp_2);
