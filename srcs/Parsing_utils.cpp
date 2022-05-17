@@ -14,7 +14,7 @@
 #include <iostream>
 
 /*
-**	Getters need to be moved to Parsing_getters.cpp
+**	Getters
 */
 std::vector<t_server>			Parsing::ft_get_servers( void )
 {
@@ -72,12 +72,6 @@ std::vector<std::string>        Parsing::ft_get_scope( size_t index )
 	size_t                  				i = index;
 	size_t                  				count = 0;
 
-	// std::cout << "\n\nDans get scope index = " << index << std::endl;
-	// for (std::vector<std::string>::iterator it = this->_data.begin(); it != this->_data.end(); it++)
-	// {
-	// 	std::cout << *it << std::endl;
-	// }
-	// std::cout << "\n\n";
 	while (i++ < size_data)
 	{
 		if (this->_data[i] == "{")
@@ -123,7 +117,7 @@ bool			Parsing::ft_check_code_serv( int code ) const
 bool			Parsing::ft_check_code_client( int code ) const
 {
 	if ((code >= 400 && code <= 417) || (code >= 421 && code <= 426) 
-			|| code == 428 || code == 429 || code == 431 || code == 451 )		// || code == 499 pour NGINX
+			|| code == 428 || code == 429 || code == 431 || code == 451 )
 		return (false);
 	else
 		throw Error(100, "Error, wrong code client.", 1);
@@ -145,7 +139,10 @@ bool			Parsing::ft_check_code_error( int code ) const
 		return (true);
 }
 
-
+/*
+**	ft_get_scope_location( size_t index , std::vector<std::string> scope_bloc_server)
+**		This function return a vector<std::string> which contains a the scope of a bloc location
+*/
 std::vector<std::string>        Parsing::ft_get_scope_location( size_t index , std::vector<std::string> scope_bloc_server)
 {
 	std::vector<std::string>::iterator      it_b;
@@ -169,10 +166,8 @@ std::vector<std::string>        Parsing::ft_get_scope_location( size_t index , s
 				break ;
 			}
 		}
-
 		index++;
 	}
 	std::vector<std::string>    tmp(it_b, it_e);
-
 	return (tmp);
 }
