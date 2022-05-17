@@ -60,9 +60,9 @@ Parsing::~Parsing( void ) {
 }
 
 /*
-**	Parsing copy Constructor
+**	Parsing Copy Constructor
 */
-Parsing::Parsing( const Parsing &copy ) : _name_of_file(copy._name_of_file) {
+Parsing::Parsing( const Parsing &copy ) : _name_of_file(copy._name_of_file), _nbr_servers(copy._nbr_servers), _error(copy._error) {
 
 	return ;
 }
@@ -78,6 +78,7 @@ Parsing                         &Parsing::operator=( const Parsing &element ) {
 		this->_data = element._data;
 		this->_nbr_servers = element._nbr_servers;
 		this->_servers = element._servers;
+		this->_error = element._error;
 	}
 	return (*this);
 }
@@ -102,12 +103,7 @@ bool                            Parsing::ft_check_data( void )
 	if (this->ft_check_semicolon())
 		throw Error(5, "Error, the configuration file miss one or multiple semi colon.", 1);
 	if (this->ft_check_server())
-	{
-		// std::cout << "ERROR, problem bloc server" << std::endl;
 		throw Error(0, "Error, data conf file", 1);
-		return (true);
-	}
-	// std::cout << "lol ok " << std::endl;
 	return (false);
 }
 
@@ -135,42 +131,19 @@ bool                            Parsing::ft_check_server( void )
 			if (this->_data[i + 1] == "{")
 				this->_nbr_servers++;
 			else
-			{
-				// std::cout << "data[i] = " << this->_data[i] << " et data[i] + 1 " << this->_data[i + 1] << std::endl;
 				throw Error(6, "Error, a block server should start with 'server' and '{'.", 1);
-			}
 		}
 		i++;
 	}
 	i = 0;
-	// std::cout << "dans ft_check_server : nbr server = " << this->_nbr_servers << std::endl;
 	while (i < this->_nbr_servers)
 	{
 		std::vector<std::string>    scope_server = this->ft_get_scope(server_size);
-
-		// std::cout << RED << "DISPLAY SCOPE -" CLEAR << std::endl;
-		// for (std::vector<std::string>::iterator it = scope_server.begin(); it != scope_server.end(); it++)
-		// {
-		// 	std::cout << "it = " << *it << std::endl;
-		// }
-		// // i++;
-		
 		server_size += scope_server.size();
 		if (ft_check_directive_server(scope_server, server_size))
-		{
-			// std::cout << "ft_check_directive_server return true " << std::endl;
 			return (true);
-		}
 		if (ft_find_directive_server(1, scope_server, i))
-		{
-			// std::cout << "ft_find_directive_server return true" << std::endl;
 			return (true);
-		}
-
-
-		// else
-		// 	std::cout << "cool ca marche " << std::endl;
-		// std::cout << "FIN DU PREMIER SERVER  i = " << i << " DEBUT DU DEUXIEME" << std::endl;
 		i++;
 	}
 	return (false);

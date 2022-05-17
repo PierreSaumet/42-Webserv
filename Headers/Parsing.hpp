@@ -126,10 +126,9 @@ class Parsing {
 		size_t							ft_get_error( void );
 		
 		/*
-		**	Need to be delete.
+		**	Other functions
 		*/
 		void							put_name_server( void );
-
 
 	private:
 		Parsing( void );
@@ -139,7 +138,6 @@ class Parsing {
 		size_t                          _nbr_servers;
 		std::vector<t_server>           _servers;
 		size_t							_error;
-
 };
 
 #endif
