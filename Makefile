@@ -33,7 +33,7 @@ SOURCES			+=	main.cpp					\
 					HttpServerError.cpp			\
 					CGI_exec.cpp				\
 					Error.cpp					\
-					to_delete.cpp
+					other.cpp
 					
 # INCLUDES =====================================================================
 INCLUDE 		+= 	Headers/Parsing.hpp			\

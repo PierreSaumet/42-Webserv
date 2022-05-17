@@ -22,54 +22,28 @@
 */
 size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	// Adding a block server
-	//this->_servers.push_back(t_server());
-	//std::cout << "dans finddirective location On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
-	// struct stat buff;
-
 	if (this->_servers[index_server].location.size() == 0)
 		this->_servers[index_server].nbr_location = 1;
 	else
 		this->_servers[index_server].nbr_location += 1;
-	// std::cout << "debut find directive location" << std::endl;
-	// std::cout << "k = " << k << std::endl;
-	// std::cout << "tmp[k] = " << tmp[k] << std::endl;
-	// std::cout << "size tmp = " << tmp.size() << std::endl;
-	// for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end(); it++)
-	// {
-	// 	std::cout << *it << std::endl;
-	// }
-	// std::cout << "\n\n";
-
-
 
 	this->_servers[index_server].location.push_back(t_location());
 	if (tmp[k] != "location" || tmp[k + 2] != "{")
 		throw Error(62, "Error,  in 'location' directive, it needs 'location' + '/' + '{'.", 1);
 	if (tmp[k + 1][0] != '/')
 		throw Error(62, "Error,  in 'location' directive, it needs 'location' + '/' + '{'.", 1);
-	
-	// Getting name of the location
+
 	size_t index_location = this->_servers[index_server].location.size() - 1;	
 	this->_servers[index_server].location[index_location].name_location = tmp[k + 1].substr(0, tmp[k + 1].size());
 	
-	// Getting the scope of the location block
 	k += 2;
-
-
 	std::vector<std::string> scope_location = this->ft_get_scope_location(k, tmp);
-
-	
-
-	// TEST REDIRECTION 301
-	// Actuellement on peut avoir un bloc location sans rien dedans
-	//	je vais changer ca et forcer a avoir au mois dav_methods
 	std::map<std::string, bool>            	location_dir;
 	location_dir.insert(std::pair<std::string, bool>("dav_methods", false));
-	size_t i = 0;
+	
+	size_t 									i = 0;
 	while (i < scope_location.size())
 	{
-		// std::cout << "truc = " << scope_location[i] << std::endl;
 		std::map<std::string, bool>::iterator it = location_dir.begin();
 		if (it->first == scope_location[i])
 		{
@@ -87,8 +61,6 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 			throw Error(12, "Error, in 'location bloc', 'dav_methods' directive is missing.", 1);
 	}
 
-
-	// Going through the scope to get data
 	i = 1;
 	while (i < scope_location.size())
 	{
@@ -124,14 +96,12 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 		}
 		else if (scope_location[i] == "return")
 		{
-			// std::cout << "On trouve return dans location " << std::endl;
 			if (this->ft_find_return_location(i, scope_location, index_server, index_location))
 				return (true);
 			i += 3;
 		}
 		else
 		{
-			// std::cout << "scope location i " << scope_location[i] << std::endl;
 			if (scope_location[i] == "}")
 				break;
 			else
@@ -142,9 +112,15 @@ size_t			Parsing::ft_find_directive_location( size_t k, std::vector<std::string>
 	return (k);
 }
 
+/*
+**	ft_find_return_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location)
+**		This function find return directive from a bloc's location.
+**		It checks the given code if it is between 301 and 308.
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
+*/
 bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location)
 {
-	// std::cout << GREEN << "Dans ft_find_return location " << CLEAR << std::endl;
 
 	k += 1;
 	// Check the redirection number
@@ -172,7 +148,6 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 				throw Error(0, "Error, in 'return' location's bloc directive, it should start with '/'.", 0);
 			this->_servers[index_server].location[index_location].return_location = tmp[k];
 			this->_servers[index_server].location[index_location].return_location.erase(this->_servers[index_server].location[index_location].return_location.size() - 1, 1);
-			// std::cout << "On a un return : " << this->_servers[index_server].location[index_location].return_location << std::endl;
 			return (false);
 		}
 	}
@@ -189,8 +164,6 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 */
 size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
-	// std::cout << "Dans ft_find_error_location " << std::endl;
-
 	k += 1;
 	if (!isdigit(tmp[k][0]))
 		throw Error(0, "Error, in 'error_page' location's bloc directive, code error is not correct.", 1);
@@ -211,14 +184,11 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 		this->_servers[index_server].location[index_location].error_location.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
-	
 	if (tmp[k][0] != '/')
 		throw Error(45, "Error, in 'error_page' location's bloc directive, it should start with '/'.", 1);
 
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
-
 	this->_servers[index_server].location[index_location].folder_error = address;
-	
 	std::map<int, std::string>::iterator it = this->_servers[index_server].location[index_location].error_location.begin();
 	for (it = this->_servers[index_server].location[index_location].error_location.begin(); it != this->_servers[index_server].location[index_location].error_location.end(); it++)
 	{
@@ -229,48 +199,6 @@ size_t          Parsing::ft_find_error_location( size_t k, std::vector<std::stri
 	return (k);
 
 }
-
-// /*
-// **	ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
-// **		This function will check the information given in the 'client_max_body_size' directive from a location block.
-// **		The information given is between 8000 (8k) and 16000 (16k) maximum.
-// **		The information will be used for the 'POST' command.
-// **
-// **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
-// */
-// bool			Parsing::ft_find_buffer_size_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
-// {
-// 	size_t		i;
-// 	int			buffer_size;
-
-// 	k += 1;
-// 	i = 0;
-// 	buffer_size = 0;
-// 	while (isdigit(tmp[k][i]))
-// 		i++;
-// 	if (i == 0)
-// 		throw Error(57, "Error, in 'client_max_body_size' directive, it should only be digits.", 1);
-// 	if (tmp[k][i] == 'k' && tmp[k][i + 1] == ';' && i + 1 == tmp[k].size() - 1 && tmp[k][i + 2] == '\0')
-// 	{
-// 		buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
-// 		if (buffer_size < 8 || buffer_size > 16)
-// 			throw Error(58, "Error, in 'client_max_body_size' directive, buffer size must be between 8k and 16k.", 1);
-// 		this->_servers[index_server].location[index_location].buffer_size_location = buffer_size * 1000;
-// 	}
-// 	else
-// 	{
-// 		if (tmp[k][i] == ';' && i + 1 == tmp[k].size() && tmp[k][i + 1] == '\0')
-// 		{
-// 			buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
-// 			if (buffer_size < 8000 || buffer_size > 16000)
-// 				throw Error(59, "Error, in 'client_max_body_size' directive, buffer size must be between 8000 and 16000.", 1);
-// 			this->_servers[index_server].location[index_location].buffer_size_location = buffer_size;
-// 		}
-// 		else
-// 			throw Error(60, "Error, in 'client_max_body_size' directive, informations are corrupted.", 1);
-// 	}
-// 	return (false);
-// }
 
 /*
 **	ft_find_autoindex( size_t k, std::vector<std::string> tmp, size_t index_server):
@@ -296,7 +224,6 @@ bool            Parsing::ft_find_autoindex_location( size_t k, std::vector<std::
 	return (false);
 }
 
-
 /*
 **	ft_find_root( size_t k, std::vector<std::string> tmp, size_t index_server ):
 **		This function will checks the informations given in the 'root' directive from a location block.
@@ -307,7 +234,6 @@ bool            Parsing::ft_find_autoindex_location( size_t k, std::vector<std::
 */
 bool            Parsing::ft_find_root_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
-	// struct stat buffer;
 	size_t  	len;
 	
 	k += 1;
@@ -325,10 +251,6 @@ bool            Parsing::ft_find_root_location( size_t k, std::vector<std::strin
 	
 	if (this->_servers[index_server].location[index_location].root_location[this->_servers[index_server].location[index_location].root_location.size() - 1] == '/')
 		this->_servers[index_server].location[index_location].root_location.erase(this->_servers[index_server].location[index_location].root_location.size()-1, 1);
-	// std::cout << "pb root location = " << this->_servers[index_server].location[index_location].root_location << std::endl;
-	
-
-	
 	return (false);
 }
 
@@ -379,7 +301,6 @@ size_t          Parsing::ft_find_methods_location( size_t k, std::vector<std::st
 	if (tmp[k] == "GET" || tmp[k] == "GET;" || tmp[k] == "DELETE" || tmp[k] == "DELETE;" || tmp[k] == "POST" || tmp[k] == "POST;")
 		throw Error(41, "Error, in 'dav_methods' directive, methods are not correct.", 1);
 	
-	// Checking doublons.
 	size_t int_del = 0;
 	size_t int_get = 0;
 	size_t int_post = 0;
@@ -409,7 +330,6 @@ size_t          Parsing::ft_find_methods_location( size_t k, std::vector<std::st
 */
 bool			Parsing::ft_find_index_location( size_t k, std::vector<std::string> tmp, size_t index_server, size_t index_location )
 {
-	// struct stat buffer;
 	size_t  	len;
 	
 	k += 1;
@@ -423,9 +343,5 @@ bool			Parsing::ft_find_index_location( size_t k, std::vector<std::string> tmp, 
 	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
 		throw Error(29, "Error, in 'index' directive, it should end with '.html'.", 1);
 	this->_servers[index_server].location[index_location].index_location = tmp[k].substr(0, len - 1);
-	// if (stat(this->_servers[index_server].location[index_location].index_location.c_str(), &buffer) == -1)
-	// 	throw Error(30, "Error, in 'index' location bloc directive, file doesn't exist.", 1);
-	// if (buffer.st_size == 0)
-	// 	throw Error(31, "Error, in 'index' directive, file is empty.", 1);
 	return (false);
 }

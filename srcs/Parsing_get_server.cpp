@@ -27,7 +27,6 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 	size_t 									k = 0;
 	server_size = scope_server.size();
 	serv_dir.insert(std::pair<std::string, bool>("listen", false));
-	// serv_dir.insert(std::pair<std::string, bool>("server_name", false));
 	serv_dir.insert(std::pair<std::string, bool>("error_page", false));
 	serv_dir.insert(std::pair<std::string, bool>("root", false));
 	serv_dir.insert(std::pair<std::string, bool>("dav_methods", false));
@@ -35,7 +34,6 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 	serv_dir.insert(std::pair<std::string, bool>("autoindex", false));
 	serv_dir.insert(std::pair<std::string, bool>("client_max_body_size", false));
 	serv_dir.insert(std::pair<std::string, bool>("cgi_path", false));
-	// serv_dir.insert(std::pair<std::string, bool>("return", false));
 	
 	while (k < scope_server.size())
 	{
@@ -47,33 +45,22 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 				if (it_b->second == false)
 					it_b->second = true;
 				else
-				{
-					// std::cout << "doublon = " << it_b->first << std::endl;
 					throw Error(7, "Error, in 'server bloc', it has a doublon.", 1);
-				}
 			}
 		}
 		if (scope_server[k] == "location")
 		{
-			// std::cout << "on trouve un location scope_server[k]= " << scope_server[k] << " et k = " << k << std::endl;
-			// TEST
 			std::vector<std::string> scope_location = this->ft_get_scope_location(k, scope_server);
-			//std::vector<std::string>    scope_location = this->ft_get_scope(k + 1);
 			k = k + scope_location.size();
-			// std::cout << "on passe le groupe location = " << scope_server[k] << " et k = " << k << std::endl;
-			// std::cout << "talle du scope = " << scope_location.size() << std::endl;
 		}
 		k++;
 	}
 	for (std::map<std::string, bool>::iterator it_b = serv_dir.begin(); it_b != serv_dir.end(); it_b++)
 	{
-		// std::cout << "first = " << it_b->first << " et second = " << it_b->second << std::endl;
 		if (it_b->second == false)
 		{
 			if (it_b->first == "listen")
 				throw Error(8, "Error, in 'server bloc', 'listen' directive is missing.", 1);
-			// if (it_b->first == "server_name")
-			// 	throw Error(9, "Error, in 'server bloc', 'server_name' directive is missing.", 1);
 			if (it_b->first == "root")
 				throw Error(10, "Error, in 'server bloc', 'root' directive is missing.", 1);
 			if (it_b->first == "error_page")
@@ -85,8 +72,6 @@ bool			Parsing::ft_check_directive_server( std::vector<std::string> scope_server
 		}
 	}
 	this->_servers.push_back(t_server());
-	// std::cout << "fin directive server, nbr de server = " << this->_servers.size() << std::endl;
-	// std::cout << "On a ajoute un block server, taille = " << this->_servers.size() << std::endl;
 	return (false);
 }
 
@@ -149,7 +134,6 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 				return (true);
 			k += 2;
 		}
-
 		else if (scope_server[k] == "server" && scope_server[k + 1] == "{")
 			throw Error(61, "Error, a bloc server cannot have another bloc server inside.", 1);
 		else if (scope_server[k] == "location")
@@ -175,12 +159,16 @@ bool			Parsing::ft_find_directive_server( size_t k, std::vector<std::string> sco
 	return (false);
 }
 
+/*
+**	ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
+**		This function find return directive from a bloc's server.
+**		It checks the given code if it is between 301 and 308.
+**
+**	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
+*/
 bool			Parsing::ft_find_return( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	// std::cout << GREEN << "Dans ft_find_return server " << CLEAR << std::endl;
-
 	k += 1;
-	// Check the redirection number
 	std::vector<std::string> 	number;
 	number.push_back("300");
 	number.push_back("301");
@@ -209,9 +197,7 @@ bool			Parsing::ft_find_return( size_t k, std::vector<std::string> tmp, size_t i
 		}
 	}
 	throw Error(0, "Error, in 'return' server's bloc directive, error's number is not correct.", 0);
-
 }
-
 
 /*
 **	ft_find_buffer_size( size_t k, std::vector<std::string> tmp, size_t index_server ):
@@ -235,7 +221,6 @@ bool			Parsing::ft_find_buffer_size( size_t k, std::vector<std::string> tmp, siz
 		throw Error(57, "Error, in 'client_max_body_size' directive, it should only be digits.", 1);
 	if (tmp[k][i] == 'k' && tmp[k][i + 1] == ';' && i + 1 == tmp[k].size() - 1 && tmp[k][i + 2] == '\0')
 	{
-		// std::cout << "LA " << std::endl;
 		buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
 		if (buffer_size < 1 || buffer_size > 1000000)
 			throw Error(58, "Error, in 'client_max_body_size' directive, buffer size must be between 1 and 1000000k.", 1);
@@ -245,7 +230,6 @@ bool			Parsing::ft_find_buffer_size( size_t k, std::vector<std::string> tmp, siz
 	{
 		if (tmp[k][i] == ';' && i + 1 == tmp[k].size() && tmp[k][i + 1] == '\0')
 		{
-			// std::cout << "ICI" << std::endl;
 			buffer_size = std::strtol(tmp[k].c_str(), NULL, 10);
 			if (buffer_size < 1 || buffer_size > 1000000000)
 				throw Error(59, "Error, in 'client_max_body_size' directive, buffer size must be between 1 and 1 000 000 000.", 1);
@@ -285,10 +269,8 @@ bool			Parsing::ft_find_cgi_path( size_t k, std::vector<std::string> tmp, size_t
 		throw Error(560, "Error, in 'cgi_path' directive, the path should be ./usr/bin/php-cgi", 1);
 	if (stat(this->_servers[index_server].cgi_path_server.c_str(), &buffer) == -1)
 		throw Error(56, "Error, in 'cgi_path' directive, the folder doesn't exist!", 1);
-	
 	return (false);
 }
-
 
 /*
 **	ft_find_error( size_t k, std::vector<std::string> tmp, size_t index_server ):
@@ -319,24 +301,17 @@ size_t          Parsing::ft_find_error( size_t k, std::vector<std::string> tmp, 
 		this->_servers[index_server].error_server.insert(std::pair<int, std::string>(error_code, "NULL"));
 		k++;
 	}
-
 	if (tmp[k][0] != '/')
 		throw Error(45, "Error, in 'error_page' in server's bloc directive, it should start with '/'.", 1);
 
-	
 	std::string address = tmp[k].substr(0, tmp[k].size() - 1);
-
 	this->_servers[index_server].folder_error = address;
-
-
-	// std::cout << "address = " << address << std::endl;
 	std::map<int, std::string>::iterator it = this->_servers[index_server].error_server.begin();
 	for ( ; it != this->_servers[index_server].error_server.end(); ++it)
 	{
 		if (it->second == "NULL")
 			it->second = address;
 	}
-
 	k++;
 	return (k);
 }
@@ -481,12 +456,8 @@ bool         	Parsing::ft_find_server_name( size_t k, std::vector<std::string> t
 	if (tmp[k][len - 1] != ';')
 		throw Error(25, "Error, in 'server_name' directive, it should end with ';'.", 1);
 	this->_servers[index_server].name_server = tmp[k].substr(0, len - 1);
-
 	if (this->_servers[index_server].name_server.size() == 0)
 		throw Error(25, "Error, in 'server_name' directive, you should put a name'.", 1);
-	// std::cout << "server_name = " << this->_servers[index_server].name_server << std::endl;
-	// std::cout << "index server = " << index_server << std::endl;
-
 	len = 0;
 	while (len < index_server)
 	{
@@ -494,7 +465,6 @@ bool         	Parsing::ft_find_server_name( size_t k, std::vector<std::string> t
 			throw Error(27, "Error, in 'server_name' directive, server_name shoould be different from other servers", 1);
 		len++;
 	}
-
 	return (false);
 }
 
@@ -505,45 +475,6 @@ bool         	Parsing::ft_find_server_name( size_t k, std::vector<std::string> t
 **
 **	==>	If an error occurs, throw an Error message. Otherwise it returns 0.
 */
-#include <algorithm>
-bool ft_count_dot( std::string const host )   // check if there is 3 dots
-{
-	size_t i = std::count(host.begin(), host.end(), '.');
-	if (i != 3)
-		return (true);
-	return (false);
-}
-
-bool ft_check_host( std::string const host )
-{
-	size_t i = 0;
-
-	// std::cout << "\n\n host = " << host << std::endl;;
-	if (host[0] == '.' || host[host.size()] == '.')
-		return (true);
-
-	while (i < host.size())
-	{
-		// std::cout << "host[i] = " << host[i] << std::endl;
-		if (host[i] == '.' && host[i + 1] == '.')
-			return (true);
-		i++;
-	}
-	// std::cout << "GOOD" << std::endl;
-	return (false);
-}
-
-bool all_digit(std::string string)
-{
-	size_t i = 0;
-	while (isdigit(string[i]) != 0)
-		i++;
-	if (i == string.size())
-		return (false);
-	return (true);
-
-}
-
 bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, size_t index_server) 
 {
 
@@ -554,31 +485,23 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 	if (total[total.size() - 1 ] != ';')
 		throw Error(16, "Error, in 'listen directive' server's bloc,  it should end with ';'.", 1);
 	if ((pos = total.find(":")) == std::string::npos)
-	{ // dans ce cas on a que le port
+	{
 		if (total.size() <= 1)
 			throw Error(21, "Error, in 'listen directive'  port should be between 1 and 65535.", 1);
-		total.erase(total.size() - 1, 1); // erase ;
-		// std::cout << "total = " << total << std::endl;
+		total.erase(total.size() - 1, 1);
 		if (all_digit(total) == true)
 			throw Error(16, "Error, in 'listen' directive server's bloc, port should have only digits. ", 1);
-		
 		this->_servers[index_server].host_server = "";
 		this->_servers[index_server].port_server = std::strtol(total.substr(0, total.size()).c_str(), NULL, 10);
 		if (this->_servers[index_server].port_server < 0 || this->_servers[index_server].port_server > 65535)
 			throw Error(21, "Error, in 'listen directive'  port should be between 1 and 65535.", 1);
 		return (false);
-
 	}
 	else
 	{
-		// std::cout << "on a le host et le port" << std::endl;
-		// std::cout << "la separation est : [os = " << pos << std::endl;
 		if (pos == 0 || pos == total.size() - 2)
 			throw Error(12, "Error, in 'listen directive' server's bloc,  it should have ':' between post and host.", 1); 
-		
-		total.erase(total.size() -1, 1); // erase ;
-
-
+		total.erase(total.size() -1, 1);
 		std::string tmp_port(total, pos+1, total.size());
 		if (tmp_port.size() <= 1)
 			throw Error(21, "Error, in 'listen directive'  port should be between 1 and 65535.", 1);
@@ -587,10 +510,6 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 		this->_servers[index_server].port_server = std::strtol(tmp_port.substr(0, tmp_port.size()).c_str(), NULL, 10);
 		if (this->_servers[index_server].port_server < 0 || this->_servers[index_server].port_server > 65535)
 			throw Error(21, "Error, in 'listen directive'  port should be between 1 and 65535.", 1);
-
-
-
-
 		std::string tmp_host(total, 0, pos);
 		if (tmp_host.size() < 7 || tmp_host.size() > 15)
 			throw Error(16, "Error, in 'listen directive' server's bloc,  host is not correctly setup.", 1);
@@ -601,18 +520,13 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 		}
 		if (ft_count_dot(tmp_host) == true)
 			throw Error(16, "Error, in 'listen directive' server's bloc,  host should have 3 dots.", 1);
-
-
 		if (ft_check_host(tmp_host) == true)
 			throw Error(16, "Error, in 'listen directive' server's bloc,  host is not correctly setup.", 1);
 		this->_servers[index_server].host_server = tmp_host;
-		// std::cout << "host = " << tmp_host << std::endl;
-		// std::cout << "port = " << tmp_port << std::endl;
 		return (false);
 	}
 	return (true);
 }
-
 
 /*
 **	ft_find_index( size_t k, std::vector<std::string> tmp, size_t index_server ):
@@ -623,7 +537,6 @@ bool        	Parsing::ft_find_listen( size_t k, std::vector<std::string> tmp, si
 */
 bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t index_server )
 {
-	// struct stat buffer;
 	size_t  	len;
 	
 	if (this->_servers[index_server].root_server.empty() == true)
@@ -639,6 +552,5 @@ bool			Parsing::ft_find_index( size_t k, std::vector<std::string> tmp, size_t in
 	if (tmp[k].compare(tmp[k].size() - 6, 6, ".html;") !=  0)
 		throw Error(29, "Error, in 'index' directive, it should end with '.html'.", 1);
 	this->_servers[index_server].index_server = tmp[k].substr(0, len - 1);
-	
 	return (false);
 }

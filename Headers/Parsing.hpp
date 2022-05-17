@@ -23,7 +23,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <algorithm>
 #include "Error.hpp"
 
 typedef struct							s_location {
@@ -129,6 +129,9 @@ class Parsing {
 		**	Other functions
 		*/
 		void							put_name_server( void );
+		bool							ft_count_dot( std::string const host );
+		bool 							ft_check_host( std::string const host );
+		bool							all_digit(std::string string);
 
 	private:
 		Parsing( void );
