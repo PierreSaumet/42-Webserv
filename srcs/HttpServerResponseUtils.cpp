@@ -59,27 +59,18 @@ std::string		HttpServer::ft_create_autoindex( t_header_request *requete )
 std::string HttpServer::ft_get_return_location( void ) const
 {
 	if (this->_servers[this->_num_serv].nbr_location == 0)
-	{
 		return ("Location: " + this->_servers[this->_num_serv].return_server + "\r\n");
-	}
 	else
-	{
 		return ("Location: " + this->_servers[this->_num_serv].location[this->_num_loc].return_location + "\r\n");
-	}
 }
 
 
-/*
-**
-*/
 std::string	HttpServer::ft_get_file( std::string path ) const
 {
 	FILE *input_file = NULL;
 	struct stat sb;
 	std::string	file;
 
-	// path.erase(0, 1);
-	// std::cout << ""
 	input_file = fopen(path.c_str(), "r");
 	if (input_file == NULL)
 	{
@@ -96,14 +87,10 @@ std::string	HttpServer::ft_get_file( std::string path ) const
 
 std::string		HttpServer::ft_get_allow( void ) const
 {
-	// std::cout << "Dans ft_get_allow:" << std::endl;
 	std::string tmp = "Allow: ";
 	
 	if (this->_servers[this->_num_serv].nbr_location > 0)
 	{
-		//std::cout << "il y a des locations : " << this->_servers[this->_num_serv].nbr_location << std::endl;
-		// std::cout << "num loc et loc = " << this->_num_loc << " et " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
-		
 		std::vector<std::string>::const_iterator it_loc = this->_servers[this->_num_serv].location[this->_num_loc].methods_location.begin();
 		for (; it_loc != this->_servers[this->_num_serv].location[this->_num_loc].methods_location.end(); it_loc++)
 		{
@@ -114,7 +101,6 @@ std::string		HttpServer::ft_get_allow( void ) const
 		tmp.append("\r\n");
 		return (tmp);
 	}
-	// std::cout << "on va chercher dans le root" << std::endl;
 	std::vector<std::string>::const_iterator  it_serv = this->_servers[this->_num_serv].methods_server.begin();
 	for (; it_serv != this->_servers[this->_num_serv].methods_server.end(); it_serv++)
 	{
@@ -147,13 +133,11 @@ std::string  HttpServer::ft_get_code_redirection( t_header_request *requete ) co
 	num.insert(std::pair<std::string, std::string>("308", "Permanent Redirect"));
 	if (this->_servers[requete->num_server].nbr_location == 0)
 	{
-		// std::cout << GREEN << "Dans t_get_code_redirection" << CLEAR << std::endl;
 		std::map<std::string, std::string>::iterator it = num.begin();
 		for ( ; it != num.end(); ++it)
 		{
 			if (it->first == this->_servers[requete->num_server].code_return_server)
 			{
-				// std::cout << "BIngo on a le bon code" << std::endl;
 				ret = "\r\n";
 				ret.insert(0, it->second);
 				ret.insert(0, it->first + " ");
@@ -164,19 +148,15 @@ std::string  HttpServer::ft_get_code_redirection( t_header_request *requete ) co
 	}
 	else
 	{
-		// std::cout << this->_servers[requete->num_server].location[requete->num_loc].code_return_location << std::endl;
-		// std::cout << "nom -=" << this->_servers[requete->num_server].location[requete->num_loc].name_location << std::endl;
 		std::map<std::string, std::string>::iterator it = num.begin();
 		for (; it != num.end(); ++it)
 		{
 			if (it->first == this->_servers[requete->num_server].location[requete->num_loc].code_return_location)
 			{
-				// std::cout << "BIngo on a le bon code" << std::endl;
 				ret = "\r\n";
 				ret.insert(0, it->second);
 				ret.insert(0, it->first + " ");
 				ret.insert(0, "HTTP/1.1 ");
-				// std::cout << "RET = " << ret << std::endl;
 				return (ret);
 			}
 		}
@@ -186,8 +166,6 @@ std::string  HttpServer::ft_get_code_redirection( t_header_request *requete ) co
 
 std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) const 
 {
-	// a changer lol
-
 	std::map<size_t, std::string> list_error;
 	list_error.insert(std::pair<size_t, std::string>(100, "Continue"));
 	list_error.insert(std::pair<size_t, std::string>(400, "Bad Request"));
@@ -249,9 +227,7 @@ std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) cons
 				status_str.insert(0, tmp);
 				if (x == true)
 					status_str.insert(0, "HTTP/1.1 ");
-				// status_str.append("\r\n");
 				return (status_str);
-				break;
 			}
 		}
 	}
@@ -274,18 +250,14 @@ std::string		HttpServer::ft_get_status( t_header_request *requete, bool x ) cons
 		if (requete->num_error == 500)
 			return ("HTTP/1.1 500 Internal Server Error\r\n");
 	}
-	// if (this->_servers[this->_num_serv].return_server.empty() == false)
-	// 	return ("HTTP/1.1 301 Moved Permanently\r\n");
 	return ("HTTP/1.1 200 OK\r\n");
 }
 
 
 std::string		HttpServer::ft_get_server_name( void ) const
 {
-	// a changer en fonctin du server qu'on utilise KEK...
 	std::string		tmp;
 
-	// std::cout << " je dois prendre ca = " << this->_servers[this->_num_serv].name_server << std::endl;
 	tmp.insert(0, "\r\n");
 	tmp.insert(0, this->_servers[this->_num_serv].name_server);
 	tmp.insert(0, "Server: ");
@@ -293,12 +265,12 @@ std::string		HttpServer::ft_get_server_name( void ) const
 }
 
 
-std::string		HttpServer::ft_get_charset( void ) const			// peut etre a changer
+std::string		HttpServer::ft_get_charset( void ) const
 {
 	return ("charset=UTF-8\r\n");
 }
 
-std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t binary ) const		// peut etre a changer 
+std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t binary ) const
 {
 	std::vector<std::string> image;
 	image.push_back("gif");
@@ -308,43 +280,30 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 	image.push_back("bmp");
 	image.push_back("webp");
 	image.push_back("ico");
-
 	std::vector<std::string> music;
 	music.push_back("midi");
 	music.push_back("mpeg");
-	// image.push_back("webm");
 	music.push_back("ogg");
 	music.push_back("wav");
 	music.push_back("mp3");
-
-
 	std::vector<std::string> video;
-	video.push_back("mp4");	// video
+	video.push_back("mp4");
 	video.push_back("avi");
 	video.push_back("mov");
 	video.push_back("mpeg4");
 	video.push_back("webm");
-
 	std::vector<std::string> autre;
-	autre.push_back("pdf");	// aure
+	autre.push_back("pdf");
 
 	if (binary == 1)
 	{
-		// std::cout << "path = " << requete->path << std::endl;
 		for( std::vector<std::string>::iterator it = image.begin(); it != image.end(); ++it)
 		{
 			size_t find = requete->path.find(*it, requete->path.size() - 5);
-			// std::cout << "it = " << *it << std::endl;
 			if (find != std::string::npos)
 			{
-				// std::cout << "trouve ico ? " << std::endl;
-				// std::cout << "find = " << find << " it-size = " << it->size() << " long path " << requete->path.size() << std::endl;
 				if (requete->path.size() == find + it->size())
-				{
-					
-					return ("Content-Type: image/" + *it + "; ");
-				}
-				
+					return ("Content-Type: image/" + *it + "; ");				
 			}
 		}
 		for( std::vector<std::string>::iterator it = music.begin(); it != music.end(); ++it)
@@ -354,7 +313,6 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 			{
 				if (requete->path.size() == find + it->size())
 				{
-					// std::cout << "SON " << std::endl;
 					if (*it == "mp3")
 						return ("Content-Type: audio/mpeg; ");
 					return ("Content-Type: audio/" + *it + "; ");
@@ -367,12 +325,7 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 			if (find != std::string::npos)
 			{
 				if (requete->path.size() == find + it->size())
-				{
-					// std::cout << "video " << std::endl;
-					// if (*it == "mp3")
-					// 	return ("Content-Type: audio/mpeg; ");
 					return ("Content-Type: video/" + *it + "; ");
-				}
 			}
 		}
 		for( std::vector<std::string>::iterator it = autre.begin(); it != autre.end(); ++it)
@@ -381,19 +334,14 @@ std::string		HttpServer::ft_get_content_type( t_header_request *requete, size_t 
 			if (find != std::string::npos)
 			{
 				if (requete->path.size() == find + it->size())
-				{
-					// std::cout << "autre " << std::endl;
-					// if (*it == "mp3")
-					// 	return ("Content-Type: audio/mpeg; ");
 					return ("Content-Type: application/" + *it + "; ");
-				}
 			}
 		}
 	}
 	return ("Content-Type: text/html; ");
 }
 
-std::string		HttpServer::ft_get_content_length( struct stat buff, size_t len, size_t len_header ) const		// peut etre a changer
+std::string		HttpServer::ft_get_content_length( struct stat buff, size_t len, size_t len_header ) const
 {
 	std::string tmp_size;
 	std::stringstream ss_tmp;
@@ -401,20 +349,17 @@ std::string		HttpServer::ft_get_content_length( struct stat buff, size_t len, si
 	(void)len_header;
 	if (len == 0)
 	{
-		
 		ss_tmp << buff.st_size + 100; 
 		ss_tmp >> tmp_size;
-
 		tmp_size.insert(0, "Content-Length: ");
 		return (tmp_size);
 	}
 	else
 	{
-		ss_tmp << len - 38 - 4;		// - 38 = Content-type: text/html; charset=UTF-8
+		ss_tmp << len - 38 - 4;
 		ss_tmp >> tmp_size;
 		tmp_size.append("\r\n");
 		tmp_size.insert(0, "Content-Length: ");
-		// std::cout << "tmp _size = " << tmp_size << std::endl;
 		return (tmp_size);
 	}
 }

@@ -180,7 +180,7 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 					path_error.insert(0, this->ft_get_server_name());
 					path_error.insert(0, this->ft_get_date());
 					path_error.insert(0, this->ft_get_charset());
-					path_error.insert(0, this->ft_get_content_type(requete, 0)); // a changer
+					path_error.insert(0, this->ft_get_content_type(requete, 0));
 					if(requete->num_error == 405)
 						path_error.insert(0, this->ft_get_allow());
 					path_error.insert(0, this->ft_get_status(requete, true));
@@ -207,7 +207,7 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 		path_error.insert(0, this->ft_get_status(requete, true));
 		return (path_error);
 	}
-	return (ft_create_error(requete)); // test
+	return (ft_create_error(requete));
 }
 
 /*
@@ -245,7 +245,7 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 	error_string.insert(0, this->ft_get_server_name());
 	error_string.insert(0, this->ft_get_date());
 	error_string.insert(0, this->ft_get_charset());
-	error_string.insert(0, this->ft_get_content_type(requete, 0)); // a changer
+	error_string.insert(0, this->ft_get_content_type(requete, 0));
 	if(requete->num_error == 405)
 		error_string.insert(0, this->ft_get_allow());
 	error_string.insert(0, this->ft_get_status(requete, true));

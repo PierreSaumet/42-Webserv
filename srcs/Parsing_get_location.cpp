@@ -123,7 +123,6 @@ bool		Parsing::ft_find_return_location( size_t k, std::vector<std::string> tmp, 
 {
 
 	k += 1;
-	// Check the redirection number
 	std::vector<std::string> 	number;
 	number.push_back("300");
 	number.push_back("301");

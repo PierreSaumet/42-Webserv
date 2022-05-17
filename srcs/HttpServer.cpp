@@ -196,7 +196,6 @@ void		HttpServer::ft_check_isset( void )
 			if (FD_ISSET(it_b->sock, &this->_read_fs))
 			{
 				socket_new_client = accept(it_b->sock, (struct sockaddr *)&addr_new_client, &size_addr_new_client);		
-				// std::cerr << strerror(errno) << std::endl;
 				if (socket_new_client < 0 && int_signal == 0)
 					throw Error(6, "Error, 'main loop server', server cannot accept() a client, maybe DDOS.", 2);
 				else

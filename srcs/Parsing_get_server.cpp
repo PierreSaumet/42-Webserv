@@ -363,7 +363,6 @@ size_t          Parsing::ft_find_methods( size_t k, std::vector<std::string> tmp
 	if (tmp[k] == "GET" || tmp[k] == "GET;" || tmp[k] == "DELETE" || tmp[k] == "DELETE;" || tmp[k] == "POST" || tmp[k] == "POST;")
 		throw Error(41, "Error, in 'dav_methods' directive, methods are not correct.", 0);
 
-	// Checks Doublons.
 	size_t int_del = 0;
 	size_t int_get = 0;
 	size_t int_post = 0;

@@ -22,7 +22,6 @@
 */
 std::string			HttpServer::ft_parsing_path_get_request( void )
 {
-	// std::cout << RED << "Dans ft_parsing_path_get_request : FONCTION A CHANGER " << CLEAR << std::endl;
 	size_t		pos_cursor = this->_header_requete[0].path.find("?");
 	this->_header_requete[0].query_string = "";
 	if (pos_cursor == std::string::npos)
@@ -50,7 +49,7 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 				{
 					if (it_b->second == "NULL")
 					{
-						tmp = ft_clean_path_get_request(tmp); // a refaire
+						tmp = ft_clean_path_get_request(tmp);
 						it_b->second = tmp;
 						this->_header_requete[0].query_string.append(it_b->first);
 						this->_header_requete[0].query_string.append("=");
@@ -77,7 +76,7 @@ std::string			HttpServer::ft_parsing_path_get_request( void )
 **	quel server on utilise.
 **	retourne -1 si une erreur sinon retourne le numero de l'emplacement du server.
 */
-int HttpServer::ft_find_index_server( void ) // A DEPLACER
+int HttpServer::ft_find_index_server( void )
 {
 	std::string 	port_request = this->_header_requete[0].host;
 	size_t			pos = port_request.find(":");
@@ -111,22 +110,15 @@ int HttpServer::ft_find_index_server( void ) // A DEPLACER
 	return (-1);
 }
 
-
-
 int		HttpServer::ft_redirection( void )
 {
-
-	// std::cout << GREEN << "Dans ft_redirection " << CLEAR << std::endl;
 	if (this->_header_requete[0].location == true)
 	{
 		if (this->_servers[this->_num_serv].location[this->_num_loc].return_location.empty() == true)
 		{
-			// std::cout << "On a pas de  redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
 			this->_header_requete[0].return_used = false;
 			return (0);
 		}
-		// std::cout << "On a une redirection dans le bloc location : " << this->_servers[this->_num_serv].location[this->_num_loc].name_location << std::endl;
-		this->_header_requete[0].return_used = true;
 		this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size());
 		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[this->_num_loc].return_location);
 		return (1);
@@ -141,53 +133,41 @@ size_t HttpServer::check_location( std::string path, std::string name_location )
 	size_t 	i = 0;
 	(void)i;
 	(void)name_location;
-	// std::cout << "\nFonction check_location avec le path = -" << path << "-" << " dans le bloc - " << name_location << std::endl;
 
-	// On regarde si ca existe
 	struct stat buff;
 	if (stat(path.c_str(), &buff) < 0)
-	{
-		// std::cout << "existe pas " << std::endl;
-		// sleep(2);
 		return (1);
-	}
 	else if (S_ISREG(buff.st_mode))
-	{
-		// std::cout << "FICHIER donc bon" << std::endl;
 		return (0);
-	}
 	else if (S_ISDIR(buff.st_mode))
 	{
 		if (path[path.size() - 1] == '/')
 		{
-			if (this->_servers[this->_num_serv].location[this->_num_loc].index_location.empty() == false)	// if index location, return index location
+			if (this->_servers[this->_num_serv].location[this->_num_loc].index_location.empty() == false)
 			{
 				this->_header_requete[0].path.append(this->_servers[this->_num_serv].location[this->_num_loc].index_location);
 				return (0);
 			}
-			if (this->_servers[this->_num_serv].location[this->_num_loc].autoindex_location ==  true)		// if autoindex location, return autoindex location
+			if (this->_servers[this->_num_serv].location[this->_num_loc].autoindex_location ==  true)
 			{
 				this->_header_requete[0].autoindex = true;
 				return (0);
 			}
-			// Adding index of server
 			std::string tmp = this->_servers[this->_num_serv].index_server;
 			if (tmp[0] == '.')
 				tmp.erase(0, 1);
 			this->_header_requete[0].path.append(tmp);
 			return (0); 
 		}
-		return (2); // 403
+		return (2);
 	}
 	else
-		return (1); // 404
+		return (1);
 }
 
 
 size_t 	HttpServer::ft_check_access_path( void )
 {
-	// std::cout << GREEN <<  "\n\nDans verifie le droit duchemin" << CLEAR << std::endl;
-
 	if (this->_header_requete[0].path.find("/flavicon.ico") != std::string::npos)
 	{
 		if (this->_header_requete[0].path.compare("/flavicon.ico") == 0)
@@ -197,23 +177,18 @@ size_t 	HttpServer::ft_check_access_path( void )
 			this->_header_requete[0].path.append("/flavicon.ico");
 			return (0);
 		}
-		// std::cout << "404 flavicon" << std::endl;
-		// exit(1);
-		return (1); // 404
+		return (1);
 	}
 	if (this->_header_requete[0].location == false)
 	{
-		// std::cout << "pas de location donc on compare la demande avec l'acces de l'index" << std::endl;
-		// std::cout << "path = " << this->_header_requete[0].path << std::endl;
-
 		struct stat		buff_path;
-		if (this->_header_requete[0].path == "/")			// On demande l'index on retourne 0
+		if (this->_header_requete[0].path == "/")
 		{
 			this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
 			this->_header_requete[0].path.append(this->_servers[this->_num_serv].index_server);
 			if (stat(this->_header_requete[0].path.c_str(), &buff_path) < 0)
-				return (1); // 404
-			return (0); // good
+				return (1);
+			return (0);
 		}
 		std::string		path_index_server = this->_servers[this->_num_serv].index_server;
 		if (path_index_server[0] == '.')
@@ -224,28 +199,24 @@ size_t 	HttpServer::ft_check_access_path( void )
 		stat(path_index_server.c_str(), &buff_index_server);
 		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
 		if (stat(this->_header_requete[0].path.c_str(), &buff_path) < 0)
-			return (1); // 404
+			return (1);
 		if (buff_path.st_dev == buff_index_server.st_dev && buff_path.st_ino == buff_index_server.st_ino)
 			return (0);
 		else
-			return (2); // 403
+			return (2);
 	}
 	else
 	{
 		if (this->_servers[this->_num_serv].location[this->_num_loc].root_location.empty() == false)
 		{
-			// std::cout << "path = " << this->_header_requete[0].path << std::endl;
-			if (this->_servers[this->_num_serv].location[this->_num_loc].name_location != "/") // on supprime le nom du bloc location et on met le root location
+			if (this->_servers[this->_num_serv].location[this->_num_loc].name_location != "/")
 			{
 				if (this->_servers[this->_num_serv].location[this->_num_loc].name_location[this->_servers[this->_num_serv].location[this->_num_loc].name_location.size() - 1] == '/')	
 					this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size() - 1);
 				else
 					this->_header_requete[0].path.erase(0, this->_servers[this->_num_serv].location[this->_num_loc].name_location.size());
 			}
-			// std::cout << "path = " << this->_header_requete[0].path << std::endl;
 			this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].location[this->_num_loc].root_location);
-			// std::cout << "path = " << this->_header_requete[0].path << std::endl;
-			
 		}
 		this->_header_requete[0].path.insert(0, this->_servers[this->_num_serv].root_server);
 		return (this->check_location(this->_header_requete[0].path, this->_servers[this->_num_serv].location[this->_num_loc].name_location ));
@@ -253,8 +224,6 @@ size_t 	HttpServer::ft_check_access_path( void )
 	return (1);
 
 }
-
-
 
 /*
 **	find_replace and ft_clean_path get request
@@ -272,12 +241,11 @@ std::string		find_replace( std::string to_search, std::string to_replace, std::s
 	}
 	return (data);
 }
-// URL ENCODING
-std::string		HttpServer::ft_clean_path_get_request( std::string tmp )  // A TERMINER
+
+std::string		HttpServer::ft_clean_path_get_request( std::string tmp )
 {
 	std::map<std::string, std::string> url_coding;
-
-	// url_coding.insert(std::pair<std::string , std::string>("+", " ")); // space	
+	
 	url_coding.insert(std::pair<std::string , std::string>("%21", "!")); 	
 	url_coding.insert(std::pair<std::string , std::string>("%22", "\"")); 	
 	url_coding.insert(std::pair<std::string , std::string>("%23", "#")); 	
