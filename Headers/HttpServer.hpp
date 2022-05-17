@@ -146,12 +146,6 @@ class HttpServer {
 		std::string			ft_setup_header( t_header_request *requete );
 
 
-		/*
-		**
-		*/
-
-
-		void ft_test_add_client(int client_sock, struct sockaddr_in client_adr, int server_port);
 
 
 		/*	Functions used to get information from the header of a request.
@@ -162,7 +156,7 @@ class HttpServer {
 		std::string		ft_check_host_header( std::string header );
 		std::string		ft_check_pathhttp_header( std::string header );
 		std::string		ft_check_accept_header( std::string header );
-		bool			ft_check_cgi_or_php( std::string request_http );
+		bool			ft_check_cgi_or_php( void );
 		std::string		ft_check_content_length( std::string request_http );
 		std::string		ft_check_content_type( std::string request_http );
 		std::string		ft_check_body_post( std::string request_http );
@@ -170,13 +164,13 @@ class HttpServer {
 
 		size_t			ft_check_access_location( std::string path );
 
-		// std::string::iterator ft_find_end_header( std::string request_http );
+	
 
 
 		
 	void			ft_exec_cgi_test( void );
 		
-		// void			ft_exec_cgi_test( std::string request_http, int len_msg );
+
 
 		std::string		ft_parsing_path_get_request( void );
 		std::string		ft_clean_path_get_request( std::string tmp );

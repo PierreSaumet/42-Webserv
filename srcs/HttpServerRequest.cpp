@@ -129,7 +129,7 @@ size_t HttpServer::ft_post_continue( t_header_request data, std::string body)
 		
 	
 	this->_header_requete[0] = data;
-	if (this->ft_check_cgi_or_php(this->_header_requete[0].path) == 1)  // verifier cette fonction
+	if (this->ft_check_cgi_or_php() == 1)
 	{
 		this->_num_serv = data.num_server;
 		if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
@@ -290,7 +290,7 @@ size_t			HttpServer::ft_get(std::string request_http, int len_msg)
 		return (ft_do_error(405));
 	// std::cout << "path = " << this->_header_requete[0].path << std::endl;
 
-	if (this->ft_check_cgi_or_php(request_http) == 1)
+	if (this->ft_check_cgi_or_php() == 1)
 	{
 		if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
 			return (ft_do_error(500));
@@ -503,7 +503,7 @@ size_t			HttpServer::ft_post(std::string request_http, t_header_request data)
 		return (ft_do_error(100));
 	}
 
-	if (this->ft_check_cgi_or_php(request_http) == 1)  // verifier cette fonction
+	if (this->ft_check_cgi_or_php() == 1)  // verifier cette fonction
 	{
 		if (this->_servers[this->_num_serv].cgi_path_server.empty() == true)
 		{

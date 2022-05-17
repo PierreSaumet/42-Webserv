@@ -12,13 +12,14 @@
 
 #include "../Headers/HttpServer.hpp"
 
-
 /*
-**	genere un corps de error dans le fichier HttpServerResponse
+**	HttpServer::ft_setup_error_header_response( t_header_request *requete ) 
+**		This function is mostly used in the 'HttpServerResponse' file, when the request was parsed
+**	and we need to send an answer. But If there is an error at this step, before sending data.
+**	We will use this function.
 */
 void			HttpServer::ft_setup_error_header_response( t_header_request *requete ) 
 {
-	// std::cout << GREEN << "Dans ft_setup_error_header_response" << CLEAR << std::endl;
 	std::string tmp = requete->body_error;
 
 	if (requete->location == true)
@@ -41,7 +42,6 @@ void			HttpServer::ft_setup_error_header_response( t_header_request *requete )
 		}
 		requete->body_error.clear();
 		return ;
-
 	}
 	else
 	{
@@ -65,6 +65,10 @@ void			HttpServer::ft_setup_error_header_response( t_header_request *requete )
 	return ;
 }
 
+/*
+**	HttpServer::put_error_in_body( void )
+**		This function is used to put the error body setup in the conf file to the body_error variable
+*/
 void HttpServer::put_error_in_body( void )
 {
 	this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].location[this->_num_loc].root_location);
@@ -86,16 +90,15 @@ void HttpServer::put_error_in_body( void )
 }
 
 /*
-**	void		pour gerer les requete
+**	SAME as HttpServer::ft_setup_error_header_response( t_header_request *requete ) 
+**		but used during the process of parsing the request
 */
 void			HttpServer::ft_setup_error_header( void) 
 {
-	// std::cout << GREEN << "Dans ft_setup_error_header" << CLEAR << std::endl;
 	std::string tmp = this->_header_requete[0].body_error;
 
 	if (this->_header_requete[0].location == true)
 	{
-		// std::cout << "On a un path sur une location " << std::endl;
 		this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].location[this->_num_loc].root_location);
 		this->_header_requete[0].body_error.insert(0, this->_servers[this->_num_serv].root_server);
 		
@@ -104,15 +107,12 @@ void			HttpServer::ft_setup_error_header( void)
 		{
 			if (it_loc->first >= 0 && this->_header_requete[0].num_error == (size_t)it_loc->first)
 			{
-				// std::cout << "ici = this->_header_requete[0].body_error = " << this->_header_requete[0].body_error << std::endl;
 				this->_header_requete[0].body_error.append(it_loc->second);
-				// std::cout << "ici = this->_header_requete[0].body_error = " << this->_header_requete[0].body_error << std::endl;
-				struct stat buff;
+				
+				struct stat		buff;
 				stat(this->_header_requete[0].body_error.c_str(), &buff);
 				if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
 					this->_header_requete[0].body_error.append("/");
-				// std::cout << "ici = this->_header_requete[0].body_error = " << this->_header_requete[0].body_error << std::endl;
-				// std::cout << "\nplusieurs bloc location sbody error contient = " << this->_header_requete[0].body_error << std::endl;
 				return ;
 			}
 		}
@@ -120,35 +120,32 @@ void			HttpServer::ft_setup_error_header( void)
 	}
 	else
 	{
-		// std::cout << "On a un path qui ne correspond pas a une loc " << std::endl;
 		this->_header_requete[0].body_error.append(this->_servers[this->_num_serv].root_server);
-	
 		std::map<int, std::string>::iterator it = this->_servers[this->_num_serv].error_server.begin();
 		for (; it != this->_servers[this->_num_serv].error_server.end(); it++)
 		{
 			if (it->first >= 0 && this->_header_requete[0].num_error == (size_t)it->first)
 			{
 				this->_header_requete[0].body_error.append(it->second);
-				struct stat buff;
+				struct stat		buff;
 				stat(this->_header_requete[0].body_error.c_str(), &buff);
 				if (S_ISDIR(buff.st_mode) && this->_header_requete[0].body_error[this->_header_requete[0].body_error.size() -1 ] != '/')
 					this->_header_requete[0].body_error.append("/");
-				// std::cout << "\n 0 bloc location body error contient = " << this->_header_requete[0].body_error << std::endl;
 				return ;
 			}
 		}
 		this->_header_requete[0].body_error.clear();
-		// std::cout << " body error = " << this->_header_requete[0].body_error << std::endl;
 		return ;
 	}
 	return ;	
 }
 
-
-
+/*
+**	std::string		HttpServer::ft_find_error_html( t_header_request *requete )
+**		This function is used to find the error page given in the parsing and return an answer with an header and a body
+*/
 std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 {
-	// std::cout << GREEN << "\n On est dans ft_find_error_html " <<  CLEAR << std::endl;
 	std::stringstream 	ss;
 	std::string			path_error;
 	struct stat 		buff;
@@ -170,7 +167,6 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 			{
 				if (path_error.compare(0, 3, file->d_name, 0, 3) == 0)
 				{
-					// std::cout << "fichier = " << file->d_name << std::endl;
 					if (requete->body_error[requete->body_error.size() - 1] != '/')
 						requete->body_error.append("/");
 					requete->body_error.append(file->d_name);
@@ -195,7 +191,6 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 		}
 	}
 	closedir(dir);
-	
 	if (S_ISREG(buff.st_mode))
 	{
 		path_error.clear(); 
@@ -206,7 +201,7 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 		path_error.insert(0, this->ft_get_server_name());
 		path_error.insert(0, this->ft_get_date());
 		path_error.insert(0, this->ft_get_charset());
-		path_error.insert(0, this->ft_get_content_type(requete, 0)); // a changer
+		path_error.insert(0, this->ft_get_content_type(requete, 0));
 		if(requete->num_error == 405)
 			path_error.insert(0, this->ft_get_allow());
 		path_error.insert(0, this->ft_get_status(requete, true));
@@ -221,12 +216,8 @@ std::string		HttpServer::ft_find_error_html( t_header_request *requete )
 **
 **	It will creates a body and a header into a std::string and return it.
 */
-
-
 std::string		HttpServer::ft_create_error( t_header_request *requete )
 {
-	// std::cout << "\n Dans ft_create_error " << std::endl;
-
 	std::string content_length;
 	std::string error_string;
 	std::stringstream ss;
@@ -241,13 +232,10 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 	ss.str("");
 	ss.clear();
 	pos = error_string.find("by");
-	
-	
 	pos = error_string.find("by Pierre");
 	error_string.insert(pos, tmp);
 	pos = error_string.find("by Pierre");
 	error_string.insert(pos, " ");
-	
 	error_string.insert(0, this->ft_get_end_header());
 	ss << error_string.size() - 2;
 	ss >> content_length;
@@ -263,17 +251,12 @@ std::string		HttpServer::ft_create_error( t_header_request *requete )
 	error_string.insert(0, this->ft_get_status(requete, true));
 	error_string.append("\0");
 
-	
 	if (requete->num_error == 100)
 	{
 		error_string.clear();
-		// error_string.insert(0, this->ft_get_end_header());
 		error_string.insert(0, this->ft_get_server_name());
 		error_string.insert(0, this->ft_get_date());
 		error_string.insert(0, this->ft_get_status(requete, true));
-		// error_string.append("\0");
-
 	}
-	// std::cout << "error_string = " << error_string << std::endl;
 	return (error_string);
 }
