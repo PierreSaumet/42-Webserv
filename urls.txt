@@ -1,0 +1,8 @@
+127.0.0.4:4340/
+127.0.0.4:4340/media
+127.0.0.4:4340/media/
+http://127.0.0.4:4340/get_post/query_get_test.php?name=aerg&prenom=arg&message=awrg
+http://127.0.0.4:4340/get_post/query_get_test.php?
+http://127.0.0.4:4340/get_post/info.php
+http://127.0.0.4:4340/download/bison.png
+http://127.0.0.4:4340/coucou/page.html
