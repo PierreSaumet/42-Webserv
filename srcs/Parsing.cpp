@@ -32,15 +32,12 @@ Parsing::Parsing( std::string &configfile ) : _name_of_file(configfile), _nbr_se
 	{
 		if (!this->ft_check_conf_file())
 		{
-			//std::cout << "On continue" << std::endl;
 			this->_data = this->ft_get_data_container();
 			this->_nbr_servers = 0;
 			
 		}
 		if (!this->ft_check_data())
 		{
-			//std::cout << "On continue 2" << std::endl;
-			//this->put_name_server();
 			std::cout << GREEN << "Parsing is terminated" << CLEAR << std::endl;
 			this->put_name_server();
 		}

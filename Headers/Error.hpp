@@ -36,11 +36,9 @@ class Error: public std::exception
 		int get_level() const throw();
  
     protected:
-        int _number_error;               	//Numéro de l'erreur
-        std::string _line_error;            //Description de l'erreur
-        int _level_error;               	//Niveau de l'erreur
-
+        int         _number_error;
+        std::string _line_error;
+        int         _level_error;
 };
-
 
 #endif		
