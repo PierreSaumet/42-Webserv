@@ -46,19 +46,3 @@ DIRECTIVES:
 		ex:		cgi_path		./cgi;
 
 
-* Directives obligatoire actuellement 22/02/2022:
-	listen
-	root
-	server_name
-	error_page
-	dav_methods
-	index 
-	
-	
-	client_max_body_size
-	cgi_path
-	autoindex
-	rajouter index ? 
-	et peut etre garder seulement:
-	- listen root server_name error_page et dav_methods
-

@@ -496,7 +496,7 @@ int		HttpServer::ft_reading( void )
 			{
 				// A CHANGER
 				
-				// std::cout << RED << "recv return 0 ou -1 donc on ferme le client: " <<  it_b_client->client_socket << " recv =" << request_length <<  CLEAR << std::endl;
+				
 				if (request_length == 0)
 				{				
 					FD_CLR(it_b_client->client_socket, &this->_read_fs);
@@ -504,6 +504,7 @@ int		HttpServer::ft_reading( void )
 					close(it_b_client->client_socket);
 					it_b_client = this->_all_client_socket.erase(it_b_client);
 					it_b_client->recv = false;
+					
 					break ;
 				}
 				FD_CLR(it_b_client->client_socket, &this->_read_fs);
@@ -511,7 +512,7 @@ int		HttpServer::ft_reading( void )
 				close(it_b_client->client_socket);
 				it_b_client = this->_all_client_socket.erase(it_b_client);
 				it_b_client->recv = false;
-				std::cout << RED << "Client disconnect" << CLEAR << std::endl;
+				
 				break ;
 				
 				// }

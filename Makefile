@@ -17,9 +17,9 @@ NAME			= webserv
 # SRCS =========================================================================
 SRCS	= ./srcs
 
-SOURCES			+=	main.cpp		\
-					Parsing.cpp		\
-					Parsing_get_server.cpp	\
+SOURCES			+=	main.cpp					\
+					Parsing.cpp					\
+					Parsing_get_server.cpp		\
 					Parsing_get_location.cpp	\
 					Parsing_utils.cpp			\
 					HttpServer.cpp				\
